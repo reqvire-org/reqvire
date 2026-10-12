@@ -24,4 +24,3 @@ The system SHALL deliver prompts.
 #### Relations
   * specify: [Authoring Capability](Targets.md#authoring-capability)
 ---
-

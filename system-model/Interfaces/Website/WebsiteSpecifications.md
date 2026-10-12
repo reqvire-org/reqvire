@@ -41,6 +41,8 @@ Worktree and publication guidance MUST show local worktree creation from an expl
 
 The page MUST distinguish `--enable-mutations`, optional `--enable-commits`, and optional `--enable-github` with `--github-remote` defaulting to `origin`. Show standalone and embedded flag combinations, hidden publishing tools after failed gh startup checks, restart after repairing availability, and actual-operation permission errors. Examples MUST NOT suggest guaranteed write permission, implicit push/fork/merge, or automatic retries after uncertain remote outcomes. Public examples are published together with the implemented and verified tools, not as a claim that this specification alone provides them.
 
+The integration guide MUST explain the MCP-only authoring surface and conditional formatting/lint tools from the referenced interface contracts. Default discovery permits formatting preview and lint inspection; applying formatting or safe lint repair requires mutation enablement. Successful model edits already persist canonical formatting in affected documents. Show CLI migration as the recovery path for known legacy syntax before valid MCP startup, and never suggest an MCP migration or validation-bypass mode. This model contract precedes the corresponding website implementation update.
+
 #### Metadata
   * type: specification
 
@@ -53,7 +55,7 @@ The page MUST distinguish `--enable-mutations`, optional `--enable-commits`, and
 #### Details
 The user guide MUST describe shareable selection URLs for Model (including workspace mode), Traces verifications/file overviews, Thesaurus concepts, Ontologies nodes and Coverage scopes. Explain explicit-link precedence, copied URLs, reload and browser history, unavailable-selection fallback and worktree context. Describe the centered worktree-loading spinner over a dimmed, blurred retained model, atomic success, and dismissible errors returning to that model through outside click, Escape or Close before explicit retry.
 
-Workflow documentation covers CLI commands, report commands, model mutation commands, change-impact analysis, collection, coverage, traces, and advanced workflows using current command names and options.
+Workflow documentation follows the supported interface boundary: CLI inspection/reports/exports and deterministic migrations, MCP-only authoring and formatting, and MCP lint repair. Show typed MCP field names, mutation enablement, non-persisting previews and automatic canonical formatting of successful writes. Explain the intentional breaking removal of CLI CRUD, formatting and lint repair. Keep migration preview/application in CLI because invalid legacy models cannot start MCP; no pre-validation MCP endpoint exists. Retained collection, coverage, traces and change-impact examples keep their current supported output controls.
 
 Workflow examples form part of the source context for CLI and report contract changes.
 

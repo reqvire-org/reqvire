@@ -564,4 +564,4 @@ Found 9 file(s) with formatting changes:
 
 
 
-Run with --fix to apply these changes.
+Apply with MCP reqvire.format using fix: true and mutation enablement.

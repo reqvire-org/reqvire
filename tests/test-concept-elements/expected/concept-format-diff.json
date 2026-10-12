@@ -1,0 +1,312 @@
+[
+  {
+    "file_path": "specifications/FormatConceptOrder.md",
+    "lines": [
+      {
+        "color": "context",
+        "content": "    # Elements",
+        "prefix": "01"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "02"
+      },
+      {
+        "color": "context",
+        "content": "    ### Format Concept Scheme",
+        "prefix": "03"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "      * concept_base: https://example.test/format-native-concepts",
+        "prefix": "07"
+      },
+      {
+        "color": "context",
+        "content": "      * concept_prefix: formatconcept",
+        "prefix": "08"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "09"
+      },
+      {
+        "color": "red",
+        "content": "-   ### Format Parent Concept",
+        "prefix": "10"
+      },
+      {
+        "color": "green",
+        "content": "+   ### Format Child Concept",
+        "prefix": "10"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "11"
+      },
+      {
+        "color": "context",
+        "content": "    #### Metadata",
+        "prefix": "12"
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "13"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "    #### Relations",
+        "prefix": "15"
+      },
+      {
+        "color": "context",
+        "content": "      * derivedFrom: [Format Concept Scheme](#format-concept-scheme)",
+        "prefix": "16"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "17"
+      },
+      {
+        "color": "red",
+        "content": "-   ### Format Peer Concept",
+        "prefix": "18"
+      },
+      {
+        "color": "green",
+        "content": "+   ### Format Close Concept",
+        "prefix": "18"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "19"
+      },
+      {
+        "color": "context",
+        "content": "    #### Metadata",
+        "prefix": "20"
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "21"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "    #### Relations",
+        "prefix": "23"
+      },
+      {
+        "color": "context",
+        "content": "      * derivedFrom: [Format Concept Scheme](#format-concept-scheme)",
+        "prefix": "24"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "25"
+      },
+      {
+        "color": "red",
+        "content": "-   ### Format Child Concept",
+        "prefix": "26"
+      },
+      {
+        "color": "green",
+        "content": "+   ### Format Exact Concept",
+        "prefix": "26"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "27"
+      },
+      {
+        "color": "context",
+        "content": "    #### Metadata",
+        "prefix": "28"
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "29"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "40"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "41"
+      },
+      {
+        "color": "context",
+        "content": "    #### Relations",
+        "prefix": "42"
+      },
+      {
+        "color": "green",
+        "content": "+     * derivedFrom: [Format Concept Scheme](#format-concept-scheme)",
+        "prefix": "43"
+      },
+      {
+        "color": "green",
+        "content": "+     * broader: [Format Parent Concept](#format-parent-concept)",
+        "prefix": "44"
+      },
+      {
+        "color": "green",
+        "content": "+     * narrower: [Format Child Concept](#format-child-concept)",
+        "prefix": "45"
+      },
+      {
+        "color": "green",
+        "content": "+     * related: [Format Peer Concept](#format-peer-concept)",
+        "prefix": "46"
+      },
+      {
+        "color": "green",
+        "content": "+     * exactMatch: [Format Exact Concept](#format-exact-concept)",
+        "prefix": "47"
+      },
+      {
+        "color": "context",
+        "content": "      * closeMatch: [Format Close Concept](#format-close-concept)",
+        "prefix": "48"
+      },
+      {
+        "color": "red",
+        "content": "-     * exactMatch: [Format Exact Concept](#format-exact-concept)",
+        "prefix": "49"
+      },
+      {
+        "color": "red",
+        "content": "-     * related: [Format Peer Concept](#format-peer-concept)",
+        "prefix": "49"
+      },
+      {
+        "color": "red",
+        "content": "-     * narrower: [Format Child Concept](#format-child-concept)",
+        "prefix": "49"
+      },
+      {
+        "color": "red",
+        "content": "-     * broader: [Format Parent Concept](#format-parent-concept)",
+        "prefix": "49"
+      },
+      {
+        "color": "red",
+        "content": "-     * derivedFrom: [Format Concept Scheme](#format-concept-scheme)",
+        "prefix": "49"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "49"
+      },
+      {
+        "color": "red",
+        "content": "-   ### Format Exact Concept",
+        "prefix": "50"
+      },
+      {
+        "color": "green",
+        "content": "+   ### Format Parent Concept",
+        "prefix": "50"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "51"
+      },
+      {
+        "color": "context",
+        "content": "    #### Metadata",
+        "prefix": "52"
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "53"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "    #### Relations",
+        "prefix": "55"
+      },
+      {
+        "color": "context",
+        "content": "      * derivedFrom: [Format Concept Scheme](#format-concept-scheme)",
+        "prefix": "56"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "57"
+      },
+      {
+        "color": "red",
+        "content": "-   ### Format Close Concept",
+        "prefix": "58"
+      },
+      {
+        "color": "green",
+        "content": "+   ### Format Peer Concept",
+        "prefix": "58"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "59"
+      },
+      {
+        "color": "context",
+        "content": "    #### Metadata",
+        "prefix": "60"
+      },
+      {
+        "color": "context",
+        "content": "      * type: concept",
+        "prefix": "61"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      }
+    ]
+  }
+]

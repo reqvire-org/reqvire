@@ -1,5 +1,13 @@
 import { BulletList, CodeBlock, DetailGrid, Section } from "@/components/Doc";
 import { Footer } from "@/components/Footer";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function CodingAssistants() {
   return (
@@ -18,12 +26,8 @@ export default function CodingAssistants() {
         <DetailGrid
           items={[
             {
-              name: "Claude Code plugin",
-              desc: "Marketplace plugin with Reqvire skills for model analysis, requirement authoring, verification work, impact analysis, and task generation.",
-            },
-            {
-              name: "Codex skill package",
-              desc: "Installable Reqvire skills for Codex workflows, including semantic engineering, ontology authoring, and concept/thesaurus authoring guidance.",
+              name: "Agent skills",
+              desc: "One shared skill collection for Codex, Claude Code, and other supported coding assistants. Install with the skills CLI for model analysis, authoring, verification, and task generation.",
             },
             {
               name: "MCP server",
@@ -33,48 +37,67 @@ export default function CodingAssistants() {
         />
       </Section>
 
-      <Section title="Claude Code Plugin">
+      <Section title="Install Skills">
         <p className="text-zinc-600 mb-4">
-          Add the Reqvire marketplace, install the plugin, then restart Claude
-          Code. This is the default Claude Code installation path.
+          Install the shared collection from the repository's main branch.
+          The installer lets you choose skills and target agents; installation
+          is scoped to the current project by default.
         </p>
-        <CodeBlock>{`/plugin marketplace add https://github.com/reqvire-org/reqvire
-/plugin install reqvire@reqvire-org`}</CodeBlock>
+        <CodeBlock>{`npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills`}</CodeBlock>
         <p className="text-zinc-600 mt-4 mb-4">
-          Direct skill install is also available for environments that use the
-          local Claude skills folder:
+          To install all four skills globally for both Codex and Claude Code:
         </p>
-        <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-claude-skill.sh | bash`}</CodeBlock>
-        <div className="mt-4">
-          <BulletList
-            items={[
-              "Skills: syseng, audit, ontology-authoring, and concept-authoring.",
-              "The direct installer uses CLAUDE_HOME when set, otherwise it installs into ~/.claude/skills.",
-              "Use the plugin for guided model exploration, authoring, impact review, coverage analysis, ontology work, and concept/thesaurus work.",
-              "Skill workflows use the current Reqvire CLI and MCP tool surfaces instead of relying on legacy slash-command inventories.",
-            ]}
-          />
-        </div>
+        <CodeBlock>{`npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills --agent codex claude-code --skill '*' --global`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Or select one skill for a project:
+        </p>
+        <CodeBlock>{`npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills --agent codex --skill reqvire-syseng`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Rerun the same install command to refresh from main, then restart your
+          assistant. Installing skills does not start the MCP server or enable
+          model mutations.
+        </p>
+        <Dialog>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              className="mt-4 text-sm text-blue-700 underline underline-offset-4 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
+            >
+              Migrating from the Claude plugin?
+            </button>
+          </DialogTrigger>
+          <DialogContent
+            aria-labelledby="skills-migration-title"
+            aria-describedby="skills-migration-description"
+            className="bg-white text-zinc-900 max-h-[calc(100dvh-2rem)] overflow-y-auto"
+          >
+            <DialogHeader>
+              <DialogTitle id="skills-migration-title">
+                Migrate to shared skills
+              </DialogTitle>
+              <DialogDescription id="skills-migration-description">
+                The Claude marketplace plugin and custom curl installers are
+                deprecated. The shared skills replace both assistant packages.
+              </DialogDescription>
+            </DialogHeader>
+            <ol className="list-decimal pl-5 space-y-3 text-sm text-zinc-600">
+              <li>
+                In Claude Code, open <code>/plugin</code> and disable or uninstall
+                the Reqvire marketplace plugin.
+              </li>
+              <li>Install the shared skills for Claude Code:</li>
+            </ol>
+            <CodeBlock>{`npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills --agent claude-code --skill '*' --global`}</CodeBlock>
+            <p className="text-sm text-zinc-600">
+              Restart Claude Code. Skill names now use the <code>reqvire-*</code>
+              prefix, including <code>reqvire-syseng</code> and{" "}
+              <code>reqvire-audit</code>.
+            </p>
+          </DialogContent>
+        </Dialog>
       </Section>
 
-      <Section title="Codex Skills">
-        <p className="text-zinc-600 mb-4">
-          Reqvire also provides Codex skills for semantic engineering workflows.
-          They package guidance for system-model work without requiring users to
-          memorize the full CLI and ontology conventions.
-        </p>
-        <CodeBlock>{`curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-codex-skill.sh | bash`}</CodeBlock>
-        <p className="text-zinc-600 mt-4 mb-4">
-          The installer uses{" "}
-          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
-            CODEX_HOME
-          </code>{" "}
-          when set, otherwise it installs into{" "}
-          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
-            ~/.codex/skills
-          </code>
-          . Restart Codex after installing or updating skills.
-        </p>
+      <Section title="Included Skills">
         <BulletList
           items={[
             "reqvire-syseng: capability, requirement, contract, verification, traceability, and model-structure work.",

@@ -117,7 +117,12 @@ pub fn available_parallelism() -> usize {
 pub fn parallel_read(method: &str, params: &Value) -> bool {
     match method {
         "tools/call" => params["name"].as_str().is_some_and(|name| {
-            name != "reqvire.tool_contract" && crate::mcp_session::snapshot_read(name)
+            name != "reqvire.tool_contract"
+                && crate::mcp_session::snapshot_read(name)
+                && !reqvire::tool_interface::request_requires_write_tool(
+                    name,
+                    params.get("arguments"),
+                )
         }),
         "resources/read" | "prompts/get" => true,
         _ => false,

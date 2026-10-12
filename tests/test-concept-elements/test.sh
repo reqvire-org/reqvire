@@ -16,7 +16,7 @@ CONCEPT_SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type conc
 CONCEPT_SEARCH_EXIT=$?
 LINT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --json 2>&1)
 LINT_EXIT=$?
-FORMAT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format 2>&1)
+FORMAT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format 2>&1)
 FORMAT_EXIT=$?
 set -e
 
@@ -192,7 +192,7 @@ trap cleanup_invalid_concept_file EXIT
 cp "$FIXTURE_DIR/FormatConceptOrder.md.fixture" "$FORMAT_ORDER_FILE"
 
 set +e
-FORMAT_ORDER_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --json 2>&1)
+FORMAT_ORDER_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --json 2>&1)
 FORMAT_ORDER_EXIT=$?
 set -e
 
@@ -202,23 +202,13 @@ if [ $FORMAT_ORDER_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! jq -e '
-  [.diffs[]
-    | select(.file_path == "specifications/FormatConceptOrder.md")
-    | .lines[]
-    | select(.color == "green")
-    | .content] as $added
-  | ($added | index("+     * broader: [Format Parent Concept](#format-parent-concept)")) as $broader
-  | ($added | index("+     * narrower: [Format Child Concept](#format-child-concept)")) as $narrower
-  | ($added | index("+     * related: [Format Peer Concept](#format-peer-concept)")) as $related
-  | $broader != null
-    and $narrower != null
-    and $related != null
-    and $broader < $narrower
-    and $narrower < $related
-' >/dev/null 2>&1 <<< "$FORMAT_ORDER_OUTPUT"; then
-  echo "FAILED: format output should canonicalize concept relation order"
-  echo "$FORMAT_ORDER_OUTPUT"
+printf '%s\n' "$FORMAT_ORDER_OUTPUT" | jq -S '[.diffs[] | select(.file_path == "specifications/FormatConceptOrder.md")]' > "$TEST_DIR/output/concept-format-diff.json"
+if ! diff -u <(jq -S . "$TEST_DIR/expected/concept-format-diff.json") "$TEST_DIR/output/concept-format-diff.json"; then
+  echo "FAILED: concept formatting diff does not match the ranked relation fixture"
+  exit 1
+fi
+if ! diff -u "$FIXTURE_DIR/FormatConceptOrder.md.fixture" "$FORMAT_ORDER_FILE"; then
+  echo "FAILED: formatting preview changed its source fixture"
   exit 1
 fi
 

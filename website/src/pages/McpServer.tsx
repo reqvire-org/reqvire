@@ -357,9 +357,15 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
           assistant should be allowed to modify the model.
         </p>
         <CodeBlock>{`reqvire mcp --enable-mutations`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          MCP validates the model before starting. Migration remains CLI-only:
+          preview with <code>reqvire migrate</code> and apply with{" "}
+          <code>reqvire migrate --fix</code> before starting the server.
+          There is no MCP migration tool or startup mode that bypasses validation.
+        </p>
         <BulletList
           items={[
-            "Mutation mode adds add, remove, move, rename, merge, link, unlink, relink, move-asset, and remove-asset tools.",
+            "Mutation mode exposes typed CRUD, relation, file/folder, and asset tools, including their previews. It also enables format application and safe lint repair with fix: true; format preview and lint inspection remain available in read-only mode. Authored-model writes automatically format affected documents.",
             "Startup requires a clean Git worktree on a committed branch, a valid model, and Git author identity. Only one mutation-enabled MCP server may own the branch.",
             "Successful changes are validated and saved before the updated model is published. Automatic commits are off by default: HEAD and staging stay unchanged, and results omit the commit field.",
             "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",

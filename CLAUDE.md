@@ -29,7 +29,7 @@ This guide is split into domain-specific guides for better organization:
 
 ### Basic cargo Commands
 - Build: `cargo build`
-- Run specific commands: `cargo run -- format` or `./target/debug/reqvire format`
+- Run inspection commands: `cargo run -- validate` or `./target/debug/reqvire lint`
 - Test: `cargo test`
 - Test specific: `cargo test <test_name>`
 - Lint: `cargo clippy -- -D warnings`
@@ -38,12 +38,14 @@ This guide is split into domain-specific guides for better organization:
 ### Development Commands
 
 **For working with specifications, use the Reqvire skills:**
-- `reqvire:syseng` - System and requirements engineering
-- `reqvire:task-master` - Task planning from requirement changes
+- `reqvire-syseng` - System and requirements engineering
+- `reqvire-audit` - Model quality, coverage, and change-impact review
+
+Shared packages live in `skills/`; task planning is part of `reqvire-syseng`.
 
 #### Essential Development Commands
 - **Validate**: `./target/debug/reqvire validate [--json]`
-- **Format**: `./target/debug/reqvire format [--fix]`
+- **Authoring and formatting**: typed MCP tools; start `./target/debug/reqvire mcp --enable-mutations`. `reqvire.format` previews by default; `fix: true` applies formatting. Successful authored-model mutations format affected documents automatically.
 - **Search**: `./target/debug/reqvire search [--json] [--short] [--filter-*]`
 - **Serve**: `./target/debug/reqvire serve --port 8080`
 

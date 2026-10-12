@@ -1127,7 +1127,11 @@ impl GraphRegistry {
                 .map(|v| v == "true")
                 .unwrap_or(false)
         {
-            return self.single_element_file_markdown(file_path, elements[0], with_full_relations);
+            return crate::format::apply_formatting_rules(&self.single_element_file_markdown(
+                file_path,
+                elements[0],
+                with_full_relations,
+            ));
         }
 
         let mut markdown = String::new();
@@ -1164,7 +1168,7 @@ impl GraphRegistry {
             markdown.push_str("---\n\n");
         }
 
-        markdown
+        crate::format::apply_formatting_rules(&markdown)
     }
 
     /// Copies InternalPath files to the output directory

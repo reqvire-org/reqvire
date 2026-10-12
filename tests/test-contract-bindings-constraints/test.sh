@@ -327,7 +327,7 @@ rm -f "$TEST_DIR/specifications/TestReverseDirectionContractBinding.md"
 # ==================================
 
 set +e
-LINK_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req D" bindContract "Contracts.md#spec-x" 2>&1)
+LINK_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Req D" bindContract "Contracts.md#spec-x" 2>&1)
 LINK_DIRECTION_EXIT=$?
 set -e
 
@@ -366,7 +366,7 @@ Source element with contract_bindings to Spec-X.
 EOF
 
 set +e
-MERGE_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Req D" "Merge Direction Source" 2>&1)
+MERGE_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Req D" "Merge Direction Source" 2>&1)
 MERGE_DIRECTION_EXIT=$?
 set -e
 
@@ -388,7 +388,7 @@ rm -f "$TEST_DIR/specifications/TestMergeDirection.md"
 # ==================================
 
 set +e
-LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "User Req X" bindContract "Contracts.md#orphan-spec" 2>&1)
+LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "User Req X" bindContract "Contracts.md#orphan-spec" 2>&1)
 LINK_ORPHAN_EXIT=$?
 set -e
 
@@ -408,7 +408,7 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-orphan-error.txt" \
 # ==================================
 
 set +e
-LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req B" bindContract "Contracts.md#spec-1" 2>&1)
+LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Req B" bindContract "Contracts.md#spec-1" 2>&1)
 LINK_HIERARCHY_EXIT=$?
 set -e
 
@@ -448,7 +448,7 @@ Source element with contract_bindings to Spec-1.
 EOF
 
 set +e
-MERGE_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Req B" "Merge Source Element" 2>&1)
+MERGE_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Req B" "Merge Source Element" 2>&1)
 MERGE_HIERARCHY_EXIT=$?
 set -e
 
@@ -490,7 +490,7 @@ Source element with contract_bindings to orphan contract.
 EOF
 
 set +e
-MERGE_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "User Req X" "Merge Orphan Source" 2>&1)
+MERGE_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "User Req X" "Merge Orphan Source" 2>&1)
 MERGE_ORPHAN_EXIT=$?
 set -e
 

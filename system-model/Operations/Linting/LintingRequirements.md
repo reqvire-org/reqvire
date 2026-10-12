@@ -2,21 +2,18 @@
 
 ### Model Linting
 
-The system shall provide model linting capabilities to analyze model quality and detect issues in requirements relations.
+The system SHALL analyze model quality and report categorized relation findings.
 
 #### Details
-When linting the model, the system shall identify issues with model relations that may need attention.
+The system SHALL distinguish safe auto-fixable findings from findings requiring human judgment and support category filtering.
 
-When categorizing lint issues, the system shall distinguish between issues that can be automatically fixed and those requiring human judgment.
-
-When reporting lint findings, the system shall provide clear categorization to help users understand what actions are needed.
-
-When running the lint command, the system shall support both reporting mode and automatic fixing mode.
-
-When filtering lint results, the system shall allow focusing on specific categories of issues.
+When a permitted repair operation is requested, the system SHALL apply only eligible safe findings through shared model operations.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
 
 #### Relations
   * constrainedBy: [Lint Rule Metadata Shape](../../Ontologies/BehaviorValidationOperations.md#lint-rule-metadata-shape)
@@ -50,18 +47,18 @@ The system shall use this detection during lint analysis to identify and report 
 
 ### Lint Auto-fix Capability
 
-The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the `--fix` flag is used.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
+When a permitted lint repair is requested, the system SHALL apply only safe auto-fixable changes to the complete validated model candidate and preserve manual-review findings.
 
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Operation Command Contract Specification](../../ModelStructure/Specifications.md#operation-command-contract-specification)
+  * [Canonical Model Mutation Persistence Specification](../ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+
 #### Relations
   * definedBy: [Lint Auto-fix Capability Contract Specification](Specifications.md#lint-auto-fix-capability-contract-specification)
   * derivedFrom: [Model Linting](#model-linting)
-  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
 

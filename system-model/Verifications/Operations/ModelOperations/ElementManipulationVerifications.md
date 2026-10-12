@@ -2,60 +2,84 @@
 
 ### Element Mutation and File Operation Verification Objective
 
-This objective groups verification that element creation, removal, movement, renaming, linking, relinking, merging, file movement, folder movement, and ontology-aware mutations preserve model validity.
+This objective groups verification that shared element, relation, asset and file operations preserve model validity.
+
+#### Details
+Operation fixtures use typed MCP authoring requests and compare expected outputs and source trees with unified diffs. Cross-repository aggregate workspace cases exercise the transport-neutral core API; selected-worktree MCP ownership has separate protocol coverage.
 
 #### Metadata
   * type: verification-objective
 
 #### Relations
-  * derive: [Add Command Duplicate Detection Test](#add-command-duplicate-detection-test)
-  * derive: [Add Command Error Messages Test](#add-command-error-messages-test)
   * derive: [Atomic Relation Relink Test](#atomic-relation-relink-test)
-  * derive: [CLI Add Element Test](#cli-add-element-test)
-  * derive: [CLI Move Element Test](#cli-move-element-test)
-  * derive: [CLI Move File Test](#cli-move-file-test)
-  * derive: [CLI Move Folder Test](#cli-move-folder-test)
-  * derive: [CLI Remove Element Test](#cli-remove-element-test)
-  * derive: [CLI Rename Element Test](#cli-rename-element-test)
+  * derive: [Create Element Diagnostic Verification](#create-element-diagnostic-verification)
+  * derive: [Create Element Duplicate Detection Verification](#create-element-duplicate-detection-verification)
   * derive: [Create Element Override Test](#create-element-override-test)
   * derive: [Create Element Test](#create-element-test)
   * derive: [Cross-Repository Workspace CRUD Test](#cross-repository-workspace-crud-test)
   * derive: [Delete Element Test](#delete-element-test)
   * derive: [File Persistence Test](#file-persistence-test)
-  * derive: [Link Command Cross-Section Detection Test](#link-command-cross-section-detection-test)
-  * derive: [Link Command Verification](#link-command-verification)
   * derive: [Merge Elements Test](#merge-elements-test)
   * derive: [Move Element Test](#move-element-test)
   * derive: [Move File Squash Test](#move-file-squash-test)
   * derive: [Move Folder Test](#move-folder-test)
   * derive: [Ontology Boundary-Changing Mutation Test](#ontology-boundary-changing-mutation-test)
   * derive: [Relation Consistency Test](#relation-consistency-test)
+  * derive: [Relation Cross-Section Conflict Verification](#relation-cross-section-conflict-verification)
   * derive: [Target Location Validation Test](#target-location-validation-test)
-  * derive: [Unlink Command Verification](#unlink-command-verification)
   * derive: [Verification Objective Mutation Test](#verification-objective-mutation-test)
 ---
 
-### Add Command Duplicate Detection Test
+### Atomic Relation Relink Test
 
-Test verifies that the add command rejects elements with duplicate entries.
+Verify atomic relation rewiring in the shared core operation.
 
 #### Details
-Test cases:
-1. **Duplicate relations**: Add element with same relation twice -> Error
-2. **Duplicate contract_bindings**: Add element with same contract_bindings twice -> Error
-3. **Cross-section duplicate**: Add element with same target in Relations and Contract Bindings -> Error
+- Resolve the source, old target and replacement target by exact name or canonical identifier against one pre-operation snapshot.
+- Rewire one compatible relation or Contract Reference exactly once. Preserve ownership and permitted requirement-subtree boundaries.
+- Reject cycles, incompatible endpoint types, missing old edges and multi-root candidates with structured diagnostics and guidance. Preserve source bytes and the accepted model; a later valid operation succeeds.
+- Preview returns deterministic diff evidence without writes. Application validates the complete candidate and persists its semantic change atomically.
+- Match the existing relink fixtures and unified source diffs. Their evidence covers current core behavior; new canonical persistence and MCP transport acceptance remain separate plans.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
-  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-relink-command/test.sh)
+  * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
 ---
 
-### Add Command Error Messages Test
+### Canonical Mutation Persistence Verification
 
-Test verifies that the add command provides contextual error messages with examples when format parsing fails.
+Executable verification for canonical writes within model mutation transactions.
+
+#### Details
+- Use a small fixture matrix: create/override in a single-element document, relation edit in a multi-element document, move with referencing documents, and safe lint repair. Compare the complete affected source tree against expected fixture bytes with unified diffs.
+- Require default formatting preview to propose zero additional changes in every just-written document. Check reserved subsection layout, parent-before-child ordering, sorted relations, readable labels and relative links through those representative fixtures.
+- Keep an untouched model document, a binary/text evidence asset and fenced examples as preservation controls. Compare their bytes before and after; default writes must retain the authored inverse-relation subset.
+- Exercise invalid candidates and an injected persistence failure. Require unchanged source bytes, accepted model revision and subsequent read results; a valid later mutation succeeds.
+- Include semantic-contract candidates with undeclared or outside-context SHACL references, deletion or override that removes a referenced ontology declaration, and unlinking a required ontology `use` relation. Require shared semantic diagnostics with source identity, reference kind, IRI, reachable context and repair guidance; include the removed declaration source when known. Compare unchanged source files and accepted-model read results after each rejection.
+- Exercise explicit full-relation formatting as the only control that adds generated inverse declarations. Repeating it is idempotent.
+- Interface fixtures compare exact repaired and full-relations output, preserve unrelated bytes, and require default formatting to be a no-op after creation. Transaction tests reject a late invalid candidate and failed Git publication; folder-move rollback restores the source directory tree. Existing typed mutation fixtures retain semantic rejection, move and fenced-payload coverage.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-interface-boundary/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
+  * satisfiedBy: [fenced_code.py](../../../../tests/test-parsing-functionality/fenced_code.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-crud/test.sh)
+  * verify: [Canonical Model Mutation Persistence](../../../Operations/ModelOperations/ElementManipulationRequirements.md#canonical-model-mutation-persistence)
+  * verify: [CRUD Semantic Contract Mutation Validation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
+---
+
+### Create Element Diagnostic Verification
+
+Test verifies that the core create operation provides contextual error messages with examples when format parsing fails.
 
 #### Details
 **Test Cases:**
@@ -88,7 +112,7 @@ Test verifies that the add command provides contextual error messages with examp
    - Separator (---)
 
 **Success Criteria:**
-- Command exits with non-zero code for all invalid inputs
+- Core or MCP returns structured errors for all invalid inputs
 - Error messages include "Example of correctly formatted element"
 - Examples show proper structure for all subsections
 - Format guidance is specific to the error type
@@ -98,523 +122,39 @@ Test verifies that the add command provides contextual error messages with examp
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-add-command-error-messages/test.sh)
-  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
-  * verify: [Detailed Error Handling and Logging](../../../Interfaces/CLI/Commands.md#detailed-error-handling-and-logging)
+  * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * verify: [Markdown Structure Validator](../../../Operations/Validation/ValidationRequirements.md#markdown-structure-validator)
   * verify: [Validation Error Handling](../../../Operations/Validation/ValidationRequirements.md#validation-error-handling)
 ---
 
-### Atomic Relation Relink Test
+### Create Element Duplicate Detection Verification
 
-This test verifies atomic relation relink behavior, including hierarchical subgraph relinks and rollback on validation failures.
+Test verifies that the core create operation rejects elements with duplicate entries.
 
 #### Details
-
-##### Acceptance Criteria
-- Relink rewires relation targets atomically with no partial persistence on failure.
-- Hierarchical relink supports subgraph boundary use cases.
-- Candidate relink state is validated before persistence.
-- Relink rejects operations that would create circular dependencies.
-- Relink rejects operations that violate single-root ownership.
-- Relink rejects operations that violate single-root ownership with deterministic command error output.
-
-##### Test Criteria
-1. **Successful relink:**
-   - Command: `reqvire relink <source> <relation-type> <old-target> <new-target>`
-   - Relink an existing relation from old target to new target.
-   - Assert success exit code and deterministic diff output.
-
-2. **Circular dependency rejection:**
-   - Attempt relink that introduces cycle.
-   - Assert non-zero exit and no persisted changes.
-
-3. **Single-root rejection:**
-   - Attempt hierarchical relink producing multi-root ownership.
-   - Assert non-zero exit, deterministic single-root ownership error output, and no persisted changes.
-
-4. **Dry-run behavior:**
-   - Run `reqvire relink ... --dry-run`.
-   - Assert reported changes with no file persistence.
-
-5. **JSON output behavior:**
-   - Run `reqvire relink ... --dry-run --json`.
-   - Assert valid JSON using the shared CRUD result structure.
-   - Run `reqvire relink ... --dry-run --json --output <FILE>`.
-   - Assert the output file is written and contains valid JSON.
-
-The owning relink suite appends independent and combined identifier selection for source, old and new targets, including Contract Reference relinks. Compare previews with exact-name controls and unchanged physical/Git state.
+Test cases:
+1. **Duplicate relations**: Add element with same relation twice -> Error
+2. **Duplicate contract_bindings**: Add element with same contract_bindings twice -> Error
+3. **Cross-section duplicate**: Add element with same target in Relations and Contract Bindings -> Error
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-relink-command/test.sh)
-  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
-  * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
----
-
-### CLI Add Element Test
-
-The test shall verify that the `add` command creates new elements from stdin or inline string input, validates structure, inserts following Element Ordering Behavior, and outputs git-style diffs.
-
-#### Details
-**Test Setup:**
-- Prepare test model with existing files and sections
-- Prepare valid element markdown strings
-- Prepare invalid element markdown strings
-- Set up test environment with stdin/tty detection
-
-**Test Steps - Stdin Input:**
-1. Pipe element markdown to `reqvire add <file>`
-2. Verify element is read from stdin
-3. Verify element is validated and inserted
-4. Verify git-style diff is output showing changes
-5. Verify file is modified on disk
-
-**Test Steps - Content Flag:**
-1. Run `reqvire add <file> --content "### Element..."`
-2. Verify element is read from --content argument
-3. Verify element is validated and inserted
-4. Verify git-style diff is output
-
-**Test Steps - Element Ordering:**
-1. Add child element to file with existing parent
-2. Verify element is inserted following Element Ordering Behavior (parent before child)
-3. Add parent element to file with existing children
-4. Verify file is reordered with parent before children
-
-**Test Steps - Dry Run:**
-1. Run `reqvire add --dry-run <file> < element.md`
-2. Verify git-style diff is shown
-3. Verify no changes are applied to files
-
-**Test Steps - JSON Output:**
-1. Run `reqvire add --json <file> < element.md`
-2. Verify JSON output with element details
-3. Verify changes are applied
-
-**Test Steps - Validation Errors:**
-1. Provide invalid element (duplicate name, malformed)
-2. Verify error is reported
-3. Verify file is not modified
-4. Verify exit code is non-zero
-
-**Success Criteria:**
-- Reads from stdin when piped
-- Reads from --content argument when provided
-- Validates before insertion
-- Inserts following Element Ordering Behavior
-- Shows git-style diff by default
-- Supports --dry-run preview
-- Supports --json output
-- Reports validation errors
-- Returns correct exit codes
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
-  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
----
-
-### Cross-Repository Workspace CRUD Test
-
-This test verifies that graph-backed CRUD commands work across multiple eligible Git worktrees under one effective workspace root while rejecting create, move, and asset targets in non-Git workspace folders.
-
-#### Details
-**Test Setup:**
-- Create a temporary effective workspace root that is not itself a Git repository.
-- Create `repo-a` and `repo-b` as descendant eligible Git worktrees.
-- Create an ordinary `not-a-repo` folder under the same workspace root.
-- Store all model and element fixture content in fixture files, not inline shell heredocs.
-
-**Success Criteria - Cross-Repository CRUD:**
-1. `add` creates a new element in `repo-b` from fixture content and indexes it with a workspace-root-relative identifier.
-2. `mv` moves an element from `repo-a` to a target file in `repo-b` and indexes the moved element under `repo-b`.
-3. `rename` renames an element in `repo-b` and removes the old name from search results.
-4. `link` adds a relation from a `repo-b` element to a `repo-a` InternalPath target normalized as `repo-a/...`.
-5. `unlink` removes that cross-repo relation and leaves no satisfiedBy relation on the source element.
-6. `relink` replaces a `repo-b` InternalPath target with a `repo-a` InternalPath target.
-7. `merge` merges a source requirement stored in `repo-a` into a target requirement stored in `repo-b`, removes the source element, and preserves merged content on the target.
-8. `mv-file` moves a model file from `repo-a` to `repo-b`, removes the source file, creates the target file, and keeps the model valid.
-9. `mv-folder` moves a model folder subtree from `repo-a` to `repo-b`, removes the source folder, creates the target folder, and keeps the model valid.
-10. `mv-asset` moves an InternalPath asset from `repo-a` to `repo-b` and rewrites affected model references to the new workspace-root-relative path.
-11. `rm-asset` removes an InternalPath asset in `repo-b` and removes affected model references.
-12. `rm` removes an element from `repo-a` and leaves no stale indexed element.
-13. The workspace validates after the full cross-repo CRUD sequence.
-
-The `link` result MUST reload in a fresh CLI process with the exact workspace-root-relative artifact target. Its Markdown path MUST resolve from `repo-b/specifications` to the recorded `repo-a` file without an extra source-folder traversal.
-
-**Success Criteria - Non-Git Workspace Rejection:**
-1. `add` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
-2. `mv` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
-3. `mv-file` rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
-4. `mv-folder` rejects a target folder under `not-a-repo` with an error mentioning eligible Git worktrees.
-5. `mv-asset` rejects a target asset path under `not-a-repo` with an error mentioning eligible Git worktrees.
-6. Each rejected operation exits non-zero and does not create the requested target under `not-a-repo`.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-multi-workspace-crud/test.sh)
-  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
-  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
-  * verify: [CLI Move File Command](../../../Interfaces/CLI/Commands.md#cli-move-file-command)
-  * verify: [CLI Move Folder Command](../../../Interfaces/CLI/Commands.md#cli-move-folder-command)
-  * verify: [CLI Rename Element Command](../../../Interfaces/CLI/Commands.md#cli-rename-element-command)
-  * verify: [CLI Merge Element Command](../../../Interfaces/CLI/Commands.md#cli-merge-element-command)
-  * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
-  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
-  * verify: [CLI Move Asset Command](../../../Interfaces/CLI/Commands.md#cli-move-asset-command)
-  * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
-  * verify: [Target Location Validation and Auto-Creation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)
----
-
-### CLI Move Element Test
-
-The test shall verify that the `mv` command relocates elements, updates all relations, inserts following Element Ordering Behavior, and outputs git-style diffs.
-
-#### Details
-**Test Setup:**
-- Create test model with multiple files and sections
-- Create elements with incoming and outgoing relations
-- Document expected relation updates
-- Prepare target locations
-
-**Test Steps - Basic Move:**
-1. Run `reqvire mv <element-name> <target-file>`
-2. Verify element is removed from source
-3. Verify element is inserted into target following Element Ordering Behavior
-4. Verify all incoming relations are updated
-5. Verify git-style diff shows all affected files
-6. Verify identifier change is reported
-
-**Test Steps - Element Ordering:**
-1. Move child element to file with existing parent
-2. Verify element is inserted after parent (following hierarchy)
-3. Move parent element to file with existing children
-4. Verify file is reordered with parent before children
-
-**Test Steps - Dry Run:**
-1. Run `reqvire mv --dry-run <element-name> <file>`
-2. Verify git-style diff is shown for all affected files
-3. Verify no changes are applied
-4. Verify relation updates are previewed
-
-**Test Steps - JSON Output:**
-1. Run `reqvire mv --json <element-name> <file>`
-2. Verify JSON output with relation updates
-3. Verify old → new identifier mapping
-4. Verify changes are applied
-
-**Test Steps - Metadata Preservation:**
-1. Move an element whose metadata uses a custom `other-*` element type.
-2. Verify the moved Markdown preserves the exact `other-*` metadata token.
-3. Verify the moved Markdown does not serialize only the internal custom type suffix.
-
-**Test Steps - Error Cases:**
-1. Try to move non-existent element by name
-2. Try to move to invalid location
-3. Try to move with duplicate name at target
-4. Verify errors are reported
-5. Verify exit code is non-zero
-
-**Success Criteria:**
-- Moves element to target location
-- Updates all incoming relations
-- Preserves element content, metadata, and outgoing relations
-- Preserves custom `other-*` metadata tokens when rewriting moved elements
-- Inserts following Element Ordering Behavior
-- Shows git-style diff for all affected files
-- Reports identifier change
-- Supports --dry-run preview
-- Supports --json output with relation mapping
-- Reports validation and location errors
-- Returns correct exit codes
-
-The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-custom-element-types/test.sh)
-  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
----
-
-### CLI Move File Test
-
-The test shall verify that the `mv-file` command moves entire specification files with all their elements to a new location, updates all relations referencing elements in the moved file, and outputs git-style diffs.
-
-#### Details
-**Test Setup:**
-- Create test model with multiple specification files
-- Create files with multiple elements
-- Create elements in other files with relations pointing to elements in the file to be moved
-- Document expected relation updates
-- Prepare target file paths
-
-**Test Steps - Basic Move File:**
-1. Run `reqvire mv-file <source-file> <target-file>`
-2. Verify source file is removed from filesystem
-3. Verify target file is created with all elements from source
-4. Verify all elements are preserved with identical content, metadata, and relations
-5. Verify all incoming relations (from other files) are updated to reference the new file location
-6. Verify element identifiers are updated to reflect new file path
-7. Verify git-style diff shows source file deletion and target file creation
-8. Verify git-style diff shows all affected files with relation updates
-
-**Test Steps - Subdirectory Execution:**
-1. Navigate to a subdirectory of the git repository
-2. Run `reqvire mv-file specifications/File.md specifications/NewFile.md`
-3. Verify paths are resolved relative to the effective workspace root selected for the invocation
-4. Verify target file is created at `<workspace-root>/specifications/NewFile.md`
-5. Verify source file at `<workspace-root>/specifications/File.md` is removed
-6. Verify all relations are updated correctly
-
-**Test Steps - Dry Run:**
-1. Run `reqvire mv-file --dry-run <source-file> <target-file>`
-2. Verify git-style diff is shown for all affected files
-3. Verify no changes are applied to filesystem
-4. Verify relation updates are previewed
-5. Verify file move is previewed (deletion + creation)
-
-**Test Steps - JSON Output:**
-1. Run `reqvire mv-file --json <source-file> <target-file>`
-2. Verify JSON output with list of moved elements
-3. Verify old → new identifier mappings for all elements
-4. Verify list of affected files with relation updates
-5. Verify changes are applied
-
-**Test Steps - Error Cases:**
-1. Try to move non-existent source file
-2. Try to move to a target file that already exists
-3. Try to move file outside subdirectory scope when running from subdirectory
-4. Verify errors are reported clearly
-5. Verify exit code is non-zero
-6. Verify no changes are applied on error
-
-**Success Criteria:**
-- Source file is deleted from filesystem
-- Target file is created with all elements
-- All element content, metadata, and outgoing relations are preserved
-- All incoming relations are updated to new file location
-- Element identifiers are updated (file path component changes)
-- Shows git-style diff for source deletion, target creation, and all affected files
-- Paths are resolved relative to the effective workspace root selected for the invocation
-- Supports --dry-run preview
-- Supports --json output with element mappings
-- Reports errors for non-existent files and existing targets
-- Returns correct exit codes
-- Works correctly when executed from subdirectories
-
-**Test Coverage:**
-- Move file with single element
-- Move file with multiple elements
-- Move file with elements that have incoming relations from other files
-- Move file with elements that have outgoing relations to other files
-- Move file with bidirectional relations (verify/verifiedBy, derive/derivedFrom)
-- Execute from an effective workspace root
-- Execute from subdirectory (relative path resolution)
-- Dry run mode
-- JSON output mode
-- Error: non-existent source file
-- Error: target file already exists
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
-  * verify: [CLI Move File Command](../../../Interfaces/CLI/Commands.md#cli-move-file-command)
----
-
-### CLI Move Folder Test
-
-The test shall verify that the `mv-folder` command recursively moves or renames a folder subtree, updates moved element identifiers, updates path-based model references, and exposes dry-run and JSON output behavior.
-
-#### Details
-**Test Setup:**
-- Create a source folder with multiple Markdown model files, nested subfolders, and referenced local files.
-- Include elements with incoming relations from outside the moved folder.
-- Include moved contract elements referenced by contract_bindings outside the moved folder.
-- Include moved concept elements referenced through `#### Concept References` outside the moved folder.
-- Include relations and references between elements inside the moved folder.
-- Prepare a target folder path that does not exist.
-
-**Test Steps - Basic Move Folder:**
-1. Run `reqvire mv-folder <source-folder> <target-folder>`.
-2. Verify the source folder is removed from the filesystem.
-3. Verify the target folder is created with the complete recursive file subtree.
-4. Verify all moved model files, non-model files, element content, metadata, ontology blocks, and semantic-contract shapes are preserved.
-5. Verify all moved element identifiers are updated to the new folder path.
-6. Verify incoming relations from files outside the moved folder point to the new identifiers.
-7. Verify contract_bindings from files outside the moved folder point to moved contract elements at their new identifiers.
-8. Verify Concept References from files outside the moved folder point to moved concept elements at their new identifiers.
-9. Verify references between moved files remain valid after relocation.
-10. Verify model validation passes after the move.
-
-**Test Steps - Preview and JSON:**
-1. Run `reqvire mv-folder --dry-run <source-folder> <target-folder>`.
-2. Verify no filesystem changes occur.
-3. Verify preview output reports moved folders, moved files, moved element mappings, changed referencing files, and diffs.
-4. Run `reqvire mv-folder --json <source-folder> <target-folder>`.
-5. Verify JSON output includes old-to-new folder paths, file paths, element identifiers, changed references, and validation status.
-
-**Test Steps - Error Cases:**
-1. Try to move a non-existent source folder.
-2. Try to move a source path that is a file.
-3. Try to move to a target folder that already exists.
-4. Try to move a folder into one of its own descendants.
-5. Try to move outside the effective workspace root or outside all eligible Git worktrees.
-6. Verify errors are reported clearly, exit status is non-zero, and no files are changed.
-
-**Success Criteria:**
-- Recursively moves the folder subtree.
-- Preserves moved file content and model structure.
-- Updates moved element identifiers.
-- Updates relation references, contract_bindings, Concept References, and InternalPath references covered by Reqvire model semantics.
-- Preserves references within the moved subtree.
-- Supports dry-run preview and JSON output.
-- Rejects unsafe paths, collisions, file sources, recursive moves, and workspace-scope escapes.
-- Leaves the model valid after successful execution.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-folder/test.sh)
-  * verify: [CLI Move Folder Command](../../../Interfaces/CLI/Commands.md#cli-move-folder-command)
----
-
-### CLI Remove Element Test
-
-The test shall verify that the `rm` command deletes elements, removes relations, and outputs git-style diffs showing all affected files.
-
-#### Details
-**Test Setup:**
-- Create test model with multiple elements
-- Create elements with incoming relations (derivedFrom, verifiedBy, etc.)
-- Document expected relation removals
-
-**Test Steps - Basic Deletion:**
-1. Run `reqvire rm <element-name>`
-2. Verify element is deleted from file
-3. Verify all incoming relations are removed
-4. Verify git-style diff shows all affected files
-5. Verify changes are applied
-
-**Test Steps - Dry Run:**
-1. Run `reqvire rm --dry-run <element-name>`
-2. Verify git-style diff is shown
-3. Verify no changes are applied to files
-4. Verify affected files are listed
-
-**Test Steps - JSON Output:**
-1. Run `reqvire rm --json <element-name>`
-2. Verify JSON output with removed relations
-3. Verify changes are applied
-
-**Test Steps - Error Cases:**
-1. Try to remove non-existent element by name
-2. Verify error is reported
-3. Verify exit code is non-zero
-
-**Success Criteria:**
-- Deletes element from file
-- Removes all incoming relations
-- Shows git-style diff for all affected files
-- Supports --dry-run preview
-- Supports --json output with relation details
-- Reports errors for non-existent elements
-- Returns correct exit codes
-
-The owning CRUD suite appends identifier subject preview equality with the exact-name control and unchanged files/index/HEAD.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
-  * verify: [CLI Remove Element Command](../../../Interfaces/CLI/Commands.md#cli-remove-element-command)
----
-
-### CLI Rename Element Test
-
-The test shall verify that the `rename` command renames elements, updates all relations, and outputs git-style diffs.
-
-#### Details
-**Test Setup:**
-- Create test model with elements
-- Create elements with incoming and outgoing relations
-- Document expected relation updates
-
-**Test Steps - Basic Rename:**
-1. Run `reqvire rename <current-name> <new-name>`
-2. Verify element heading is updated in markdown file
-3. Verify all incoming relations are updated with new identifier
-4. Verify git-style diff shows all affected files
-5. Verify identifier change is reported (old → new)
-
-**Test Steps - Dry Run:**
-1. Run `reqvire rename --dry-run <current-name> <new-name>`
-2. Verify git-style diff is shown
-3. Verify no changes are applied
-4. Verify relation updates are previewed
-
-**Test Steps - JSON Output:**
-1. Run `reqvire rename --json <current-name> <new-name>`
-2. Verify JSON output with relation updates
-3. Verify old → new identifier mapping
-4. Verify changes are applied
-
-**Test Steps - Error Cases:**
-1. Try to rename non-existent element
-2. Try to rename to an existing element name
-3. Verify errors are reported
-4. Verify exit code is non-zero
-
-**Success Criteria:**
-- Updates element heading text
-- Updates all incoming relations
-- Preserves element content and outgoing relations
-- Shows git-style diff for all affected files
-- Reports identifier change
-- Supports --dry-run preview
-- Supports --json output
-- Reports validation errors
-- Returns correct exit codes
-
-The owning CRUD suite appends identifier subject preview/acceptance, stale identifier rejection and ambiguity-before-persistence assertions. A new name resembling an identifier remains literal.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
-  * verify: [CLI Rename Element Command](../../../Interfaces/CLI/Commands.md#cli-rename-element-command)
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
 ---
 
 ### Create Element Override Test
 
-Test verifies `add --override` behavior as asserted by the override E2E script.
+Verify shared create/override behavior against the existing override fixtures.
 
 #### Details
-Test cases:
-1. Override existing element content and assert command output contains `Updated`.
-2. Compare resulting file content to expected fixture after override.
-3. Verify model validation succeeds after successful override.
-4. Attempt duplicate add without `--override` and assert command fails.
-5. Run `--override` for a non-existent element and assert operation succeeds (acts as add).
-6. Attempt override that would orphan children and assert failure:
-   - error mentions orphaning
-   - error names `Capability B`
-   - error includes remediation guidance
-7. Override an element without children and assert success with `Updated` output.
+- Override existing content and compare the complete resulting source fixture; require the core result to identify an update and the reloaded model to validate.
+- Reject duplicate creation without override and preserve files. Override of a previously absent name acts as creation.
+- Reject an override that would orphan children. Require child names and remediation guidance in the shared error while retaining source bytes.
+- Override a childless element successfully and retain its incoming references and valid ownership.
+- Match core results and unified source diffs. Terminal status wording is renderer evidence, not a required MCP response field; protocol acceptance is planned separately.
 
 #### Metadata
   * type: test-verification
@@ -662,12 +202,12 @@ The test shall verify that new model elements can be created from a full Markdow
 
 **Test Steps - Override with Orphaned Children Prevention:**
 1. Create a parent element with child elements having parent hierarchical relations
-2. Attempt to override the parent element with `--override` flag
+2. Attempt to override the parent element with `override_existing: true`
 3. Verify the operation is rejected with clear error message
 4. Verify the error lists all children that would be orphaned
 5. Verify the error provides resolution guidance
 6. Create a parent element with children having multiple parent hierarchical relations
-7. Override the parent element with `--override` flag
+7. Override the parent element with `override_existing: true`
 8. Verify the operation succeeds (children have other parents)
 9. Override an element with no children
 10. Verify the operation succeeds
@@ -711,6 +251,50 @@ The test shall verify that new model elements can be created from a full Markdow
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
+---
+
+### Cross-Repository Workspace CRUD Test
+
+This test verifies that graph-backed CRUD commands work across multiple eligible Git worktrees under one effective workspace root while rejecting create, move, and asset targets in non-Git workspace folders.
+
+#### Details
+**Test Setup:**
+- Create a temporary effective workspace root that is not itself a Git repository.
+- Create `repo-a` and `repo-b` as descendant eligible Git worktrees.
+- Create an ordinary `not-a-repo` folder under the same workspace root.
+- Store all model and element fixture content in fixture files, not inline shell heredocs.
+
+**Success Criteria - Cross-Repository CRUD:**
+1. the shared create operation in apply mode creates a new element in `repo-b` from fixture content and indexes it with a workspace-root-relative identifier.
+2. the shared element-move operation in apply mode moves an element from `repo-a` to a target file in `repo-b` and indexes the moved element under `repo-b`.
+3. the shared rename operation in apply mode renames an element in `repo-b` and removes the old name from search results.
+4. the shared link operation in apply mode adds a relation from a `repo-b` element to a `repo-a` InternalPath target normalized as `repo-a/...`.
+5. the shared unlink operation in apply mode removes that cross-repo relation and leaves no satisfiedBy relation on the source element.
+6. the shared relink operation in apply mode replaces a `repo-b` InternalPath target with a `repo-a` InternalPath target.
+7. the shared merge operation in apply mode merges a source requirement stored in `repo-a` into a target requirement stored in `repo-b`, removes the source element, and preserves merged content on the target.
+8. the shared file-move operation in apply mode moves a model file from `repo-a` to `repo-b`, removes the source file, creates the target file, and keeps the model valid.
+9. the shared folder-move operation in apply mode moves a model folder subtree from `repo-a` to `repo-b`, removes the source folder, creates the target folder, and keeps the model valid.
+10. the shared asset-move operation in apply mode moves an InternalPath asset from `repo-a` to `repo-b` and rewrites affected model references to the new workspace-root-relative path.
+11. the shared asset-removal operation in apply mode removes an InternalPath asset in `repo-b` and removes affected model references.
+12. the shared remove operation in apply mode removes an element from `repo-a` and leaves no stale indexed element.
+13. The workspace validates after the full cross-repo CRUD sequence.
+
+The the shared link operation in apply mode result MUST reload in a fresh CLI process with the exact workspace-root-relative artifact target. Its Markdown path MUST resolve from `repo-b/specifications` to the recorded `repo-a` file without an extra source-folder traversal.
+
+**Success Criteria - Non-Git Workspace Rejection:**
+1. the shared create operation in apply mode rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+2. the shared element-move operation in apply mode rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+3. the shared file-move operation in apply mode rejects a target file under `not-a-repo` with an error mentioning eligible Git worktrees.
+4. the shared folder-move operation in apply mode rejects a target folder under `not-a-repo` with an error mentioning eligible Git worktrees.
+5. the shared asset-move operation in apply mode rejects a target asset path under `not-a-repo` with an error mentioning eligible Git worktrees.
+6. Each rejected operation returns a structured error and does not create the requested target under `not-a-repo`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-multi-workspace-crud/test.sh)
+  * verify: [Target Location Validation and Auto-Creation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)
 ---
 
 ### Delete Element Test
@@ -758,24 +342,13 @@ The test shall verify that existing model elements can be deleted, all relations
 9. Delete the last remaining parent
 10. Verify the operation is rejected (child would be orphaned)
 
-**Test Steps - Semantic Reference Deletion Prevention:**
-1. Create an ontology element that declares an ontology term.
-2. Create another semantic contract whose Shapes section references that ontology term.
-3. Attempt to delete the declaring ontology element.
-4. Verify the operation is rejected before persistence.
-5. Verify the error includes the referencing semantic-contract identifier, reference kind, missing IRI, and the removed ontology identifier.
-6. Verify the declaring ontology remains in the source file.
+**Test Steps - Native Concept Reference Deletion Prevention:**
+1. Use the concept-reference fixture containing the native Service Endpoint concept and an API requirement that references it.
+2. Attempt to remove that native concept through the shared remove operation.
+3. Require rejection identifying the referencing requirement, missing concept name and identifier, and removed declaration source.
+4. Compare the complete source file with its pre-operation snapshot using a unified diff; rejection must leave its bytes unchanged.
 
-**Test Steps - Centralized Semantic Mutation Validation:**
-1. Attempt to add a semantic contract with a Shapes reference to an undeclared IRI.
-2. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, missing IRI, and fix guidance.
-3. Attempt to add a semantic contract with a Shapes reference to an IRI declared outside its explicit ontology-use context.
-4. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, referenced IRI, declaring ontology, ontology-use context, and guidance to add an explicit `use` relation.
-5. Attempt to unlink a semantic-contract `use` relation that is required to make a semantic reference reachable.
-6. Verify `unlink` is rejected before persistence and the relation remains in the source file.
-7. Attempt to override an ontology element that declares an ontology term referenced elsewhere with replacement content that no longer declares that term.
-8. Verify `add --override` is rejected before persistence and reports the removed declaration source.
-9. Verify the original declaring ontology remains in the source file after the failed override.
+The CRUD manipulation fixture establishes ordinary removal, artifact preservation and orphan protection. The concept-reference fixture establishes native concept deletion protection. Semantic-contract fixtures and canonical transaction tests provide separate rejection and persistence evidence.
 
 **Success Criteria:**
 - Element is completely removed from the source file
@@ -790,8 +363,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Deletion of parent elements with orphaned children is rejected
 - Error message clearly lists orphaned children with resolution guidance
 - Deletion succeeds when children have other parent relations
-- Deletion that would leave dangling semantic-contract SHACL references is rejected with actionable references before files are written
-- Add, unlink, and override mutations that would leave dangling or outside-context semantic-contract SHACL references are rejected by the shared pre-persistence mutation validation
+- Deletion of a native concept still referenced by a requirement is rejected with source and target identities, removed declaration source, and unchanged source bytes
 
 **Test Coverage:**
 - Delete element with `derivedFrom` relations pointing to it
@@ -805,16 +377,13 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete parent element with children (single parent - rejected)
 - Delete parent element with children having multiple parents (allowed)
 - Error message validation for orphaned children prevention
-- Delete ontology that would leave dangling semantic references (rejected)
-- Add semantic contract with dangling semantic references (rejected)
-- Add semantic contract with outside-context semantic references (rejected)
-- Remove ontology declaration required by concept references (rejected)
-- Override ontology declaration source with replacement that drops the declaration (rejected)
+- Delete a native concept required by Concept References (rejected)
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-concept-references/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * verify: [Delete Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)
 ---
@@ -866,128 +435,9 @@ The test shall verify that element manipulation operations are persisted to sour
   * verify: [Element Manipulation File Persistence](../../../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
 ---
 
-### Link Command Cross-Section Detection Test
-
-Test verifies that link commands detect cross-section conflicts.
-
-#### Details
-Test cases:
-1. Element has contract_bindings to B -> `link A relation B` -> Error (already in Contract Bindings)
-2. Element has relation to B -> `link A bindContract B` -> Error (already in Relations)
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
-  * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
----
-
-### Link Command Verification
-
-The test shall verify that the `link` command adds relations to elements following the Relation Operations Specification.
-
-#### Details
-**Test Setup:**
-- Create test model with multiple elements of different types
-- Prepare source elements (by name and by file path)
-- Prepare target elements
-- Document valid and invalid relation type combinations
-
-**Test Steps - Basic Link:**
-1. Run `reqvire link <source-element-name> <relation-type> <target-element-name>`
-2. Verify relation entry is added to source element's Relations subsection (written to file)
-3. Verify relation format: `* <relation-type>: [target-name](target-path)`
-4. Verify target element's file does NOT contain opposite relation (opposite exists in-memory only)
-5. Verify model validates after link (confirms in-memory model is complete)
-
-**Test Steps - Source Resolution:**
-1. Link using element name as source
-2. Verify element is found by name in registry
-3. Link using internal file path as source
-4. Verify file is found first, then element resolved
-5. Link with source that matches both file and element name
-6. Verify file path takes priority over element name
-
-**Test Steps - Relations Subsection Creation:**
-1. Link to element without existing Relations subsection
-2. Verify Relations subsection is created
-3. Verify relation entry is added
-
-**Test Steps - Duplicate Detection:**
-1. Link same relation twice
-2. Verify second link fails with error
-3. Verify error message mentions 'already exists'
-4. Verify file is unchanged after failed operation
-
-**Test Steps - Dry Run:**
-1. Run `reqvire link --dry-run <source> <relation-type> <target>`
-2. Verify diff is shown
-3. Verify no changes are applied
-
-**Test Steps - JSON Output:**
-1. Run `reqvire link <source> <relation-type> <target> --dry-run --json`
-2. Verify output is valid JSON using the shared CRUD result structure
-3. Run `reqvire link <source> <relation-type> <target> --dry-run --json --output <FILE>`
-4. Verify output file is written and contains valid JSON
-
-**Test Steps - Validation:**
-1. Link with invalid relation type
-2. Verify error is reported
-3. Link with incompatible element types
-4. Verify error is reported and no relation is persisted
-5. Link to non-existent target
-6. Verify error is reported
-7. Link from non-existent source
-8. Verify error is reported
-9. Link that introduces multi-root ownership in hierarchy
-10. Verify operation is rejected with deterministic single-root ownership error output and unchanged files
-
-**Test Steps - External URL Handling:**
-1. Link with relation type (e.g., trace) to external URL
-2. Verify relation is added with URL as target
-3. Attempt to reuse external URL using 'bindContract' keyword
-4. Verify operation fails with clear error message
-5. Verify error message states that `bindContract` requires a contract element identifier target
-
-**Test Steps - Canonical Artifact Targets:**
-1. After deleting a verification from the nested artifact-link fixture, preview and apply a new `satisfiedBy` link to an existing extensionless root `NOTICE` file.
-2. Verify preview leaves files unchanged, adds only the intended `../../../NOTICE` target, and preserves existing artifact targets. Apply the link and validate the persisted model in a fresh CLI process.
-3. Through the core registry API, add a cross-repository artifact link and an extensionless root artifact link. Verify their in-memory targets remain workspace-root-relative and adding either link again rejects the duplicate.
-
-**Success Criteria:**
-- Adds relation to source element's Relations subsection (written to file)
-- Does NOT add opposite relation to target element's file (opposite exists in-memory only)
-- In-memory model is complete with bidirectional relations (verified by successful validation)
-- Creates Relations subsection if missing
-- Source resolves by file path first, then element name
-- Target must be existing element name
-- Duplicate relations/contract_bindings return error with 'already exists' message
-- Validates relation type against supported types
-- Rejects incompatible element type relations before persistence
-- Supports --dry-run preview
-- Supports --json structured output and --json --output file output
-- Reports errors for invalid inputs
-- Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output
-- External URLs allowed for relations (trace, satisfiedBy, etc.)
-- Non-identifier targets rejected for 'bindContract' with clear identifier-target error message
-
-The owning link/unlink suite appends independent and combined identifier source/target selection for relations and Contract Bindings/References. Identifier binding targets remain controls while contract names must also work.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
-  * satisfiedBy: [check_rm_artifact_links.py](../../../../tests/test-crud-manipulation/check_rm_artifact_links.py)
-  * satisfiedBy: [graph_registry.rs](../../../../crates/reqvire-core/src/graph_registry.rs)
-  * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
-  * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
----
-
 ### Merge Elements Test
 
-Test verifies that the merge command correctly combines elements.
+Test verifies that the core merge operation correctly combines elements.
 
 #### Details
 Test cases:
@@ -998,13 +448,16 @@ Test cases:
 5. **Type compatibility error**: merging incompatible types fails with type-mismatch message.
 6. **Merge into self error**: merging an element into itself fails.
 7. **Non-existent source error**: merge with missing source fails.
-8. **Dry-run mode**: `--dry-run` does not modify files.
+8. **Dry-run mode**: `dry_run: true` does not modify files.
 9. **Relation deduplication**: duplicate merged relation appears once.
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 11. **Document-to-elements rejection**: merging a source from `# Element` into a target in `# Elements` fails with explicit manual-migration guidance.
 12. **Single-root rejection**: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.
 
 The owning merge suite appends identifier selection for the target and each source member, combined selection, mixed-alias duplicate/self rejection, known wrong-type identifiers and atomic late-source rejection.
+
+
+The linked fixtures establish shared merge behavior. Typed MCP fixture execution and canonical transaction tests provide protocol and persistence evidence.
 
 #### Metadata
   * type: test-verification
@@ -1017,18 +470,18 @@ The owning merge suite appends identifier selection for the target and each sour
 
 ### Model Mutation Validation Gate Verification
 
-Representative automated verification of complete-candidate validation through CLI create, CLI override dry-run, and MCP override operations. Fixture-backed E2E assertions compare results and source files with expected output using unified diffs.
+Representative automated verification of complete-candidate validation through MCP create, MCP override dry-run, and MCP override operations. Fixture-backed E2E assertions compare results and source files with expected output using unified diffs.
 
 #### Details
 
 ##### Acceptance Criteria
 - Graph-backed mutations and supported dry runs use the shared rule contracts on candidate content, identifiers, membership, ownership, and canonical relations.
 - Invalid candidates preserve authored source bytes and the accepted graph, including changes to otherwise untouched elements affected by the mutation.
-- CLI and MCP entry points retain shared structured diagnostics, guidance, and applicable repair examples.
+- Core and MCP mutation entry points retain shared structured diagnostics, guidance, and applicable repair examples.
 
 ##### Test Criteria
-1. Start with a valid model. Submit a CLI create containing a prohibited prose link; require rejection, structured source/target context and repair guidance, and unchanged model files.
-2. Submit a CLI override dry-run containing the same violation; require rejection rather than a successful preview and preserve source files.
+1. Start with a valid model. Submit an MCP create containing a prohibited prose link; require rejection, structured source/target context and repair guidance, and unchanged model files.
+2. Submit an MCP override dry-run containing the same violation; require rejection rather than a successful preview and preserve source files.
 3. Create an otherwise valid target element that makes an untouched prose destination resolve to a model element. Require complete-candidate rejection and preservation of all source files.
 4. Submit an MCP override containing a prohibited prose link. Require shared structured guidance, unchanged source files, and preservation of the accepted model fingerprint and content.
 5. After rejected creates/overrides, submit an explicit repair with readable prose and a valid Contract Reference. Require success, match the resulting file against a checked-in expected fixture, and validate the persisted model when reloaded.
@@ -1116,72 +569,15 @@ The test shall verify that existing model elements can be moved to different loc
 
 ### Move File Squash Test
 
-The test shall verify that the `mv-file --squash` command moves all elements from a source file to an existing target file's first section, updates all relations, and removes the source file.
+Verify shared whole-file squash semantics and typed MCP move-file selection.
 
 #### Details
-**Test Setup:**
-- Create a source file with multiple elements
-- Create a target file that already exists with its own elements and sections
-- Create elements in other files with relations pointing to elements in the source file
-- Document expected relation updates and element placement
-
-**Test Steps - Squash to Existing File:**
-1. Run `reqvire mv-file --squash <source-file> <existing-target-file>`
-2. Verify source file is removed from filesystem
-3. Verify all elements from source file are added to target file's first section
-4. Verify elements from source file are appended to the first level-2 section (##) in target file
-5. Verify original target file elements remain unchanged
-6. Verify element ordering from source file is preserved when inserted
-7. Verify all element identifiers are updated to reflect new file path
-8. Verify all incoming relations (from other files) are updated to reference the new file location
-9. Verify git-style diff shows source file deletion and target file modification
-10. Verify git-style diff shows all affected files with relation updates
-
-**Test Steps - Error Without Squash Flag:**
-1. Run `reqvire mv-file <source-file> <existing-target-file>` (without --squash)
-2. Verify operation fails with clear error message
-3. Verify error message indicates target file already exists
-4. Verify no changes are applied to any files
-5. Verify exit code is non-zero
-
-**Test Steps - Squash with Dry Run:**
-1. Run `reqvire mv-file --squash --dry-run <source-file> <existing-target-file>`
-2. Verify git-style diff is shown for all affected files
-3. Verify no changes are applied to filesystem
-4. Verify preview shows elements being added to target file's first section
-
-**Test Steps - Squash with JSON Output:**
-1. Run `reqvire mv-file --squash --json <source-file> <existing-target-file>`
-2. Verify JSON output with list of moved elements
-3. Verify old → new identifier mappings for all elements
-4. Verify list of affected files with relation updates
-5. Verify changes are applied
-
-**Success Criteria:**
-- Source file is deleted from filesystem
-- All elements from source are added to target file's first section
-- Target file's existing elements remain unchanged
-- Element ordering from source file is preserved
-- All incoming relations are updated to new file location
-- Element identifiers are updated (file path component changes)
-- Shows git-style diff for source deletion, target modification, and all affected files
-- Supports --dry-run preview
-- Supports --json output with element mappings
-- Returns correct exit codes
-- Without --squash flag, existing target file causes error
-
-**Test Coverage:**
-- Squash file with single element to existing target
-- Squash file with multiple elements to existing target
-- Squash file containing ontology elements to existing target
-- Squash file with elements that have incoming relations from other files
-- Squash file with elements that have outgoing relations to other files
-- Verify elements are placed in target file's first section
-- Verify target file's existing content is preserved
-- Dry run mode with --squash
-- JSON output mode with --squash
-- Error: target file exists without --squash flag
-- Error: `mv-file --squash` target is existing `# Element` file
+- With `source_file`, an occupied `target_file` and `squash: true`, merge eligible contained elements into the existing document through the core writer; remove the emptied source file.
+- Preserve existing target/page content and fenced payloads. Apply canonical file-local hierarchy ordering rather than placement into a legacy level-2 element group.
+- Rewrite every affected identifier and incoming/outgoing relation, dependency, concept and evidence link. Structured results include moved elements, old/new identifier mappings, changed files and diffs.
+- With `squash: false`, reject an occupied destination. Reject incompatible single-element destinations, workspace paths and invalid resulting models atomically.
+- `dry_run: true` returns reviewable candidate diffs without writes. Enabled application matches the expected source fixture, validates on reload and requires no further default formatting in changed documents.
+- Retain single/multiple-element, ontology-boundary, incoming/outgoing-reference, preview and occupied-target fixture coverage. The fixture harness submits typed MCP requests; accepted source bytes and rewritten references are compared with expected files.
 
 #### Metadata
   * type: test-verification
@@ -1232,44 +628,44 @@ This test verifies ontology-aware mutation rewrites when a CRUD change crosses o
 - Deleting an ontology contribution preserves the remaining ontology boundary and keeps validation green.
 - Moving an ontology contribution preserves its inherited ontology prefix/base bindings and keeps validation green after the move.
 - Renaming an ontology contribution updates the element heading without corrupting inherited ontology bindings or validation.
-- Merging ontology blocks is rejected when it would violate the one-ontology-block-per-element structure.
+- Merging ontology elements consolidates their authored Turtle into one target Ontology block while preserving the target boundary and validation.
 - Validation passes after each successful mutation.
 
 ##### Test Criteria
 1. **Child boundary conversion**
    - Start with a root ontology and a child contribution that inherits the root base.
-   - Run `add --override` to convert the child into an explicit boundary.
+   - Run the shared create operation in override mode to convert the child into an explicit boundary.
    - Verify the child block now declares its own `ontology_base` and `ontology_prefix`.
    - Verify the child block includes the required `owl:imports` to the root ontology.
 
 2. **Grandchild boundary conversion under a bounded child**
    - Start with a bounded child ontology that imports the root ontology and a grandchild contribution derived from the child.
-   - Run `add --override` to convert the grandchild into an explicit boundary.
+   - Run the shared create operation in override mode to convert the grandchild into an explicit boundary.
    - Verify the grandchild block declares its own `ontology_base` and `ontology_prefix`.
    - Verify the grandchild block imports the child ontology base.
    - Verify the child boundary still imports the root ontology base.
 
 3. **Boundary revert**
-   - Run `add --override` to convert the grandchild boundary back into a contribution.
+   - Run the shared create operation in override mode to convert the grandchild boundary back into a contribution.
    - Verify the grandchild block no longer declares its own boundary.
    - Verify the grandchild block no longer carries a redundant cross-boundary import.
 
 4. **Ontology delete**
-   - Run `rm` on an ontology contribution.
+   - Run the shared remove operation in apply mode on an ontology contribution.
    - Verify the deleted ontology block is removed.
    - Verify the remaining ontology boundary still validates.
 
 5. **Ontology rename**
-   - Run `rename` on an ontology contribution.
+   - Run the shared rename operation in apply mode on an ontology contribution.
    - Verify the heading changes and the inherited ontology binding remains valid.
 
 6. **Ontology move**
-   - Run `mv` on an ontology contribution into a new file.
+   - Run the shared element-move operation in apply mode on an ontology contribution into a new file.
    - Verify the moved file contains the ontology contribution and the source file no longer does.
    - Verify the moved contribution keeps its inherited ontology binding.
 
 7. **Ontology merge**
-   - Run `merge` on ontology blocks and verify the target element remains a single ontology element with one `#### Ontology` block.
+   - Run the shared merge operation in apply mode on ontology blocks and verify the target element remains a single ontology element with one `#### Ontology` block.
    - Verify all source authored Turtle is rewritten to the target ontology boundary before consolidation.
    - Verify the merged result preserves the target ontology metadata and recalculates inherited prefix bindings, document declarations, `owl:imports`, and reachable SHACL references as needed.
    - Verify source ontology elements are removed after successful merge and the model still validates.
@@ -1331,6 +727,23 @@ The test shall verify that bidirectional relation consistency is maintained when
   * verify: [Relation Consistency Maintenance](../../../Operations/ModelOperations/ElementManipulationRequirements.md#relation-consistency-maintenance)
 ---
 
+### Relation Cross-Section Conflict Verification
+
+Test verifies that core link operations detect cross-section conflicts.
+
+#### Details
+Test cases:
+1. Element has contract_bindings to B -> the shared link operation in apply mode -> Error (already in Contract Bindings)
+2. Element has relation to B -> the shared link operation in apply mode -> Error (already in Relations)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Cross-Section Duplicate Validation](../../../Operations/Validation/ValidationRequirements.md#cross-section-duplicate-validation)
+---
+
 ### Target Location Validation Test
 
 The test shall verify that target file path validation and auto-creation work correctly, enforcing safety constraints for gitignore, reqvireignore, and path depth limits.
@@ -1381,108 +794,21 @@ The test shall verify that target file path validation and auto-creation work co
   * verify: [Target Location Validation and Auto-Creation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#target-location-validation-and-auto-creation)
 ---
 
-### Unlink Command Verification
-
-The test shall verify that the `unlink` command removes relations from elements following the Relation Operations Specification.
-
-#### Details
-**Test Setup:**
-- Create test model with elements having various relations
-- Prepare source elements with relations to remove
-- Document expected state after unlink
-
-**Test Steps - Unlink Scenario 1 (Default - Only Source in File):**
-1. Link creates relation on source (written to file), opposite on target (in-memory only)
-2. Run `reqvire unlink <source-element-name> <target-element-name>`
-3. Verify relation removed from source element's Relations subsection (from file)
-4. Verify target element's file unchanged (opposite was never written to file)
-5. Verify model validates after unlink
-
-**Test Steps - Unlink Scenario 2 (Both Relations in File):**
-1. Run `reqvire format --with-full-relations --fix` to write opposites to files
-2. Verify both source and target have relations in their files
-3. Run `reqvire unlink <source-element-name> <target-element-name>`
-4. Verify relation removed from source element's file
-5. Verify opposite relation also removed from target element's file
-6. Verify model validates after unlink
-
-**Test Steps - Unlink Scenario 3 (Unlinking from Opposite Side):**
-1. Setup: Only target has user-created relation in file, source has auto-generated opposite in-memory
-2. Run `reqvire unlink <source-element-name> <target-element-name>` (unlink from side with only in-memory opposite)
-3. Verify target element's user-created relation is removed from file
-4. Verify source element's in-memory opposite is removed
-5. Verify model validates after unlink
-
-**Test Steps - Source Resolution:**
-1. Unlink using element name as source
-2. Verify element is found by name in registry
-3. Unlink using internal file path as source
-4. Verify file is found first, then element resolved
-
-**Test Steps - Relations Subsection Cleanup:**
-1. Unlink last relation from element
-2. Verify Relations subsection is removed
-3. Unlink from element with multiple relations
-4. Verify only specified relation is removed, others preserved
-
-**Test Steps - Dry Run:**
-1. Run `reqvire unlink --dry-run <source> <relation-type> <target>`
-2. Verify diff is shown
-3. Verify no changes are applied
-
-**Test Steps - JSON Output:**
-1. Run `reqvire unlink <source> <target> --dry-run --json`
-2. Verify output is valid JSON using the shared CRUD result structure
-3. Run `reqvire unlink <source> <target> --dry-run --json --output <FILE>`
-4. Verify output file is written and contains valid JSON
-
-**Test Steps - Error Cases:**
-1. Unlink non-existent relation
-2. Verify error is reported
-3. Unlink from non-existent source
-4. Verify error is reported
-5. Unlink to non-existent target
-6. Verify error is reported
-
-**Success Criteria:**
-- Scenario 1: When only source has relation in file, removes from source file, target file unchanged
-- Scenario 2: When both have relations in file (after format --with-full-relations), removes from both files
-- Scenario 3: When unlinking from opposite side (only in-memory), removes user-created relation from target file
-- All scenarios: In-memory model updated correctly with both relations removed
-- Removes Relations subsection when empty
-- Source resolves by file path first, then element name
-- Target must be existing element name
-- Supports --dry-run preview
-- Supports --json structured output and --json --output file output
-- Reports errors for non-existent relations
-- Reports errors for invalid source/target
-
-The owning link/unlink suite appends name/identifier preview equality for relation and Contract Binding/Reference sources and targets with unchanged physical/Git state.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
-  * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
-  * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
----
-
 ### Verification Objective Mutation Test
 
 The test shall verify that verification-objective elements participate in verification-family hierarchy mutations while remaining separate from concrete verification evidence and verification semantics.
 
 #### Details
 Test cases:
-1. **Objective hierarchy link**: `link` permits `verification-objective` to derive from another verification-family element and persists the relation.
-2. **Objective hierarchy unlink**: `unlink` removes the objective hierarchy relation and keeps the model valid.
-3. **Concrete verification relink**: `relink` can move a concrete verification from one verification objective parent to another.
-4. **Objective move**: `mv` moves a verification objective to another file and updates incoming concrete verification `derivedFrom` relations.
-5. **Objective merge**: `merge` permits objective-to-objective merge and removes the merged source element.
-6. **Mixed merge rejection**: `merge` rejects verification-objective to concrete-verification merge as a type mismatch.
-7. **Verification relation rejection**: `link` rejects `verify` and `verifiedBy` relations involving verification-objective as the verification endpoint.
-8. **Evidence relation rejection**: `link` rejects `satisfiedBy` evidence relations from verification-objective to internal file targets.
-9. **Dry-run move**: `mv --dry-run` reports the operation without mutating source or target files.
+1. **Objective hierarchy link**: the shared link operation in apply mode permits `verification-objective` to derive from another verification-family element and persists the relation.
+2. **Objective hierarchy unlink**: the shared unlink operation in apply mode removes the objective hierarchy relation and keeps the model valid.
+3. **Concrete verification relink**: the shared relink operation in apply mode can move a concrete verification from one verification objective parent to another.
+4. **Objective move**: the shared element-move operation in apply mode moves a verification objective to another file and updates incoming concrete verification `derivedFrom` relations.
+5. **Objective merge**: the shared merge operation in apply mode permits objective-to-objective merge and removes the merged source element.
+6. **Mixed merge rejection**: the shared merge operation in apply mode rejects verification-objective to concrete-verification merge as a type mismatch.
+7. **Verification relation rejection**: the shared link operation in apply mode rejects `verify` and `verifiedBy` relations involving verification-objective as the verification endpoint.
+8. **Evidence relation rejection**: the shared link operation in apply mode rejects `satisfiedBy` evidence relations from verification-objective to internal file targets.
+9. **Dry-run move**: the shared element-move operation in preview mode reports the operation without mutating source or target files.
 
 #### Metadata
   * type: test-verification

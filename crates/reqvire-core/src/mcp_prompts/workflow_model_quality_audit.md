@@ -20,7 +20,7 @@ Audit categories:
 - Recommendations: ordered by severity, blast radius, priority/risk/owner metadata, and ease of safe correction.
 
 Cleanup rules:
-- Apply or recommend `reqvire.lint --fix` only for safe auto-fixable issues.
+- Apply `reqvire.lint` with `fix: true` only for safe auto-fixable issues and only when mutations are enabled. Preserve findings requiring semantic review.
 - Do not remove manual-review relations without explaining the trace consequence and getting user confirmation where needed.
 - Do not hide validation failures behind coverage summaries. Validation errors come first.
 - Do not count capabilities as implementation-covered requirements; capability coverage rolls up from requirements.

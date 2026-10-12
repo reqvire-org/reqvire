@@ -1,25 +1,18 @@
 use crate::mcp;
 use crate::serve;
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
-use reqvire::crud;
-use reqvire::diff::{render_crud_json, render_crud_result};
-use reqvire::element::Element;
 use reqvire::error::ReqvireError;
 use reqvire::exclusions::ExclusionSet as GlobSet;
 use reqvire::explorer_runtime;
 use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::git_commands;
-use reqvire::graph_registry::Page;
 use reqvire::migrations;
 use reqvire::operations;
 use reqvire::report;
 use reqvire::semantic_contract::{self, SemanticExportFormat, SemanticExportLayer};
-use reqvire::GraphRegistry;
 use reqvire::ModelBuildOptions;
 use reqvire::ModelManager;
-use rustc_hash::FxHashMap;
 use serde::Serialize;
-use std::path::Path;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -264,28 +257,6 @@ pub enum Commands {
         allowed_hosts: Vec<crate::mcp_http::AllowedHost>,
     },
 
-    /// Format and normalize requirements files. By default, shows preview without applying changes
-    #[clap(
-        override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix                   Apply formatting changes to files\n      --json                  Output results in JSON format\n      --output <FILE>         Save JSON output to file (requires --json)\n      --with-full-relations   Include all relations (user-created and auto-generated)"
-    )]
-    Format {
-        /// Apply formatting changes to files
-        #[clap(long, help_heading = "FORMAT OPTIONS")]
-        fix: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "FORMAT OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "FORMAT OPTIONS")]
-        output: Option<String>,
-
-        /// Include all relations (user-created and auto-generated inverse relations)
-        #[clap(long, help_heading = "FORMAT OPTIONS")]
-        with_full_relations: bool,
-    },
-
     /// Preview or apply source migrations for known model-breaking changes
     #[clap(
         override_help = "Preview or apply source migrations for known model-breaking changes. By default, shows preview without applying changes\n\nMIGRATE OPTIONS:\n      --fix              Apply migration changes to files\n      --json             Output results in JSON format\n      --output <FILE>    Save JSON output to file (requires --json)\n\nCURRENT MIGRATIONS:\n    v0.15-documents-to-element-header - rewrite legacy single-element '# Documents' headers to '# Element'\n    v0.16-verification-objective - create one shared holder verification-objective in root VerificationObjectiveMigration.md and link standalone concrete verifications from that holder with derive\n    v1.0-contract-relations - rewrite legacy contract relation names to contract relation names: refinedBy -> definedBy and refine -> define\n    v1.1-contract-bindings-section - rewrite legacy 'Reused Contract Context'/'Attachments' reserved section headings to 'Contract Bindings'\n    v1.2-concept-reference-links - rewrite legacy Concept References entries from Label: IRI to Markdown links targeting native concept elements"
@@ -414,7 +385,7 @@ pub enum Commands {
 
     /// Analyze model quality and detect issues in requirements relations
     #[clap(
-        override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Lint {
         /// Show only auto-fixable issues
@@ -425,326 +396,12 @@ pub enum Commands {
         #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "fixable")]
         auditable: bool,
 
-        /// Apply automatic fixes for auto-fixable issues
-        #[clap(long, help_heading = "LINT OPTIONS")]
-        fix: bool,
-
         /// Output results in JSON format
         #[clap(long, help_heading = "LINT OPTIONS")]
         json: bool,
 
         /// Save JSON output to file (requires --json)
         #[clap(long, value_name = "FILE", help_heading = "LINT OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Add new element to model from Markdown definition
-    #[clap(
-        override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to workspace root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument"
-    )]
-    Add {
-        /// Target file path (relative to workspace root)
-        file: String,
-
-        /// Element markdown content (alternative to stdin)
-        #[clap(long, value_name = "MARKDOWN", help_heading = "ADD OPTIONS")]
-        content: Option<String>,
-
-        /// Replace existing element with same name
-        #[clap(long = "override", help_heading = "ADD OPTIONS")]
-        override_existing: bool,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "ADD OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "ADD OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "ADD OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Remove element from model
-    #[clap(
-        override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>"
-    )]
-    Rm {
-        /// Exact element name or canonical identifier
-        element_name: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "RM OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "RM OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "RM OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Move element to different location
-    #[clap(
-        override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Exact element name or canonical identifier\n       <FILE>                   Target file path (relative to workspace root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>"
-    )]
-    Mv {
-        /// Exact element name or canonical identifier
-        element_name: String,
-
-        /// Target file path (relative to workspace root)
-        file: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "MV OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MV OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Rename element
-    #[clap(
-        override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current exact element name or canonical identifier\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>"
-    )]
-    Rename {
-        /// Current exact element name or canonical identifier
-        element_name: String,
-
-        /// New element name
-        new_name: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "RENAME OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "RENAME OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "RENAME OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Merge multiple elements into target element
-    #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target exact element name or canonical identifier (receives merged content)\n       <SOURCES>...             One or more source element names or canonical identifiers to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations, contract bindings, and contract references are merged with deduplication; mixed dependency sections are rejected\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Concrete verifications can merge into concrete verifications\n    - Verification objectives can merge only into verification objectives\n    - Contracts can merge into contracts (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
-    )]
-    Merge {
-        /// Target exact element name or canonical identifier (receives merged content)
-        target: String,
-
-        /// One or more source element names or canonical identifiers to merge into target
-        #[clap(required = true, num_args = 1..)]
-        sources: Vec<String>,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "MERGE OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MERGE OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "MERGE OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Move entire specification file with all its elements
-    #[clap(
-        name = "mv-file",
-        override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --squash                  Move all elements to target file's first section (if target exists)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>\n    reqvire mv-file <source-file> <target-file> --squash"
-    )]
-    MvFile {
-        /// Source file path (relative to current working directory)
-        source_file: String,
-
-        /// Target file path (relative to current working directory)
-        target_file: String,
-
-        /// Move all elements to target file's first section (if target exists)
-        #[clap(long, help_heading = "MV-FILE OPTIONS")]
-        squash: bool,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "MV-FILE OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MV-FILE OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "MV-FILE OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Move or rename an entire folder subtree
-    #[clap(
-        name = "mv-folder",
-        override_help = "Move or rename an entire folder subtree\n\nMV-FOLDER OPTIONS:\n       <SOURCE_FOLDER>          Source folder path (relative to current working directory)\n       <TARGET_FOLDER>          Target folder path (relative to current working directory)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-folder <source-folder> <target-folder>"
-    )]
-    MvFolder {
-        /// Source folder path (relative to current working directory)
-        source_folder: String,
-
-        /// Target folder path (relative to current working directory)
-        target_folder: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "MV-FOLDER OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MV-FOLDER OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "MV-FOLDER OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Add relation, contract binding, or contract reference between elements
-    #[clap(
-        name = "link",
-        override_help = "Add relation, contract binding, or contract reference between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>           Relation type, bindContract, or referenceContract\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    define        - Source contract element defines a requirement\n    definedBy     - Source requirement owns a compatible contract element\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    broader       - Source concept has a broader concept\n    narrower      - Source concept has a narrower concept\n    related       - Source concept is related to another concept\n    exactMatch    - Source concept exactly matches an external concept IRI or concept element\n    closeMatch    - Source concept closely matches an external concept IRI or concept element\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by concrete verification\n    verify        - Source concrete verification verifies a requirement\n\nCONTRACT BINDINGS:\n    Use 'bindContract' keyword to bind compatible requirement-owned contract elements\n\nCONTRACT REFERENCES:\n    Use 'referenceContract' for a contract content dependency used by change impact.\n    A requirement may use Contract Bindings or Contract References, never both.\n\nTARGET TYPES:\n    For referenceContract: requirement-owned contract element name or identifier\n    For relations: exact element name or canonical identifier, internal file path, or external URL (http/https)\n    For bindContract: requirement may reuse compatible requirement-owned source, constraint, behavior, specification, state, or input-output contract element names or identifiers (file.md#element-id or #element-id). Non-ontology prose uses Concept References; structural ontology uses reqvire:mapsToConcept; semantic contracts use use/usedBy.\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" definedBy \"Invoice Numbering Specification\"\n    reqvire link \"Invoice Numbering Specification\" define \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Traceability\" broader \"Engineering Knowledge\"\n    reqvire link \"Traceability\" related \"Verification Evidence\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"System Requirement\" bindContract \"constraints.md#latency-limit\""
-    )]
-    Link {
-        /// Source exact element name or canonical identifier
-        source: String,
-
-        /// Relation type, 'bindContract', or 'referenceContract'.
-        /// Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify.
-        /// Use 'bindContract' to reuse compatible requirement-owned contract elements
-        relation_type: String,
-
-        /// Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
-        target: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "LINK OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "LINK OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "LINK OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Remove relation, contract binding, or contract reference between elements (auto-detects type)
-    #[clap(
-        name = "unlink",
-        override_help = "Remove relation, contract binding, or contract reference between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <TARGET>                 Target element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Detects relations, Contract Bindings, and Contract References.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
-    )]
-    Unlink {
-        /// Source exact element name or canonical identifier
-        source: String,
-
-        /// Target element name or canonical identifier, file path, or URL
-        target: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "UNLINK OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "UNLINK OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "UNLINK OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Replace an existing relation target with a new target in one operation
-    #[clap(
-        name = "relink",
-        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source exact element name or canonical identifier\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL\n       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
-    )]
-    Relink {
-        /// Source exact element name or canonical identifier
-        source: String,
-
-        /// Relation type to preserve
-        relation_type: String,
-
-        /// Existing target to replace: element name or canonical identifier, file path, or URL
-        from_target: String,
-
-        /// Replacement element name or canonical identifier, file path, or URL
-        to_target: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "RELINK OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "RELINK OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "RELINK OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Move/rename asset file and update all references (Contract Bindings and Relations)
-    #[clap(
-        name = "mv-asset",
-        override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf"
-    )]
-    MvAsset {
-        /// Current file path
-        old_path: String,
-
-        /// New file path
-        new_path: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "MV-ASSET OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "MV-ASSET OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "MV-ASSET OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Remove asset file and remove all references (Contract Bindings and Relations)
-    #[clap(
-        name = "rm-asset",
-        override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf"
-    )]
-    RmAsset {
-        /// Path to file to remove
-        file_path: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "RM-ASSET OPTIONS")]
-        dry_run: bool,
-
-        /// Output results in JSON format
-        #[clap(long, help_heading = "RM-ASSET OPTIONS")]
-        json: bool,
-
-        /// Save JSON output to file (requires --json)
-        #[clap(long, value_name = "FILE", help_heading = "RM-ASSET OPTIONS")]
         output: Option<String>,
     },
 
@@ -859,14 +516,6 @@ pub enum Commands {
         #[clap(long, value_name = "FILE", help_heading = "COLLECT OPTIONS")]
         output: Option<String>,
     },
-
-    /// Interactive shell for GraphRegistry operations (undocumented)
-    #[clap(hide = true)]
-    Shell,
-
-    /// Single output stream for all pages, sections, and requirements (undocumented)
-    #[clap(hide = true)]
-    Sout,
 }
 
 #[derive(Subcommand, Debug)]
@@ -973,7 +622,42 @@ impl Args {
             print_custom_help(&cmd);
             std::process::exit(0);
         }
-        Self::parse()
+        match Self::try_parse_from(&args) {
+            Ok(args) => args,
+            Err(error) => {
+                use clap::error::{ContextKind, ContextValue};
+                let replacement = match error.get(ContextKind::InvalidSubcommand) {
+                    Some(ContextValue::String(command)) => match command.as_str() {
+                        "add" => Some("reqvire.add_element"),
+                        "rm" => Some("reqvire.remove_element"),
+                        "mv" => Some("reqvire.move_element"),
+                        "rename" => Some("reqvire.rename_element"),
+                        "merge" => Some("reqvire.merge_elements"),
+                        "mv-file" => Some("reqvire.move_file"),
+                        "mv-folder" => Some("reqvire.move_folder"),
+                        "link" => Some("reqvire.link"),
+                        "unlink" => Some("reqvire.unlink"),
+                        "relink" => Some("reqvire.relink"),
+                        "mv-asset" => Some("reqvire.move_asset"),
+                        "rm-asset" => Some("reqvire.remove_asset"),
+                        "format" => Some("reqvire.format"),
+                        _ => None,
+                    },
+                    _ => match error.get(ContextKind::InvalidArg) {
+                        Some(ContextValue::String(argument))
+                            if argument == "--fix" && args.iter().any(|arg| arg == "lint") =>
+                        {
+                            Some("reqvire.lint")
+                        }
+                        _ => None,
+                    },
+                };
+                if let Some(tool) = replacement {
+                    eprintln!("Use the typed MCP tool `{tool}` for this operation. Start `reqvire mcp --enable-mutations` for authoring and repair, including CRUD dry-run previews. MCP format preview and lint inspection work without mutation enablement; applying format or lint fixes requires `fix: true`. Use CLI `migrate` for source upgrades.");
+                }
+                error.exit()
+            }
+        }
     }
 
     pub fn print_help() {
@@ -1231,7 +915,6 @@ pub(crate) const fn wants_json(args: &Args) -> bool {
             | QueryCommands::Export { json, .. }
             | QueryCommands::Check { json, .. } => *json,
         },
-        Some(Commands::Format { json, .. }) => *json,
         Some(Commands::Migrate { json, .. }) => *json,
         Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
@@ -1241,18 +924,6 @@ pub(crate) const fn wants_json(args: &Args) -> bool {
         Some(Commands::Model { .. }) => true,
         Some(Commands::Lint { json, .. }) => *json,
         Some(Commands::Submodels { json, .. }) => *json,
-        Some(Commands::Link { json, .. }) => *json,
-        Some(Commands::Unlink { json, .. }) => *json,
-        Some(Commands::Relink { json, .. }) => *json,
-        Some(Commands::Add { json, .. })
-        | Some(Commands::Rm { json, .. })
-        | Some(Commands::Mv { json, .. })
-        | Some(Commands::Rename { json, .. })
-        | Some(Commands::Merge { json, .. })
-        | Some(Commands::MvFile { json, .. })
-        | Some(Commands::MvFolder { json, .. }) => *json,
-        Some(Commands::MvAsset { json, .. }) => *json,
-        Some(Commands::RmAsset { json, .. }) => *json,
         Some(Commands::Containment { .. }) => true,
         Some(Commands::Resources { .. }) => true,
         Some(Commands::Concepts {
@@ -1312,7 +983,6 @@ pub async fn handle_command(
     // Check before model parsing so we can fail fast with a clear error
     if let Some(ref cmd) = args.command {
         let (has_output, has_json) = match cmd {
-            Commands::Format { output, json, .. } => (output.is_some(), *json),
             Commands::Migrate { output, json, .. } => (output.is_some(), *json),
             Commands::Validate { output, json, .. } => (output.is_some(), *json),
             Commands::Search(search) => (search.output.is_some(), search.json),
@@ -1321,17 +991,6 @@ pub async fn handle_command(
             Commands::Coverage { output, json, .. } => (output.is_some(), *json),
             Commands::Model { output, .. } => (output.is_some(), true),
             Commands::Lint { output, json, .. } => (output.is_some(), *json),
-            Commands::Add { output, json, .. } => (output.is_some(), *json),
-            Commands::Rm { output, json, .. } => (output.is_some(), *json),
-            Commands::Mv { output, json, .. } => (output.is_some(), *json),
-            Commands::Rename { output, json, .. } => (output.is_some(), *json),
-            Commands::Merge { output, json, .. } => (output.is_some(), *json),
-            Commands::MvFile { output, json, .. } => (output.is_some(), *json),
-            Commands::Link { output, json, .. } => (output.is_some(), *json),
-            Commands::Unlink { output, json, .. } => (output.is_some(), *json),
-            Commands::Relink { output, json, .. } => (output.is_some(), *json),
-            Commands::MvAsset { output, json, .. } => (output.is_some(), *json),
-            Commands::RmAsset { output, json, .. } => (output.is_some(), *json),
             Commands::Containment { output, .. } => (output.is_some(), true),
             Commands::Resources { output, .. } => (output.is_some(), true),
             Commands::Ontologies { .. } => (false, false),
@@ -1408,9 +1067,6 @@ pub async fn handle_command(
         .await
         .map(|_| 0);
     }
-
-    // Get current working directory once at the start
-    let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
 
     let mut model_manager = ModelManager::new();
     let is_lint_command = matches!(args.command, Some(Commands::Lint { .. }));
@@ -1599,24 +1255,6 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Format {
-            fix,
-            json,
-            output,
-            with_full_relations,
-        }) => {
-            // Default is dry-run mode (preview only), --fix flag applies changes
-            let format_result =
-                operations::format_diff(&model_manager.graph_registry, fix, with_full_relations)?;
-
-            if json {
-                let json_str = render_diff_json(&format_result);
-                handle_json_output(&json_str, &output)?;
-            } else {
-                render_diff(&format_result);
-            }
-            Ok(0)
-        }
         Some(Commands::Migrate { fix, json, output }) => {
             let dry_run = !fix;
             let (documents_summary, documents_diffs) =
@@ -1779,72 +1417,15 @@ pub async fn handle_command(
         Some(Commands::Lint {
             fixable,
             auditable,
-            fix,
             json,
             output,
         }) => {
-            // Run lint analysis
-            let lint_report = operations::lint_report(&model_manager.graph_registry);
-
-            if fix {
-                // Apply automatic fixes
-                match lint_report.apply_fixes(&mut model_manager.graph_registry) {
-                    Ok(relations_removed) => {
-                        if relations_removed > 0 {
-                            // Rewrite all files with updated relations (use default relations, not full)
-                            let format_result =
-                                format_files(&model_manager.graph_registry, false, false)?;
-
-                            if !json {
-                                println!(
-                                    "✅ Fixed {} redundant verify relation(s)\n",
-                                    relations_removed
-                                );
-                                println!(
-                                    "Formatted {} file(s) with removed relations.\n",
-                                    format_result.files_changed
-                                );
-                            }
-
-                            // Show remaining issues that need manual review
-                            if !lint_report.needs_manual_review.is_empty() {
-                                if json {
-                                    handle_json_output(
-                                        &lint_report.to_json_string(false, true),
-                                        &output,
-                                    )?;
-                                } else {
-                                    lint_report.print(false, false, true);
-                                }
-                            }
-                        } else {
-                            if !json {
-                                println!("No auto-fixable issues found.\n");
-                            }
-                            if json {
-                                handle_json_output(
-                                    &lint_report.to_json_string(fixable, auditable),
-                                    &output,
-                                )?;
-                            } else {
-                                lint_report.print(false, fixable, auditable);
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("❌ Failed to apply fixes: {}", e);
-                        return Ok(1);
-                    }
-                }
+            let report = operations::lint_report(&model_manager.graph_registry);
+            if json {
+                handle_json_output(&report.to_json_string(fixable, auditable), &output)?;
             } else {
-                // Just print the report based on flags
-                if json {
-                    handle_json_output(&lint_report.to_json_string(fixable, auditable), &output)?;
-                } else {
-                    lint_report.print(false, fixable, auditable);
-                }
+                report.print(false, fixable, auditable);
             }
-
             Ok(0)
         }
         Some(Commands::Export { output }) => {
@@ -1856,364 +1437,6 @@ pub async fn handle_command(
             explorer_runtime::export_to_dir(&explorer_assets, output_dir)?;
 
             println!("Exported Explorer site to: {}", output_dir.display());
-            Ok(0)
-        }
-        Some(Commands::Add {
-            file,
-            content,
-            override_existing,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Use --content if provided, otherwise read from stdin
-            let element_markdown = if let Some(content_str) = content {
-                content_str
-            } else {
-                use std::io::Read;
-                let mut stdin_content = String::new();
-                std::io::stdin().read_to_string(&mut stdin_content)?;
-                stdin_content
-            };
-
-            if element_markdown.trim().is_empty() {
-                return Err(ReqvireError::ProcessError(
-                    "Element markdown is empty. Provide content via --content or pipe to stdin."
-                        .to_string(),
-                ));
-            }
-
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::add_element(
-                &mut model_manager,
-                &element_markdown,
-                &file,
-                excluded_filename_patterns,
-                &current_dir,
-                &workspace_root,
-                dry_run,
-                override_existing,
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::Rm {
-            element_name,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Resolve element name to identifier
-            let element_id = model_manager
-                .graph_registry
-                .select_element(element_name.trim(), "rm element_name")?
-                .identifier
-                .clone();
-
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result =
-                crud::remove_element(&mut model_manager, &element_id, &workspace_root, dry_run)?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::Mv {
-            element_name,
-            file,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Resolve element name to identifier
-            let element_id = model_manager
-                .graph_registry
-                .select_element(element_name.trim(), "mv element_name")?
-                .identifier
-                .clone();
-
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::move_element(
-                &mut model_manager,
-                &element_id,
-                &file,
-                excluded_filename_patterns,
-                &current_dir,
-                &workspace_root,
-                dry_run,
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::Rename {
-            element_name,
-            new_name,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Resolve element name to identifier
-            let element_id = model_manager
-                .graph_registry
-                .select_element(element_name.trim(), "rename element_name")?
-                .identifier
-                .clone();
-
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::rename_element(
-                &mut model_manager,
-                &element_id,
-                &new_name,
-                &workspace_root,
-                dry_run,
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::Merge {
-            target,
-            sources,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::merge_elements(
-                &mut model_manager,
-                &target,
-                &sources,
-                &workspace_root,
-                dry_run,
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::MvFile {
-            source_file,
-            target_file,
-            squash,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::move_file(
-                &mut model_manager,
-                &source_file,
-                &target_file,
-                excluded_filename_patterns,
-                &current_dir,
-                &workspace_root,
-                crud::MoveFileOptions { dry_run, squash },
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::MvFolder {
-            source_folder,
-            target_folder,
-            dry_run,
-            json,
-            output,
-        }) => {
-            // Call CRUD operation
-            let workspace_root = current_dir.clone();
-            let result = crud::move_folder(
-                &mut model_manager,
-                &source_folder,
-                &target_folder,
-                &current_dir,
-                &workspace_root,
-                dry_run,
-            )?;
-
-            // Output result
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-
-            Ok(0)
-        }
-        Some(Commands::Link {
-            source,
-            relation_type,
-            target,
-            dry_run,
-            json,
-            output,
-        }) => {
-            let workspace_root = current_dir.clone();
-
-            // Check if relation_type is 'bindContract' - special keyword for contract_bindings
-            let result = if relation_type == "bindContract" {
-                // External URLs are not allowed for contract_bindings
-                if reqvire::utils::is_external_url(&target) {
-                    return Err(ReqvireError::ProcessError(
-                        "External URLs cannot be reused as contract context. Use a semantically specific relation only when the URL is valid evidence for that relation."
-                            .to_string(),
-                    ));
-                }
-
-                reqvire::crud::reuse_contract_element_identifier(
-                    &mut model_manager,
-                    &source,
-                    &target,
-                    &workspace_root,
-                    dry_run,
-                )?
-            } else {
-                // Regular relation link
-                reqvire::crud::link(
-                    &mut model_manager,
-                    &source,
-                    &relation_type,
-                    &target,
-                    &workspace_root,
-                    dry_run,
-                )?
-            };
-
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-            Ok(0)
-        }
-        Some(Commands::Unlink {
-            source,
-            target,
-            dry_run,
-            json,
-            output,
-        }) => {
-            let workspace_root = current_dir.clone();
-            let result = reqvire::crud::unlink(
-                &mut model_manager,
-                &source,
-                &target,
-                &workspace_root,
-                dry_run,
-            )?;
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-            Ok(0)
-        }
-        Some(Commands::Relink {
-            source,
-            relation_type,
-            from_target,
-            to_target,
-            dry_run,
-            json,
-            output,
-        }) => {
-            let workspace_root = current_dir.clone();
-            let result = reqvire::crud::relink(
-                &mut model_manager,
-                &source,
-                &relation_type,
-                &from_target,
-                &to_target,
-                &workspace_root,
-                dry_run,
-            )?;
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-            Ok(0)
-        }
-        Some(Commands::MvAsset {
-            old_path,
-            new_path,
-            dry_run,
-            json,
-            output,
-        }) => {
-            let workspace_root = current_dir.clone();
-            let result = reqvire::crud::mv_asset(
-                &mut model_manager,
-                &old_path,
-                &new_path,
-                &workspace_root,
-                dry_run,
-            )?;
-
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
-            Ok(0)
-        }
-        Some(Commands::RmAsset {
-            file_path,
-            dry_run,
-            json,
-            output,
-        }) => {
-            let workspace_root = current_dir.clone();
-            let result =
-                reqvire::crud::rm_asset(&mut model_manager, &file_path, &workspace_root, dry_run)?;
-
-            if json {
-                handle_json_output(&render_crud_json(&result), &output)?;
-            } else {
-                render_crud_result(&result);
-            }
             Ok(0)
         }
         Some(Commands::Containment { output, short }) => {
@@ -2367,14 +1590,6 @@ pub async fn handle_command(
             }
             Ok(0)
         }
-        Some(Commands::Shell) => {
-            run_shell(&mut model_manager)?;
-            Ok(0)
-        }
-        Some(Commands::Sout) => {
-            run_sout(&model_manager.graph_registry)?;
-            Ok(0)
-        }
         Some(Commands::Mcp { .. } | Commands::Serve { .. }) => {
             unreachable!("Server commands are handled before model parsing")
         }
@@ -2382,502 +1597,6 @@ pub async fn handle_command(
             // This case is handled at the beginning of handle_command
             unreachable!("Command is None but should have been handled earlier");
         }
-    }
-}
-
-fn run_sout(graph_registry: &GraphRegistry) -> Result<(), ReqvireError> {
-    use std::collections::BTreeMap;
-
-    // Collect all file paths from pages and elements
-    let mut file_map: BTreeMap<String, (Option<&Page>, Vec<&Element>)> = BTreeMap::new();
-
-    // Collect pages
-    for (file_path, page) in &graph_registry.pages {
-        file_map.entry(file_path.clone()).or_default().0 = Some(page);
-    }
-
-    // Collect elements grouped by file
-    for element_node in graph_registry.nodes.values() {
-        let element = &element_node.element;
-        file_map
-            .entry(element.file_path.clone())
-            .or_default()
-            .1
-            .push(element);
-    }
-
-    // Output content for each file in sorted order
-    for (file_path, (page, mut elements)) in file_map {
-        println!("File: {}", file_path);
-        println!();
-
-        // Output page content if exists
-        if let Some(page) = page {
-            if !page.frontmatter_content.trim().is_empty() {
-                println!("{}", page.frontmatter_content);
-                println!();
-            }
-        }
-
-        // Sort elements by file_order_index for consistent ordering
-        elements.sort_by_key(|e| e.file_order_index);
-
-        // Output elements
-        for element in elements {
-            println!("### {}", element.name);
-            println!();
-            if !element.content.trim().is_empty() {
-                println!("{}", element.content);
-                println!();
-            }
-
-            // Output metadata if exists
-            if !element.metadata.is_empty() {
-                println!("#### Metadata");
-                for (key, value) in &element.metadata {
-                    println!("  * {}: {}", key, value);
-                }
-                println!();
-            }
-
-            // Output relations if exists
-            if !element.relations.is_empty() {
-                println!("#### Relations");
-                for relation in &element.relations {
-                    println!(
-                        "  * {}: [{}]({})",
-                        relation.relation_type.name,
-                        relation.target.text,
-                        relation.target.link.as_str()
-                    );
-                }
-                println!();
-            }
-
-            println!("---");
-            println!();
-        }
-
-        // Add separator between files
-        println!();
-        println!();
-    }
-
-    Ok(())
-}
-
-fn run_shell(model_manager: &mut ModelManager) -> Result<(), ReqvireError> {
-    use std::io::{self, Write};
-
-    println!("Reqvire Interactive Shell");
-    println!("Type 'help' for available commands, 'exit' to quit");
-    println!();
-
-    // Use the existing graph registry from the model manager
-    let graph_registry = &mut model_manager.graph_registry;
-
-    loop {
-        print!("reqvire> ");
-        io::stdout().flush().expect("unexpected error");
-
-        let mut input = String::new();
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                let input = input.trim();
-                if input.is_empty() {
-                    continue;
-                }
-
-                match input {
-                    "exit" | "quit" => {
-                        println!("Goodbye!");
-                        break;
-                    }
-                    "help" => {
-                        print_shell_help();
-                    }
-                    _ => {
-                        if let Err(e) = process_shell_command(graph_registry, input) {
-                            eprintln!("Error: {}", e);
-                        }
-                    }
-                }
-            }
-            Err(error) => {
-                eprintln!("Error reading input: {}", error);
-                break;
-            }
-        }
-    }
-
-    Ok(())
-}
-
-fn print_shell_help() {
-    println!("Available commands:");
-    println!("  help                                        - Show this help message");
-    println!("  exit, quit                                  - Exit the shell");
-    println!(
-        "  list-elements [filter]                     - List all elements or filter by pattern"
-    );
-    println!(
-        "  show-element <element_id>                  - Show detailed information about an element"
-    );
-    println!("  move-element <element_id> <file> <section> - Move element to existing location");
-    println!("  create-section <file> <section>            - Create new section in existing file");
-    println!("  create-file <file> <section>               - Create new file with section");
-    println!(
-        "  list-locations                             - Show all available file/section locations"
-    );
-    println!("  get-move-impact <element_id>               - Show elements affected by moving an element");
-    println!(
-        "  impact-tree <element_id>                   - Show change impact tree for an element"
-    );
-    println!("  flush <output_dir>                         - Flush all changes to directory");
-    println!("  flush-files <file1,file2,...> <output_dir> - Flush specific files to directory");
-    println!("  stats                                       - Show registry statistics");
-    println!();
-    println!("  Dynamic Graph Management:");
-    println!("  add-element <id> <name> <file> [section]   - Add new element to graph");
-    println!("  remove-element <element_id>                - Remove element from graph");
-    println!("  add-relation <source> <target> <type>      - Add relation between elements");
-    println!("  remove-relation <source> <target> <type>   - Remove relation between elements");
-    println!("  graph-stats                                 - Show graph statistics");
-    println!();
-}
-
-fn process_shell_command(
-    graph_registry: &mut GraphRegistry,
-    command: &str,
-) -> Result<(), ReqvireError> {
-    let parts: Vec<&str> = command.split_whitespace().collect();
-    if parts.is_empty() {
-        return Ok(());
-    }
-
-    match parts[0] {
-        "list-elements" => {
-            let filter = parts.get(1).unwrap_or(&"");
-            let elements = graph_registry.get_all_elements();
-            let filtered: Vec<_> = if filter.is_empty() {
-                elements
-            } else {
-                elements
-                    .into_iter()
-                    .filter(|elem| elem.identifier.contains(filter) || elem.name.contains(filter))
-                    .collect()
-            };
-
-            println!("Found {} elements:", filtered.len());
-            for element in filtered {
-                println!(
-                    "  {} ({:?}): {}",
-                    element.identifier, element.element_type, element.name
-                );
-            }
-        }
-        "show-element" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: show-element <element_id>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-            if let Some(element) = graph_registry.get_element(element_id) {
-                println!("Element ID: {}", element.identifier);
-                println!("Name: {}", element.name);
-                println!("Type: {:?}", element.element_type);
-                println!("File: {}", element.file_path);
-                println!("Content: {}", element.content);
-                if !element.relations.is_empty() {
-                    println!("Relations:");
-                    for relation in &element.relations {
-                        println!(
-                            "  {} -> {}",
-                            relation.relation_type.name, relation.target.text
-                        );
-                    }
-                }
-            } else {
-                println!("Element '{}' not found", element_id);
-            }
-        }
-        "move-element" => {
-            if parts.len() < 3 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: move-element <element_id> <file>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-            let file_path = parts[2];
-
-            graph_registry.move_element_to_location(element_id, file_path)?;
-            println!("Element '{}' moved to {}", element_id, file_path);
-        }
-        "create-file" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: create-file <file>".to_string(),
-                ));
-            }
-            let file_path = parts[1];
-
-            graph_registry.create_virtual_file(file_path)?;
-            println!("Virtual file '{}' created", file_path);
-        }
-        "list-locations" => {
-            let locations = graph_registry.get_available_locations();
-            println!("Available file locations:");
-            for file in locations {
-                println!("  {}", file);
-            }
-        }
-        "get-move-impact" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: get-move-impact <element_id>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-            let impact = graph_registry.get_move_impact(element_id);
-            if impact.is_empty() {
-                println!("No elements would be affected by moving '{}'", element_id);
-            } else {
-                println!(
-                    "Elements affected by moving '{}': {}",
-                    element_id,
-                    impact.join(", ")
-                );
-            }
-        }
-        "impact-tree" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: impact-tree <element_id>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-
-            // Check if element exists
-            if graph_registry.get_element(element_id).is_none() {
-                println!("Element '{}' not found", element_id);
-                return Ok(());
-            }
-
-            println!("Change Impact Tree for element '{}':", element_id);
-            let impact_tree = graph_registry.get_impact_tree(element_id);
-            print_impact_tree(&impact_tree, 0);
-        }
-        "flush" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: flush <output_dir>".to_string(),
-                ));
-            }
-            let output_dir = Path::new(parts[1]);
-
-            let (md_count, file_count) = graph_registry.flush_to_directory(output_dir, false)?;
-            println!(
-                "Flushed {} markdown files and {} other files to '{}'",
-                md_count,
-                file_count,
-                output_dir.display()
-            );
-        }
-        "flush-files" => {
-            if parts.len() < 3 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: flush-files <file1,file2,...> <output_dir>".to_string(),
-                ));
-            }
-            let file_list = parts[1];
-            let output_dir = Path::new(parts[2]);
-
-            let file_paths: Vec<String> =
-                file_list.split(',').map(|s| s.trim().to_string()).collect();
-            let (md_count, file_count) =
-                graph_registry.flush_files_to_directory(&file_paths, output_dir, false)?;
-            println!(
-                "Flushed {} markdown files and {} other files to '{}'",
-                md_count,
-                file_count,
-                output_dir.display()
-            );
-        }
-        "stats" => {
-            let elements = graph_registry.get_all_elements();
-            let mut type_counts = FxHashMap::default();
-            for element in &elements {
-                let type_str = format!("{:?}", element.element_type);
-                *type_counts.entry(type_str).or_insert(0) += 1;
-            }
-
-            println!("Registry Statistics:");
-            println!("  Total elements: {}", elements.len());
-            println!("  By type:");
-            for (element_type, count) in &type_counts {
-                println!("    {}: {}", element_type, count);
-            }
-
-            let total_relations: usize = elements.iter().map(|e| e.relations.len()).sum();
-            println!("  Total relations: {}", total_relations);
-        }
-        "add-element" => {
-            if parts.len() < 4 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: add-element <element_id> <element_name> <file_path> [section]"
-                        .to_string(),
-                ));
-            }
-            let element_id = parts[1];
-            let element_name = parts[2];
-            let file_path = parts[3];
-            // Note: section parameter removed - sections are no longer tracked in the model
-
-            let element = reqvire::element::Element::new(
-                element_name,
-                element_id,
-                file_path,
-                1, // REPL-added elements default to line 1
-                None,
-            );
-
-            match graph_registry.add_element(element) {
-                Ok(()) => println!("Successfully added element '{}'", element_id),
-                Err(e) => println!("Failed to add element '{}': {}", element_id, e),
-            }
-        }
-        "remove-element" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: remove-element <element_id>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-
-            match graph_registry.remove_element(element_id) {
-                Ok(()) => println!("Successfully removed element '{}'", element_id),
-                Err(e) => println!("Failed to remove element '{}': {}", element_id, e),
-            }
-        }
-        "add-relation" => {
-            if parts.len() < 4 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: add-relation <source_id> <target_id> <relation_type>".to_string(),
-                ));
-            }
-            let source_id = parts[1];
-            let target_id = parts[2];
-            let relation_type = parts[3];
-
-            match graph_registry.add_relation(source_id, target_id, relation_type) {
-                Ok(()) => println!(
-                    "Successfully added relation '{}' from '{}' to '{}'",
-                    relation_type, source_id, target_id
-                ),
-                Err(e) => println!("Failed to add relation: {}", e),
-            }
-        }
-        "remove-relation" => {
-            if parts.len() < 4 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: remove-relation <source_id> <target_id> <relation_type>".to_string(),
-                ));
-            }
-            let source_id = parts[1];
-            let target_id = parts[2];
-            let relation_type = parts[3];
-
-            match graph_registry.remove_relation(source_id, target_id, relation_type) {
-                Ok(()) => println!(
-                    "Successfully removed relation '{}' from '{}' to '{}'",
-                    relation_type, source_id, target_id
-                ),
-                Err(e) => println!("Failed to remove relation: {}", e),
-            }
-        }
-        "list-relations" => {
-            if parts.len() < 2 {
-                return Err(ReqvireError::ProcessError(
-                    "Usage: list-relations <element_id>".to_string(),
-                ));
-            }
-            let element_id = parts[1];
-
-            match graph_registry.list_relations(element_id) {
-                Ok(relations) => {
-                    if relations.is_empty() {
-                        println!("Element '{}' has no relations", element_id);
-                    } else {
-                        println!("Relations for element '{}':", element_id);
-                        for (relation_type, target_id) in relations {
-                            println!("  {} -> {}", relation_type, target_id);
-                        }
-                    }
-                }
-                Err(e) => println!("Failed to list relations: {}", e),
-            }
-        }
-        "graph-stats" => {
-            let (element_count, relation_count) = graph_registry.get_graph_stats();
-            println!("Graph Statistics:");
-            println!("  Elements: {}", element_count);
-            println!("  Relations: {}", relation_count);
-            println!(
-                "  Average relations per element: {:.2}",
-                if element_count > 0 {
-                    relation_count as f64 / element_count as f64
-                } else {
-                    0.0
-                }
-            );
-        }
-        _ => {
-            println!(
-                "Unknown command: '{}'. Type 'help' for available commands.",
-                parts[0]
-            );
-        }
-    }
-
-    Ok(())
-}
-
-fn print_impact_tree(node: &reqvire::graph_registry::ElementNode, depth: usize) {
-    let indent = "  ".repeat(depth);
-    let element = &node.element;
-
-    // Print current element with impact propagation info
-    if depth == 0 {
-        println!("{}📍 {} ({})", indent, element.identifier, element.name);
-    } else {
-        println!("{}└─ {} ({})", indent, element.identifier, element.name);
-    }
-
-    // Print element details
-    println!("{}   Type: {:?}", indent, element.element_type);
-    println!("{}   Location: {}", indent, element.file_path);
-
-    // Print relations that caused this impact
-    if !node.relations.is_empty() {
-        println!("{}   Impacts through:", indent);
-        for relation_node in &node.relations {
-            println!(
-                "{}     {} -> {}",
-                indent,
-                relation_node.relation_trigger,
-                relation_node.element_node.element.identifier
-            );
-        }
-        println!();
-
-        // Recursively print impacted elements
-        for relation_node in &node.relations {
-            print_impact_tree(&relation_node.element_node, depth + 1);
-        }
-    } else if depth > 0 {
-        println!("{}   (No further impacts)", indent);
-        println!();
     }
 }
 

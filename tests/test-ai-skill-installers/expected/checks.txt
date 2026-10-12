@@ -1,0 +1,4 @@
+PASS canonical package manifests, links, and CLI discovery
+PASS main-branch installation and marketplace migration guidance
+PASS complete Codex and Claude Code installs and executable report guidance
+PASS selection installs only the requested skill and agent

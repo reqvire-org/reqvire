@@ -40,7 +40,7 @@ echo ""
 # Test 1: Reuse contract identifier
 # ==================================
 echo "Test 1: Reuse contract identifier..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
 
 if [ "$(contract_bindings_count "Performance Requirement")" -ne 1 ]; then
   echo "❌ FAILED: Performance Requirement should have 1 contract_bindings"
@@ -60,7 +60,7 @@ echo ""
 # ==================================
 echo "Test 2: Duplicate reuse returns error..."
 set +e
-ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-constraint-element" 2>&1)
+ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#test-constraint-element" 2>&1)
 ATTACH_DUP_EXIT=$?
 set -e
 
@@ -82,7 +82,7 @@ echo ""
 # Test 3: Multiple contract contract_bindings
 # ==================================
 echo "Test 3: Multiple contract contract_bindings..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-behavior-element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#test-behavior-element" > /dev/null 2>&1
 
 if [ "$(contract_bindings_count "Performance Requirement")" -ne 2 ]; then
   echo "❌ FAILED: Performance Requirement should have 2 contract_bindings"
@@ -96,7 +96,7 @@ echo ""
 # Test 4: Same contract to multiple elements
 # ==================================
 echo "Test 4: Same contract on multiple elements..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "No Contract Bindings Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "No Contract Bindings Requirement" bindContract "#test-constraint-element" > /dev/null 2>&1
 
 if [ "$(contract_bindings_count "No Contract Bindings Requirement")" -ne 1 ]; then
   echo "❌ FAILED: No Contract Bindings Requirement should have 1 contract_bindings"
@@ -110,7 +110,7 @@ echo ""
 # Test 5: Remove Contract Binding isolation
 # ==================================
 echo "Test 5: Remove Contract Binding one contract_bindings without affecting others..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Behavior Element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Performance Requirement" "Test Behavior Element" > /dev/null 2>&1
 
 if [ "$(contract_bindings_count "Performance Requirement")" -ne 1 ]; then
   echo "❌ FAILED: Performance Requirement should have 1 contract_bindings after remove contract binding"
@@ -129,7 +129,7 @@ echo ""
 # Test 6: Remove Contract Binding all from source element
 # ==================================
 echo "Test 6: Remove Contract Binding remaining contract_bindings from source..."
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
 
 if [ "$(contract_bindings_count "Performance Requirement")" -ne 0 ]; then
   echo "❌ FAILED: Performance Requirement should have no contract_bindings"
@@ -165,7 +165,7 @@ echo ""
 # ==================================
 echo "Test 8: File-path target is rejected..."
 set +e
-ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "docs/SLA.txt" 2>&1)
+ATTACH_PATH_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "docs/SLA.txt" 2>&1)
 ATTACH_PATH_EXIT=$?
 set -e
 
@@ -228,7 +228,7 @@ echo ""
 echo "Test 10: Dry-run mode..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#test-behavior-element" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#test-behavior-element" --dry-run > /dev/null 2>&1
 
 if ! cmp -s "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"; then
   echo "❌ FAILED: Dry-run mode should not modify the file"
@@ -244,7 +244,7 @@ echo ""
 # ==================================
 echo "Test 11: Non-contract contract_bindings target is rejected..."
 set +e
-ATTACH_NON_CONTRACT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#no-contract-bindings-requirement" 2>&1)
+ATTACH_NON_CONTRACT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#no-contract-bindings-requirement" 2>&1)
 ATTACH_NON_CONTRACT_EXIT=$?
 set -e
 
@@ -267,7 +267,7 @@ echo ""
 # ==================================
 echo "Test 12: Unresolved identifier target is rejected..."
 set +e
-ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" bindContract "#missing-contract" 2>&1)
+ATTACH_MISSING_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Performance Requirement" bindContract "#missing-contract" 2>&1)
 ATTACH_MISSING_EXIT=$?
 set -e
 
@@ -319,7 +319,7 @@ echo "#!/bin/bash" > "$TEST_DIR/scripts/test_script.sh"
 echo "echo 'test'" >> "$TEST_DIR/scripts/test_script.sh"
 
 mkdir -p "$TEST_DIR/src"
-cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "scripts/test_script.sh" "src/test_script.sh" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-asset "scripts/test_script.sh" "src/test_script.sh" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/17-after-mv-asset-relation.md" "$TEST_DIR/specifications/RelationsTest.md" "satisfiedBy relation not updated after mv-asset"
 
@@ -346,7 +346,7 @@ echo ""
 # ==================================
 echo "Test 14: rm-asset removes satisfiedBy relations..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" rm-asset "src/test_script.sh" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm-asset "src/test_script.sh" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/18-after-rm-asset-relation.md" "$TEST_DIR/specifications/RelationsTest.md" "satisfiedBy relation not removed after rm-asset"
 

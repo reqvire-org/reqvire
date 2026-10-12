@@ -89,28 +89,31 @@ This test verifies that the system assigns the default type 'requirement' to all
 **Explicit Type Metadata Overrides:**
 - System shall allow explicit type specification via Metadata subsection
 - System shall respect explicit type metadata when present
-- System shall support all standard element types: capability, requirement, ontology, semantic-contract, verification-objective, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, source, state, input-output, constraint, behavior, specification, other
+- Explicit canonical types retain their classification under the supported element type vocabulary, including native concepts, concept schemes and managed semantic queries; custom extension types remain distinct from canonical types
+- Concrete verifications use an explicit method such as `test-verification`; `verification` is a compatibility input alias, not a canonical authoring token
 
 ##### Test Criteria
 1. **Default type assignment verification:**
    - Create test elements in various directories without type metadata
-   - Run reqvire summary --json to extract element types
+   - Run `reqvire search --json` to extract element types
    - Verify all elements without type metadata have type 'requirement'
    - Test elements in root specifications folder
    - Test elements in nested subdirectories
    - Test elements in various file locations
 
 2. **Explicit type metadata verification:**
-   - Create elements with explicit type metadata (capability, verification, semantic-contract, etc.)
-   - Run reqvire summary --json
+   - Create elements with representative explicit canonical type metadata (`capability`, `test-verification`, `semantic-contract`, etc.)
+   - Run `reqvire search --json`
    - Verify elements have the explicitly specified types
    - Verify explicit types override default behavior
 
 3. **Location independence verification:**
    - Create identical elements in different directories
    - None have explicit type metadata
-   - Run reqvire summary --json
+   - Run `reqvire search --json`
    - Verify all elements have type 'requirement' regardless of location
+
+The existing fixture also checks compatibility input normalization; accepted aliases must appear as canonical types in public results. Native concept and managed-query classification is exercised by the dedicated semantic fixtures rather than this default-type harness.
 
 #### Metadata
   * type: test-verification
@@ -167,7 +170,7 @@ This test verifies that the system correctly validates relation types based on e
 - System shall allow `define` relations on `state` and `input-output` elements pointing to requirements
 - System shall allow `define` relations on `source` elements pointing to capabilities
 - System shall allow `constrain` relations on `semantic-contract` elements pointing to requirements
-- System shall reject all other relation types on contract elements (derivedFrom, verifiedBy, trace, satisfiedBy)
+- System shall reject all other relation types on contract elements (derivedFrom, verifiedBy, satisfiedBy)
 - System shall provide clear error message indicating non-semantic-contract types can only have define relations
 
 **trace Relation Validation:**
@@ -228,20 +231,20 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
 - System shall use ONLY the effective-workspace-root .reqvireignore file, not nested .reqvireignore files
 - System shall correctly process files when .gitignore is absent
 - System shall correctly process files when .reqvireignore is absent
-- Exclusion shall work across all commands (validate, summary, format, traces, etc.)
+- Retained CLI validation and reports, and shared core operations consumed by MCP, shall use the same exclusion policy
 
 ##### Test Criteria
 1. **Gitignore pattern exclusion:**
    - Create test environment with the Git-worktree root .gitignore containing patterns (e.g., "**/build/**", "temp-*.md")
    - Create files matching those patterns in specifications folder
-   - Run reqvire summary command
+   - Run `reqvire search`
    - Verify files matching .gitignore patterns are NOT processed
    - Verify files NOT matching patterns ARE processed
 
 2. **Reqvireignore pattern exclusion:**
    - Create test environment with effective-workspace-root .reqvireignore containing patterns (e.g., "**/draft-*.md", "examples/**")
    - Create files matching those patterns in specifications folder (files that ARE in Git)
-   - Run reqvire summary command
+   - Run `reqvire search`
    - Verify files matching .reqvireignore patterns are NOT processed
    - Verify files NOT matching patterns ARE processed
 
@@ -347,7 +350,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
 - System should detect and report requirement elements with verifiedBy relations pointing to non-existing verification elements
 - System should detect and report requirement elements with satisfiedBy relations pointing to other requirement elements (incompatible types)
 - System should detect and report verification elements with satisfiedBy relations pointing to other verification elements (incompatible types)
-- System should detect and report non-evidence-backed verification elements with satisfiedBy relations (only test-verification and formal-proof-verification may use satisfiedBy, trace is always allowed)
+- System should detect and report non-evidence-backed verification elements with satisfiedBy relations (only test-verification and formal-proof-verification may use satisfiedBy; computed report traces do not provide an authored relation exception)
 - System should detect and report if a requirement is missing required capability or parent requirement ownership
 - System should detect and report if there is circular dependency in requirements
 - Pass 2 validation should only execute when Pass 1 completes without errors
@@ -516,13 +519,13 @@ Test cases:
 
 #### Relations
   * derivedFrom: [Validation and Semantic Integrity Verification Objective](#validation-and-semantic-integrity-verification-objective)
-  * satisfiedBy: [test.sh](../../../../tests/test-shacl-recursive-ast/test.sh)
   * satisfiedBy: [shacl_build.rs](../../../../crates/reqvire-core/tests/shacl_build.rs)
-  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
+  * satisfiedBy: [test.sh](../../../../tests/test-shacl-recursive-ast/test.sh)
   * verify: [SHACL Ontology Alignment](../../../Architecture/OntologyKernelRequirements.md#shacl-ontology-alignment)
   * verify: [SHACL Structural Parser Registry](../../../Architecture/OntologyKernelRequirements.md#shacl-structural-parser-registry)
   * verify: [Reqvire SHACL Context Adapter](../../../Operations/Validation/ValidationRequirements.md#reqvire-shacl-context-adapter)
   * verify: [Semantic Contract Shape Validation](../../../Operations/Validation/ValidationRequirements.md#semantic-contract-shape-validation)
+  * verify: [Ontology and Shapes Collection](../../../Semantics/SemanticModelRequirements.md#ontology-and-shapes-collection)
 ---
 
 ### Same-File Fragment Relations Test
@@ -582,7 +585,7 @@ Test cases:
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
 7. Capability contract_bindings to `ontology` fails; capabilities use concept references for SKOS concepts.
 8. Requirement `constrainedBy` to `semantic-contract` validates.
-9. Requirement contract_bindings to `ontology` fails because ontology terms use concept references and semantic-contract ontology use is explicit through `use`.
+9. Requirement contract_bindings to `ontology` fails. Concept References target native concepts, structural OWL bridges use `reqvire:mapsToConcept`, and semantic-contract ontology dependencies use explicit `use` relations; requirements use `constrainedBy` for SHACL constraints.
 10. Capability contract_bindings to `semantic-contract` fails.
 
 #### Metadata
@@ -731,10 +734,10 @@ This test verifies that the system treats the effective process working director
 - System shall process only eligible Git-worktree files within the effective workspace root when run from a subfolder
 - System shall handle identifier normalization correctly relative to the effective workspace root
 - System shall generate missing relation target errors for references to elements or files outside the effective workspace root
-- System shall work with model, serve, format, traces, and CRUD commands (validation is automatic)
+- Retained CLI reports and server startup, and shared core formatting and mutation operations, shall apply automatic validation within the selected effective workspace
 - System shall ignore files outside the effective workspace root
 - System shall provide meaningful missing relation target error messages for parent directory references
-- CRUD commands (add, rm, mv, mv-file) shall resolve paths relative to the effective workspace root
+- Shared create, remove, element-move and file-move operations shall resolve paths relative to the effective workspace root
 
 ##### Test Criteria
 - Commands run from subdirectory process only eligible Git-worktree files within that subdirectory workspace root
@@ -742,20 +745,22 @@ This test verifies that the system treats the effective process working director
 - Identifier normalization works correctly for paths within the effective workspace root
 - References to parent directories generate missing relation target errors with clear error messages
 - Missing relation target errors specifically identify the unreachable parent directory reference
-- All major commands (model, serve, format, traces) work from subdirectories with automatic validation
-- CRUD commands (add, rm, mv, mv-file) resolve file paths relative to the effective workspace root
-- CRUD mv command successfully moves elements within subdirectory scope
-- CRUD mv-file command successfully moves entire files within subdirectory scope
+- Retained reports and server startup work from subdirectories with automatic validation; shared formatting uses the same effective workspace scope
+- Shared mutation operations resolve file paths relative to the effective workspace root
+- The shared move operation successfully moves elements within subdirectory scope
+- The shared file-move operation successfully moves entire files within subdirectory scope
 - Commands exit with validation error code when parent directory references cannot be resolved
 - Error messages clearly explain the missing relation target due to parent directory reference
+
+The current CLI harness establishes core workspace-relative resolution and move behavior. It does not establish MCP element/file-move adapters; those pending protocol plans check the selected worktree context independently of the caller's launch directory.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-subdirectory-functionality/test.sh)
-  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
-  * verify: [CLI Move File Command](../../../Interfaces/CLI/Commands.md#cli-move-file-command)
+  * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
+  * verify: [Move File Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-file-operation)
 ---
 
 ### Type Validation Errors Test

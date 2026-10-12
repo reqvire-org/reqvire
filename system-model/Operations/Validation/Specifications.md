@@ -3,7 +3,7 @@
 ### Contract Bindings Scope Validation Contract Specification
 
 #### Details
-When validating contract_bindings, the system is expected to enforce contract_bindings scope constraints for contract-element identifier targets and report errors with clear messages indicating the bindContract element, the contract_bindings target, and the reason for the violation.
+When validating contract_bindings, the system is expected to enforce contract_bindings scope constraints for contract-element identifier targets and report errors with clear messages indicating the consuming requirement, the bound contract target, and the reason for the violation.
 
 Contract Bindings scope validation is expected to enforce:
 - Hierarchical independence from the contract's defining hierarchy

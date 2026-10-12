@@ -1,7 +1,8 @@
+import os
 import hashlib,json,pathlib,subprocess,sys
 bin,workspace=sys.argv[1:];root=pathlib.Path(workspace)
 def run(*args,ok=True,input=None):
- p=subprocess.run([bin,*args],cwd=root,input=input,text=True,capture_output=True)
+ p=subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else bin,*args],cwd=root,input=input,text=True,capture_output=True)
  assert (p.returncode==0)==ok,(args,p.returncode,p.stdout,p.stderr)
  return p.stdout
 

@@ -127,6 +127,124 @@ fn git_test(args: &[&str]) -> String {
         .to_string()
 }
 
+case!(folder_move_restores_directories_on_publication_failure, {
+    std::fs::create_dir_all("source/nested/empty").expect("source directories");
+    std::fs::write("source/nested/Model.md", MODEL).expect("folder model");
+    std::fs::remove_file("Model.md").expect("relocate fixture");
+    git_test(&["add", "-A"]);
+    git_test(&["commit", "-qm", "folder fixture"]);
+    let server = fixture(true);
+    let baseline = server.session.lock().expect("session").status();
+    let request = json!({"name":"reqvire.move_folder", "arguments":{"source_folder":"source", "target_folder":"destination"}});
+    reject_reference_publication();
+    let rejected = server
+        .dispatch("tools/call", request.clone())
+        .expect("rejected move");
+    assert_eq!(rejected["isError"], true, "{rejected}");
+    assert_eq!(
+        std::fs::read_to_string("source/nested/Model.md").expect("restored model"),
+        MODEL
+    );
+    assert!(std::path::Path::new("source/nested/empty").is_dir());
+    assert!(!std::path::Path::new("destination/nested/Model.md").exists());
+    assert_eq!(
+        git_test(&["rev-parse", "HEAD"]),
+        baseline["head"].as_str().expect("head")
+    );
+    assert_eq!(
+        server.session.lock().expect("session").status()["model_revision"],
+        baseline["model_revision"]
+    );
+    std::fs::remove_file(".git/hooks/reference-transaction").expect("remove failure hook");
+    let moved = server
+        .dispatch("tools/call", request)
+        .expect("accepted move");
+    assert_ne!(moved["isError"], true, "{moved}");
+    assert!(!std::path::Path::new("source").exists());
+    assert_eq!(
+        std::fs::read_to_string("destination/nested/Model.md").expect("moved model"),
+        MODEL
+    );
+});
+
+case!(lint_repair_uses_the_accepted_candidate_transaction, {
+    const BEFORE: &str =
+        include_str!("../../../tests/test-interface-boundary/fixtures/Repair.md.fixture");
+    const AFTER: &str =
+        include_str!("../../../tests/test-interface-boundary/expected/after-repair.md.txt");
+    for commits in [false, true] {
+        std::fs::write("Repair.md", BEFORE).expect("repair fixture");
+        git_test(&["add", "Repair.md"]);
+        git_test(&["commit", "--allow-empty", "-qm", "repair baseline"]);
+        let server = fixture(commits);
+        let baseline = server.session.lock().expect("session").status();
+        let request = json!({"method":"tools/call", "params":{"name":"reqvire.lint", "arguments":{"fix":true}}});
+        // A late invalid candidate cannot persist a safe repair or replace the
+        // accepted revision. The next ordinary typed request still succeeds.
+        let rejected = server
+            .session
+            .lock()
+            .expect("session")
+            .execute(true, "reqvire.lint", || {
+                let result = crate::mcp_worker::dispatch_rpc(&request, false, &server.exclusions)?;
+                reqvire::mutation_io::write("Repair.md", "# Elements\n\n### Broken Requirement\n\n#### Metadata\n  * type: requirement\n")
+                    .expect("candidate injection");
+                Ok(result)
+            })
+            .0
+            .expect("tool result");
+        assert_eq!(rejected["isError"], true, "{rejected}");
+        assert_eq!(
+            std::fs::read_to_string("Repair.md").expect("source"),
+            BEFORE
+        );
+        assert_eq!(
+            server.session.lock().expect("session").status()["model_revision"],
+            baseline["model_revision"]
+        );
+        if commits {
+            reject_reference_publication();
+            let rejected = server
+                .dispatch("tools/call", request["params"].clone())
+                .expect("rejected repair");
+            assert_eq!(rejected["isError"], true, "{rejected}");
+            assert_eq!(
+                std::fs::read_to_string("Repair.md").expect("source"),
+                BEFORE
+            );
+            assert_eq!(
+                git_test(&["rev-parse", "HEAD"]),
+                baseline["head"].as_str().expect("head")
+            );
+            std::fs::remove_file(".git/hooks/reference-transaction").expect("remove failure hook");
+        }
+        let repaired = server
+            .dispatch("tools/call", request["params"].clone())
+            .expect("repair");
+        assert_ne!(repaired["isError"], true, "{repaired}");
+        assert_eq!(
+            repaired["structuredContent"]["applied_fixes"]["relations_removed"],
+            1
+        );
+        assert_eq!(std::fs::read_to_string("Repair.md").expect("source"), AFTER);
+        assert_eq!(
+            std::fs::read_to_string("Model.md").expect("unrelated source"),
+            MODEL
+        );
+        let accepted = server.session.lock().expect("session").status();
+        let no_op = server
+            .dispatch("tools/call", request["params"].clone())
+            .expect("no-op repair");
+        assert_eq!(
+            no_op["structuredContent"]["applied_fixes"]["relations_removed"],
+            0
+        );
+        let repeated = server.session.lock().expect("session").status();
+        assert_eq!(repeated["head"], accepted["head"]);
+        assert_eq!(repeated["model_revision"], accepted["model_revision"]);
+    }
+});
+
 #[cfg(unix)]
 fn install_stalled_reference_hook(phase: &str, evidence: &str) {
     use std::os::unix::fs::PermissionsExt;

@@ -53,7 +53,7 @@ billing:BadPayloadShape
 ```'
 
 set +e
-ADD_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$BAD_CONTRACT" | "$REQVIRE_BIN" add specifications/SemanticContracts.md 2>&1)
+ADD_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$BAD_CONTRACT" | "$MCP_OPERATION_BIN" add specifications/SemanticContracts.md 2>&1)
 ADD_EXIT=$?
 set -e
 
@@ -110,7 +110,7 @@ billing:OutsideContextPayloadShape
 ```'
 
 set +e
-OUTSIDE_ADD_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$OUTSIDE_CONTEXT_CONTRACT" | "$REQVIRE_BIN" add specifications/SemanticContracts.md 2>&1)
+OUTSIDE_ADD_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$OUTSIDE_CONTEXT_CONTRACT" | "$MCP_OPERATION_BIN" add specifications/SemanticContracts.md 2>&1)
 OUTSIDE_ADD_EXIT=$?
 set -e
 
@@ -147,7 +147,7 @@ assert_diff \
   "failed outside-context semantic add should not persist file changes"
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Billing Shape Contract" "Tax Ontology" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Billing Shape Contract" "Tax Ontology" 2>&1)
 UNLINK_EXIT=$?
 set -e
 
@@ -179,7 +179,7 @@ assert_diff \
   "failed semantic unlink should not persist file changes"
 
 set +e
-DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Tax Ontology" 2>&1)
+DELETE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Tax Ontology" 2>&1)
 DELETE_EXIT=$?
 set -e
 
@@ -239,7 +239,7 @@ tax:OtherRate a owl:DatatypeProperty .
 ```'
 
 set +e
-OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$OVERRIDE_TAX_CONTRACT" | "$REQVIRE_BIN" add specifications/SemanticContracts.md --override 2>&1)
+OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$OVERRIDE_TAX_CONTRACT" | "$MCP_OPERATION_BIN" add specifications/SemanticContracts.md --override 2>&1)
 OVERRIDE_EXIT=$?
 set -e
 

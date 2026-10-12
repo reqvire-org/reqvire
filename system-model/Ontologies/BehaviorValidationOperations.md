@@ -286,16 +286,16 @@ reqvire:lintRepairMode a owl:DatatypeProperty ;
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
   reqvire:lintScope "capability-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract contract_bindings would preserve ownership more clearly." ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned Contract Binding or Contract Reference would preserve ownership more clearly, according to implementation responsibility or review dependency." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
 reqvire:redundantRelationLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "redundant-relation" ;
-  reqvire:lintScope "relations and contract_bindings" ;
-  reqvire:lintCondition "A relation or contract_bindings duplicates an already implied or repeated model edge." ;
+  reqvire:lintScope "hierarchical and verification relations" ;
+  reqvire:lintCondition "A direct relation is redundant under its hierarchical or verification reachability policy." ;
   reqvire:lintFindingKind "redundant-relation" ;
-  reqvire:lintRepairMode "explicit-fix-or-format-when-lossless" .
+  reqvire:lintRepairMode "mutation-enabled-safe-lint-repair" .
 
 ```
 
@@ -460,7 +460,7 @@ reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationSeverity "warning" ;
   reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
   reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with contract_bindings/trace or remodel hierarchy under one capability root." .
+  reqvire:validationRepair "Remove the cross-boundary hierarchy edge and declare the intended compatible dependency: a Contract Binding for a shared implementation obligation, a Contract Reference for change-impact review, a Concept Reference for native terminology, or semantic-contract use/constrain relations. Keep contract dependencies on responsible requirements; retain hierarchy only for genuine ownership within one capability root." .
 
 reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
@@ -474,9 +474,9 @@ reqvire:redundantVerifyLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-verify-relation" ;
   reqvire:validationScope "lint" ;
   reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A verification directly verifies both a requirement and an ancestor covered by that requirement's verification path." ;
-  reqvire:validationOutcome "Report as manual review or auto-fixable depending on whether removing the ancestor verify relation preserves intended evidence scope." ;
-  reqvire:validationRepair "Keep verification at the most precise requirement scope, or document why broader requirement verification is intended." .
+  reqvire:validationCondition "A direct verification target is redundant under the verification relation redundancy policy." ;
+  reqvire:validationOutcome "Report eligible redundant direct ancestor targets as auto-fixable. Coverage roll-up alone does not make a separately scoped parent verification redundant." ;
+  reqvire:validationRepair "Remove only direct verify edges classified as redundant by the shared reachability policy; review independent parent integration intent separately." .
 
 reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-multi-branch-convergence" ;

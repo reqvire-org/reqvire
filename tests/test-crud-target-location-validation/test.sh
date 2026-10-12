@@ -81,7 +81,7 @@ This should be rejected.
 '
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/build/Ignored.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/build/Ignored.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -106,7 +106,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 2: Reqvireignore exclusion..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/draft-Ideas.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/draft-Ideas.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -141,7 +141,7 @@ Testing path depth validation.
 DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/DeepFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$DEEP_PATH" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$MCP_OPERATION_BIN" add "$DEEP_PATH" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -168,7 +168,7 @@ echo "Test 4: Valid path depth (10 levels)..." >> "${TEST_DIR}/test_results.log"
 VALID_DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/ValidFile.md"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$REQVIRE_BIN" add "$VALID_DEEP_PATH" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$DEPTH_TEST_ELEMENT" | "$MCP_OPERATION_BIN" add "$VALID_DEEP_PATH" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -190,7 +190,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 5: Auto-create non-existent file..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/NewFile.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/NewFile.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -224,7 +224,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 6: Add element to existing file..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Base.md 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && echo "${NEW_ELEMENT/Test Requirement/Existing File Requirement}" | "$MCP_OPERATION_BIN" add specifications/Base.md 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -235,7 +235,7 @@ if [ $EXIT_CODE -ne 0 ]; then
   echo "❌ FAILED: Should add element to existing file"
   echo "Got: $OUTPUT"
   OVERALL_RESULT=1
-elif ! grep -q "^### Test Requirement" "${TEST_DIR}/specifications/Base.md"; then
+elif ! grep -q "^### Existing File Requirement" "${TEST_DIR}/specifications/Base.md"; then
   echo "❌ FAILED: Element was not added to existing file"
   OVERALL_RESULT=1
 elif ! grep -q "^### Base System Requirement" "${TEST_DIR}/specifications/Base.md"; then

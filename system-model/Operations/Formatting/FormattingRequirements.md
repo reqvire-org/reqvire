@@ -34,7 +34,7 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
-  * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Formatting Operations Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#formatting-operations-verification)
 ---
 
 ### Document Structure Normalization
@@ -52,7 +52,7 @@ Detailed header, section, preservation, and normalization rules shall follow the
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [parser.rs](../../../crates/reqvire-core/src/parser.rs)
-  * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Formatting Operations Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#formatting-operations-verification)
 ---
 
 ### Element Ordering Normalization
@@ -70,12 +70,10 @@ When formatting or persisting specification files, the system shall reorder elem
 
 ### Format Duplicate Removal
 
-The system shall remove duplicate entries within the same subsection during format fix operations.
+WHEN serializing valid formatting input, the system SHALL emit canonical relation and binding entries without duplicates.
 
 #### Details
-A behavior defines the detailed deduplication rules.
-
-The system shall consume shared duplicate classification and preserve semantic errors for an explicit author decision.
+IF source declarations fail shared duplicate validation, THEN the system SHALL reject them without treating formatting as a semantic repair or a model-admission bypass.
 
 #### Metadata
   * type: requirement
@@ -87,6 +85,7 @@ The system shall consume shared duplicate classification and preserve semantic e
   * definedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [Format Duplicate Removal Test](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-duplicate-removal-test)
 ---
 
@@ -118,15 +117,12 @@ The system shall display formatting changes suggestion in similar manner as git 
   * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
   * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
-  * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Formatting Operations Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#formatting-operations-verification)
 ---
 
 ### Full Relations Insertion
 
-When the --with-full-relations flag is provided, the system shall insert all registered relations into elements, including both user-created and auto-generated relations.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
+When full-relation materialization is explicitly requested, the system SHALL include both authored and generated inverse relations in formatted model documents.
 
 #### Metadata
   * type: requirement
@@ -150,5 +146,5 @@ The system shall replace absolute links with relative links, where applicable an
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
-  * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Formatting Operations Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#formatting-operations-verification)
 ---

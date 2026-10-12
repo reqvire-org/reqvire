@@ -1,5 +1,27 @@
 # Elements
 
+### Existing Element Reference Resolution
+
+When an operation argument selects an existing model element by name, the system SHALL also accept its canonical element identifier and resolve either form through the shared element-selection contract within the selected model context.
+
+If a selector identifies different elements through its name and identifier interpretations, then the system SHALL reject the selection as ambiguous before executing the operation.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
+  * [Structure and Addressing in Markdown Documents Contract Specification](Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
+  * [Workspace Scope Specification](Specifications.md#workspace-scope-specification)
+
+#### Relations
+  * definedBy: [Existing Element Selection Specification](#existing-element-selection-specification)
+  * satisfiedBy: [element_selection.rs](../../crates/reqvire-core/src/element_selection.rs)
+  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
+  * specify: [Existing Element Selection](#existing-element-selection)
+  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+---
+
 ### Existing Element Selection
 
 As a **System Engineer**, I want to select existing model elements consistently by name or canonical identifier, so that interactive commands and automated clients can use the same model references across operations and interfaces.
@@ -12,33 +34,11 @@ As a **System Engineer**, I want to select existing model elements consistently 
   * specifiedBy: [Existing Element Reference Resolution](#existing-element-reference-resolution)
 ---
 
-### Existing Element Reference Resolution
-
-When an operation argument selects an existing model element by name, the system SHALL also accept its canonical element identifier and resolve either form through the shared element-selection contract within the selected model context.
-
-If a selector identifies different elements through its name and identifier interpretations, then the system SHALL reject the selection as ambiguous before executing the operation.
-
-#### Metadata
-  * type: requirement
-
-#### Contract References
-  * [Workspace Scope Specification](Specifications.md#workspace-scope-specification)
-  * [Structure and Addressing in Markdown Documents Contract Specification](Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
-
-#### Relations
-  * satisfiedBy: [element_selection.rs](../../crates/reqvire-core/src/element_selection.rs)
-  * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
-  * specify: [Existing Element Selection](#existing-element-selection)
-  * definedBy: [Existing Element Selection Specification](#existing-element-selection-specification)
-  * verifiedBy: [Existing Element Selection Verification](../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
----
-
 ### Existing Element Selection Specification
 
 Shared implementation obligation for arguments that select existing Reqvire model elements.
 
 #### Details
-
 **Applicability and reuse**
 - Every argument that currently accepts an existing model element name in a CLI command, MCP tool, or their shared core operation MUST also accept the canonical element identifier returned by Reqvire. This applies to positional arguments, named arguments, optional selectors and every member of a selector list, including arguments currently named `element_name`, `name`, `from`, `source`, `target`, `sources`, `old_target` or `new_target` when their declared role selects an existing element.
 - Canonical element identifiers use the effective workspace-relative source path plus element fragment, such as `system-model/Requirements.md#authentication-requirement`. They are location-based references and can change after moving or renaming an element; this contract does not create a persistent identity or alias service.
@@ -76,7 +76,7 @@ Shared implementation obligation for arguments that select existing Reqvire mode
 - Mixed-domain relation or contract arguments MUST preserve their operation's existing domain detection and path/URL normalization. Apply this contract within the existing-element branch without intercepting a supported file, evidence URL or semantic IRI. Generic element selection adds no new filesystem target or fragment-only syntax.
 
 **Compatibility, diagnostics and side effects**
-- Preserve existing CLI command names, flag names, positional order, MCP tool names, argument keys and response field names. CLI help and MCP argument descriptions MUST advertise name-or-identifier support for affected selectors and the remaining operation-specific type restrictions.
+- Preserve retained CLI command names, flag names and positional order, and existing MCP tool names, argument keys and response field names. Selector compatibility does not retain CLI authoring or formatting commands removed by the supported interface boundary. CLI help and MCP argument descriptions MUST advertise name-or-identifier support for affected selectors and the remaining operation-specific type restrictions.
 - Successful name and identifier selections MUST expose the same canonical selected element and existing result/evidence fields. Transport-specific envelopes and context/revision metadata remain governed by their interface contracts.
 - Selection failures MUST identify the operation, argument, supplied value, cause and relevant context. Report missing, ambiguous, wrong-type and contradictory selections distinctly. CLI fails with a nonzero status; schema-valid MCP calls use the existing structured tool-error envelope.
 - Selection and type validation MUST finish before candidate mutation, file persistence, index updates, commits or publication. Rejection and dry-run MUST preserve the operation's existing accepted-state and no-side-effect guarantees. This contract does not enable writes or clear ownership/recovery restrictions.

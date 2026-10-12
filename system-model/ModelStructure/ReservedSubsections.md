@@ -12,7 +12,9 @@
 
 Reserved subsection vocabulary is defined by the Reqvire core element ontology. This specification defines parser-facing syntax, validation, and serialization behavior for those ontology-defined subsection concepts.
 
-The parser-facing vocabulary comprises Relations, Details, Metadata, Contract Bindings, Contract References, Concept References, Ontology, External Ontology, Shapes, and Query. Each subsection MUST retain the element-type applicability, syntax, validation, and serialization behavior defined by its applicable contract.
+The parser-facing vocabulary comprises Relations, Details, Metadata, Contract Bindings, Contract References, Concept References, Ontology, External Ontology, Shapes, Query, and Produces. Each subsection MUST retain the element-type applicability, syntax, validation, and serialization behavior defined by its applicable contract.
+
+The H4 headings and examples below describe subsections in a multi-element `# Elements` document. A single-element `# Element` document uses H2 metadata and optional relations before its named H2 body; headings within that body remain content under the single-element grammar.
 
 ## Relations Subsection
 
@@ -74,8 +76,8 @@ The Metadata subsection stores element properties including type, requirement go
 
 The following properties have special meaning:
 
-- `type`: Defines the element type (supported types are defined in [Supported Element Types Specification](../Specifications.md#supported-element-types-specification))
-- `status`, `priority`, `risk`, `owner`: Define governance metadata for capability and requirement elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
+- `type`: Selects the canonical element type and its applicable structural rules.
+- `status`, `priority`, `risk`, `owner`: Define governance metadata for capability and requirement elements only, using the owned governance metadata contract.
 - Additional reserved properties may be defined in future releases
 
 **Examples:**
@@ -85,12 +87,13 @@ The following properties have special meaning:
 This is a verification element.
 
 #### Metadata
-  * type: verification
+  * type: inspection-verification
   * domain: safety
   * review_method: inspection
 
 #### Relations
-* verify: [Some Requirement](#some-requirement)
+  * derivedFrom: [Verification Objective](#verification-objective)
+  * verify: [Some Requirement](#some-requirement)
 ```
 
 ```markdown
@@ -102,11 +105,12 @@ This is a verification element.
 Some details.
 
 #### Metadata
-  * type: verification
+  * type: inspection-verification
   * domain: safety
   * review_method: inspection
 
 #### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Some Requirement](#some-requirement)
 ```
 
@@ -144,7 +148,7 @@ Element identifier contract_bindings link to model elements that are reusable un
 The system shall expose an API contract.
 
 #### Contract Bindings
-* [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
+  * [Reusable Payload Specification](Contracts.md#reusable-payload-shape)
 ```
 
 ## Contract References Subsection
@@ -171,7 +175,7 @@ Concept references bind readable element prose to native `concept` elements; Req
 - The parser records the authored label, normalized concept-element target, and source line number.
 - Semantic validation fails when the target is missing, does not have `type: concept`, or cannot derive a generated SKOS concept IRI from a `concept-scheme` namespace.
 - Semantic validation derives the generated SKOS concept IRI from the target concept element and scheme; authors do not write concept IRIs or CURIEs in this subsection.
-- `format --fix` normalizes already-valid concept-reference Markdown links to canonical source-relative targets. `migrate --fix` rewrites legacy `* Label: IRI` entries only when the IRI resolves to exactly one generated native concept element.
+- MCP formatting with `fix: true` normalizes already-valid concept-reference Markdown links to canonical source-relative targets. `migrate --fix` rewrites legacy `* Label: IRI` entries only when the IRI resolves to exactly one generated native concept element.
 
 **Example:**
 ```markdown
@@ -230,9 +234,15 @@ Shapes subsections contain fenced SHACL/RDF content owned by semantic-contract e
 
 Must be defined with a level 4 header: `#### Query`.
 
-Query subsections contain fenced SPARQL or query content when a semantic contract owns query text.
+Query is the source subsection of a native `semantic-query` element. Semantic-contract elements author SHACL in Shapes; they do not own managed query artifacts.
 
 **Parsing Rules:**
-- The parser extracts fenced code blocks under `#### Query`.
-- The parser preserves fenced block language, content, and source line number.
-- Query validation or execution behavior is owned by semantic model requirements over the parsed block.
+- Retain the Query document, fenced language, source location and diagnostics as structured query source, alongside prose used for purpose.
+- Apply the native semantic query authoring contract for required cardinality and SPARQL syntax, and the context contract for ontology resolution. Artifact validation does not execute queries.
+- Preserve the authored Query text through collection, serialization and supported mutations; generic prose storage alone is insufficient.
+
+## Produces Subsection
+
+Must be defined with a level 4 header: `#### Produces`.
+
+Produces is an optional native semantic-query output declaration subsection. Its property/family entries, CONSTRUCT applicability, prefix/context resolution, duplicate handling and serialization follow the native semantic query authoring and context contracts. It is not a generic prose subsection or a semantic-contract Shapes declaration.

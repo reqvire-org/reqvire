@@ -13,4 +13,3 @@ The system SHALL deliver prompts using the shared contract.
 #### Relations
   * specify: [Authoring Capability](Targets.md#authoring-capability)
 ---
-

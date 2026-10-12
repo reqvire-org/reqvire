@@ -39,30 +39,39 @@ Candidate semantic-contract validation for graph-backed CRUD mutations.
 #### Details
 Before any graph-backed CRUD mutation persists model files, invoke the shared semantic-contract validator on the complete candidate through the model-operation validation gate. The owning requirement's Contract References supply schema-reference rules and diagnostics; this contract owns their mutation-time invocation and contextual enrichment.
 
-This pre-persistence validation applies to graph-backed mutation commands:
-- `add`
-- `add --override`
-- `rm`
-- `mv`
-- `rename`
-- `merge`
-- `mv-file`
-- `mv-folder`
-- `link`
-- `unlink`
-- `relink`
+This pre-persistence validation applies to shared core create/override, remove, move, rename, merge, file/folder moves and relation/dependency edits, exposed through their typed MCP authoring tools. Safe lint repair uses the same complete-candidate gate.
 
 Reject the operation before flushing changes when the shared validator reports an invalid candidate. Preserve its referencing contract, reference kind, target IRI, declaration context, and repair guidance in the response.
 
 If comparison with the accepted model identifies an ontology element removed by this mutation as the prior declaration source, add that removed source identifier to the diagnostic. Do not use the prior declaration to make the candidate valid.
 
-Rejection preserves authored files and accepted state according to the model-operation gate. Apply the same checks to supported dry runs and CLI/MCP entry points.
+Rejection preserves authored files and accepted state according to the model-operation gate. Apply the same checks to supported typed previews and core/MCP entry points.
 
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [CRUD Semantic Contract Mutation Validation](ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
+---
+
+### Canonical Model Mutation Persistence Specification
+
+Canonical serialization of successful model mutations.
+
+#### Details
+- Apply the same normalization as default formatting to authored model documents affected by create/override, removal, move, rename, merge, file/folder moves, relation and contract-dependency edits, asset-reference changes, and safe lint repairs. Normalize before durable acceptance and optional commit, within the same transaction as the semantic change.
+- Preserve the document's valid single-element or multi-element header, page text, element prose, literal fenced payloads and semantic identities. Normalize reserved subsection layout, file-local hierarchy ordering, relation ordering, human-readable link labels, source-relative links, whitespace and final newline through the existing formatting engine.
+- Default mutation persistence preserves the authored relation subset; do not materialize generated inverses. Only an explicit formatting request with full relations enabled expands that subset.
+- Limit normalization to affected model documents. Preserve untouched documents and evidence asset bytes; do not format the whole workspace as a side effect. Semantic no-ops must not churn unrelated sources.
+- Validate the complete resulting candidate using the shared model validators. Normalization must not choose a repair for invalid prose hyperlinks, dependency ownership, hierarchy or semantic intent.
+- Prepare serialized contents before replacing durable files or publishing accepted graph/revision state. Validation, serialization or persistence failure must preserve the pre-operation files and accepted state through the shared transaction/rollback behavior.
+- After a successful write, default formatting preview reports no further changes for the documents just persisted. Explicit full-relation formatting may still propose additional inverse declarations.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Canonical Model Mutation Persistence](ElementManipulationRequirements.md#canonical-model-mutation-persistence)
 ---
 
 ### Create Element Workflow Specification
@@ -214,26 +223,26 @@ When moving a file, the system is expected to:
 - Accept source file path (relative to the effective workspace root)
 - Accept target file path (relative to the effective workspace root)
 - Allow source and target files to be in different eligible Git worktrees under the same effective workspace root
-- Accept optional squashing flag
+- Accept optional core squashing control, exposed as MCP `squash`
 - Validate both source and target paths
 - Move the physical file from source to target location
 - Update all element identifiers within the file to reflect the new file path
 - Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
-- Preserve all file content, structure, and formatting
+- Preserve domain content, fenced payloads and valid document form while canonically normalizing affected model documents
 - Provide updates report following Diff Output Format Specification
 
 The system is expected to reject the operation with a clear error message if:
 - The source file does not exist
-- The target file already exists (unless --squash flag is provided)
+- The target file already exists (unless `squash: true` is requested)
 - The source or target paths fail validation
 - The target file resolves to a workspace folder outside all eligible Git worktrees
-- `--squash` is used with a target that is an existing `# Element` file
+- `squash: true` is used with a target that is an existing `# Element` file
 
 **Squash Mode Behavior:**
-When the --squash flag is provided and the target file already exists, the system is expected to:
+When `squash: true` is requested and the target file already exists, the system is expected to:
 - Move all elements from the source file to the target end of file
 - Remove the source file after all elements have been successfully moved
-- Preserve element ordering from the source file when inserting into target section
+- Apply the shared file-local hierarchy ordering to the combined destination document
 - Reject squash if target is `# Element` format (single-element file)
 
 #### Metadata

@@ -110,7 +110,7 @@ EOF
 
 # Move Data Format Spec to Contracts.md
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Data Format Spec" specifications/Contracts.md 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Data Format Spec" specifications/Contracts.md 2>&1)
 MV_EXIT=$?
 set -e
 
@@ -157,32 +157,26 @@ echo "Test 3 passed"
 echo ""
 
 # ==================================
-# Test 4: rm Contract Element - Validation Fails
+# Test 4: Reject Deletion of a Bound Contract
 # ==================================
-echo "Test 4: rm Contract element with contract_bindings - validation fails..."
+echo "Test 4: MCP rejects deletion of a still-bound contract..."
 
 # Remove Data Format Spec (bound to 3 requirements)
 set +e
-RM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Data Format Spec" 2>&1)
+RM_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Data Format Spec" 2>&1)
 RM_EXIT=$?
 set -e
 
-# Validation should now fail because contract_bindings are broken
-set +e
-VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
-VALIDATE_EXIT=$?
-set -e
-
-if [ $VALIDATE_EXIT -eq 0 ]; then
-  echo "FAILED: Validation should fail when Contract with contract_bindings is removed"
-  echo "$VALIDATE_OUTPUT"
+# Existing contract bindings make this deletion candidate invalid. MCP must
+# reject it before persistence, preserving the provider and every consumer.
+if [ $RM_EXIT -eq 0 ] || ! grep -q 'Missing contract_bindings target' <<< "$RM_OUTPUT"; then
+  echo "FAILED: MCP must reject deletion of a still-bound contract"
+  echo "$RM_OUTPUT"
   exit 1
 fi
-
-# Verify error mentions the broken contract_bindings
-if ! echo "$VALIDATE_OUTPUT" | grep -qi "data-format-spec\|not found\|invalid\|missing"; then
-  echo "FAILED: Validation error should mention the broken contract_bindings identifier"
-  echo "$VALIDATE_OUTPUT"
+(cd "$TEST_DIR" && "$REQVIRE_BIN" validate) || exit 1
+if ! (cd "$TEST_DIR" && git diff --exit-code --quiet); then
+  echo "FAILED: rejected contract deletion changed authored files"
   exit 1
 fi
 

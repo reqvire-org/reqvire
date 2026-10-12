@@ -51,7 +51,7 @@ Error message structure for validation issues.
 #### Details
 - File path and line number included
 - Element name and relation details shown
-- Optional terminal color coding follows the Functional Output Color Scheme Specification
+- Optional terminal color coding distinguishes errors, warnings, success, and informational messages while preserving readable uncolored output
 - Actionable suggestions when possible
 
 #### Metadata

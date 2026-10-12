@@ -344,13 +344,16 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 vec!["query"],
             ),
         ),
-        read_tool(
+        tool(
             "reqvire.lint",
-            "Analyze model quality without applying fixes.",
+            "Inspect model quality; fix=true applies only safe repairs when mutations are enabled.",
             object_schema(vec![
+                ("fix", if enable_mutations { json!({"type":"boolean", "default":false}) } else { json!({"type":"boolean", "enum":[false], "default":false}) }),
                 ("fixable", json!({ "type": "boolean" })),
                 ("auditable", json!({ "type": "boolean" })),
             ]),
+            !enable_mutations,
+            false,
         ),
         read_tool(
             "reqvire.coverage",

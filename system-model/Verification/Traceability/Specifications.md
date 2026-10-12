@@ -60,13 +60,8 @@ Build a normalized graph showing how verifications trace upward through the requ
 - Concrete verifications without resolved direct requirements are omitted; verification objectives do not produce trace records.
 - CLI, MCP, and Explorer Project Store use this same graph projection. Explorer consumers shall render from nodes and edges without reconstructing expanded path trees. The Project Store schema version changes with this representation.
 
-**Virtual Verification Pattern:**
-For hierarchical relation analysis (not verification-specific), create a virtual verification element connected to all leaf requirements. Apply the same algorithm to detect redundant hierarchical relations.
-
 **Usage:**
-- Trace Report Generator: visualize verification-to-root paths
-- Redundant Verify Detection: find ancestors that are both directly and transitively verified
-- Redundant Hierarchical Detection: find derivedFrom relations with alternate paths
+Trace reports and downstream projections consume this normalized graph. Lint classification uses hierarchical ancestor reachability under its own redundancy contracts; it does not change direct flags, require synthetic verification elements or make graph presentation define automatic repair safety.
 
 #### Metadata
   * type: specification

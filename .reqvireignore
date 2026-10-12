@@ -6,9 +6,8 @@
 # Tests
 tests/**
 
-# Plugin and tool directories
-.claude-plugin/**
-reqvire-claude-plugin/**
+# Assistant skill instruction files are implementation artifacts
+skills/**
 
 # Documentation and build output
 doc/**

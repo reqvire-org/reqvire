@@ -43,7 +43,7 @@ The mutation boundary shall preserve shared validation diagnostics and enrich th
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
-  * verifiedBy: [Delete Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#delete-element-test)
+  * verifiedBy: [Canonical Mutation Persistence Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#canonical-mutation-persistence-verification)
 ---
 
 ### Create Element Operation
@@ -108,6 +108,26 @@ The system shall persist all element manipulation operations to the source files
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * verifiedBy: [File Persistence Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#file-persistence-test)
+---
+
+### Canonical Model Mutation Persistence
+
+When a supported model mutation writes authored model documents, the system SHALL persist affected documents in the canonical default formatting within the validated mutation transaction.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Element Ordering Behavior](../Formatting/Behaviors.md#element-ordering-behavior)
+  * [Document Structure Specification](../Formatting/Specifications.md#document-structure-specification)
+  * [Format Consistency Specification](../Formatting/Specifications.md#format-consistency-specification)
+  * [Relation Ordering Specification](../Formatting/Specifications.md#relation-ordering-specification)
+
+#### Relations
+  * derivedFrom: [Element Manipulation File Persistence](#element-manipulation-file-persistence)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
 ---
 
 ### Merge Element Operation

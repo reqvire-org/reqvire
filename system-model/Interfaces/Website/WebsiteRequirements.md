@@ -53,44 +53,45 @@ WHEN documenting model collaboration, the system SHALL explain unified browser b
   * type: requirement
 
 #### Contract References
-  * [MCP Worktree Worker Sessions Specification](../MCP/Specifications.md#mcp-worktree-worker-sessions-specification)
-  * [Explorer Worktree Runtime Isolation Specification](../WebExplorer/Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [MCP Accepted Change Commit Specification](../MCP/Specifications.md#mcp-accepted-change-commit-specification)
+  * [MCP Branch Push Specification](../MCP/Specifications.md#mcp-branch-push-specification)
+  * [MCP Coverage Scope Selection Specification](../MCP/Specifications.md#mcp-coverage-scope-selection-specification)
+  * [MCP Formatting Tool Specification](../MCP/Specifications.md#mcp-formatting-tool-specification)
+  * [MCP GitHub Tool Availability Specification](../MCP/Specifications.md#mcp-github-tool-availability-specification)
+  * [MCP Lint Fix Tool Specification](../MCP/Specifications.md#mcp-lint-fix-tool-specification)
+  * [MCP Managed Query Artifacts Specification](../MCP/Specifications.md#mcp-managed-query-artifacts-specification)
+  * [MCP Managed Worktree Removal Specification](../MCP/Specifications.md#mcp-managed-worktree-removal-specification)
+  * [MCP Model Evidence Tools Specification](../MCP/Specifications.md#mcp-model-evidence-tools-specification)
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
+  * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
+  * [MCP Publication Scope and Recovery Specification](../MCP/Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * [MCP Pull Request Commenting Specification](../MCP/Specifications.md#mcp-pull-request-commenting-specification)
+  * [MCP Pull Request Creation Specification](../MCP/Specifications.md#mcp-pull-request-creation-specification)
+  * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
+  * [MCP Server Command Specification](../MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
   * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
   * [MCP Worktree Creation Specification](../MCP/Specifications.md#mcp-worktree-creation-specification)
   * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
-  * [MCP Managed Worktree Removal Specification](../MCP/Specifications.md#mcp-managed-worktree-removal-specification)
-  * [MCP Accepted Change Commit Specification](../MCP/Specifications.md#mcp-accepted-change-commit-specification)
-  * [MCP GitHub Tool Availability Specification](../MCP/Specifications.md#mcp-github-tool-availability-specification)
-  * [MCP Publication Scope and Recovery Specification](../MCP/Specifications.md#mcp-publication-scope-and-recovery-specification)
-  * [MCP Branch Push Specification](../MCP/Specifications.md#mcp-branch-push-specification)
-  * [MCP Pull Request Creation Specification](../MCP/Specifications.md#mcp-pull-request-creation-specification)
-  * [MCP Pull Request Commenting Specification](../MCP/Specifications.md#mcp-pull-request-commenting-specification)
-  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
-  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
-  * [MCP Server Command Specification](../MCP/Specifications.md#mcp-server-command-specification)
-  * [MCP Managed Query Artifacts Specification](../MCP/Specifications.md#mcp-managed-query-artifacts-specification)
-  * [MCP Model Evidence Tools Specification](../MCP/Specifications.md#mcp-model-evidence-tools-specification)
-  * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
+  * [MCP Worktree Worker Sessions Specification](../MCP/Specifications.md#mcp-worktree-worker-sessions-specification)
   * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
-  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Explorer Worktree Runtime Isolation Specification](../WebExplorer/Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [MCP Prompt Guidance Specification](../MCP/Specifications.md#mcp-prompt-guidance-specification)
-  * [MCP Protocol Standard Conformance Specification](../MCP/Specifications.md#mcp-protocol-standard-conformance-specification)
-  * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
-  * [MCP Coverage Scope Selection Specification](../MCP/Specifications.md#mcp-coverage-scope-selection-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
 
 #### Relations
   * definedBy: [Website Assistant Integration Documentation Specification](WebsiteSpecifications.md#website-assistant-integration-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
-  * satisfiedBy: [Integrations.tsx](../../../website/src/pages/Integrations.tsx)
-  * satisfiedBy: [McpServer.tsx](../../../website/src/pages/McpServer.tsx)
 ---
 
 ### Website Command and Workflow Documentation
 
-The system SHALL document everyday CLI workflows, model commands, report commands, mutation commands, change impact, and advanced workflow patterns.
+The system SHALL document retained CLI inspections, exports and migrations, MCP authoring and maintenance, change impact, and advanced workflow patterns.
 
 #### Details
 The system SHALL provide scoped coverage command examples according to the CLI and coverage contracts referenced by this requirement.
@@ -101,27 +102,29 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * type: requirement
 
 #### Contract References
-  * [Explorer Shareable Selection Navigation Specification](../WebExplorer/Specifications.md#explorer-shareable-selection-navigation-specification)
-  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
+  * [CLI Coverage Scope Selection Specification](../CLI/Specifications.md#cli-coverage-scope-selection-specification)
+  * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [CLI Managed Query Artifacts Specification](../CLI/Specifications.md#cli-managed-query-artifacts-specification)
+  * [MCP Formatting Tool Specification](../MCP/Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](../MCP/Specifications.md#mcp-lint-fix-tool-specification)
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Explorer Automatic Store Refresh Specification](../WebExplorer/Specifications.md#explorer-automatic-store-refresh-specification)
+  * [Explorer Coverage Scope and Display Specification](../WebExplorer/Specifications.md#explorer-coverage-scope-and-display-specification)
+  * [Explorer Live Store Refresh Input Output](../WebExplorer/Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Shareable Selection Navigation Specification](../WebExplorer/Specifications.md#explorer-shareable-selection-navigation-specification)
+  * [Explorer Verification Trace Rendering Specification](../WebExplorer/Specifications.md#explorer-verification-trace-rendering-specification)
+  * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
+  * [Serve Command Contract Specification](../WebExplorer/Specifications.md#serve-command-contract-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
-  * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
-  * [Serve Command Contract Specification](../WebExplorer/Specifications.md#serve-command-contract-specification)
-  * [Explorer Live Store Refresh Input Output](../WebExplorer/Specifications.md#explorer-live-store-refresh-input-output)
-  * [Explorer Automatic Store Refresh Specification](../WebExplorer/Specifications.md#explorer-automatic-store-refresh-specification)
-  * [CLI Coverage Scope Selection Specification](../CLI/Specifications.md#cli-coverage-scope-selection-specification)
-  * [Explorer Verification Trace Rendering Specification](../WebExplorer/Specifications.md#explorer-verification-trace-rendering-specification)
-  * [Explorer Coverage Scope and Display Specification](../WebExplorer/Specifications.md#explorer-coverage-scope-and-display-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+  * [Report Command Catalog Specification](../../Reports/ModelReports/Specifications.md#report-command-catalog-specification)
 
 #### Relations
   * definedBy: [Website Command and Workflow Documentation Specification](WebsiteSpecifications.md#website-command-and-workflow-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
-  * satisfiedBy: [Advanced.tsx](../../../website/src/pages/Advanced.tsx)
-  * satisfiedBy: [UserGuide.tsx](../../../website/src/pages/UserGuide.tsx)
 ---
 
 ### Website Home Messaging
@@ -155,11 +158,11 @@ The system SHALL explain how contract binding placement identifies the requireme
   * type: requirement
 
 #### Contract References
-  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
-  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
-  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
   * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
+  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
 
 #### Relations
   * definedBy: [Website Implementation Coverage Documentation Specification](WebsiteSpecifications.md#website-implementation-coverage-documentation-specification)
@@ -180,11 +183,11 @@ The system SHALL describe requirements as verification targets and capability ve
   * type: requirement
 
 #### Contract References
-  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [ReservedSubsections](../../ModelStructure/ReservedSubsections.md#reservedsubsections)
-  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [Specification File Identification Contract Specification](../../ModelStructure/Specifications.md#specification-file-identification-contract-specification)
   * [Structure and Addressing in Markdown Documents Contract Specification](../../ModelStructure/Specifications.md#structure-and-addressing-in-markdown-documents-contract-specification)
+  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
 
 #### Relations
   * definedBy: [Website Modeling Language Documentation Specification](WebsiteSpecifications.md#website-modeling-language-documentation-specification)
@@ -200,13 +203,13 @@ The system SHALL document ontology authoring, external ontology sources, built-i
   * type: requirement
 
 #### Contract References
-  * [Semantic Query Authoring Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-authoring-specification)
-  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
-  * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
   * [Ontology Projection Subgraph Materialization Specification](../../Reports/ModelReports/Specifications.md#ontology-projection-subgraph-materialization-specification)
+  * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
   * [OWL Reserved Vocabulary Recognition Specification](../../Semantics/SemanticModelSpecifications.md#owl-reserved-vocabulary-recognition-specification)
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
+  * [Semantic Query Authoring Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-authoring-specification)
+  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
   * definedBy: [Website Ontology Documentation Specification](WebsiteSpecifications.md#website-ontology-documentation-specification)
@@ -229,11 +232,11 @@ The system SHALL explain child and parent contract binding placement, implementa
   * type: requirement
 
 #### Contract References
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
 
 #### Relations
   * definedBy: [Website Requirements and Contracts Documentation Specification](WebsiteSpecifications.md#website-requirements-and-contracts-documentation-specification)
@@ -256,13 +259,13 @@ The system SHALL explain contract binding scope within requirement hierarchies a
   * type: requirement
 
 #### Contract References
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
-  * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
 
 #### Relations
   * definedBy: [Website Semantic Model Documentation Specification](WebsiteSpecifications.md#website-semantic-model-documentation-specification)
@@ -279,8 +282,8 @@ The system SHALL explain Reqvire as a semantic engineering framework for AI-assi
   * type: requirement
 
 #### Contract References
-  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
   * [Relation Semantics Specification](../../ModelStructure/Specifications.md#relation-semantics-specification)
+  * [Semantic Contract Structure Specification](../../ModelStructure/Specifications.md#semantic-contract-structure-specification)
 
 #### Relations
   * definedBy: [Website Strategic Positioning Documentation Specification](WebsiteSpecifications.md#website-strategic-positioning-documentation-specification)
@@ -301,10 +304,10 @@ The system SHALL explain the availability of whole-model orphan diagnostics when
   * type: requirement
 
 #### Contract References
+  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../../Verification/Traceability/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
-  * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
 
 #### Relations
   * definedBy: [Website Verification Documentation Specification](WebsiteSpecifications.md#website-verification-documentation-specification)

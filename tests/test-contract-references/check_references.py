@@ -66,7 +66,7 @@ class Workspace:
         self.git('commit', '-qm', 'Fixture')
 
     def run(self, *args, ok=True, input=None):
-        result = subprocess.run([BINARY, *args], cwd=self.root, text=True, input=input, capture_output=True, timeout=40)
+        result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else BINARY, *args], cwd=self.root, text=True, input=input, capture_output=True, timeout=40)
         if ok:
             require(result.returncode == 0, f'{args} failed: {result.stdout}\n{result.stderr}')
         else:

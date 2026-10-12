@@ -247,7 +247,7 @@ newbilling:billingId a owl:DatatypeProperty ;
 ```'
 
 set +e
-OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$UPDATED_BILLING_ONTOLOGY" | "$REQVIRE_BIN" add specifications.md --override 2>&1)
+OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$UPDATED_BILLING_ONTOLOGY" | "$MCP_OPERATION_BIN" add specifications.md --override 2>&1)
 OVERRIDE_EXIT=$?
 set -e
 if [ $OVERRIDE_EXIT -ne 0 ]; then
@@ -282,7 +282,7 @@ if grep -Fq "oldbilling:BillingPayload" "$TEST_DIR/specifications.md"; then
 fi
 
 set +e
-RELINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" relink "API Ontology" derivedFrom "Old Foundation Ontology" "Platform Ontology" 2>&1)
+RELINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" relink "API Ontology" derivedFrom "Old Foundation Ontology" "Platform Ontology" 2>&1)
 RELINK_EXIT=$?
 set -e
 if [ $RELINK_EXIT -ne 0 ]; then
@@ -380,7 +380,7 @@ child:ChildThing a owl:Class .
 ```'
 
 set +e
-CONVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_CHILD_TO_BOUNDARY" | "$REQVIRE_BIN" add specifications.md --override 2>&1)
+CONVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_CHILD_TO_BOUNDARY" | "$MCP_OPERATION_BIN" add specifications.md --override 2>&1)
 CONVERT_EXIT=$?
 set -e
 if [ $CONVERT_EXIT -ne 0 ]; then
@@ -431,7 +431,7 @@ root:ChildThing a owl:Class .
 ```'
 
 set +e
-REVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_CHILD_BACK" | "$REQVIRE_BIN" add specifications.md --override 2>&1)
+REVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_CHILD_BACK" | "$MCP_OPERATION_BIN" add specifications.md --override 2>&1)
 REVERT_EXIT=$?
 set -e
 if [ $REVERT_EXIT -ne 0 ]; then
@@ -495,7 +495,7 @@ grandchild:GrandchildThing a owl:Class .
 ```'
 
 set +e
-GRANDCHILD_CONVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_GRANDCHILD_TO_BOUNDARY" | "$REQVIRE_BIN" add specifications.md --override 2>&1)
+GRANDCHILD_CONVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_GRANDCHILD_TO_BOUNDARY" | "$MCP_OPERATION_BIN" add specifications.md --override 2>&1)
 GRANDCHILD_CONVERT_EXIT=$?
 set -e
 if [ $GRANDCHILD_CONVERT_EXIT -ne 0 ]; then
@@ -537,7 +537,7 @@ child:GrandchildThing a owl:Class .
 ```'
 
 set +e
-GRANDCHILD_REVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_GRANDCHILD_BACK" | "$REQVIRE_BIN" add specifications.md --override 2>&1)
+GRANDCHILD_REVERT_OUTPUT=$(cd "$TEST_DIR" && printf "%s\n" "$CONVERT_GRANDCHILD_BACK" | "$MCP_OPERATION_BIN" add specifications.md --override 2>&1)
 GRANDCHILD_REVERT_EXIT=$?
 set -e
 if [ $GRANDCHILD_REVERT_EXIT -ne 0 ]; then
@@ -564,7 +564,7 @@ fi
 cp "$TEST_SCRIPT_DIR/fixtures/02-ontology-mutation-ops.txt" "$TEST_DIR/specifications.md"
 
 set +e
-ONTOLOGY_RM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Child Ontology" 2>&1)
+ONTOLOGY_RM_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Child Ontology" 2>&1)
 ONTOLOGY_RM_EXIT=$?
 set -e
 if [ $ONTOLOGY_RM_EXIT -ne 0 ]; then
@@ -589,7 +589,7 @@ fi
 cp "$TEST_SCRIPT_DIR/fixtures/02-ontology-mutation-ops.txt" "$TEST_DIR/specifications.md"
 
 set +e
-ONTOLOGY_RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Child Ontology" "Child Ontology Renamed" 2>&1)
+ONTOLOGY_RENAME_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Child Ontology" "Child Ontology Renamed" 2>&1)
 ONTOLOGY_RENAME_EXIT=$?
 set -e
 if [ $ONTOLOGY_RENAME_EXIT -ne 0 ]; then
@@ -622,7 +622,7 @@ fi
 cp "$TEST_SCRIPT_DIR/fixtures/02-ontology-mutation-ops.txt" "$TEST_DIR/specifications.md"
 
 set +e
-ONTOLOGY_MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Child Ontology" "specifications/Moved.md" 2>&1)
+ONTOLOGY_MV_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Child Ontology" "specifications/Moved.md" 2>&1)
 ONTOLOGY_MV_EXIT=$?
 set -e
 if [ $ONTOLOGY_MV_EXIT -ne 0 ]; then
@@ -656,7 +656,7 @@ cp "$TEST_SCRIPT_DIR/fixtures/02-ontology-mutation-ops.txt" "$TEST_DIR/specifica
 rm -f "$TEST_DIR/specifications/Moved.md"
 
 set +e
-ONTOLOGY_MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Billing Ontology" "Platform Ontology" 2>&1)
+ONTOLOGY_MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Billing Ontology" "Platform Ontology" 2>&1)
 ONTOLOGY_MERGE_EXIT=$?
 set -e
 if [ $ONTOLOGY_MERGE_EXIT -ne 0 ]; then

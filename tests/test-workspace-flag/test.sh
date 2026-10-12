@@ -73,7 +73,7 @@ if ! diff -u "$TEST_SCRIPT_DIR/expected/search-short.txt" "$TEST_DIR/output/sear
   fail "workspace search output does not match expected result"
 fi
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" mv "Workspace Flag Child" specifications/Moved.md) > "$TEST_DIR/output/mv.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --workspace "$TEST_DIR" mv "Workspace Flag Child" specifications/Moved.md) > "$TEST_DIR/output/mv.txt" 2>&1 \
   || fail "mv should mutate selected workspace from outside cwd" "$TEST_DIR/output/mv.txt"
 if ! grep -q "Workspace Flag Child" "$TEST_DIR/specifications/Moved.md"; then
   fail "mv should create target file inside selected workspace" "$TEST_DIR/specifications/Moved.md"
@@ -82,7 +82,7 @@ if grep -q "### Workspace Flag Child" "$TEST_DIR/specifications/Requirements.md"
   fail "mv should remove moved element from original selected workspace file" "$TEST_DIR/specifications/Requirements.md"
 fi
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" mv-file specifications/Requirements.md specifications/RenamedRequirements.md) > "$TEST_DIR/output/mv-file.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --workspace "$TEST_DIR" mv-file specifications/Requirements.md specifications/RenamedRequirements.md) > "$TEST_DIR/output/mv-file.txt" 2>&1 \
   || fail "mv-file should mutate selected workspace from outside cwd" "$TEST_DIR/output/mv-file.txt"
 if [ -f "$TEST_DIR/specifications/Requirements.md" ]; then
   fail "mv-file should remove original file inside selected workspace" "$TEST_DIR/specifications/Requirements.md"

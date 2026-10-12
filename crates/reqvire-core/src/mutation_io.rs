@@ -21,6 +21,7 @@ struct Context {
     files: SnapshotFiles,
     overlay: BTreeMap<PathBuf, Option<PreparedFile>>,
     changed: BTreeSet<PathBuf>,
+    removed_directories: BTreeSet<PathBuf>,
     model: Option<Arc<ModelManager>>,
     capture: bool,
 }
@@ -37,6 +38,7 @@ impl SnapshotFiles {
                 files: self.clone(),
                 overlay: BTreeMap::new(),
                 changed: BTreeSet::new(),
+                removed_directories: BTreeSet::new(),
                 model,
                 capture: false,
             });
@@ -45,6 +47,15 @@ impl SnapshotFiles {
     }
 }
 impl SnapshotGuard {
+    pub fn removed_directories(&self) -> BTreeSet<PathBuf> {
+        CONTEXT.with(|slot| {
+            slot.borrow()
+                .as_ref()
+                .expect("active snapshot")
+                .removed_directories
+                .clone()
+        })
+    }
     pub fn capture_dependencies(&self) {
         CONTEXT.with(|s| s.borrow_mut().as_mut().expect("active snapshot").capture = true);
     }
@@ -277,6 +288,14 @@ pub fn remove_dir_all(path: impl AsRef<Path>) -> io::Result<()> {
         for path in paths {
             remove_file(path)?;
         }
+        let path = absolute(path.as_ref());
+        CONTEXT.with(|slot| {
+            let mut context = slot.borrow_mut();
+            let context = context.as_mut().expect("active snapshot");
+            writable(context, &path)?;
+            context.removed_directories.insert(path);
+            Ok::<_, io::Error>(())
+        })?;
         Ok(())
     } else {
         std::fs::remove_dir_all(path)

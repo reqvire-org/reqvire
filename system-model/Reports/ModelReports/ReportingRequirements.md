@@ -316,7 +316,7 @@ Detailed scope resolution, filtered capability/requirement behavior, empty-submo
 The system SHALL implement a search report generator with comprehensive filtering and element type tracking.
 
 #### Details
-The system SHALL include file-level, section-level, and element-level information in search reports.
+The system SHALL include source-file information and file-owned element records in search reports.
 
 WHEN full search results contain ontology or semantic-contract elements, the system SHALL expose their parsed semantic model fields.
 
@@ -410,7 +410,7 @@ The system shall implement a validation report generator that compiles and forma
 
 ### Resources Report
 
-The system shall provide a resources report inventorying InternalPath relation targets that resolve to existing workspace-root-relative eligible Git-worktree files and contract_bindings targets that resolve to model element identifiers.
+The system SHALL provide a resources report inventorying compatible InternalPath relation targets that resolve to existing workspace-root-relative eligible Git-worktree files.
 
 #### Metadata
   * type: requirement

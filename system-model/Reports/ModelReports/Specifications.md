@@ -28,7 +28,7 @@ Technical specification for content collection from capability, requirement, ont
 - When direction is DOWNSTREAM from a capability:
  - Traverse child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`
 - When direction is DOWNSTREAM from an ontology:
- - Traverse child ontology elements through `derive` and include semantic contracts that use each reachable ontology element through `use`/`usedBy`
+ - Traverse child ontology elements through `derive` and include semantic contracts and semantic queries that use each reachable ontology element through `use`/`usedBy`
 - When direction is DOWNSTREAM from a semantic query:
  - Include the starting query without executing it
 - When direction is DOWNSTREAM from a concept scheme or concept:
@@ -37,15 +37,8 @@ Technical specification for content collection from capability, requirement, ont
 
 **Content Collection:**
 - Collect element content field (main body text including Details section)
-- For each definedBy target:
- - ElementIdentifier (contract element): Include element's content
- - FilePath pointing to .md file: Read and include file content
- - FilePath pointing to other file types: Include as markdown link
-- For each contract_bindings:
- - FilePath pointing to .md file: Read and include file content
- - FilePath pointing to other file types: Include as markdown link
- - ElementIdentifier: Include referenced element's content
-- Skip external URL contract_bindings
+- For each `definedBy` target, include the uniquely owned contract element content and source citation. Ownership targets are model contracts rather than artifact files or URLs.
+- For each Contract Binding, include the compatible owned contract content and its binding context. File and URL artifacts are not binding targets.
 - For each Contract Reference, collection MUST include the referenced contract content and source citation once per collected target, following the shared Contract Reference evidence projection contract.
 - If the target is already collected through ownership, bindings, or another reference, collection MUST reuse that content item.
 
@@ -58,7 +51,7 @@ Technical specification for content collection from capability, requirement, ont
 **Error Handling:**
 - Element not found: Error with message
 - Element not a capability, requirement, ontology, semantic-query, concept-scheme, or concept type: Error with message
-- Contract Bindings file not found: Warning, continue with other content
+- Unresolved ownership or contract dependency targets: fail shared model validation before collection
 - Cyclic Contract Reference dependencies MUST fail model validation before collection. Traversal of valid converging paths MUST deduplicate repeated reference targets.
 
 #### Metadata
@@ -154,6 +147,9 @@ Explorer route colors, element glyphs, graph colors, Mermaid rendering colors, a
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * define: [Model Reports](ReportingRequirements.md#model-reports)
 ---
 
 ### Comma-Separated Type Filter Parsing Contract Specification
@@ -239,6 +235,23 @@ Browser presentation, layout, mode controls, graph rendering, and shell integrat
   * type: specification
 ---
 
+### Contract Reference Evidence Projection Specification
+
+Contract Reference evidence is separately identifiable across human-readable and machine-readable model surfaces.
+
+#### Details
+Element-bearing model, search, containment, read-element, and Explorer Project Store outputs MUST expose authored references through a `contract_references` collection distinct from `contract_bindings`. Entries MUST use the corresponding surface's existing contract-target representation. Empty reference collections MAY be omitted. Consumers MUST accept an absent reference collection as empty, including in older stored data.
+
+Human-readable element details MUST label navigable targets `Contract References`. Element content collection MUST include the referenced contract content and its source citation once per collected target. Dependency reports MUST preserve the reference edge kind and its direction.
+
+Semantic model export MUST publish `reqvire:referencesContract` from requirement to contract, `reqvire:contractReferencedBy` in the inverse direction, and `reqvire:contractReferencesTargetIdentifier` for target identity. Reference-only edges MUST NOT emit binding predicates or implementation-contribution facts. Semantic vocabulary discovery MUST expose the distinct reference relation family.
+
+Publishing consumers MUST reuse the shared model projections. Element-detail consumers MUST show navigable references separately from implementation evidence.
+
+#### Metadata
+  * type: specification
+---
+
 ### Coverage Scope Specification
 
 Shared contract for selecting coverage report subjects while retaining their model-wide evidence context.
@@ -285,31 +298,16 @@ Shared contract for selecting coverage report subjects while retaining their mod
 
 ### Deterministic Output Specification
 
-Technical specification for ensuring deterministic, reproducible output across all report generation operations.
+Contract for reproducible report ordering.
 
 #### Details
-All report outputs are expected to use deterministic ordering to enable reliable testing, version control, and reproducible builds.
-
-**Ordering Rules:**
-
-1. **Element Ordering**: Elements is expected to be sorted by identifier before iteration to ensure consistent processing order across all operations
-2. **Relation Ordering**: Relations within each element is expected to be sorted by relation type name and then by target identifier before rendering
-3. **Section Ordering**: Sections within files is expected to be sorted alphabetically when order is not semantically significant
-4. **File Ordering**: Files within folders is expected to be sorted alphabetically
-
-**Benefits of Determinism:**
-- Running the same operation multiple times produces byte-identical output
-- Automated tests can reliably compare expected and actual outputs using simple diff tools without special normalization
-- Version control diffs are meaningful and reflect actual changes rather than random ordering variations
-- Continuous integration pipelines produce consistent, reproducible results
-
-**Applies to:**
-- Model summary reporting (text and JSON formats)
-- Verification tracing (upward traceability trees from verifications to requirements)
-- Coverage reporting (verification coverage analysis)
-- Change impact analysis (reports showing propagation of changes)
-- Validation reporting (model validation error reports)
-- Linting (model quality issue reports)
+- Each report MUST use its owned output contract's stable grouping and ordering. Determinism does not impose one identifier sort on every surface.
+- File and folder inventories sort by normalized path where their contracts prescribe it. File-owned element and verification projections retain document order where specified, using `file_order_index` rather than section containers.
+- Nested model relations sort by relation type and target identifier. Normalized trace nodes sort by identifier and trace edges by source, relation type and target; shared ancestors remain unique nodes.
+- Authored Markdown relation ordering follows the formatter contract, including concept-family priorities; report ordering does not redefine source serialization.
+- For unchanged input, nonvolatile report data and artifacts MUST remain byte-identical. Explicitly contracted commit, timestamp or other volatile metadata is outside that guarantee.
+- Applies to model JSON, normalized verification trace JSON, coverage text/JSON, change-impact text/JSON, search, containment, resource inventory, validation and lint outputs according to their supported formats.
+- Expected fixtures may compare complete stable output with ordinary diffs. They MUST normalize only explicitly volatile fields.
 
 #### Metadata
   * type: specification
@@ -425,34 +423,33 @@ JSON report outputs are expected to preserve element size-estimate metadata when
 
 ### JSON Output Structure
 
-Standard JSON output structure for CLI commands that emit JSON, either as canonical output or through a selectable `--json` mode.
+Shared JSON conventions for model reports that emit JSON, either as canonical output or through a selectable `--json` mode. Each report's contract defines its record and collection schema.
 
 #### Details
 JSON output conventions:
 
 **Structure:**
 - Root object with semantic field names (not abbreviated)
-- Arrays for collections (elements, relations, files)
-- Nested objects for hierarchical data
+- Arrays for ordered records and relations; file-grouped reports such as search and coverage use `files` objects keyed by source path
+- Nested objects where the report represents hierarchy or grouped data
 - Consistent field naming using snake_case
 
-**Common Fields:**
-- `identifier`: Full element identifier (file#fragment)
-- `name`: Display name of element
-- `type`: Element type string
-- `file_path`: Relative path from the effective workspace root
-- `relations`: Array of relation objects with `type` and `target` fields
-- `contract_bindings`: Array of contract element identifier strings
+**Element and Relation Fields:**
+- Element records expose canonical identifiers and names when applicable.
+- Field names follow the surface-specific schema: model records use `element_type` and `file_path`, while search records use `type` and `file`.
+- Source paths and identifiers are relative to the effective workspace root.
+- Relation records use the report's target representation. Search records use `relation_type` and a typed `target`; model records use `relation_type` with a nested `element`, artifact `path`, or external `url`.
+- Contract Bindings and Contract References remain distinct fields. Their target representation follows the report's contract; model records expose identifier arrays.
 
-**Error Handling:**
-- Error responses include `error` field with message
-- Successful responses omit error field entirely
-- Exit code accompanies JSON (0=success, non-zero=error)
+**Diagnostics:**
+- Each operation defines its diagnostic schema; an `error` string is not a universal report envelope.
+- Validation exposes an `errors` collection, while lint inspection groups findings by repair category.
+- CLI exit status follows the operation's success and diagnostic contract.
 
 **File Output:**
-- When `--output <FILE>` is provided, write JSON to file instead of stdout
-- Print confirmation message to stdout: `✅ Output saved to <filepath>`
-- `--output` without JSON output selection is an error only for commands that still have non-JSON modes
+- Report commands supporting `--output <FILE>` publish their selected JSON report to that file and follow the CLI JSON file-output contract for confirmation and mode validation.
+- Native artifact exporters retain their own serialization and publication contracts. Semantic RDF/JSON-LD export, managed SPARQL export, and static Explorer export are not governed by a universal JSON-only file-output rule.
+- JSON-only reports do not require a separate `--json` selector. Commands with selectable text output require JSON selection for JSON file output as specified by their command contract.
 
 #### Metadata
   * type: specification
@@ -463,13 +460,12 @@ JSON output conventions:
 
 ### Markdown Report Style Specification
 
-Style guidelines for markdown text report output (model, coverage, traces, containment commands).
+Shared style guidelines for supported Markdown reports, including coverage and change-impact text output. Each report's contract defines its headings and layout. JSON-only model, traces, and containment commands do not expose a Markdown mode.
 
 #### Details
 **Document Structure:**
-- Title as H1 header
-- Major sections as H2 headers
-- Subsections as H3 headers
+- Use the report's specified entry heading; reports may begin directly with an H2 summary rather than an H1 title.
+- Major sections use H2 headers and subsections use H3 headers where the report's layout specifies them.
 - Element listings as bullet points or tables
 
 **Formatting Conventions:**
@@ -504,8 +500,11 @@ Model output format rules:
 - `reqvire model` emits structured JSON by default.
 - The `model` command does not expose a separate output-format flag.
 - Alternative output-format flags are not supported by the `model` command.
-- JSON format uses structured data with folders, files, sections, elements, relations, and contract_bindings.
-- Element contract_bindings are included as an array of contract element identifier strings.
+- The root object contains `elements` and `metadata`. Element-centric traversal records carry `identifier`, `name`, `element_type`, `file_path`, `file_order_index`, `relations`, and `contract_bindings`; `size_estimate` and nonempty `contract_references` are included when applicable.
+- Relations carry `relation_type` with a nested `element` record, an artifact `path` and target `type`, or an external `url` and target `type`.
+- Contract Bindings and Contract References are distinct arrays of contract element identifier strings.
+- Metadata contains `total_elements`, `total_relations`, `filtered_from`, and `direction`, with `type_filter` when selected.
+- Folders and file containers belong to containment output. Markdown section headings are not model report nodes.
 
 #### Metadata
   * type: specification
@@ -516,7 +515,7 @@ Model output format rules:
 
 ### Model Relation Traversal Filtering Specification
 
-Technical specification for relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving complete element hierarchy representation.
+Technical specification for forward relation filtering in model JSON traversal to include one canonical forward relation from each inverse relation pair while preserving the requested reachable element context. Reverse traversal follows its separately owned behavior contract.
 
 #### Details
 **Model Relation Traversal Filtering Rules:**
@@ -534,6 +533,9 @@ The filtering ensures that:
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * define: [Forward-Only Relation Traversal](ReportingRequirements.md#forward-only-relation-traversal)
 ---
 
 ### Ontology Collection Output Specification
@@ -608,12 +610,12 @@ Report command catalog for model reporting capabilities.
 
 #### Details
 Report commands:
-- `collect`: capability-or-requirement context collection, with upstream or downstream traversal and source citations.
+- `collect`: capability, requirement, ontology, semantic-query and native concept context collection, with the applicable traversal and source citations.
 - `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.
-- `traces`: verification-to-capability-root traceability trees.
+- `traces`: normalized verification-to-capability-root trace graphs.
 - `search`: model element search with relations, contract_bindings, semantic-contract fields, and effective governance metadata.
 - `submodels`: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.
-- `resources`: relation file targets and contract_bindings identifier targets grouped by resource.
+- `resources`: eligible relation-file artifacts grouped by path, with the retained empty binding inventory compatibility fields.
 - `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
 - `model`: logical model graph traversal with optional direction and type filtering.
 - `lint`: model quality findings grouped for auto-fix or manual review.
@@ -811,32 +813,16 @@ All relation types use open (hollow) arrowheads for consistent diagram readabili
 
 ### Resources Report Format Specification
 
-Technical specification for resources report structure and output formats.
+Contract for the local artifact inventory.
 
 #### Details
-**Report Structure:**
-The resources report is expected to consist of two sections:
-1. Relations section
-2. Contract Bindings section
-
-**Relations Section:**
-- Existing workspace-root-relative eligible Git-worktree files from internal path relation targets such as `satisfiedBy`
-- Shows relation type and source element for each reference
-- Sorted by relation type, then by element identifier
-- Each file lists all elements that reference it with their relation types
-
-**Contract Bindings Section:**
-- Contract element identifiers from contract_bindings targets
-- Shows source element for each reference
-- Sorted by element identifier
-- Each contract identifier lists all elements that reuse it
-
-**Output Format:**
-
-*JSON Format:*
-- Structured data for programmatic use
-- Includes workspace-root-relative file paths, element identifiers, relation types
-- Suitable for automated processing and integration
+- Inventory existing eligible Git-worktree files reached through compatible InternalPath relation targets, including implementation and evidence artifacts. Preserve workspace-root-relative paths.
+- Model-element contract dependencies belong to model, search and containment projections; they do not become artifact-file inventory entries.
+- JSON has `relations`, `contract_bindings` and `summary`. Each relation-file entry has `file_path` and `references`; each reference has `relation_type`, `element_id` and `element_name`. Here `element_id` retains the source element's canonical identifier.
+- Sort files by path and references by relation type, then source identifier. Repeated references retain their existing report representation.
+- Retain the compatibility `contract_bindings` array and `total_contract_bindings_files` / `total_contract_bindings_references` counters. Canonical bindings target owned model contracts, so validated canonical input produces an empty array and zero counters. This schema retention does not authorize file-path bindings or promise a contract-identifier inventory.
+- `summary` also includes `total_relation_files` and `total_relation_references`. Counts describe the emitted inventory.
+- Empty inventory arrays and their counters remain present. Output is structured JSON with the shared output-file behavior.
 
 #### Metadata
   * type: specification
@@ -910,7 +896,7 @@ Human-readable text output conventions for CLI commands.
 Default text output (when neither `--json` nor other format flags specified):
 
 **Hierarchical Display:**
-- Group elements by file, then by section
+- Group element-bearing text reports by source file with elements directly under the file
 - Use indentation to show containment
 - Display element name with type indicator
 
@@ -926,7 +912,7 @@ Default text output (when neither `--json` nor other format flags specified):
 - Line numbers for file references
 
 **Consistency:**
-- Deterministic ordering (alphabetical by identifier)
+- Deterministic grouping and ordering according to the owning report contract; preserve source order where that surface specifies it
 - Consistent spacing and alignment
 - No trailing whitespace
 
@@ -950,7 +936,7 @@ The `change-impact` command is expected to continue to use GitHub blob URLs by d
 ### Trace Diagram Projection Data Contract Specification
 
 #### Details
-Trace diagram projection consumes trace data derived from report trace trees and produces per-verification roll-up diagram data for downstream renderers. CLI report commands remain JSON-only and do not emit Markdown or Mermaid output.
+Trace diagram projection consumes trace data derived from normalized report trace graphs and produces per-verification roll-up diagram data for downstream renderers. CLI report commands remain JSON-only and do not emit Markdown or Mermaid output.
 
 The contract defines report-owned trace diagram data semantics that interface renderers may reuse through contract bindings without creating a cross-domain hierarchy relation.
 
@@ -969,7 +955,7 @@ Reqvire provides traceability reports over the Reqvire capability, requirement, 
 - Traceability reports must use Reqvire relation semantics for traversal direction, ownership, and evidence links.
 - Upward reports must trace implementation and verification evidence to requirements and owning capability roots where applicable.
 - Downstream reports must trace capability roots to specified requirements and requirement descendants.
-- Change-impact reports must use propagation relations, contract_bindings, semantic dependencies, and impact scope rules to identify affected elements.
+- Change-impact reports must use propagation relations, contract_bindings, contract_references, semantic dependencies, and impact scope rules to identify affected elements.
 
 #### Metadata
   * type: specification
@@ -993,21 +979,4 @@ Reqvire supports verification coverage analysis for requirement verification and
 
 #### Relations
   * define: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
----
-
-### Contract Reference Evidence Projection Specification
-
-Contract Reference evidence is separately identifiable across human-readable and machine-readable model surfaces.
-
-#### Details
-Element-bearing model, search, containment, read-element, and Explorer Project Store outputs MUST expose authored references through a `contract_references` collection distinct from `contract_bindings`. Entries MUST use the corresponding surface's existing contract-target representation. Empty reference collections MAY be omitted. Consumers MUST accept an absent reference collection as empty, including in older stored data.
-
-Human-readable element details MUST label navigable targets `Contract References`. Element content collection MUST include the referenced contract content and its source citation once per collected target. Dependency reports MUST preserve the reference edge kind and its direction.
-
-Semantic model export MUST publish `reqvire:referencesContract` from requirement to contract, `reqvire:contractReferencedBy` in the inverse direction, and `reqvire:contractReferencesTargetIdentifier` for target identity. Reference-only edges MUST NOT emit binding predicates or implementation-contribution facts. Semantic vocabulary discovery MUST expose the distinct reference relation family.
-
-Publishing consumers MUST reuse the shared model projections. Element-detail consumers MUST show navigable references separately from implementation evidence.
-
-#### Metadata
-  * type: specification
 ---

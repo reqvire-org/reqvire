@@ -9,7 +9,7 @@ When analyzing verification coverage, the system shall trace from verification e
 
 When generating trace reports, the system shall indicate which requirements are directly verified versus transitively covered. Capability coverage is reported as a rollup from those requirements.
 
-When detecting model quality issues, the system shall identify redundant verification relations where a verification directly verifies both a leaf requirement and its ancestor.
+When detecting model quality issues, the system SHALL identify redundant direct verification relations according to the shared redundancy policy, preserving the distinction between coverage roll-up and verification intent.
 
 #### Metadata
   * type: requirement
@@ -37,7 +37,7 @@ The system shall implement a verification roll-up strategy where parent requirem
 
 ### Verification Trace Builder
 
-The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach owning capability roots, merging all paths into a single tree structure with marked directly verified requirements.
+The system SHALL build normalized upward trace graphs from concrete verifications through directly verified requirements, requirement ancestry and owning capability roots, preserving unique nodes, distinct labelled edges and direct verification flags.
 
 #### Metadata
   * type: requirement

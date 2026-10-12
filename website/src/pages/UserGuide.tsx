@@ -46,8 +46,6 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
         <CommandList
           items={[
             { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, Contract Bindings, Contract References, ontology, and semantic contracts." },
-            { cmd: "reqvire format", desc: "Preview canonical formatting, ordering, and relation layout." },
-            { cmd: "reqvire format --fix", desc: "Apply formatting fixes." },
             { cmd: "reqvire lint", desc: "Find model quality issues such as redundant relations and cross-boundary hierarchy problems." },
             { cmd: "reqvire lint --auditable", desc: "Report remediation-ready structural findings." },
             { cmd: "reqvire search", desc: "Filter the model by type, file, name, content, relations, and governance metadata." },
@@ -101,100 +99,84 @@ reqvire semantic export --layer queries --output queries.ttl`}</CodeBlock>
         </p>
       </Section>
 
-      <Section title="Working with Elements">
-        <CommandList
-          items={[
-            { cmd: "reqvire add <file>", desc: "Append a new Markdown element from inline content, stdin, or a file." },
-            { cmd: "reqvire add <file> --dry-run", desc: "Preview a new or overridden element without writing." },
-            { cmd: "reqvire rm <element>", desc: "Remove an element and validate remaining links." },
-            { cmd: "reqvire mv <element> <file>", desc: "Move an element to another Markdown file while preserving references." },
-            { cmd: "reqvire rename <old> <new>", desc: "Rename an element and update links." },
-            { cmd: "reqvire merge <target> <source>", desc: "Merge source element content and relations into a target." },
-            { cmd: "reqvire mv-file <old> <new>", desc: "Move or rename a model file while updating model references." },
-            { cmd: "reqvire mv-file <old> <new> --squash", desc: "Merge all elements from one file into another file." },
-            { cmd: "reqvire mv-folder <old> <new>", desc: "Move or rename a model folder while updating model references and local evidence paths." },
-            { cmd: "reqvire mv-asset <old> <new>", desc: "Move a referenced non-model file and update references." },
-            { cmd: "reqvire rm-asset <path>", desc: "Remove a referenced asset from the model." },
-          ]}
-        />
-        <p className="text-zinc-600 mt-4">
-          Element, file, folder, and asset paths are workspace-root-relative.
-          In a parent workspace, move and add commands can target any eligible
-          Git worktree under that root while rejecting non-Git workspace
-          folders.
+      <Section title="Authoring through MCP">
+        <p className="text-zinc-600 mb-4">
+          Start MCP with mutations enabled to create, replace, remove, move,
+          rename, and merge elements or move files, folders, and assets.
+          Typed authoring previews also require mutation enablement. Paths are
+          relative to the selected worktree context's workspace root.
         </p>
-        <div className="mt-5">
-          <CodeBlock>{`reqvire add system-model/Auth.md --content '### Token Expiry Requirement
+        <CodeBlock>{`reqvire mcp --enable-mutations
 
-The system shall reject expired access tokens.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [API Authentication](Auth.md#api-authentication)'
-
-reqvire add system-model/Auth.md --dry-run < new-requirement.md
-reqvire add system-model/Auth.md --override < cleaned-merged-requirement.md
-
-reqvire rm "Obsolete Requirement" --dry-run
-reqvire rm "Obsolete Requirement"
-
-reqvire mv "Token Expiry Requirement" system-model/Identity/AuthRequirements.md
-reqvire rename "Token Expiry Requirement" "Access Token Expiry Requirement"
-reqvire merge "Access Token Validation" "Legacy Token Validation" --dry-run
-
-reqvire mv-file system-model/OldAuth.md system-model/Identity/Auth.md
-reqvire mv-file system-model/AuthDrafts.md system-model/Identity/Auth.md --squash
-reqvire mv-folder system-model/IdentityDrafts system-model/Identity
-reqvire mv-asset docs/auth-flow.pdf docs/identity/auth-flow.pdf
-reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
-        </div>
+// MCP tool calls
+reqvire.add_element({file: "system-model/Auth.md", content: "<complete element Markdown>", dry_run: true})
+reqvire.add_element({file: "system-model/Auth.md", content: "<replacement Markdown>", override_existing: true})
+reqvire.remove_element({element_name: "Obsolete Requirement", dry_run: true})
+reqvire.move_element({element_name: "Token Expiry Requirement", file: "system-model/Identity/Auth.md"})
+reqvire.rename_element({element_name: "Token Expiry Requirement", new_name: "Access Token Expiry Requirement"})
+reqvire.merge_elements({target: "Access Token Validation", sources: ["Legacy Token Validation"], dry_run: true})
+reqvire.move_file({source_file: "system-model/AuthDrafts.md", target_file: "system-model/Identity/Auth.md", squash: true})
+reqvire.move_folder({source_folder: "system-model/IdentityDrafts", target_folder: "system-model/Identity"})
+reqvire.move_asset({old_path: "docs/auth-flow.pdf", new_path: "docs/identity/auth-flow.pdf"})
+reqvire.remove_asset({file_path: "docs/obsolete-auth-flow.pdf", dry_run: true})`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Each accepted mutation validates the complete candidate and persists
+          canonical formatting in affected model documents. CLI authoring
+          commands and their previews have been removed.
+        </p>
       </Section>
 
       <Section title="Linking and Contract Dependencies">
         <p className="text-zinc-600 mb-4">
-          The link and unlink commands manage relations, Contract Bindings,
+          The typed MCP link and unlink tools manage relations, Contract Bindings,
           and Contract References. Use the dependency form that matches the
           consuming requirement's responsibility.
         </p>
-        <CodeBlock>{`reqvire link "Authentication" "specifiedBy" "Authentication Requirement"
-reqvire link "Authentication Requirement" "verifiedBy" "Auth Test Case"
-reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
-reqvire link "Performance Requirement" bindContract "#rate-limiting-constraint"
-reqvire link "API Documentation" referenceContract "Error Response Specification"
-
-reqvire unlink "Authentication Requirement" "Auth Test Case"
-reqvire unlink "Performance Requirement" "#rate-limiting-constraint"
-reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent"
-
-reqvire link "Password Login Requirement" "derivedFrom" "Authentication Requirement" --dry-run
-reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent" --json`}</CodeBlock>
+        <CodeBlock>{`// MCP tool calls
+reqvire.link({source: "Authentication Requirement", relation_type: "verifiedBy", target: "Auth Test Case"})
+reqvire.link({source: "System Requirement", relation_type: "satisfiedBy", target: "src/auth/login.rs"})
+reqvire.link({source: "Performance Requirement", relation_type: "bindContract", target: "Rate Limiting Constraint"})
+reqvire.link({source: "API Documentation", relation_type: "referenceContract", target: "Error Response Specification"})
+reqvire.unlink({source: "Authentication Requirement", target: "Auth Test Case"})
+reqvire.relink({source: "Child Requirement", relation_type: "derivedFrom", from_target: "Old Parent", to_target: "New Parent", dry_run: true})`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Use <code>bindContract</code> for an implementation obligation and
           <code> referenceContract</code> for a content dependency that should
           propagate change impact. A requirement cannot contain both dependency
-          sections. The unlink command detects either kind by its target.
+          sections. The unlink tool detects either kind by its target.
         </p>
       </Section>
 
       <Section title="Validation, Formatting, and Linting">
         <p className="text-zinc-600 mb-4">
-          Mutating commands validate before they write. Run validation and
+          MCP mutations validate before they write. Formatting application and safe lint repair require mutation enablement. Run validation and
           hygiene commands explicitly in pull requests and before publishing
           generated reports.
         </p>
         <CodeBlock>{`reqvire validate
 reqvire validate --json --output reports/validate.json
 
-reqvire format
-reqvire format --fix
-reqvire format --fix --with-full-relations
+// MCP tool calls: previews/inspection work in read-only mode
+reqvire.format({fix: false})
+reqvire.format({fix: true})
+reqvire.format({fix: true, with_full_relations: true})
+reqvire.lint({fix: true})
 
 reqvire lint
 reqvire lint --fixable
 reqvire lint --auditable
 reqvire lint --json --output reports/lint.json`}</CodeBlock>
+      </Section>
+
+      <Section title="Migrating Existing Models">
+        <p className="text-zinc-600 mb-4">
+          Migration remains CLI-only. MCP validates the model before starting,
+          so migrate incompatible source before launching an MCP server.
+          The migrate command previews changes by default; add --fix to apply them.
+        </p>
+        <CodeBlock>{`reqvire migrate
+reqvire migrate --fix
+reqvire validate`}</CodeBlock>
       </Section>
 
       <Section title="Search and Collection">

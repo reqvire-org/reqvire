@@ -156,6 +156,7 @@ run_test_case() {
             TEST_DIR="$TEST_DIR" \
                 REQVIRE_BIN="$REQVIRE_BIN" \
                 REAL_REQVIRE_BIN="$REAL_REQVIRE_BIN" \
+                MCP_OPERATION_BIN="$ROOT_DIR/mcp_fixture_operations.py" \
                 REQVIRE_BENCHMARK_INVOCATIONS="$BENCHMARK_INVOCATIONS_FILE" \
                 REQVIRE_BENCHMARK_TEST="$test_name" \
                 bash "$test_folder/test.sh"

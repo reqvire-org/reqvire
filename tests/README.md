@@ -32,6 +32,12 @@ ordering, excluded inputs, and agreement across fingerprint-bearing tools.
 On failure, responses and server logs are retained in the test workspace's `output` directory.
 Explorer wire hashes and live refresh remain covered by the existing serve suite.
 
+Run `./tests/run_all.sh test-ai-skill-installers` for shared skill package checks.
+It requires Node/npm and uses the pinned `skills@1.7.2` CLI through npx to check
+discovery and project-scoped installs for Codex and Claude Code. Package manifests,
+installation bytes, selected skills, and CLI trace output use fixture comparisons
+with unified diffs; npm downloads the pinned installer on its first run.
+
 The serve suite runs the compiled Explorer in headless Chrome or Chromium. It
 requires Node.js 24 and a browser executable. Set `REQVIRE_TEST_BROWSER` to that
 executable. All browser suites use `tests/browser.mjs`: `REQVIRE_TEST_BROWSER`

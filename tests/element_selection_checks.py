@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Shared black-box assertions, invoked by the existing owning E2E suites.
 
@@ -87,7 +88,7 @@ class Checks:
         self.results.append(f"{'PASS' if passed else 'FAIL'} {label}")
 
     def cli(self, root, binary, args, ok=True):
-        result = subprocess.run([binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
+        result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
         self.artifacts.append({"args": args, "exit": result.returncode,
                                "stdout": result.stdout, "stderr": result.stderr})
         require((result.returncode == 0) == ok,
@@ -183,7 +184,7 @@ def cli_reads(checks, root, binary, profile):
     def help_check():
         commands = [("semantic", "query", action, "--help") for action in ("list", "validate", "export", "check")] if profile == "queries" else [(profile, "--help")]
         for args in commands:
-            result = subprocess.run([binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
+            result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
             require(result.returncode == 0 and "name" in result.stdout.lower() and "identifier" in result.stdout.lower(),
                     "Selector help must advertise exact names and canonical identifiers: " + " ".join(args))
     checks.check("cli/" + profile + "/selector-help", help_check)

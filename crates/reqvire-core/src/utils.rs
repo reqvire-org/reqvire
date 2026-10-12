@@ -849,6 +849,7 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_all_git_operations_sequential() {
         // Disable git caching for tests to prevent interference
         git_commands::disable_git_cache_for_tests();

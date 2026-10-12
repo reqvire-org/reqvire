@@ -94,7 +94,7 @@ pub(crate) struct CodeFence {
 }
 
 impl CodeFence {
-    pub(crate) fn is_open(&self) -> bool {
+    pub(crate) const fn is_open(&self) -> bool {
         self.length > 0
     }
 

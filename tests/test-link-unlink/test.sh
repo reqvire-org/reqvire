@@ -47,7 +47,7 @@ echo ""
 # ==================================
 echo "Test 1: Link relation by element name..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-link.md" "$TEST_DIR/specifications/Requirements.md" "File content after link does not match expected"
 
@@ -60,7 +60,7 @@ echo ""
 echo "Test 2: Link duplicate returns error..."
 
 set +e
-LINK_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" 2>&1)
+LINK_DUP_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" 2>&1)
 LINK_DUP_EXIT=$?
 set -e
 
@@ -86,7 +86,7 @@ echo ""
 # ==================================
 echo "Test 3: Link derive relation to parent..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "System Requirements" "derive" "No Relations Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "System Requirements" "derive" "No Relations Requirement" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/03-link-creates-subsection.md" "$TEST_DIR/specifications/Requirements.md" "Link derive result does not match expected"
 
@@ -98,7 +98,7 @@ echo ""
 # ==================================
 echo "Test 4: Link verifiedBy relation..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Another Requirement" "verifiedBy" "Orphan Test" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Another Requirement" "verifiedBy" "Orphan Test" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/04-link-verifiedby.md" "$TEST_DIR/specifications/Requirements.md" "verifiedBy link result does not match expected"
 
@@ -110,15 +110,15 @@ echo ""
 # ==================================
 echo "Test 5: Unlink command..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Capability Requirement" "Another Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Capability Requirement" "Another Requirement" > /dev/null 2>&1
 
 # Add another parent to "No Relations Requirement" so it won't be orphaned in Test 6
 # Link creates derive on Capability Requirement (in file) and derivedFrom on No Relations (in-memory only)
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derive" "No Relations Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "derive" "No Relations Requirement" > /dev/null 2>&1
 
 # Format with --with-full-relations to write the opposite derivedFrom to file
 # This ensures No Relations has a parent in file after Test 6 unlinks System Requirements
-cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --with-full-relations --fix > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "File content after unlink does not match expected"
 
@@ -130,7 +130,7 @@ echo ""
 # ==================================
 echo "Test 6: Unlink removes derive relation and its derivedFrom opposite..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-unlink-removes-subsection.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove both the relation and its opposite"
 
@@ -146,7 +146,7 @@ echo "Test 7: Link to non-existent target fails..."
 cp "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md"
 
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Nonexistent Element" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "derivedFrom" "Nonexistent Element" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -170,7 +170,7 @@ echo ""
 echo "Test 8: Link with invalid relation type fails..."
 
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "invalidRelation" "Another Requirement" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "invalidRelation" "Another Requirement" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -194,7 +194,7 @@ echo ""
 echo "Test 9: Unlink non-existent relation fails..."
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Capability Requirement" "Nonexistent Element XYZ" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Capability Requirement" "Nonexistent Element XYZ" 2>&1)
 UNLINK_EXIT=$?
 set -e
 
@@ -220,7 +220,7 @@ echo "Test 10: Dry-run mode..."
 # Reset to valid state for dry-run test
 cp "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "verifiedBy" "Orphan Test" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "verifiedBy" "Orphan Test" --dry-run > /dev/null 2>&1
 
 # File should be unchanged
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "Dry-run mode should not modify the file"
@@ -234,7 +234,7 @@ echo ""
 echo "Test 11: Link semantic relation to external URL succeeds..."
 
 set +e
-LINK_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "satisfiedBy" "https://example.com/spec.html" 2>&1)
+LINK_URL_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" "satisfiedBy" "https://example.com/spec.html" 2>&1)
 LINK_URL_EXIT=$?
 set -e
 
@@ -255,7 +255,7 @@ echo ""
 echo "Test 12: Reusing Contract external URL fails with helpful message..."
 
 set +e
-ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" bindContract "https://example.com/doc.pdf" 2>&1)
+ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Capability Requirement" bindContract "https://example.com/doc.pdf" 2>&1)
 ATTACH_URL_EXIT=$?
 set -e
 
@@ -285,13 +285,13 @@ echo ""
 echo "Test 13: Unlink when both relations exist in file..."
 
 # Setup: Start from state after Test 3 (link created)
-cp "${TEST_SCRIPT_DIR}/expected/03-link-creates-subsection.md" "$TEST_DIR/specifications/Requirements.md"
+cp "${TEST_SCRIPT_DIR}/fixtures/full-relations-unlink.md.txt" "$TEST_DIR/specifications/Requirements.md"
 
 # Format with full relations to write opposites to disk
-cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --with-full-relations --fix > /dev/null 2>&1
 
 # Now unlink - both relations should be removed from files
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
 
 # Expected: Both System Requirements' derive AND No Relations Requirement's derivedFrom removed
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/13-unlink-both-in-file.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove both relations when both are in file"
@@ -311,7 +311,7 @@ cp "${TEST_SCRIPT_DIR}/fixtures/opposite-side-unlink.md.txt" "$TEST_DIR/specific
 
 # Unlink from Parent side (which has only in-memory opposite derive)
 # This should remove Child's derivedFrom from file
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Parent Req" "Child Req" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" unlink "Parent Req" "Child Req" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/14-unlink-opposite-side.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
 
@@ -331,7 +331,7 @@ BEFORE_TEST15="$(mktemp /tmp/reqvire-link-before15-XXXXXX.md)"
 cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST15"
 
 set +e
-LINK_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Child" "derivedFrom" "Parent B" 2>&1)
+LINK_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Child" "derivedFrom" "Parent B" 2>&1)
 LINK_MULTIROOT_EXIT=$?
 set -e
 
@@ -366,10 +366,10 @@ echo "Test 16: Link semantic-contract relation types..."
 rm -f "$TEST_DIR/specifications/Verifications.md"
 cp "${TEST_SCRIPT_DIR}/fixtures/semantic-contract-relations.md.txt" "$TEST_DIR/specifications/Requirements.md"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "API Shape Contract" use "Extra Semantic Ontology" > /dev/null 2>&1
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "API Requirement" constrainedBy "API Shape Contract" > /dev/null 2>&1
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Audit Shape Contract" constrain "Audit Requirement" > /dev/null 2>&1
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Extra Semantic Ontology" usedBy "Audit Shape Contract" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "API Shape Contract" use "Extra Semantic Ontology" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "API Requirement" constrainedBy "API Shape Contract" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Audit Shape Contract" constrain "Audit Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Extra Semantic Ontology" usedBy "Audit Shape Contract" > /dev/null 2>&1
 
 if ! grep -Fq "  * use: [Extra Semantic Ontology](#extra-semantic-ontology)" "$TEST_DIR/specifications/Requirements.md"; then
   echo "FAILED: CLI link did not write semantic-contract use relation"

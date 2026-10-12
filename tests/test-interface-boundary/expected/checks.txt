@@ -1,0 +1,6 @@
+cli/removed-before-model-load: PASS
+cli/retained-catalog-and-migration: PASS
+mcp/read-only-discovery-and-rejection: PASS
+mcp/safe-repair-and-preserved-review: PASS
+mcp/repair-no-op-and-format-preview: PASS
+mcp/canonical-authoring-and-atomic-rejection: PASS

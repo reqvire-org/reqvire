@@ -64,7 +64,7 @@ sed -i 's|derivedFrom: \[.*specifications/MainRequirements.md.*\].*|derivedFrom:
 # Test 2: Format from submodule directory (preview mode - default)
 echo "Running: reqvire format" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$MCP_OPERATION_BIN" format 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -107,7 +107,7 @@ EOF
 cd "${TMP_DIR}/project-root" && git add submodule/specifications/OtherRequirements.md && git commit -m "Add other requirements" >/dev/null 2>&1
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv "Submodule System" "specifications/OtherRequirements.md" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$MCP_OPERATION_BIN" mv "Submodule System" "specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -149,7 +149,7 @@ echo "Running: reqvire mv-file (move entire file within subdirectory)" >> "${TES
 mkdir -p "${TMP_DIR}/project-root/submodule/specs"
 
 set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" mv-file "specifications/OtherRequirements.md" "specs/Renamed.md" 2>&1)
+OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$MCP_OPERATION_BIN" mv-file "specifications/OtherRequirements.md" "specs/Renamed.md" 2>&1)
 EXIT_CODE=$?
 set -e
 

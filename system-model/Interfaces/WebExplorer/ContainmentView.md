@@ -17,7 +17,7 @@ Model browsing modes display the physical organization and graph structure of th
 Four workspace modes are available:
 - **List**: Tabular folder/file/element browsing with sortable fields
 - **Grid**: Card-based folder/file/element browsing
-- **Graph**: Interactive project graph over elements, resources, relations, contract_bindings, and trace facts
+- **Graph**: Interactive project graph over elements, resources, relations, contract_bindings, contract_references, concept references, and trace facts
 - **Flow**: Capability-first, top-to-bottom element cards descending through requirements, verifications, and evidence, with shared element details and complete path highlighting through splits and merges
 
 In Flow, left-tree selection updates the relation scope displayed in the main workspace and keeps the Model route active. Activating an element card's name or body opens the shared element-detail modal. Pointer hover and keyboard focus on a card highlight its full directed paths through splits and merges.
@@ -29,30 +29,32 @@ Users switch between Model modes using the shared workspace layout selector. Flo
 The containment hierarchy extraction must:
 
 **Hierarchy Structure:**
-- Start from the specifications root folder
-- Traverse folder structure recursively
+- Start from the effective workspace root and include modeled source paths
+- Build the folder structure from the parsed model registry
 - For each folder: collect subfolders and files
-- For each file: collect all elements (H3 headers with Metadata)
-- For each element: collect contract_bindings as children
-- Skip sections (H2 headers) in the hierarchy representation
+- For each file: collect its parsed elements, supporting both `# Elements` collections and `# Element` single-element documents
+- For each requirement: expose its contract_bindings as dependency children and keep contract_references distinct
+- Use parsed element records; document headings and reserved subsections do not become independent hierarchy nodes
 
 **Element Information:**
 - Extract element identifier, name, and type
 - Preserve file path and folder structure
 - Maintain insertion order for elements within files
-- Extract all contract_bindings distinguishing between element and file contract_bindings
+- Extract requirement-to-owned-contract bindings and references as distinct dependency facts; obtain local and external artifact targets from compatible resource relations
 
 **Data Structure:**
 - Represent as tree: `Folder -> [Subfolders, Files]`
 - Files contain: `File -> [Elements]`
-- Elements contain: identifier, name, type, contract_bindings
-- Contract Bindings displayed as children of elements
+- Elements contain: identifier, name, type, contract_bindings, and contract_references
+- Contract Bindings are displayed as dependency children of requirements; the bound contract retains its independently owned source location
+- Contract References remain content dependencies, separately identified from bindings
+- Local and external artifacts remain resource targets of compatible relations
 
 **Ordering:**
 - Folders sorted alphabetically
 - Files sorted alphabetically within folders
 - Elements preserve document order within files
-- Contract Bindings preserve document order within elements
+- Contract Bindings and Contract References preserve declaration order within elements
 
 ---
 
@@ -94,7 +96,7 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 
 **Structure:**
 - Nodes represent modeled elements and opt-in resource/evidence targets
-- Edges represent relation facts, contract_bindings facts, concept-reference facts, verification/satisfaction facts, and trace overlays; concept references target SKOS concept nodes and do not create concept-reference nodes
+- Edges represent relation facts, contract_bindings facts, contract_references facts, concept-reference facts, verification/satisfaction facts, and trace overlays; concept references target SKOS concept nodes and do not create concept-reference nodes
 - Left-pane controls expose graph filters, overlays, layout reset, and selected element actions
 
 **Interactive Capabilities:**
@@ -171,7 +173,7 @@ The Model route includes compact mode controls in the shared workspace toolbar:
 
 ## JSON Data Format
 
-Both visualizations consume JSON data in this format:
+The following illustrative hierarchy shows a requirement binding to a compatible specification owned by another requirement. It illustrates dependency display rather than the complete normalized Project Store schema; resource records and Contract References remain separate collections.
 
 ```json
 {
@@ -192,19 +194,14 @@ Both visualizations consume JSON data in this format:
               "link": "#/content/system-model/UserStories.md",
               "children": [
                 {
-                  "name": "Authentication",
-                  "type": "capability",
-                  "link": "#/content/system-model/UserStories.md#authentication",
+                  "name": "Authenticate User",
+                  "type": "requirement",
+                  "link": "#/content/system-model/UserStories.md#authenticate-user",
                   "children": [
                     {
-                      "name": "auth-design",
+                      "name": "Authentication Specification",
                       "type": "contract-bindings-element",
-                      "link": "#/content/system-model/Design.md#auth-design"
-                    },
-                    {
-                      "name": "AuthSpec.pdf",
-                      "type": "contract-bindings-file",
-                      "link": "docs/AuthSpec.pdf"
+                      "link": "#/content/system-model/Design.md#authentication-specification"
                     }
                   ]
                 }
@@ -225,8 +222,7 @@ Both visualizations consume JSON data in this format:
 - `children`: Array of child nodes (empty array omitted in serialization)
 
 **Contract Bindings Node Types:**
-- `contract-bindings-element`: Element identifier (navigable to element definition)
-- `contract-bindings-file`: File name only, link contains the full path
+- `contract-bindings-element`: Compatible, independently owned contract element bound by a requirement (navigable to its definition)
 
 ---
 

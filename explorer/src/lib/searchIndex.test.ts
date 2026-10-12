@@ -55,12 +55,12 @@ const documents: ProjectSearchDocument[] = [
     text: "Ontology declarations and class hierarchy.",
   },
   {
-    id: "resource:resource:claude-plugins/commands/analyze-coverage.md",
+    id: "resource:resource:skills/reqvire-audit/references/AnalyzeCoverage.md",
     kind: "file",
     displayKind: "resource",
-    title: "claude-plugins/commands/analyze-coverage.md",
-    route: "#/content/claude-plugins/commands/analyze-coverage.md",
-    text: "Analyze coverage command documentation.",
+    title: "skills/reqvire-audit/references/AnalyzeCoverage.md",
+    route: "#/content/skills/reqvire-audit/references/AnalyzeCoverage.md",
+    text: "Coverage analysis skill guidance.",
   },
   {
     id: "Platform/Observability/ActivityFeedSpecifications.md#database-created-message",
@@ -132,7 +132,7 @@ describe("project search index", () => {
     const results = searchProjectDocuments(index, "coverage", new Set<SearchKind>(["resource"]));
 
     expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe("claude-plugins/commands/analyze-coverage.md");
+    expect(results[0]?.title).toBe("skills/reqvire-audit/references/AnalyzeCoverage.md");
   });
 
   it("keeps empty search in store order and respects kind filters", () => {

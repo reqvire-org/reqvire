@@ -602,7 +602,8 @@ impl MutationSession {
         if result.get("isError").and_then(Value::as_bool) == Some(true) {
             return Ok((Ok(result), false));
         }
-        let Some((candidate_files, changed)) = scope.prepared() else {
+        let removed_directories = scope.removed_directories();
+        let Some((mut candidate_files, changed)) = scope.prepared() else {
             return Ok((Ok(result), false));
         };
         let changed: BTreeSet<_> = changed
@@ -618,25 +619,97 @@ impl MutationSession {
         let scope = candidate_files.enter(None);
         let mut candidate = ModelManager::new();
         candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
-        drop(scope);
-        if !persists {
+        // Use the shared canonical writer for every authored-model operation,
+        // including previews. Only changed model documents are normalized.
+        if tool != "reqvire.format" {
+            reqvire::format::format_selected_files(
+                &candidate.graph_registry,
+                false,
+                false,
+                Some(&changed),
+            )?;
+        }
+        if let Some((normalized, _)) = scope.prepared() {
+            candidate_files = normalized;
+            let scope = candidate_files.enter(None);
+            candidate = ModelManager::new();
+            candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+            drop(scope);
+        }
+        let changed: BTreeSet<_> = changed
+            .into_iter()
+            .filter(|path| {
+                self.files.files.get(path) != candidate_files.files.get(path)
+                    || self.files.executable.contains(path)
+                        != candidate_files.executable.contains(path)
+            })
+            .collect();
+        // Return evidence for exactly the bytes prepared for persistence.
+        let model_paths: BTreeSet<_> = self
+            .model
+            .graph_registry
+            .get_all_elements()
+            .iter()
+            .chain(candidate.graph_registry.get_all_elements().iter())
+            .map(|element| self.root.join(&element.file_path))
+            .collect();
+        let diffs: Vec<_> = changed
+            .iter()
+            .filter(|path| model_paths.contains(*path))
+            .filter_map(|path| {
+                let before = self
+                    .files
+                    .files
+                    .get(path)
+                    .map(|b| b.as_slice())
+                    .unwrap_or_default();
+                let after = candidate_files
+                    .files
+                    .get(path)
+                    .map(|b| b.as_slice())
+                    .unwrap_or_default();
+                (before != after).then(|| {
+                    reqvire::diff::generate_file_diff(
+                        &path
+                            .strip_prefix(&self.root)
+                            .expect("candidate path in workspace")
+                            .to_string_lossy(),
+                        &String::from_utf8_lossy(before),
+                        &String::from_utf8_lossy(after),
+                    )
+                })
+            })
+            .collect();
+        if let Some(content) = result.get_mut("structuredContent") {
+            if content.get("diffs").is_some() {
+                content["diffs"] = serde_json::to_value(&diffs)?;
+            }
+            if content.get("applied_fixes").is_some() {
+                content["applied_fixes"]["diffs"] = serde_json::to_value(&diffs)?;
+                content["applied_fixes"]["changed_files"] =
+                    serde_json::json!(diffs.iter().map(|d| &d.file_path).collect::<Vec<_>>());
+            }
+            result["content"] = serde_json::json!([{ "type":"text", "text":serde_json::to_string_pretty(content)? }]);
+        }
+        if !persists || changed.is_empty() {
             return Ok((Ok(result), false));
         }
         let revision = reqvire::model_fingerprint(&candidate.graph_registry.get_all_elements())?;
         self.check_head()?;
-        let (commit, reconciled) = match self.persist_candidate(&candidate_files, &changed, tool) {
-            Ok(commit) => (commit, false),
-            Err(failure) => {
-                let Some(attempt) = &self.recovery_attempt else {
-                    return Err(failure);
-                };
-                let commit = attempt.commit.clone();
-                // Persistence has released its index lock. Observe and verify
-                // the recorded publication instead of repeating update-ref.
-                self.resolve_recorded_commit(&commit)?;
-                (Some(commit), true)
-            }
-        };
+        let (commit, reconciled) =
+            match self.persist_candidate(&candidate_files, &changed, tool, &removed_directories) {
+                Ok(commit) => (commit, false),
+                Err(failure) => {
+                    let Some(attempt) = &self.recovery_attempt else {
+                        return Err(failure);
+                    };
+                    let commit = attempt.commit.clone();
+                    // Persistence has released its index lock. Observe and verify
+                    // the recorded publication instead of repeating update-ref.
+                    self.resolve_recorded_commit(&commit)?;
+                    (Some(commit), true)
+                }
+            };
         if let Some(commit) = &commit {
             self.head = commit.clone();
         }
@@ -1142,6 +1215,7 @@ impl MutationSession {
         files: &SnapshotFiles,
         changed: &BTreeSet<PathBuf>,
         tool: &str,
+        removed_directories: &BTreeSet<PathBuf>,
     ) -> Result<Option<String>, ReqvireError> {
         for path in changed {
             ensure_regular_destination(&self.root, path)?;
@@ -1160,6 +1234,10 @@ impl MutationSession {
             None
         };
         self.check_head()?;
+        let mut directory_backups = BTreeSet::new();
+        for directory in removed_directories {
+            capture_directory_tree(directory, &mut directory_backups)?;
+        }
         let mut backups = BTreeMap::new();
         for path in changed {
             backups.insert(
@@ -1183,6 +1261,11 @@ impl MutationSession {
                 if self.track_file_mode && files.files.contains_key(path) {
                     reconcile_executable(path, files.executable.contains(path))?;
                 }
+            }
+            // A folder move must remove its source directory, while rejecting
+            // unexpected physical files rather than deleting external work.
+            for directory in removed_directories {
+                remove_empty_directory_tree(directory)?;
             }
             self.check_head()?;
             if let Some(publication) = &mut publication {
@@ -1241,6 +1324,11 @@ impl MutationSession {
                     )?;
                 }
                 let mut recovery_failure = None;
+                for directory in &directory_backups {
+                    if let Err(failure) = fs::create_dir_all(directory) {
+                        recovery_failure.get_or_insert_with(|| ReqvireError::from(failure));
+                    }
+                }
                 for path in attempted.iter().rev() {
                     if let Err(failure) = restore_file(path, backups[*path].as_ref()) {
                         // Restore the remaining attempted paths even if one is
@@ -1259,6 +1347,41 @@ impl MutationSession {
         }
         Ok(publication.map(|p| p.commit))
     }
+}
+
+fn capture_directory_tree(
+    path: &Path,
+    directories: &mut BTreeSet<PathBuf>,
+) -> Result<(), ReqvireError> {
+    if !fs::symlink_metadata(path)?.is_dir() {
+        return Err(error(
+            "MCP source folder changed outside the accepted snapshot",
+        ));
+    }
+    directories.insert(path.to_owned());
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        if entry.file_type()?.is_dir() {
+            capture_directory_tree(&entry.path(), directories)?;
+        }
+    }
+    Ok(())
+}
+
+fn remove_empty_directory_tree(path: &Path) -> Result<(), ReqvireError> {
+    if !fs::symlink_metadata(path)?.is_dir() {
+        return Err(error(
+            "MCP source folder changed outside the accepted snapshot",
+        ));
+    }
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        if entry.file_type()?.is_dir() {
+            remove_empty_directory_tree(&entry.path())?;
+        }
+    }
+    fs::remove_dir(path)?;
+    Ok(())
 }
 // Deliberately explicit: a new read-only tool may still depend on live Git or
 // filesystem state and needs an audit before it can run during recovery.

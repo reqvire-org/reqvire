@@ -266,7 +266,7 @@ def main():
             print(f"FAILED {name}: {error}")
 
     def cli(label, *arguments):
-        result = subprocess.run([args.binary, *arguments], cwd=root, text=True, capture_output=True, timeout=20)
+        result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if arguments[0] in ("add", "format", "link", "rename", "rm") else args.binary, *arguments], cwd=root, text=True, capture_output=True, timeout=20)
         (output / (label + ".stdout")).write_text(result.stdout)
         (output / (label + ".stderr")).write_text(result.stderr)
         return result

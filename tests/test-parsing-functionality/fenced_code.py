@@ -1,3 +1,4 @@
+import os
 """CLI regression evidence for Fenced Code Block Parsing Verification."""
 import json
 from pathlib import Path
@@ -12,7 +13,7 @@ relative_fixture = fixture.relative_to(root).as_posix()
 
 def run(*arguments, content=None, label='command'):
     result = subprocess.run(
-        [binary, *arguments], cwd=root, input=content,
+        [os.environ["MCP_OPERATION_BIN"] if arguments[0] in ("add", "format", "link", "rename", "rm") else binary, *arguments], cwd=root, input=content,
         text=True, capture_output=True,
     )
     if result.returncode:

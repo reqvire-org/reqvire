@@ -2,42 +2,17 @@
 
 ### CLI interface
 
-The system shall provide command line interface (CLI) to faciliate model management.
+The system SHALL provide a command-line interface for model inspection, artifact generation, interface startup, and deterministic source migration within the supported interface boundary.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](Specifications.md#model-interface-operation-boundary-specification)
 
 #### Relations
   * derive: [CLI Interface Structure](CLI/Commands.md#cli-interface-structure)
   * specify: [Command-Line Interface](InterfacesFeature.md#command-line-interface)
----
-
-### Shared Core Operation Layer
-
-The system shall provide transport-neutral Reqvire core operations that are reused by CLI and MCP adapters.
-
-#### Details
-- Core operation semantics shall live below CLI argument parsing and below MCP protocol wrapping.
-- CLI command handlers shall parse user input, call shared operations, and render terminal or JSON output.
-- MCP handlers shall map typed tool requests to shared operations and wrap results in MCP protocol responses.
-- Read/report operations shall be shared before broader mutation operations, because mutation operations also own dry-run, diff, persistence, and cache invalidation behavior.
-- Conditional mutation/report operations such as format and lint may be migrated when their preview/report path and mutating path preserve the same command and MCP side-effect controls.
-- Shared operation result types shall preserve machine-readable evidence so CLI JSON and MCP structured responses do not diverge.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [MCP Contract Layer Boundary Specification](MCP/Specifications.md#mcp-contract-layer-boundary-specification)
-
-#### Relations
-  * definedBy: [Shared Core Operation Layer Specification](Specifications.md#shared-core-operation-layer-specification)
-  * derivedFrom: [CLI interface](#cli-interface)
-  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [mod.rs](../../crates/reqvire-core/src/operations/mod.rs)
-  * satisfiedBy: [read_tools.rs](../../crates/reqvire-core/src/tool_interface/read_tools.rs)
-  * verifiedBy: [MCP Shared Operation Contracts Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
 ---
 
 ### MCP Interface
@@ -52,6 +27,9 @@ The system shall provide a Model Context Protocol interface for external tools, 
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](Specifications.md#model-interface-operation-boundary-specification)
 
 #### Relations
   * definedBy: [MCP Interface Boundary Specification](Specifications.md#mcp-interface-boundary-specification)
@@ -75,6 +53,55 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * derive: [MCP Tool Side Effect Classification](MCP/Tools.md#mcp-tool-side-effect-classification)
   * derive: [MCP Workspace Session Tools](MCP/Tools.md#mcp-workspace-session-tools)
   * specify: [MCP Tool Interface](InterfacesFeature.md#mcp-tool-interface)
+---
+
+### Model Interface Operation Boundary
+
+The system SHALL expose model inspection and artifact generation through the command-line and protocol interfaces, SHALL expose authored-model changes only through mutation-enabled MCP tools, and SHALL retain command-line source migration as the upgrade exception.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [definitions.rs](../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * specify: [System Model Interfaces](InterfacesFeature.md#system-model-interfaces)
+---
+
+### Shared Core Operation Layer
+
+The system SHALL provide transport-neutral core operation semantics for retained command-line inspections, MCP authoring and maintenance, and deterministic command-line source migrations.
+
+#### Details
+Adapters SHALL preserve the shared operation result and validation contracts while enforcing their permitted operation surfaces.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](Specifications.md#model-interface-operation-boundary-specification)
+  * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * definedBy: [Shared Core Operation Layer Specification](Specifications.md#shared-core-operation-layer-specification)
+  * satisfiedBy: [cli.rs](../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mod.rs](../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [read_tools.rs](../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * specify: [System Model Interfaces](InterfacesFeature.md#system-model-interfaces)
+  * verifiedBy: [MCP Shared Operation Contracts Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-shared-operation-contracts-verification)
+---
+
+### Shared Operation Diff Evidence
+
+When a core operation previews or reports source changes, the system SHALL return deterministic line-level diff evidence for the permitted interface to present.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * derivedFrom: [Shared Core Operation Layer](#shared-core-operation-layer)
+  * satisfiedBy: [diff.rs](../../crates/reqvire-core/src/diff.rs)
 ---
 
 ### Web Interface

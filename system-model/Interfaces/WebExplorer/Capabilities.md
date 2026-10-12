@@ -1,5 +1,72 @@
 # Elements
 
+### Explorer Worktree Runtime Isolation
+
+WHILE multiple worktree contexts are served, the system SHALL publish and route each context's Explorer model, source content, and eligible assets independently according to the bound isolation and live-store contracts.
+
+#### Details
+This requirement implements the Explorer portion of shared worktree isolation and snapshot publication. Browser selection consumes its runtime interface without taking ownership of MCP model operations.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
+
+#### Relations
+  * definedBy: [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [worktreeUrls.tsx](../../../explorer/src/store/worktreeUrls.tsx)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+---
+
+### Explorer Worktree Selection
+
+WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
+
+#### Details
+While displaying a served Explorer view, the system SHALL keep the branch picker visible at the far right of the shared header, after Search, theme and Help, independently of left-pane state.
+
+When a user resizes the expanded left pane, the system SHALL align the header's brand segment divider and view navigation with its live boundary while retaining header actions and the branch picker at the right edge.
+
+While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
+
+Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
+  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
+  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
+  * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+
+#### Relations
+  * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
+  * satisfiedBy: [AppShell.tsx](../../../explorer/design-system/product-patterns/shell/AppShell.tsx)
+  * satisfiedBy: [WorktreeLoadDialog.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeLoadDialog.tsx)
+  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeSelector.tsx)
+  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
+---
+
 ### Export Command
 
 The system SHALL provide an export command that writes the embedded Explorer SPA bundle, generated model data, and eligible Git-worktree static assets referenced by rendered workspace content to a local output directory, producing a self-contained static site suitable for deployment to GitHub Pages or any static file host.
@@ -205,6 +272,27 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [Diagram Contract Bindings Display Demonstration](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#diagram-contract-bindings-display-demonstration)
 ---
 
+### Explorer Shareable Selection Navigation
+
+When a user selects an item in an Explorer view, the system SHALL expose a shareable URL that restores the same selection within its model context.
+
+#### Details
+The system SHALL restore valid selections through copied links, reload and browser history, apply explicit URL selections before stored preferences, and explain unavailable selections without displaying stale context data.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [location.ts](../../../explorer/src/router/location.ts)
+  * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
+  * satisfiedBy: [useHashRoute.ts](../../../explorer/src/router/useHashRoute.ts)
+  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+---
+
 ### Model-Centric View Generation
 
 The system shall render a model-centric Explorer visualization showing model roots with nested relations containing full element details.
@@ -224,6 +312,22 @@ The Model workspace provides List, Grid, Graph, and Flow modes. Flow starts with
   * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
 ---
 
+### Model Selection Sharing
+
+When a user selects a Model element, file, folder, resource, or graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+---
+
 ### Model View Element Navigation
 
 The system shall make modeled element names in the Model workspace actionable so users can inspect their details and access their source definitions.
@@ -238,10 +342,10 @@ Implementation details shall follow the associated contract specifications.
   * definedBy: [Model View Element Navigation Contract Specification](Specifications.md#model-view-element-navigation-contract-specification)
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
-  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
-  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
   * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
 
@@ -282,12 +386,12 @@ The Ontologies view shall:
   * derive: [Ontology Symbol and Badge Vocabulary](#ontology-symbol-and-badge-vocabulary)
   * derive: [OWL Semantic Ontology Projection](#owl-semantic-ontology-projection)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * satisfiedBy: [forceAtlasLayoutEngine.ts](../../../explorer/src/workers/forceAtlasLayoutEngine.ts)
-  * satisfiedBy: [forceAtlasLayoutOwner.ts](../../../explorer/src/workers/forceAtlasLayoutOwner.ts)
-  * satisfiedBy: [forceAtlasLayout.worker.ts](../../../explorer/src/workers/forceAtlasLayout.worker.ts)
   * satisfiedBy: [forceAtlasLayout.ts](../../../explorer/src/lib/forceAtlasLayout.ts)
   * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * satisfiedBy: [OntologiesView.tsx](../../../explorer/src/views/OntologiesView.tsx)
+  * satisfiedBy: [forceAtlasLayout.worker.ts](../../../explorer/src/workers/forceAtlasLayout.worker.ts)
+  * satisfiedBy: [forceAtlasLayoutEngine.ts](../../../explorer/src/workers/forceAtlasLayoutEngine.ts)
+  * satisfiedBy: [forceAtlasLayoutOwner.ts](../../../explorer/src/workers/forceAtlasLayoutOwner.ts)
 ---
 
 ### OWL Semantic Ontology Projection
@@ -301,13 +405,13 @@ Detailed semantic-index, source-traceability, projection-subgraph, SHACL slot/fa
   * type: requirement
 
 #### Contract References
-  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
   * [Ontology Construct Classification Specification](../../Architecture/OntologyKernelSpecifications.md#ontology-construct-classification-specification)
+  * [Semantic Query Discovery Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-discovery-specification)
 
 #### Relations
-  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
   * definedBy: [OWL Semantic Ontology Projection Contract Specification](Specifications.md#owl-semantic-ontology-projection-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -322,10 +426,10 @@ Construct grouping shall cover equivalence groups, inverse properties, property-
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
-  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Construct Grouping Contract Specification](Specifications.md#ontology-construct-grouping-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -340,11 +444,27 @@ Detailed domain/range aggregation, deduplicated relationship rendering, modal ev
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
-  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Property-Centric Visualization Contract Specification](Specifications.md#ontology-property-centric-visualization-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+---
+
+### Ontology Selection Sharing
+
+When a user selects an Ontologies graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
 ---
 
 ### Ontology Symbol and Badge Vocabulary
@@ -358,10 +478,10 @@ The symbol vocabulary shall define each symbol with its semantic meaning, raw Un
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
-  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * definedBy: [Ontology Symbol and Badge Vocabulary Contract Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-contract-specification)
   * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * satisfiedBy: [ontology_graph.rs](../../../crates/reqvire-core/src/ontology_graph.rs)
+  * satisfiedBy: [ontologyGraphRenderer.ts](../../../explorer/src/lib/ontologyGraphRenderer.ts)
   * verifiedBy: [Ontology Model Viewer Analysis Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
@@ -375,8 +495,8 @@ The Knowledge Graph view shall:
 - Be reached through the canonical `index.html#/model` Explorer route by selecting Graph mode; a separate Knowledge Graph route or document entry point shall not be generated.
 - Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned contracts may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
 - Render actual relation facts, contract_bindings facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes. Concept-reference facts target SKOS concept nodes and must not create a separate concept-reference node type.
-- Use Reqvire capability-root submodels as the structural graph partitioning contract; contract_bindings, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
-- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, `reuse`, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
+- Use Reqvire capability-root submodels as the structural graph partitioning contract; Contract Bindings, Contract References, concept references, verification/satisfaction, and computed trace facts are overlays rather than submodel boundaries.
+- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `define`, Contract Bindings, Contract References, `satisfiedBy`, `verifiedBy`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
 - Compute the full graph baseline from currently visible nodes and edges using bounded data-dependent layout settings so hidden filters and overlays do not distort visible project graph structure.
 - Reorganize the clicked node's visible neighborhood during pinned focus from a stable full-graph baseline so selected-node exploration reduces local overlap, restores the previous focus when it leaves scope, and does not rebuild the full graph or lose the global layout.
 - Reuse the dense Explorer graph and modal-detail interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
@@ -389,12 +509,12 @@ The Knowledge Graph view shall:
 #### Relations
   * definedBy: [Project Knowledge Graph View Contract Specification](Specifications.md#project-knowledge-graph-view-contract-specification)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [forceAtlasLayout.ts](../../../explorer/src/lib/forceAtlasLayout.ts)
+  * satisfiedBy: [GraphLibraryViews.tsx](../../../explorer/src/views/GraphLibraryViews.tsx)
+  * satisfiedBy: [forceAtlasLayout.worker.ts](../../../explorer/src/workers/forceAtlasLayout.worker.ts)
   * satisfiedBy: [forceAtlasLayoutEngine.ts](../../../explorer/src/workers/forceAtlasLayoutEngine.ts)
   * satisfiedBy: [forceAtlasLayoutOwner.ts](../../../explorer/src/workers/forceAtlasLayoutOwner.ts)
-  * satisfiedBy: [forceAtlasLayout.worker.ts](../../../explorer/src/workers/forceAtlasLayout.worker.ts)
-  * satisfiedBy: [forceAtlasLayout.ts](../../../explorer/src/lib/forceAtlasLayout.ts)
-  * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * satisfiedBy: [GraphLibraryViews.tsx](../../../explorer/src/views/GraphLibraryViews.tsx)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
 
@@ -420,7 +540,7 @@ The SPA Explorer shell shall:
 - Do not generate separate Explorer/report document entry points.
 - Seed a normalized project snapshot that distinguishes modeled source-file containers from modeled resource and evidence-file targets. The Model tree shall render `Model` and `Resources` as the visible top-level branches. Under each branch, eligible Git worktree identity folders shall group the corresponding modeled source files or graph-linked resources, so single-repo workspaces still show the repository identity and multi-repo workspaces show each repository/worktree separately. The `Model` branch shall contain modeled element source files from the graph registry as file containers. The `Resources` branch shall expose graph-linked implementation, evidence, documentation, and resource targets as a separate resource/evidence hierarchy that preserves workspace-root-relative folder structure when a local path exists. Resource-only targets shall not be represented as file containers that imply modeled elements. Unrelated Git-worktree files and all non-Git workspace files remain absent.
 - Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
-- Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, reusable contract contract_bindings, and concept references. Capability coverage is computed from verified requirements.
+- Preserve the current relation model: capabilities may author concept references and are specified by requirements; requirements own contracts, satisfaction evidence, verification evidence, Contract Bindings, Contract References, and concept references. Capability coverage is computed from verified requirements.
 
 #### Metadata
   * type: requirement
@@ -430,19 +550,19 @@ The SPA Explorer shell shall:
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
 
 #### Relations
-  * satisfiedBy: [build.rs](../../../crates/reqvire-core/build.rs)
   * definedBy: [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
   * definedBy: [SPA Explorer Store Contract Specification](Specifications.md#spa-explorer-store-contract-specification)
-  * satisfiedBy: [package.json](../../../explorer/package.json)
-  * satisfiedBy: [Makefile](../../../Makefile)
+  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [pages.yml](../../../.github/workflows/pages.yml)
   * satisfiedBy: [pr.yml](../../../.github/workflows/pr.yml)
   * satisfiedBy: [release.yml](../../../.github/workflows/release.yml)
-  * satisfiedBy: [pages.yml](../../../.github/workflows/pages.yml)
-  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
+  * satisfiedBy: [Makefile](../../../Makefile)
+  * satisfiedBy: [build.rs](../../../crates/reqvire-core/build.rs)
   * satisfiedBy: [git_commands.rs](../../../crates/reqvire-core/src/git_commands.rs)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
   * satisfiedBy: [FileBrowser.tsx](../../../explorer/design-system/product-patterns/files/FileBrowser.tsx)
+  * satisfiedBy: [package.json](../../../explorer/package.json)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * satisfiedBy: [ElementDetailModal.tsx](../../../explorer/src/components/ElementDetailModal.tsx)
   * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
@@ -473,11 +593,11 @@ When a user dismisses a refresh error, the system SHALL retain the displayed mod
   * definedBy: [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
   * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
-  * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
-  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
+  * satisfiedBy: [fileTrees.ts](../../../explorer/src/lib/fileTrees.ts)
   * satisfiedBy: [SearchIndexContext.tsx](../../../explorer/src/search/SearchIndexContext.tsx)
   * satisfiedBy: [StoreContext.tsx](../../../explorer/src/store/StoreContext.tsx)
-  * satisfiedBy: [fileTrees.ts](../../../explorer/src/lib/fileTrees.ts)
+  * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
+  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
   * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
   * verifiedBy: [Explorer Automatic Store Refresh Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#explorer-automatic-store-refresh-verification)
 ---
@@ -558,25 +678,25 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
 #### Relations
   * derivedFrom: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
+  * satisfiedBy: [TokenVisual.tsx](../../../explorer/design-system/components/data/TokenVisual.tsx)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/product-patterns/reports/CoverageDrilldown.tsx)
   * satisfiedBy: [CoverageNavigation.tsx](../../../explorer/design-system/product-patterns/reports/CoverageNavigation.tsx)
-  * satisfiedBy: [useCoverageNavigation.ts](../../../explorer/src/state/useCoverageNavigation.ts)
   * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/product-patterns/reports/ReportPatterns.tsx)
-  * satisfiedBy: [TokenVisual.tsx](../../../explorer/design-system/components/data/TokenVisual.tsx)
-  * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
   * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/product-patterns/side-pane/PaneControls.tsx)
   * satisfiedBy: [MockShell.tsx](../../../explorer/design-system/showcase/MockShell.tsx)
   * satisfiedBy: [ProductPatternsPage.tsx](../../../explorer/design-system/showcase/pages/ProductPatternsPage.tsx)
+  * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
   * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
   * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)
   * satisfiedBy: [location.ts](../../../explorer/src/router/location.ts)
   * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
   * satisfiedBy: [useHashRoute.ts](../../../explorer/src/router/useHashRoute.ts)
-  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
   * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
+  * satisfiedBy: [useCoverageNavigation.ts](../../../explorer/src/state/useCoverageNavigation.ts)
   * satisfiedBy: [loadStore.ts](../../../explorer/src/store/loadStore.ts)
   * satisfiedBy: [types.ts](../../../explorer/src/store/types.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
 ---
 
@@ -601,6 +721,22 @@ Detailed route source, concept-scheme grouping, navigation, modal, map rendering
   * verifiedBy: [Thesaurus Project Store Projection Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#thesaurus-project-store-projection-verification)
 ---
 
+### Thesaurus Selection Sharing
+
+When a user selects a Thesaurus concept, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Thesaurus View Generation](#thesaurus-view-generation)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
+---
+
 ### Traces View Generation
 
 The system shall expose verification traceability as a specialist Explorer view backed by Project Store trace projections and rendered through the shared Explorer shell.
@@ -620,12 +756,28 @@ When a verification is selected in served or exported Explorer Traces, the syste
   * definedBy: [Traces View](TracesView.md#traces-view)
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
-  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
-  * satisfiedBy: [traceFlow.ts](../../../explorer/src/lib/traceFlow.ts)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/product-patterns/reports/TraceFlow.tsx)
-  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
+  * satisfiedBy: [traceFlow.ts](../../../explorer/src/lib/traceFlow.ts)
+  * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
   * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
+  * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
+---
+
+### Trace Selection Sharing
+
+When a user selects a Traces verification or file overview, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
+
+#### Relations
+  * derivedFrom: [Traces View Generation](#traces-view-generation)
+  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
+  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
 ---
 
 ### Web Interface Color Scheme
@@ -659,156 +811,4 @@ The system shall ensure color consistency between:
   * satisfiedBy: [ContractBindingList.tsx](../../../explorer/design-system/product-patterns/detail/ContractBindingList.tsx)
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
----
-
-### Explorer Worktree Selection
-
-WHEN Explorer is served, the system SHALL let each browser tab select any local branch through one branch picker and load only the requested context under the server's existing read-only or mutation-enabled admission rules, without switching existing Git checkouts or changing another client's context.
-
-#### Details
-While displaying a served Explorer view, the system SHALL keep the branch picker visible at the far right of the shared header, after Search, theme and Help, independently of left-pane state.
-
-When a user resizes the expanded left pane, the system SHALL align the header's brand segment divider and view navigation with its live boundary while retaining header actions and the branch picker at the right edge.
-
-While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
-
-Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Contract References
-  * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
-  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
-  * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
-  * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
-  * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
-  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
-
-#### Relations
-  * satisfiedBy: [WorktreeLoadDialog.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeLoadDialog.tsx)
-  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/product-patterns/shell/WorktreeSelector.tsx)
-  * satisfiedBy: [AppShell.tsx](../../../explorer/design-system/product-patterns/shell/AppShell.tsx)
-  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
-  * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
-  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
-  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
-  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
-  * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
----
-
-### Explorer Worktree Runtime Isolation
-
-WHILE multiple worktree contexts are served, the system SHALL publish and route each context's Explorer model, source content, and eligible assets independently according to the bound isolation and live-store contracts.
-
-#### Details
-This requirement implements the Explorer portion of shared worktree isolation and snapshot publication. Browser selection consumes its runtime interface without taking ownership of MCP model operations.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Contract Bindings
-  * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
-  * [Served Explorer Runtime Freshness Specification](Specifications.md#served-explorer-runtime-freshness-specification)
-  * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
-  * [Explorer Store Seed Data Output Specification](Specifications.md#explorer-store-seed-data-output-specification)
-
-#### Relations
-  * satisfiedBy: [worktreeUrls.tsx](../../../explorer/src/store/worktreeUrls.tsx)
-  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
-  * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
-  * definedBy: [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
----
-
-### Explorer Shareable Selection Navigation
-
-When a user selects an item in an Explorer view, the system SHALL expose a shareable URL that restores the same selection within its model context.
-
-#### Details
-The system SHALL restore valid selections through copied links, reload and browser history, apply explicit URL selections before stored preferences, and explain unavailable selections without displaying stale context data.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
-  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
-  * definedBy: [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
-  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
-  * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
-  * satisfiedBy: [routes.ts](../../../explorer/src/router/routes.ts)
-  * satisfiedBy: [useHashRoute.ts](../../../explorer/src/router/useHashRoute.ts)
-  * satisfiedBy: [location.ts](../../../explorer/src/router/location.ts)
----
-
-### Model Selection Sharing
-
-When a user selects a Model element, file, folder, resource, or graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
-
-#### Relations
-  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
-  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
-  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
----
-
-### Trace Selection Sharing
-
-When a user selects a Traces verification or file overview, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
-
-#### Relations
-  * derivedFrom: [Traces View Generation](#traces-view-generation)
-  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
-  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
----
-
-### Thesaurus Selection Sharing
-
-When a user selects a Thesaurus concept, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
-
-#### Relations
-  * derivedFrom: [Thesaurus View Generation](#thesaurus-view-generation)
-  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
-  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
----
-
-### Ontology Selection Sharing
-
-When a user selects an Ontologies graph node, the system SHALL retain and restore that selection through the shared Explorer selection navigation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Explorer Shareable Selection Navigation Specification](Specifications.md#explorer-shareable-selection-navigation-specification)
-
-#### Relations
-  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
-  * specify: [Explorer Selection Sharing](../InterfacesFeature.md#explorer-selection-sharing)
-  * satisfiedBy: [useSelectionNavigation.ts](../../../explorer/src/state/useSelectionNavigation.ts)
 ---

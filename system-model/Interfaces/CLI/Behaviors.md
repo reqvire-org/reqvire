@@ -15,19 +15,6 @@ Propagation categories and relation impact rules are defined by the Reqvire rela
   * type: behavior
 ---
 
-### Contract Bindings Input Auto-Detection Behavior
-
-When bindContract or removing contract binding via CLI commands, the system shall resolve contract_bindings targets as contract-element identifiers.
-
-#### Details
-The source requirement and existing contract target use the bound Existing Element Selection Specification. Targets accept exact names and canonical identifiers while retaining already supported contract-identifier normalization. Conflicting name/identifier matches fail as ambiguous rather than receiving identifier precedence.
-
-After selection, require a compatible `source`, `constraint`, `behavior`, `specification`, `state` or `input-output` contract with the ownership and scope required by the Contract Bindings contracts. Paths and external URLs do not become reusable contracts. Preserve link/unlink detection, idempotency and atomic rejection behavior.
-
-#### Metadata
-  * type: behavior
----
-
 ### Short Mode Behavior
 
 Behavior when `--short` flag is provided to CLI commands.

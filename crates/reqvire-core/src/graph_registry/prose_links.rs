@@ -120,15 +120,16 @@ impl GraphRegistry {
         if crate::utils::is_external_url(destination) {
             return None;
         }
-        let destination = if let Some(fragment) = destination.strip_prefix('#') {
-            format!(
-                "{}#{}",
-                source.file_path,
-                crate::utils::normalize_fragment(fragment)
-            )
-        } else {
-            destination.to_string()
-        };
+        let destination = destination.strip_prefix('#').map_or_else(
+            || destination.to_string(),
+            |fragment| {
+                format!(
+                    "{}#{}",
+                    source.file_path,
+                    crate::utils::normalize_fragment(fragment)
+                )
+            },
+        );
         if let Some(identifier) =
             self.normalize_relation_identifier_for_source(&source.file_path, &destination)
         {

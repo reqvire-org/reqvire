@@ -78,7 +78,7 @@ echo "Test 1: Initial model validates"
 assert_success "initial validation" "$REQVIRE_BIN" validate
 
 echo "Test 2: Link objective hierarchy"
-assert_success "link objective hierarchy" "$REQVIRE_BIN" link "Second Verification Objective" derivedFrom "Verification Objective"
+assert_success "link objective hierarchy" "$MCP_OPERATION_BIN" link "Second Verification Objective" derivedFrom "Verification Objective"
 assert_success "validation after objective link" "$REQVIRE_BIN" validate
 assert_file_contains \
   "$TEST_DIR/specifications/VerificationModel.md" \
@@ -86,7 +86,7 @@ assert_file_contains \
   "linked objective hierarchy should be written"
 
 echo "Test 3: Unlink objective hierarchy"
-assert_success "unlink objective hierarchy" "$REQVIRE_BIN" unlink "Second Verification Objective" "Verification Objective"
+assert_success "unlink objective hierarchy" "$MCP_OPERATION_BIN" unlink "Second Verification Objective" "Verification Objective"
 assert_success "validation after objective unlink" "$REQVIRE_BIN" validate
 
 SECOND_BLOCK=$(sed -n '/### Second Verification Objective/,/---/p' "$TEST_DIR/specifications/VerificationModel.md")
@@ -99,7 +99,7 @@ fi
 echo "Test 4: Relink concrete verification from one objective to another"
 assert_success \
   "relink concrete verification objective parent" \
-  "$REQVIRE_BIN" relink "Concrete Verification" derivedFrom "Verification Objective" "Second Verification Objective"
+  "$MCP_OPERATION_BIN" relink "Concrete Verification" derivedFrom "Verification Objective" "Second Verification Objective"
 assert_success "validation after concrete relink" "$REQVIRE_BIN" validate
 assert_file_contains \
   "$TEST_DIR/specifications/VerificationModel.md" \
@@ -107,7 +107,7 @@ assert_file_contains \
   "concrete verification should point to second objective"
 
 echo "Test 5: Move objective and update incoming concrete verification relation"
-assert_success "move objective to new file" "$REQVIRE_BIN" mv "Second Verification Objective" "specifications/VerificationPlans.md"
+assert_success "move objective to new file" "$MCP_OPERATION_BIN" mv "Second Verification Objective" "specifications/VerificationPlans.md"
 assert_success "validation after objective move" "$REQVIRE_BIN" validate
 assert_file_contains \
   "$TEST_DIR/specifications/VerificationModel.md" \
@@ -119,7 +119,7 @@ assert_file_contains \
   "moved objective should exist in target file"
 
 echo "Test 6: Merge objective into objective succeeds"
-assert_success "merge objective into objective" "$REQVIRE_BIN" merge "Objective Merge Target" "Objective Merge Source"
+assert_success "merge objective into objective" "$MCP_OPERATION_BIN" merge "Objective Merge Target" "Objective Merge Source"
 assert_success "validation after objective merge" "$REQVIRE_BIN" validate
 SEARCH_OUTPUT=$("$REQVIRE_BIN" search --filter-name="Objective Merge Source" --short 2>&1)
 if echo "$SEARCH_OUTPUT" | grep -Fq "Objective Merge Source"; then
@@ -132,35 +132,35 @@ echo "Test 7: Merge objective with concrete verification fails"
 assert_failure_contains \
   "merge objective with concrete verification" \
   "type mismatch" \
-  "$REQVIRE_BIN" merge "Objective Merge Target" "Concrete Merge Candidate"
+  "$MCP_OPERATION_BIN" merge "Objective Merge Target" "Concrete Merge Candidate"
 assert_success "validation after failed mixed merge" "$REQVIRE_BIN" validate
 
 echo "Test 8: Objective cannot verify requirement"
 assert_failure_contains \
   "objective verify relation" \
   "verification-objective" \
-  "$REQVIRE_BIN" link "Objective Merge Target" verify "System Requirement"
+  "$MCP_OPERATION_BIN" link "Objective Merge Target" verify "System Requirement"
 assert_success "validation after failed objective verify" "$REQVIRE_BIN" validate
 
 echo "Test 9: Requirement cannot be verifiedBy objective"
 assert_failure_contains \
   "requirement verifiedBy objective" \
   "verification-objective" \
-  "$REQVIRE_BIN" link "System Requirement" verifiedBy "Objective Merge Target"
+  "$MCP_OPERATION_BIN" link "System Requirement" verifiedBy "Objective Merge Target"
 assert_success "validation after failed verifiedBy objective" "$REQVIRE_BIN" validate
 
 echo "Test 10: Objective cannot carry evidence"
 assert_failure_contains \
   "objective satisfiedBy evidence" \
   "verification-objective" \
-  "$REQVIRE_BIN" link "Objective Merge Target" satisfiedBy "specifications/test.sh"
+  "$MCP_OPERATION_BIN" link "Objective Merge Target" satisfiedBy "specifications/test.sh"
 assert_success "validation after failed objective evidence link" "$REQVIRE_BIN" validate
 
 echo "Test 11: Dry-run move does not mutate objective file"
 BACKUP_DIR="/tmp/reqvire-verification-objective-mutations-$$"
 mkdir -p "$BACKUP_DIR"
 cp "$TEST_DIR/specifications/VerificationPlans.md" "$BACKUP_DIR/VerificationPlans.before.md"
-assert_success "dry-run objective move" "$REQVIRE_BIN" mv "Second Verification Objective" "specifications/DryRunTarget.md" --dry-run
+assert_success "dry-run objective move" "$MCP_OPERATION_BIN" mv "Second Verification Objective" "specifications/DryRunTarget.md" --dry-run
 if ! cmp -s "$TEST_DIR/specifications/VerificationPlans.md" "$BACKUP_DIR/VerificationPlans.before.md"; then
   echo "FAILED: dry-run objective move should not mutate source file"
   diff -u "$BACKUP_DIR/VerificationPlans.before.md" "$TEST_DIR/specifications/VerificationPlans.md"

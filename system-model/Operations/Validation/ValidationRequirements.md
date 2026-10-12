@@ -212,10 +212,10 @@ Implementation details shall follow the associated contract specifications.
   * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
-  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
 ---
 
 ### Internal Consistency Validator
@@ -278,12 +278,12 @@ WHEN reporting a prose-link violation, the system SHALL provide actionable repai
   * [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
 
 #### Relations
-  * satisfiedBy: [prose_links.rs](../../../crates/reqvire-core/src/graph_registry/prose_links.rs)
-  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * definedBy: [Model Element Prose Link Validation Specification](Specifications.md#model-element-prose-link-validation-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
+  * satisfiedBy: [prose_links.rs](../../../crates/reqvire-core/src/graph_registry/prose_links.rs)
   * verifiedBy: [Model Element Prose Link Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#model-element-prose-link-validation-test)
 ---
 
@@ -315,8 +315,8 @@ Canonical direction, reciprocal aliases, taxonomy evaluation, and cycle diagnost
   * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
   * definedBy: [Native Concept Taxonomy Cycle Validation Specification](Specifications.md#native-concept-taxonomy-cycle-validation-specification)
   * derivedFrom: [Relation Type Validation](#relation-type-validation)
-  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * verifiedBy: [Concept Relation Projection Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#concept-relation-projection-verification)
 ---
 
@@ -431,9 +431,9 @@ The system shall preserve validation diagnostics as structured data before rende
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
   * definedBy: [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
   * derivedFrom: [Validation Error Handling](#validation-error-handling)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
 ---
 
 ### Validate Markdown Structure

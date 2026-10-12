@@ -1,3 +1,4 @@
+import os
 """Contract-driven E2E checks shared by parsing, CRUD, formatting and MCP suites.
 
 Checks use authored fixtures and expected-output diffs to verify rejection,
@@ -57,7 +58,7 @@ class Checks:
 
     def run(self, *args, content=None):
         self.calls += 1
-        result = subprocess.run([self.binary, '--workspace', str(self.root), *args], cwd=self.root,
+        result = subprocess.run([os.environ['MCP_OPERATION_BIN'] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else self.binary, '--workspace', str(self.root), *args], cwd=self.root,
                                 input=content, text=True, capture_output=True, timeout=30)
         stem = self.artifacts / f'{self.calls:03d}-{args[0]}'
         stem.with_suffix('.stdout').write_text(result.stdout)

@@ -41,7 +41,7 @@ This is a newly added capability.
 '
 
 set +e
-ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ADD_EXIT=$?
 set -e
 
@@ -97,7 +97,7 @@ This capability was added via --content flag.
 '
 
 set +e
-ADD_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add specifications/Requirements.md --content "$CONTENT_ELEMENT" 2>&1)
+ADD_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" add specifications/Requirements.md --content "$CONTENT_ELEMENT" 2>&1)
 ADD_CONTENT_EXIT=$?
 set -e
 
@@ -125,7 +125,7 @@ fi
 
 # Clean up: remove the element to keep file state consistent for subsequent tests
 set +e
-RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Capability F" 2>&1)
+RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Capability F" 2>&1)
 RM_CONTENT_EXIT=$?
 set -e
 
@@ -154,7 +154,7 @@ Rate limiting constraint for Capability D.
 '
 
 set +e
-ADD_CONSTRAINT_OUTPUT=$(cd "$TEST_DIR" && echo "$CONSTRAINT_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_CONSTRAINT_OUTPUT=$(cd "$TEST_DIR" && echo "$CONSTRAINT_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ADD_CONSTRAINT_EXIT=$?
 set -e
 
@@ -166,7 +166,7 @@ fi
 
 # Link the constraint to its owning requirement via definedBy
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Separate Requirement Branch" definedBy "Capability D Constraint" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Separate Requirement Branch" definedBy "Capability D Constraint" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -192,7 +192,7 @@ This capability has a contract binding to a contract element.
 '
 
 set +e
-ADD_ATTACH_OUTPUT=$(cd "$TEST_DIR" && echo "$ELEMENT_WITH_ATTACHMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ADD_ATTACH_OUTPUT=$(cd "$TEST_DIR" && echo "$ELEMENT_WITH_ATTACHMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ADD_ATTACH_EXIT=$?
 set -e
 
@@ -238,7 +238,7 @@ echo "Test 2: Delete element operation..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
 set +e
-DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Capability B" 2>&1)
+DELETE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Capability B" 2>&1)
 DELETE_EXIT=$?
 set -e
 
@@ -292,7 +292,7 @@ echo "Test 3: Move element operation..."
 cp "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements.md" "$TEST_DIR/specifications/OtherRequirements.md"
 
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Capability C" "specifications/OtherRequirements.md" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Capability C" "specifications/OtherRequirements.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -349,7 +349,7 @@ echo ""
 echo "Test 4: Rename element operation..."
 
 set +e
-RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Capability A" "Capability Alpha" 2>&1)
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Capability A" "Capability Alpha" 2>&1)
 RENAME_EXIT=$?
 set -e
 
@@ -406,7 +406,7 @@ echo ""
 echo "Test 4b: Move element with special characters..."
 
 set +e
-MOVE_SPECIAL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Complex chars, element/name example" "specifications/OtherRequirements.md" 2>&1)
+MOVE_SPECIAL_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Complex chars, element/name example" "specifications/OtherRequirements.md" 2>&1)
 MOVE_SPECIAL_EXIT=$?
 set -e
 
@@ -466,7 +466,7 @@ cat "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements-referencer.md"
 (cd "$TEST_DIR" && git add specifications/ToMove.md specifications/OtherRequirements.md && git commit -m "Add file to move and referencer" >/dev/null 2>&1)
 
 set +e
-MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/ToMove.md" "specifications/Moved.md" 2>&1)
+MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file "specifications/ToMove.md" "specifications/Moved.md" 2>&1)
 MVFILE_EXIT=$?
 set -e
 
@@ -546,7 +546,7 @@ echo "Test 6: Error case handling..."
 # Test 4a: Move non-existent element
 echo "  4a: Move non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Non Existent Element" "specifications/OtherRequirements.md" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Non Existent Element" "specifications/OtherRequirements.md" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -566,7 +566,7 @@ echo "  ✓ Non-existent element error handled"
 # Test 4b: Delete non-existent element
 echo "  4b: Delete non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Non Existent Element" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Non Existent Element" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -594,7 +594,7 @@ This is a duplicate.
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -619,7 +619,7 @@ No header here
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -650,7 +650,7 @@ This element has a relation to a non-existent target.
 '
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_RELATION_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && echo "$INVALID_RELATION_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -670,7 +670,7 @@ echo "  ✓ Invalid relation target error handled"
 # Test 5f: Rename non-existent element
 echo "  5f: Rename non-existent element..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Non Existent Element" "New Name" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Non Existent Element" "New Name" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -690,7 +690,7 @@ echo "  ✓ Non-existent element rename error handled"
 # Test 5g: Rename to duplicate name
 echo "  5g: Rename to duplicate name..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Capability D" "Parent Capability" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Capability D" "Parent Capability" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -710,7 +710,7 @@ echo "  ✓ Duplicate name rename error handled"
 # Test 6h: Move non-existent file
 echo "  6h: Move non-existent file..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/NonExistent.md" "specifications/Target.md" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file "specifications/NonExistent.md" "specifications/Target.md" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -730,7 +730,7 @@ echo "  ✓ Non-existent file move error handled"
 # Test 6i: Move file to existing target
 echo "  6i: Move file to existing target..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/Moved.md" "specifications/Requirements.md" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file "specifications/Moved.md" "specifications/Requirements.md" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -775,7 +775,7 @@ cp "${TEST_SCRIPT_DIR}/fixtures/specifications/ToMove2.md" "$TEST_DIR/specificat
 
 # Run mv-file
 set +e
-MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/ToMove2.md" "specifications/Moved2.md" 2>&1)
+MVFILE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file "specifications/ToMove2.md" "specifications/Moved2.md" 2>&1)
 MVFILE_EXIT=$?
 set -e
 

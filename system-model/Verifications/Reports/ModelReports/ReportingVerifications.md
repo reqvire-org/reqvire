@@ -145,17 +145,17 @@ The appended element-selection profile compares exact names and canonical identi
 
 ### CLI JSON File Output Test
 
-This test verifies that the `--output` flag writes JSON output to a file across CLI commands that emit JSON.
+This test verifies that the `--output` flag writes JSON reports to a file across CLI report commands. Native artifact exporters use their own serialization and file-publication acceptance checks; raw SPARQL query export is not subject to JSON report selection or confirmation rules.
 
 #### Details
 
 ##### Acceptance Criteria
-- `--output <FILE>` writes JSON to file when combined with `--json` for commands that still expose selectable JSON output
+- `--output <FILE>` writes JSON to file when combined with `--json` for report commands that expose selectable JSON output
 - JSON-only commands such as `model`, `containment`, `resources`, and `traces` accept `--output <FILE>` directly
-- All public commands that emit JSON, including relation and asset mutation commands, support the same `--output <FILE>` behavior
+- Retained CLI report commands that emit JSON support the same `--output <FILE>` behavior
 - Confirmation message printed to stdout: `✅ Output saved to <filepath>`
 - File contains valid JSON identical to what the same command would produce on stdout
-- `--output` without JSON output selection produces an error and non-zero exit code only for commands that still have non-JSON output modes
+- `--output` without JSON output selection produces an error and non-zero exit code for report commands that also have non-JSON report modes
 - File is created if it doesn't exist
 - File is overwritten if it exists
 
@@ -183,9 +183,7 @@ This test verifies that the `--output` flag writes JSON output to a file across 
    - Run command with `--json --output <same-file>`
    - Verify file is overwritten with new JSON content
 
-5. **Mutation command parity**
-   - Run dry-run JSON file output for `link`, `unlink`, `relink`, `mv-asset`, and `rm-asset`
-   - Verify each command writes valid JSON to the requested output file
+The current fixture harness also exercises historical CLI authoring commands and formatting. Those cases must be removed when the breaking interface boundary is implemented. This verification claims evidence only for retained CLI JSON file output; MCP tool results use their protocol envelope and accept no CLI output-path fields.
 
 #### Metadata
   * type: test-verification
@@ -234,6 +232,30 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-coverage-report/test.sh)
   * verify: [Capability Coverage Rollup](../../../ModelStructure/ModelManagement.md#capability-coverage-rollup)
+---
+
+### Concept Relation Projection Verification
+
+This verification checks native concept projection correctness, acyclic taxonomy, and bounded normalization work.
+
+#### Details
+- Count registry-element and authored-link visits during semantic construction for increasing sparse concept graphs, including unrelated elements. Normalization visits each input element and link once, independently of the number of concepts emitted; use operation counts rather than timing thresholds.
+- Compare generated taxonomy inverses and symmetric related/mapping facts against explicit expected RDF, including singly authored edges, consistent reciprocal declarations, isolated concepts, external mappings, and cross-scheme associations whose endpoints retain their own namespaces.
+- Reorder registration and authored links and require identical deterministic Turtle; compare JSON-LD concept facts with the same expected relationships. Projection must leave authored payloads unchanged.
+- Rebuild edited and invalid candidates and confirm no stale inverse relationships leak into the new index or alter an earlier accepted index. Existing validation continues to reject missing targets and cross-scheme taxonomy.
+- Reject self, two-concept, and longer mixed-alias taxonomy cycles with a deterministic closed path. Preserve consistent reciprocal aliases, symmetric associations, and acyclic diamonds. Check both declaration orders and a deep taxonomy chain without recursive stack growth.
+- Reject cycle-creating Core and MCP-dispatch link and element-replacement mutations in normal and dry-run modes; source bytes and accepted revision/read results remain unchanged. A valid mutation after rejection still succeeds. Model validation and semantic export reject the same cycle, and removing its closing edge restores valid output.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [concept_projection_tests.rs](../../../../crates/reqvire-core/src/semantic_contract/concept_projection_tests.rs)
+  * satisfiedBy: [concept_taxonomy.rs](../../../../crates/reqvire-core/tests/concept_taxonomy.rs)
+  * satisfiedBy: [check-taxonomy.py](../../../../tests/test-concept-elements/check-taxonomy.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
+  * verify: [Native Concept Taxonomy Cycle Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-cycle-validation)
+  * verify: [Concept Relation Projection Materialization](../../../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)
 ---
 
 ### Containment Hierarchy Extraction Test
@@ -378,7 +400,7 @@ This test verifies that the system generates valid, well-structured JSON output 
 
 ### Custom Element Type Tracking Test
 
-This test verifies that the system correctly tracks and displays custom element types in model summary reports, providing accurate counts in both text and JSON output formats.
+This test verifies custom element type counts in search reports and preservation of custom metadata through the shared move operation.
 
 #### Details
 
@@ -386,57 +408,57 @@ This test verifies that the system correctly tracks and displays custom element 
 - System SHALL track elements with custom types (types not in the standard categories)
 - Custom types SHALL be counted separately from standard element types
 - Text output SHALL display custom types in alphabetical order
-- JSON output SHALL include `custom_element_types` field in global_counters
+- JSON output SHALL include `total_other_types` in `global_counters`
 - Custom types field SHALL be omitted from JSON when no custom types exist
 - Standard types (capability, requirement, verification types, and contract types) SHALL NOT be counted as custom
 - File-type elements SHALL NOT be counted as custom types
 
 ##### Test Criteria
 1. **Custom Types in Text Output**
-   Command: `reqvire summary` (on test data with custom types)
+   Command: `reqvire search` (on test data with custom types)
    - exits code **0**
-   - output contains `📋 Element Types:` section
+   - output contains `📋 Other Types:` section
    - custom types appear after standard types
-   - format: `Custom (type-name): count`
+   - format: `type-name: count` within the custom-type section
    - custom types are sorted alphabetically
-   - standard types (Capabilities, System Requirements, Verifications, and Contracts) appear first
+   - standard-type counters appear before the custom-type section
 
 2. **Custom Types in JSON Output**
-   Command: `reqvire summary --json` (on test data with custom types)
+   Command: `reqvire search --json` (on test data with custom types)
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `.global_counters.custom_element_types` object
-   - custom_element_types is a HashMap with type names as keys and counts as values
-   - example: `{"custom_element_types": {"moe": 2, "interface": 1}}`
-   - type names are stored and displayed exactly as defined in metadata
+   - JSON contains `.global_counters.total_other_types` object
+   - keys are custom type names and values are counts
+   - example: `{"total_other_types": {"actor": 1, "moe": 2}}`
+   - map keys and display labels omit the `other-` metadata prefix; model persistence retains the complete canonical metadata token
 
 3. **No Custom Types Handling**
-   Command: `reqvire summary --json` (on test data without custom types)
+   Command: `reqvire search --json` (on test data without custom types)
    - exits code **0**
    - output parses as valid JSON
-   - JSON does NOT contain `custom_element_types` field in global_counters
+   - JSON does NOT contain `total_other_types` in `global_counters`
    - field is omitted entirely (not present as empty object)
 
 4. **Standard Types Not Counted as Custom**
-   - Verify requirements with type `requirement` are NOT in custom_element_types
-   - Verify capabilities with type `capability` are NOT in custom_element_types
-   - Verify verifications with type `test-verification` are NOT in custom_element_types
-   - Verify verifications with type `analysis-verification` are NOT in custom_element_types
-   - Verify verifications with type `inspection-verification` are NOT in custom_element_types
-   - Verify verifications with type `demonstration-verification` are NOT in custom_element_types
-   - Only elements with non-standard types appear in custom_element_types
+   - Verify requirements with type `requirement` are NOT in `total_other_types`
+   - Verify capabilities with type `capability` are NOT in `total_other_types`
+   - Verify verifications with type `test-verification` are NOT in `total_other_types`
+   - Verify verifications with type `analysis-verification` are NOT in `total_other_types`
+   - Verify verifications with type `inspection-verification` are NOT in `total_other_types`
+   - Verify verifications with type `demonstration-verification` are NOT in `total_other_types`
+   - Only elements with custom types appear in `total_other_types`
 
 5. **Multiple Custom Types**
-   Command: `reqvire summary` (on test data with multiple different custom types)
+   Command: `reqvire search` (on test data with multiple different custom types)
    - exits code **0**
    - each distinct custom type is counted separately
    - counts are accurate for each type
    - alphabetical sorting is maintained
    - example output:
      ```
-     Custom (interface): 1
-     Custom (moe): 2
-     Custom (other): 1
+     actor: 1
+     moe: 2
+     rule: 1
      ```
 
 6. **Alphabetical Sorting**
@@ -445,24 +467,26 @@ This test verifies that the system correctly tracks and displays custom element 
    - Sorting is case-sensitive (lowercase before uppercase if mixed)
 
 7. **JSON Structure Validation**
-   Command: `reqvire summary --json` (on test data with custom types)
-   - `.global_counters.custom_element_types` is an object/map
+   Command: `reqvire search --json` (on test data with custom types)
+   - `.global_counters.total_other_types` is an object/map
    - Keys are strings (type names)
    - Values are numbers (counts > 0)
-   - No custom_element_types entry with zero count
+   - No `total_other_types` entry with zero count
 
 8. **Custom Type Metadata Write-back**
-   Command: `reqvire mv <custom-element-name> <target-file>`
-   - exits code **0**
+   - Apply the shared move operation to a custom-type fixture
+   - require operation success and compare the moved source against its expected fixture
    - moved Markdown preserves the exact custom metadata token, such as `type: other-use-case`
    - moved Markdown does not serialize the internal custom type name without the `other-` prefix
+
+The current CLI harness establishes search output and shared move serialization. It does not establish the MCP move adapter; custom-type persistence is also an acceptance case in that adapter's pending protocol plan.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-custom-element-types/test.sh)
-  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
+  * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
   * verify: [Search Report Generator](../../../Reports/ModelReports/ReportingRequirements.md#search-report-generator)
 ---
 
@@ -489,63 +513,26 @@ Expected checks:
 
 ### Model Command Verification
 
-Comprehensive test verifying model command generates model-centric nested output in different modes.
+Verify model JSON, traversal modes and exact start selection against canonical fixture output.
 
 #### Details
+The linked model-command fixture establishes:
+- Default output matches the expected `elements` and `metadata` structure; each element uses `identifier`, `name`, `element_type`, `file_path`, `file_order_index`, `relations` and `contract_bindings`, with optional `contract_references` and opt-in size estimates.
+- Filtered forward output and reverse output match their complete expected nested fixtures. Generated inverse pairs are traversed in the selected canonical direction.
+- The reverse/type-filter combination matches its golden fixture and explicit type filtering selects only the requested start type.
+- Size estimates are absent by default and present on root and nested element records when enabled.
+- Exact names and canonical identifiers select equivalent capability/requirement starts; ambiguous interpretation is rejected and help documents selectors.
+- Removed `--json` and `--mmd` flags are rejected.
 
-##### Acceptance Criteria
-1. `reqvire model` generates JSON model-centric output showing ontology-root and capability-root structures with nested relations
-2. `reqvire model --from=<name>` generates nested structure starting from specified element
-3. Default mode filters to top-level model roots according to model traversal rules
-4. Relations contain full target element details recursively
+The native concept fixture separately establishes concept-scheme start selection and nested native concept records. Default root semantics include the contracted ontology, capability and native concept roots; the generic model-command fixture alone does not exercise every root family.
 
-##### Test Criteria
-1. **Default Model Output (Model Roots)**
-   Command: `reqvire model`
-   - exits code **0**
-   - output parses as valid JSON
-   - JSON contains `elements` array with model roots at top level
-   - JSON contains `metadata` with total_elements, total_relations, filtered_from (null)
-   - Only elements selected by default root traversal appear at top level
-   - Nested relations contain full element details recursively
-
-2. **Filtered Model Output (From Specific Element)**
-   Command: `reqvire model --from=<test-element-name>`
-   - exits code **0**
-   - output parses as valid JSON
-   - JSON elements array contains specified element at top level
-   - metadata.filtered_from contains element name
-   - Only forward-related elements appear in nested structure
-
-3. **Nested JSON Structure Validation**
-   Command: `reqvire model`
-   - JSON has keys: `elements`, `metadata`
-   - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `contract_bindings`
-   - Each relation has: `relation_type`, target (element/file/external)
-   - Element targets are nested recursively with same structure
-   - File targets have: `path`, `type: "file"`
-   - External targets have: `url`, `type: "external"`
-   - Contract Bindings is an array of contract element identifier strings (empty array if no contract_bindings)
-   - Metadata has: `total_elements`, `total_relations`, `filtered_from`
-
-4. **Forward-Only Traversal Verification**
-   - Create test with element A that derives B, and B derives C
-   - Running `reqvire model --from=<A-name>` includes B and C nested in relations
-   - Create element D that is derived from B (backward relation)
-   - Running `reqvire model --from=<A-name>` includes B and C but NOT D
-   - Confirms only forward relations (derive, satisfiedBy, verifiedBy, trace) are followed
-
-5. **Cycle Detection Verification**
-   - System prevents infinite recursion when cycles exist in forward relations
-   - Nested structure handles circular dependencies gracefully
-   - Each element appears at most once in traversal
-
-The appended element-selection profile compares root/nested capability and requirement scopes selected by exact name or canonical identifier, rejects colliding name/identifier interpretations, and checks selector help.
+Forward interpretation must account for generated inverses: if D declares `derivedFrom B`, B has the forward `derive D` edge and traversal from B includes D. Separate dependency arrays do not recursively expand their targets as relation edges. These rules govern fixture design; no nonexistent exclusion or standalone cycle fixture is claimed as current evidence.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Forward-Only Relation Traversal](../../../Reports/ModelReports/ReportingRequirements.md#forward-only-relation-traversal)
   * verify: [Model JSON Output Format](../../../Reports/ModelReports/ReportingRequirements.md#model-json-output-format)
@@ -616,30 +603,6 @@ This test verifies that the search command correctly filters by multiple element
   * verify: [Comma-Separated Type Filter Parsing](../../../Reports/ModelReports/ReportingRequirements.md#comma-separated-type-filter-parsing)
 ---
 
-### Concept Relation Projection Verification
-
-This verification checks native concept projection correctness, acyclic taxonomy, and bounded normalization work.
-
-#### Details
-- Count registry-element and authored-link visits during semantic construction for increasing sparse concept graphs, including unrelated elements. Normalization visits each input element and link once, independently of the number of concepts emitted; use operation counts rather than timing thresholds.
-- Compare generated taxonomy inverses and symmetric related/mapping facts against explicit expected RDF, including singly authored edges, consistent reciprocal declarations, isolated concepts, external mappings, and cross-scheme associations whose endpoints retain their own namespaces.
-- Reorder registration and authored links and require identical deterministic Turtle; compare JSON-LD concept facts with the same expected relationships. Projection must leave authored payloads unchanged.
-- Rebuild edited and invalid candidates and confirm no stale inverse relationships leak into the new index or alter an earlier accepted index. Existing validation continues to reject missing targets and cross-scheme taxonomy.
-- Reject self, two-concept, and longer mixed-alias taxonomy cycles with a deterministic closed path. Preserve consistent reciprocal aliases, symmetric associations, and acyclic diamonds. Check both declaration orders and a deep taxonomy chain without recursive stack growth.
-- Reject cycle-creating CLI and MCP-dispatch link and element-replacement mutations in normal and dry-run modes; source bytes and accepted revision/read results remain unchanged. A valid mutation after rejection still succeeds. Model validation and semantic export reject the same cycle, and removing its closing edge restores valid output.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [concept_projection_tests.rs](../../../../crates/reqvire-core/src/semantic_contract/concept_projection_tests.rs)
-  * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
-  * satisfiedBy: [check-taxonomy.py](../../../../tests/test-concept-elements/check-taxonomy.py)
-  * satisfiedBy: [concept_taxonomy.rs](../../../../crates/reqvire-core/tests/concept_taxonomy.rs)
-  * verify: [Concept Relation Projection Materialization](../../../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)
-  * verify: [Native Concept Taxonomy Cycle Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-cycle-validation)
----
-
 ### Ontology Semantic Export Verification
 
 This verification shall prove that semantic ontology export materializes authored ontology, SHACL, generated document ownership, external-subset, reserved-vocabulary, and full projection semantics according to the reporting requirements.
@@ -670,8 +633,8 @@ Expected checks:
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
   * satisfiedBy: [semantic_store.rs](../../../../crates/reqvire-core/src/semantic_store.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
   * verify: [External Vocabulary Exposure Policy](../../../Reports/ModelReports/ReportingRequirements.md#external-vocabulary-exposure-policy)
   * verify: [Ontology Collection Output](../../../Reports/ModelReports/ReportingRequirements.md#ontology-collection-output)
   * verify: [Ontology Projection Subgraph Materialization](../../../Reports/ModelReports/ReportingRequirements.md#ontology-projection-subgraph-materialization)
@@ -682,63 +645,17 @@ Expected checks:
 
 ### Resources Report Verification
 
-This test verifies that the resources command correctly generates reports showing file-based relations and identifier-based contract_bindings.
+Verify the local artifact inventory and retained JSON schema.
 
 #### Details
+The linked resources fixture establishes:
+- `reqvire resources` succeeds and emits valid JSON with `relations`, `contract_bindings` and `summary`.
+- The four expected relation-file entries carry `file_path` and `references`; references expose `relation_type`, `element_id` and `element_name`.
+- Canonical model-contract bindings do not enter the artifact inventory: `contract_bindings` is empty and its file/reference counts are zero.
+- `--output resources.json` writes the same structured result as stdout and reports successful saving.
+- Removed `--json` and `--html` modes are rejected.
 
-##### Acceptance Criteria
-**Report Structure:**
-- Report shall have two main sections: Relations and Contract Bindings
-- Relations section lists files alphabetically by path
-- Contract Bindings section lists contract identifiers alphabetically
-- Each entry shows referencing element identifiers and names
-
-**Relations Section:**
-- Includes files from InternalPath relation targets (satisfiedBy, trace, etc.)
-- Each reference shows relation type and source element
-- References sorted by relation type, then by element identifier
-
-**Contract Bindings Section:**
-- Includes contract identifiers from contract_bindings targets
-- Each reference shows source element
-- References sorted by element identifier
-
-**Output Format:**
-- JSON output provides structured data with relations, contract_bindings, and summary
-
-##### Test Criteria
-1. **Basic JSON output**
-   Command: `reqvire resources`
-   - exits code **0**
-   - output parses under `jq`
-   - contains `relations` array with file_path and references
-   - contains `contract_bindings` array with identifier and references
-   - contains `summary` with totals
-
-2. **Explicit output file**
-   Command: `reqvire resources --output resources.json`
-   - exits code **0**
-   - file content parses under `jq`
-   - file contains `relations`, `contract_bindings`, and `summary`
-
-3. **Relations section content**
-   - satisfiedBy relations to code files appear in Relations section
-   - `satisfiedBy` relations to document files appear in Relations section
-   - each reference includes relation_type, element_id, element_name
-
-4. **Contract Bindings section content**
-   - contract identifier contract_bindings appear in Contract Bindings section
-   - each reference includes element_id, element_name
-
-5. **Sorting verification**
-   - Relation files sorted alphabetically by path
-   - Contract Bindings identifiers sorted alphabetically by identifier
-   - Within each entry, references sorted by relation_type then element_id
-   - Consistent ordering across multiple runs
-
-6. **Empty sections handling**
-   - If no InternalPath relations exist, Relations array is empty and summary count is zero
-   - If no contract_bindings identifiers exist, Contract Bindings array is empty and summary count is zero
+The fixture does not establish a positive contract-identifier inventory. File ordering and reference ordering follow the owned inventory contract; positive filtering, empty-model and repeated-run cases require their own executable evidence before claiming coverage.
 
 #### Metadata
   * type: test-verification
@@ -790,8 +707,8 @@ The appended nonvisual element-selection profile compares exact-name and canonic
 
 #### Relations
   * derivedFrom: [Reporting, Search, Coverage, and Model Export Verification Objective](#reporting-search-coverage-and-model-export-verification-objective)
-  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
   * satisfiedBy: [scoped_coverage.rs](../../../../crates/reqvire-core/tests/scoped_coverage.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
   * verify: [Scoped Coverage Reporting](../../../Reports/ModelReports/ReportingRequirements.md#scoped-coverage-reporting)
 ---
 
@@ -1098,7 +1015,7 @@ This test verifies that the system correctly generates verification coverage rep
 - Command shall support `--json` flag for JSON output format
 - Coverage report shall include summary section with total counts and percentages for leaf requirements
 - Coverage report shall show breakdown by verification type (test, formal-proof, analysis, inspection, demonstration)
-- Coverage report shall list verified leaf requirements grouped by file and section
+- Coverage report shall list verified leaf requirements grouped by source file, without section containers
 - Coverage report shall list unverified leaf requirements with details
 - Coverage report shall list satisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) with `satisfiedBy` relations
 - Coverage report shall list unsatisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) without `satisfiedBy` relations
@@ -1110,28 +1027,25 @@ This test verifies that the system correctly generates verification coverage rep
 
 ##### Test Criteria
 1. **Basic Coverage Report**
-   Command: `reqvire coverage-report`
+   Command: `reqvire coverage`
    - exits code **0**
-   - output contains `=== Verification Coverage Report ===`
-   - output contains `Summary:` section with leaf requirements counts and percentages
-   - output contains `Verification Types:` breakdown
-   - output contains coverage percentage calculation for leaf requirements
-   - verified leaf requirements are marked with ✅
-   - unverified leaf requirements are marked with ❌
-   - satisfied evidence-backed verification elements are marked with ✅
-   - unsatisfied evidence-backed verification elements are marked with ❌
+   - complete text output matches the expected report fixture using `diff -u`
+   - the fixture begins with `## Summary` and includes `### Leaf Requirements`, `### Verification Types`, and the verified/unverified and satisfied/unsatisfied listings
+   - source-file groups, coverage percentages and verification status markers match the fixture
 
 2. **JSON Coverage Report**
-   Command: `reqvire coverage-report --json`
+   Command: `reqvire coverage --json`
    - exits code **0**
    - output parses as valid JSON
    - JSON contains `summary` object with leaf requirements counts and percentages
    - JSON contains `verified_leaf_requirements` and `unverified_leaf_requirements` sections
    - JSON contains `satisfied_test_verifications` and `unsatisfied_test_verifications` sections
-   - verification details include identifier, name, section, type, and satisfied_by relations for evidence-backed verification types
+   - grouped requirement and verification sections contain `files` objects
+   - summary contains the verification type breakdown, evidence satisfaction counters, orphan counters, and implementation coverage counters
+   - the mixed fixture has two formal-proof verifications; the capability aggregate contains five leaves and four verified leaves and has mark `partial`
 
 3. **Coverage Calculation**
-   - Leaf requirements coverage percentage calculated as (verified_leaf_system-model/total_leaf_requirements * 100)
+   - Leaf requirements coverage percentage calculated as (verified_leaf_requirements/total_leaf_requirements * 100)
    - Evidence-backed verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100), where the existing JSON field includes both test and formal-proof verifications
    - Verification types correctly categorized
    - Test-verification and formal-proof-verification elements without satisfiedBy relations are flagged as unsatisfied
@@ -1148,15 +1062,15 @@ This test verifies that the system correctly generates verification coverage rep
 
 ### Verification Traces Filter Options Test
 
-This test verifies that the `traces` command filter options work correctly when generating upward trace trees from verification elements to owning capability roots.
+This test verifies that the `traces` command filter options work correctly when generating normalized upward trace graphs from verification elements to owning capability roots.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall provide CLI command `traces` that generates upward trace trees from verifications
+- System shall provide CLI command `traces` that generates normalized upward trace graphs from concrete verifications
 - Command shall output structured JSON by default
 - System shall traverse all upward parent relations to reach owning capability roots
-- System shall merge multiple verification paths into single tree per verification
+- System shall preserve unique nodes and all distinct labelled edges when multiple verification paths converge, without copying shared subtrees
 - System shall support `--filter-id=<id>` filter for specific verification element
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
 - System shall support `--filter-type=<type>` for filtering by verification type
@@ -1204,9 +1118,9 @@ This test verifies that the `traces` command filter options work correctly when 
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
-  * satisfiedBy: [check_graph.py](../../../../tests/test-verification-traces/check_graph.py)
   * satisfiedBy: [verification_trace.rs](../../../../crates/reqvire-core/src/verification_trace.rs)
+  * satisfiedBy: [check_graph.py](../../../../tests/test-verification-traces/check_graph.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
   * verify: [Trace Projection Data Generation](../../../Reports/ModelReports/ReportingRequirements.md#trace-projection-data-generation)
 ---

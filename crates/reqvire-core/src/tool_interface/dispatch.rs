@@ -74,7 +74,7 @@ pub fn dispatch_tool(
         "reqvire.semantic.sparql" => {
             sparql_tool(args, excluded_filename_patterns, with_size_estimates)
         }
-        "reqvire.lint" => lint_tool(args, excluded_filename_patterns),
+        "reqvire.lint" => lint_tool(args, enable_mutations, excluded_filename_patterns),
         "reqvire.coverage" => coverage_tool(args, excluded_filename_patterns),
         "reqvire.traces" => traces_tool(args, excluded_filename_patterns),
         "reqvire.resources" => resources_tool(excluded_filename_patterns),

@@ -11,14 +11,14 @@ use crate::mutation_io as fs;
 use std::path::Path;
 
 /// Represents a diff for a single file
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct FileDiff {
     pub file_path: String,
     pub lines: Vec<DiffLine>,
 }
 
 /// Represents a single line in a diff
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct DiffLine {
     pub prefix: String,
     pub content: String,

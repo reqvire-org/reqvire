@@ -8,8 +8,8 @@ Top-level container for test requirements.
   * type: capability
 
 #### Relations
-  * derive: [Performance Requirement](#performance-requirement)
   * derive: [No Contract Bindings Requirement](#no-contract-bindings-requirement)
+  * derive: [Performance Requirement](#performance-requirement)
 ---
 
 
@@ -24,8 +24,8 @@ This requirement has an reused SLA document.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [System Requirements](#system-requirements)
   * derive: [Implementation Detail](#implementation-detail)
+  * derivedFrom: [System Requirements](#system-requirements)
 
 
 
@@ -63,8 +63,8 @@ A separate requirement that owns contracts (outside main hierarchy).
   * type: capability
 
 #### Relations
-  * definedBy: [Test Constraint Element](#test-constraint-element)
   * definedBy: [Test Behavior Element](#test-behavior-element)
+  * definedBy: [Test Constraint Element](#test-constraint-element)
 
 ---
 
@@ -91,4 +91,3 @@ This behavior defines expected system operation.
   * type: behavior
 
 ---
-

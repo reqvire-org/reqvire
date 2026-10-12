@@ -11,7 +11,7 @@ const integrationPages = [
   {
     name: "Coding Assistants",
     href: "/coding-assistants",
-    desc: "Claude Code plugin, Codex skills, MCP workflows, assistant prompts, and AI-native Reqvire use cases.",
+    desc: "Shared agent skills, MCP workflows, assistant prompts, and AI-native Reqvire use cases.",
   },
 ];
 
@@ -58,7 +58,7 @@ export default function Integrations() {
             },
             {
               name: "Assistant packages",
-              desc: "Install Claude Code plugins or Codex skills when the assistant environment supports native commands or skill files.",
+              desc: "Install the shared Reqvire skills for Claude Code, Codex, or another supported agent with the skills CLI.",
             },
             {
               name: "GitHub",

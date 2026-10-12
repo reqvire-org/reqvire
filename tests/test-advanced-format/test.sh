@@ -26,7 +26,7 @@ cd "$TEST_DIR"
 # No need to backup files - we're already in a temporary directory
 
 # Use the reqvire binary provided by test runner
-REQVIRE="$REQVIRE_BIN"
+REQVIRE="$MCP_OPERATION_BIN"
 
 # Test 1: Requirement - System shall provide format command with dry-run as default
 echo "Starting test..." > test_results.log

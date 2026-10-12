@@ -118,9 +118,19 @@ impl<'a> ReqvireToolRegistry<'a> {
             crate::model_cache::begin_write();
         }
         let exclusions = self.excluded_filename_patterns.refreshed();
+        // Stage previews through the same writer as applications. The session
+        // validates the complete candidate, returns canonical diffs, and drops
+        // this overlay instead of persisting a dry run.
+        let mut staged_args = args.clone();
+        let preview = crate::mutation_io::active()
+            && is_mutation_tool_name(name)
+            && args.get("dry_run").and_then(Value::as_bool) == Some(true);
+        if preview {
+            staged_args["dry_run"] = Value::Bool(false);
+        }
         let result = dispatch_tool(
             name,
-            args,
+            &staged_args,
             self.enable_mutations,
             self.with_size_estimates,
             &exclusions,
@@ -131,7 +141,12 @@ impl<'a> ReqvireToolRegistry<'a> {
         if persists && !crate::mutation_io::active() {
             crate::model_cache::invalidate();
         }
-        result
+        result.map(|mut result| {
+            if preview {
+                result["dry_run"] = Value::Bool(true);
+            }
+            result
+        })
     }
 
     pub fn read_resource(&self, uri: &str) -> Result<Value, ReqvireError> {
@@ -221,7 +236,7 @@ pub fn is_mutation_tool_name(name: &str) -> bool {
 
 pub fn request_requires_write_tool(tool_name: &str, arguments: Option<&Value>) -> bool {
     is_mutation_tool_name(tool_name)
-        || (tool_name == "reqvire.format"
+        || (matches!(tool_name, "reqvire.format" | "reqvire.lint")
             && arguments
                 .and_then(|args| args.get("fix"))
                 .and_then(Value::as_bool)

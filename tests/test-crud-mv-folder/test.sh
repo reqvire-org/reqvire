@@ -27,7 +27,7 @@ assert_file_contains() {
 
 echo "Test 1: dry-run previews recursive folder move without changing files..."
 set +e
-DRY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder --dry-run "specifications/Shared" "specifications/Renamed" 2>&1)
+DRY_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder --dry-run "specifications/Shared" "specifications/Renamed" 2>&1)
 DRY_EXIT=$?
 set -e
 
@@ -49,13 +49,13 @@ fi
 
 echo "Test 2: invalid folder moves are rejected without filesystem changes..."
 set +e
-MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder "specifications/Missing" "specifications/New" 2>&1)
+MISSING_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder "specifications/Missing" "specifications/New" 2>&1)
 MISSING_EXIT=$?
-FILE_SOURCE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder "specifications/Outside.md" "specifications/New" 2>&1)
+FILE_SOURCE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder "specifications/Outside.md" "specifications/New" 2>&1)
 FILE_SOURCE_EXIT=$?
-EXISTING_TARGET_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder "specifications/Shared" "specifications/Existing" 2>&1)
+EXISTING_TARGET_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder "specifications/Shared" "specifications/Existing" 2>&1)
 EXISTING_TARGET_EXIT=$?
-DESCENDANT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder "specifications/Shared" "specifications/Shared/Nested" 2>&1)
+DESCENDANT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder "specifications/Shared" "specifications/Shared/Nested" 2>&1)
 DESCENDANT_EXIT=$?
 set -e
 
@@ -68,7 +68,7 @@ set -e
 
 echo "Test 3: JSON execution moves folder and rewrites model references..."
 set +e
-JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-folder --json "specifications/Shared" "specifications/Renamed" 2>&1)
+JSON_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-folder --json "specifications/Shared" "specifications/Renamed" 2>&1)
 JSON_EXIT=$?
 set -e
 

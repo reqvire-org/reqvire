@@ -49,7 +49,7 @@ New details section added.
 '
 
 set +e
-OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 OVERRIDE_EXIT=$?
 set -e
 
@@ -98,7 +98,7 @@ This is a duplicate.
 '
 
 set +e
-DUPLICATE_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+DUPLICATE_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 DUPLICATE_EXIT=$?
 set -e
 
@@ -129,7 +129,7 @@ This is a brand new capability.
 '
 
 set +e
-ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 ADD_EXIT=$?
 set -e
 
@@ -174,7 +174,7 @@ Attempted override that would orphan Capability B.
 '
 
 set +e
-DRYRUN_OUTPUT=$(cd "$TEST_DIR" && echo "$DRYRUN_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override --dry-run 2>&1)
+DRYRUN_OUTPUT=$(cd "$TEST_DIR" && echo "$DRYRUN_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override --dry-run 2>&1)
 DRYRUN_EXIT=$?
 set -e
 
@@ -224,7 +224,7 @@ This is UPDATED Capability B content.
 '
 
 set +e
-OVERRIDE_B_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_B_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+OVERRIDE_B_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_B_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 OVERRIDE_B_EXIT=$?
 set -e
 

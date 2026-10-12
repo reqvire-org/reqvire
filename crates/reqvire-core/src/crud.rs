@@ -819,7 +819,7 @@ fn finalize_crud_operation(
     Ok(diffs)
 }
 
-fn validate_model_after_mutation(
+pub(crate) fn validate_model_after_mutation(
     model_manager: &ModelManager,
     removed_declaration_source: Option<&str>,
 ) -> Result<(), ReqvireError> {
@@ -1559,7 +1559,7 @@ pub fn move_folder(
             fs::rename(old_abs, &new_abs).map_err(ReqvireError::IoError)?;
         }
 
-        if crate::mutation_io::exists(&source_abs) {
+        if crate::mutation_io::active() || crate::mutation_io::exists(&source_abs) {
             fs::remove_dir_all(&source_abs).map_err(ReqvireError::IoError)?;
         }
 

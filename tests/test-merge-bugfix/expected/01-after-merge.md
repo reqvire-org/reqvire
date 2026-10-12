@@ -60,4 +60,3 @@ The output shall include element identifiers, names, types, and relationships.
 #### Relations
   * derivedFrom: [Test Parent](#test-parent)
 ---
-

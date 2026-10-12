@@ -6,6 +6,9 @@ A requirement without initial relations that link/unlink commands will modify.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * specify: [Test Capability Test Link Unlink Specifications Requirements Md](#test-capability-test-link-unlink-specifications-requirements-md)
 ---
 
 ### System Requirements
@@ -55,6 +58,6 @@ Test capability root for migrated requirement fixtures.
   * type: capability
 
 #### Relations
+  * specifiedBy: [No Relations Requirement](#no-relations-requirement)
   * specifiedBy: [System Requirements](#system-requirements)
 ---
-

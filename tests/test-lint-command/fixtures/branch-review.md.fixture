@@ -1,0 +1,48 @@
+# Elements
+
+### Branch Review Capability
+
+#### Metadata
+  * type: capability
+---
+
+### Branch Review Root
+
+Root of the branch review control.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Branch Review Capability](#branch-review-capability)
+---
+
+### Branch Review Left
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Branch Review Root](#branch-review-root)
+---
+
+### Branch Review Right
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Branch Review Root](#branch-review-root)
+---
+
+### Branch Review Leaf
+
+Two meaningful branches with no direct edge to the common ancestor.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Branch Review Left](#branch-review-left)
+  * derivedFrom: [Branch Review Right](#branch-review-right)
+---

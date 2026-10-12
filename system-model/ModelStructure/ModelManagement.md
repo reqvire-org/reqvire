@@ -1,5 +1,40 @@
 # Elements
 
+### Contract Reference Semantics
+
+The system SHALL distinguish requirement dependencies on contract content from shared implementation obligations.
+
+#### Details
+When a requirement declares a Contract Reference, the system SHALL resolve and retain its dependency on a uniquely owned requirement contract.
+
+WHEN equivalent fragment-only and file-qualified Contract Reference identifiers are supplied, the system SHALL resolve them to the same canonical contract target.
+
+If a Contract Reference has an invalid source, target, ownership, or duplicate declaration, then the system SHALL report the invalid declaration.
+
+If a requirement declares both Contract Bindings and Contract References, then the system SHALL reject the element even when their targets differ.
+
+If a Contract Reference participates in a circular dependency through contract ownership, other contract references, contract bindings, or requirement ancestry, then the system SHALL reject the model with the dependency path.
+
+When assessing implementation coverage, the system SHALL classify requirements using child requirements and Contract Bindings independently of Contract References.
+
+#### Concept References
+  * [Contract Reference](../Thesaurus/Thesaurus.md#contract-reference)
+  * [Contract Binding](../Thesaurus/Thesaurus.md#contract-binding)
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
+
+#### Relations
+  * constrainedBy: [Relation Compatibility Shape](../Ontologies/RelationsAndImpact.md#relation-compatibility-shape)
+  * definedBy: [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
+  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
+  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
+  * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
+---
+
 ### Default Requirement Type Assignment
 
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
@@ -14,8 +49,8 @@ Type assignment behavior shall follow the associated contract specifications.
   * [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
 
 #### Relations
-  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * definedBy: [Default Requirement Type Assignment Contract Specification](Specifications.md#default-requirement-type-assignment-contract-specification)
+  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
   * verifiedBy: [Element Subsection Parsing Test](../Verifications/ModelStructure/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](../Verifications/Operations/Validation/ValidationVerifications.md#default-element-type-assignment-test)
@@ -43,11 +78,11 @@ When a graph is copied for a mutation candidate, the system shall isolate candid
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Efficient Processing](#efficient-processing)
   * definedBy: [Canonical Graph Storage Specification](Specifications.md#canonical-graph-storage-specification)
+  * derivedFrom: [Efficient Processing](#efficient-processing)
   * satisfiedBy: [graph_registry.rs](../../crates/reqvire-core/src/graph_registry.rs)
-  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
   * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * satisfiedBy: [registration.rs](../../crates/reqvire-core/src/graph_registry/registration.rs)
 ---
 
 ### In-Memory Model Build Cache
@@ -82,9 +117,9 @@ If input changes or invalidation supersede an in-progress build, the system shal
   * definedBy: [In-Memory Model Build Cache Specification](Specifications.md#in-memory-model-build-cache-specification)
   * derivedFrom: [Efficient Processing](#efficient-processing)
   * satisfiedBy: [exclusions.rs](../../crates/reqvire-core/src/exclusions.rs)
+  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [model_cache.rs](../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [model_inputs.rs](../../crates/reqvire-core/src/model_inputs.rs)
-  * satisfiedBy: [model.rs](../../crates/reqvire-core/src/model.rs)
   * satisfiedBy: [semantic_store.rs](../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [arg_helpers.rs](../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * verifiedBy: [In-Memory Model Build Cache Verification](../Verifications/ModelStructure/ParsingVerifications.md#in-memory-model-build-cache-verification)
@@ -182,6 +217,36 @@ This requirement ensures consistency between relation updates and contract_bindi
   * verifiedBy: [Contract Bindings Identifier CRUD Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-identifier-crud-verification)
 ---
 
+### Contract Reference Identifier Updates
+
+When a model operation changes a contract identifier or its referencing requirement, the system SHALL preserve the Contract Reference dependency in the resulting model.
+
+#### Details
+When a user adds or removes a Contract Reference, the system SHALL apply the same validation and atomic persistence guarantees as other model mutations.
+
+WHEN an edit replaces an element at the same identifier, the system SHALL preserve incoming Contract References and externally authored ownership relations while validating the replacement.
+
+IF an edit changes a referenced contract's owner to a non-requirement element, THEN the system SHALL reject the edit and preserve the original model.
+
+WHEN an override relocates a referenced contract to another file, the system SHALL preserve its incoming references and ownership at the replacement identifier.
+
+WHEN compatible contracts with the same requirement owner are merged, the system SHALL preserve unique ownership and consolidate each consumer's references to the surviving contract.
+
+When contracts or referencing requirements are moved, renamed, merged, or removed, the system SHALL maintain resolvable references according to the Contract Reference mutation contract.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
+
+#### Relations
+  * definedBy: [Contract Reference Mutation Specification](Specifications.md#contract-reference-mutation-specification)
+  * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
+  * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+---
+
 ### Relation Types and behaviors
 
 The system shall implement relations following clearly defined specifications for types and behaviors.
@@ -225,9 +290,9 @@ Collect traversal behavior shall follow the associated output specification.
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [collect.rs](../../crates/reqvire-core/src/report/collect.rs)
   * definedBy: [Capability Collect Traversal Specification](Specifications.md#capability-collect-traversal-specification)
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * satisfiedBy: [collect.rs](../../crates/reqvire-core/src/report/collect.rs)
   * verifiedBy: [Capability Collect Traversal Test](../Verifications/Reports/ModelReports/ReportingVerifications.md#capability-collect-traversal-test)
 ---
 
@@ -242,8 +307,8 @@ Capability coverage shall remain separate from capability validation. Capability
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [coverage.rs](../../crates/reqvire-core/src/report/coverage.rs)
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * satisfiedBy: [coverage.rs](../../crates/reqvire-core/src/report/coverage.rs)
   * verifiedBy: [Capability Coverage Rollup Test](../Verifications/Reports/ModelReports/ReportingVerifications.md#capability-coverage-rollup-test)
 ---
 
@@ -360,8 +425,8 @@ When unlinking, the system shall:
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
   * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
-  * verifiedBy: [Link Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
-  * verifiedBy: [Unlink Command Verification](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
+  * verifiedBy: [MCP Link Tool Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-link-tool-verification)
+  * verifiedBy: [MCP Unlink Tool Verification](../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-unlink-tool-verification)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
 ---
 
@@ -390,27 +455,16 @@ Governance metadata behavior shall follow the associated contract specifications
 
 ### Template-Based Model Bootstrapping
 
-The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
+The system SHALL support valid starter model templates in Git repositories for systems engineers to copy or clone before validation and MCP authoring.
 
 #### Details
-Template Bootstrapping Capabilities
-
-Users can initialize new models using the CLI with templates from Git repositories:
-- Discover available templates within a specified repository
-- Select and apply templates interactively
-- Bootstrap model structure with predefined files, folders, and requirements
-
-Templates are consumed from Git repositories only, with support for repositories containing multiple templates alongside other content.
-
-**Example usage:**
-```bash
-reqvire init --template <github-repo-url>
-```
-
-The system discovers all available templates in the repository and allows the user to select which template to apply.
+When a starter repository is prepared, the system SHALL validate its model through the supported inspection interface before accepting MCP authoring requests.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
 
 #### Relations
   * specify: [Operating on Model Elements](../Operations/BehaviorValidationOperationsFeature.md#operating-on-model-elements)
@@ -453,69 +507,4 @@ The system shall use the effective Reqvire workspace root as the project base fo
   * definedBy: [Workspace Scope Specification](Specifications.md#workspace-scope-specification)
   * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
   * verifiedBy: [Subdirectory Processing Verification](../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
----
-
-### Contract Reference Semantics
-
-The system SHALL distinguish requirement dependencies on contract content from shared implementation obligations.
-
-#### Details
-When a requirement declares a Contract Reference, the system SHALL resolve and retain its dependency on a uniquely owned requirement contract.
-
-WHEN equivalent fragment-only and file-qualified Contract Reference identifiers are supplied, the system SHALL resolve them to the same canonical contract target.
-
-If a Contract Reference has an invalid source, target, ownership, or duplicate declaration, then the system SHALL report the invalid declaration.
-
-If a requirement declares both Contract Bindings and Contract References, then the system SHALL reject the element even when their targets differ.
-
-If a Contract Reference participates in a circular dependency through contract ownership, other contract references, contract bindings, or requirement ancestry, then the system SHALL reject the model with the dependency path.
-
-When assessing implementation coverage, the system SHALL classify requirements using child requirements and Contract Bindings independently of Contract References.
-
-#### Concept References
-  * [Contract Reference](../Thesaurus/Thesaurus.md#contract-reference)
-  * [Contract Binding](../Thesaurus/Thesaurus.md#contract-binding)
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Relation Semantics Specification](Specifications.md#relation-semantics-specification)
-
-#### Relations
-  * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
-  * definedBy: [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
-  * constrainedBy: [Relation Compatibility Shape](../Ontologies/RelationsAndImpact.md#relation-compatibility-shape)
-  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
-  * satisfiedBy: [validation.rs](../../crates/reqvire-core/src/graph_registry/validation.rs)
----
-
-### Contract Reference Identifier Updates
-
-When a model operation changes a contract identifier or its referencing requirement, the system SHALL preserve the Contract Reference dependency in the resulting model.
-
-#### Details
-When a user adds or removes a Contract Reference, the system SHALL apply the same validation and atomic persistence guarantees as other model mutations.
-
-WHEN an edit replaces an element at the same identifier, the system SHALL preserve incoming Contract References and externally authored ownership relations while validating the replacement.
-
-IF an edit changes a referenced contract's owner to a non-requirement element, THEN the system SHALL reject the edit and preserve the original model.
-
-WHEN an override relocates a referenced contract to another file, the system SHALL preserve its incoming references and ownership at the replacement identifier.
-
-WHEN compatible contracts with the same requirement owner are merged, the system SHALL preserve unique ownership and consolidate each consumer's references to the surviving contract.
-
-When contracts or referencing requirements are moved, renamed, merged, or removed, the system SHALL maintain resolvable references according to the Contract Reference mutation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Contract Reference Semantics Specification](Specifications.md#contract-reference-semantics-specification)
-
-#### Relations
-  * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
-  * definedBy: [Contract Reference Mutation Specification](Specifications.md#contract-reference-mutation-specification)
-  * satisfiedBy: [crud.rs](../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
 ---

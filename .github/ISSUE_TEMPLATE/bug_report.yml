@@ -26,7 +26,7 @@ body:
         - Ontologies, semantic contracts, SHACL, RDF export, or SPARQL
         - MCP server, MCP tools, or MCP prompts
         - Explorer UI, exported Explorer, or serve command
-        - Codex or Claude assistant skills/plugins
+        - Assistant skills (Codex, Claude Code, or other agents)
         - Installation, packaging, release, or documentation website
         - Other
     validations:
