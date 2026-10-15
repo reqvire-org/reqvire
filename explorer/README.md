@@ -34,7 +34,7 @@ and non-state hooks are explicit config; Toast usage rules remain component-owne
 For the source-level tour, start with the
 [local design-system guide](design-system/readme.md). Use DS skills for
 implementation workflows; shared rules belong to the
-[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/DS.md).
+[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/DS.md).
 
 The public `ExplorerWorkspace` and screen patterns are shared by production
 adapters and the fixture showcase. Run `npm run dev:showcase` and select Composition → Explorer workspace to inspect

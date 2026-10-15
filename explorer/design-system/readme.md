@@ -50,7 +50,7 @@ Use DS skills for implementation workflows: `ds-designer` for UI changes,
 `ds-motion` for animation, and `ds-break-ui` for difficult content and states.
 They can be installed or read through the configured DS MCP server. This guide
 records Reqvire-specific conventions; shared architecture belongs to the
-[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/DS.md).
+[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/DS.md).
 
 [ds.config.json](../ds.config.json) identifies this directory and the public
 `@ds` alias. It registers Toast usage rules and the Sonner import restriction,
