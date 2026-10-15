@@ -25,7 +25,8 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ads` is a development dependency configured by `ds.config.json`.
+`@reqvire-org/ads` is pinned to `0.3.0` as a development dependency; project
+architecture and preview settings live in `ds.config.json`.
 `npm run lint` runs shared ADS architecture checks and core/registered Oxlint
 rules (`lint:ds`), then Biome CSS correctness checks (`lint:style`). Build hooks
 refresh ignored `.ds/oxlintrc.json`, validate source, and generate configured
@@ -34,7 +35,7 @@ and non-state hooks are explicit config; Toast usage rules remain component-owne
 For the source-level tour, start with the
 [local design-system guide](design-system/readme.md). Use ADS skills for
 implementation workflows; shared rules belong to the
-[ADS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/ADS.md).
+[ADS tooling contract](https://github.com/reqvire-org/ads/blob/main/docs/ADS.md).
 
 The public `ExplorerWorkspace` and screen patterns are shared by production
 adapters and the fixture showcase. Run `npm run dev:showcase` and select Composition → Explorer workspace to inspect
@@ -163,29 +164,29 @@ and compiler; use the URL from `ads_status`. Components, styles, fonts and runti
 execute only inside the sandboxed App. The host's theme selects the project's
 own skin. Failed checks/builds retain the previous preview with stale diagnostics.
 
-## Local ADS development
+## ADS MCP and showcase
 
-The current ADS 0.3 tooling is not published yet. This checkout uses the sibling
-`../../design-system-template` as a local npm file dependency. Build that tool
-before installing Explorer dependencies:
+From the repository root:
 
 ```sh
-cd ../design-system-template
-npm ci
-npm run build
-cd ../reqvire/explorer
+cd explorer
 npm ci
 npm run ads-mcp -- --port 4191
 ```
 
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
-preview compiler with the installed tool. `npm run dev:showcase` starts the
-browser-only runtime. MCP clients launching the npm scripts should use
-`npm --silent run ads-mcp` or `npm --silent run ads-read-mcp` to keep stdout
-exclusive to JSON-RPC. The repository's `.mcp.json` launches the installed
-ADS CLI for `explorer/` with guarded mutations enabled; it uses the same local
-tool and preview compiler. After changing tool source, rebuild the sibling tool
-and restart the MCP connection/showcase. When 0.3 is published, replace the file
-dependency with `npm install --save-dev @reqvire-org/ads@0.3.0`; the runtime and
-scenario configuration stay the same.
+preview compiler. `npm run dev:showcase` starts the browser-only runtime.
+These launch commands use `npx --yes @reqvire-org/ads@0.3.0`; build checks and
+the preview compiler use the same published version installed by `npm ci`.
+
+The repository's `.mcp.json` launches ADS with guarded mutations from the
+repository root using:
+
+```sh
+npx --yes @reqvire-org/ads@0.3.0 mcp explorer --mutations
+```
+
+MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
+`npm --silent run ads-read-mcp` to keep stdout exclusive to JSON-RPC. Restart the
+MCP connection after changing client configuration or upgrading ADS.

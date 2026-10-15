@@ -10,9 +10,10 @@
     },
     "ads": {
       "type": "stdio",
-      "command": "node",
+      "command": "npx",
       "args": [
-        "explorer/node_modules/@reqvire-org/ads/dist/cli.mjs",
+        "-y",
+        "@reqvire-org/ads@0.3.0",
         "mcp",
         "explorer",
         "--mutations"

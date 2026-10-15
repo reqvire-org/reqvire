@@ -3,9 +3,8 @@ import { OntologyGraphScreen } from "@ds";
 import { useExplorerUiState } from "../state/ExplorerUiState";
 import { useStore } from "../store/StoreContext";
 import { mountOntologyGraph } from "../lib/ontologyGraphRenderer";
-import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 
-export function OntologiesView(_: Partial<ExplorerViewProps> = {}) {
+export function OntologiesView() {
   const { store } = useStore();
   const ui = useExplorerUiState();
   const activeFilters = useMemo(() => [...ui.ontologyFilters], [ui.ontologyFilters]);

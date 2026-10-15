@@ -50,7 +50,7 @@ Use ADS skills for implementation workflows: `ads-designer` for UI changes,
 `ads-motion` for animation, and `ads-break-ui` for difficult content and states.
 They can be installed or read through the configured ADS MCP server. This guide
 records Reqvire-specific conventions; shared architecture belongs to the
-[ADS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/ADS.md).
+[ADS tooling contract](https://github.com/reqvire-org/ads/blob/main/docs/ADS.md).
 
 [ds.config.json](../ds.config.json) identifies this directory and the public
 `@ds` alias. It registers Toast usage rules and the Sonner import restriction,

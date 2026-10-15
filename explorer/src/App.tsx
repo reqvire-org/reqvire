@@ -262,7 +262,7 @@ function ActiveView({
     case "traces":
       return <TracesView activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "ontologies":
-      return <OntologiesView activeView={view} onNavigate={onNavigate} />;
+      return <OntologiesView />;
     case "coverage":
       return <CoverageView activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "resources":
