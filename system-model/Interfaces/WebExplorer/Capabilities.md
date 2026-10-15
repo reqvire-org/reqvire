@@ -170,6 +170,7 @@ WHEN an embedded MCP endpoint uses a configured bind address or additional endpo
 
 #### Relations
   * definedBy: [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
+  * derivedFrom: [MCP Streamable HTTP Transport](../MCP/Tools.md#mcp-streamable-http-transport)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [serve.rs](../../../crates/reqvire-cli/src/serve.rs)
@@ -684,7 +685,7 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
   * satisfiedBy: [CoverageNavigation.tsx](../../../explorer/design-system/patterns/reports/CoverageNavigation.tsx)
   * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/patterns/reports/ReportPatterns.tsx)
   * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/patterns/side-pane/PaneControls.tsx)
-  * satisfiedBy: [PatternsPage.tsx](../../../explorer/design-system/showcase/pages/PatternsPage.tsx)
+  * satisfiedBy: [CoverageReportScreen.scenario.tsx](../../../explorer/design-system/patterns/reports/CoverageReportScreen.scenario.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
   * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
   * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)

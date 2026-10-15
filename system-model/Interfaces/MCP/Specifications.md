@@ -918,18 +918,22 @@ The `reqvire mcp` command is expected to start the MCP server for the current wo
 
 #### Details
 Command behavior:
+- `--transport <http|stdio>` selects one standalone MCP transport; omission selects `http`. Selection does not enable mutations, commits, GitHub publication, or size estimates.
+- `--workspace <DIR>` resolves the same effective workspace for either transport; otherwise the process working directory selects it. Use an absolute path when a client may launch the command from another directory.
+- Unknown transport values fail argument validation before model loading. Explicit `--host`, `--port`, `--allow-origin`, and `--allow-host` arguments are HTTP-only and MUST be rejected with `--transport stdio`, including explicitly supplied default values. Implicit HTTP defaults do not prevent stdio startup.
+- Root and MCP command help document both transport choices, the HTTP default, and the HTTP-only options. `serve --enable-mcp` remains embedded HTTP and does not accept standalone transport selection.
 - `reqvire mcp` starts MCP protocol service mode with read/report tools only, and MCP `tools/list` does not include mutation tools.
 - `reqvire mcp --enable-mutations` claims the current clean branch and worktree as the original context under the MCP Mutation Concurrency Control Specification, validates the model, and advertises mutation tools, with automatic commits disabled.
-- `reqvire mcp --enable-mutations --enable-commits` additionally enables automatic local commits. `--enable-commits` is a boolean startup flag, defaults to false when absent, and requires `--enable-mutations`. Invalid combinations MUST fail argument validation before model loading or opening a listener.
+- `reqvire mcp --enable-mutations --enable-commits` additionally enables automatic local commits. `--enable-commits` is a boolean startup flag, defaults to false when absent, and requires `--enable-mutations`. Invalid combinations MUST fail argument validation before model loading or accepting protocol messages.
 - `reqvire mcp --enable-mutations --enable-github` enables startup checks for optional publishing tools. `--github-remote <NAME>` selects the configured remote and defaults to `origin`. GitHub enablement requires mutations; the remote override requires GitHub enablement. Checks and degraded local operation follow MCP GitHub Tool Availability Specification.
 - Root and MCP command help MUST describe `--enable-commits` as opt-in automatic commits requiring mutation mode.
-- `reqvire mcp --allow-origin <ORIGIN>` MUST accept repeatable additional browser origins according to the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. Invalid values MUST fail argument validation before model loading or opening a listener.
-- `reqvire mcp --allow-host <HOST[:PORT]>` MUST accept repeatable endpoint hostnames according to the same bound transport safety contract. Invalid values MUST fail argument validation before model loading or opening a listener.
+- `reqvire mcp --allow-origin <ORIGIN>` MUST accept repeatable additional browser origins according to the MCP Streamable HTTP Transport Safety Specification bound by its owning requirement. Invalid values MUST fail argument validation before model loading or accepting protocol messages.
+- `reqvire mcp --allow-host <HOST[:PORT]>` MUST accept repeatable endpoint hostnames according to the same bound transport safety contract. Invalid values MUST fail argument validation before model loading or accepting protocol messages.
 - `reqvire mcp` is not exposed back through MCP as a tool.
 - The server resolves the workspace root using the Workspace Scope Specification shared with Reqvire core commands.
 - Startup validates the model before the server accepts protocol requests.
 - Startup validation failures are forwarded from Reqvire validation diagnostics and prevent the MCP server from starting. No tool is available before this gate; use CLI migration for supported legacy source upgrades and validate normally before restart.
-- Startup diagnostics include Reqvire version and supported MCP protocol revision.
+- Startup diagnostics include Reqvire version and supported MCP protocol revision. In stdio mode, all diagnostics go to stderr and stdout is reserved for MCP messages.
 - Startup fails with a clear error when the workspace cannot be resolved or parsed enough to report status.
 
 #### Metadata
@@ -1031,6 +1035,43 @@ The MCP server is expected to expose element size estimates only when explicitly
   * define: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
+### MCP Stdio Process Lifecycle Specification
+
+A stdio server lives for its client connection and preserves durable model work when it exits.
+
+#### Details
+- Every stdout line is a valid MCP JSON-RPC message. Startup banners, logs, validation failures, Git/npm-launcher diagnostics, and other informational text go to stderr, including failure before initialization. Notifications receive no JSON-RPC response.
+- Invalid model or workspace startup fails with a nonzero exit status and stderr diagnostics, without publishing a successful initialization result or non-protocol stdout output.
+- After successful initialization, closing stdin ends protocol service and exits successfully within a bounded shutdown interval. An orderly interrupt or termination also stops service within a bounded interval.
+- Shutdown stops owned worktree workers and releases ownership and administration locks. A fresh server can reacquire a clean previously owned context after EOF or termination; no worker from the departed server retains ownership.
+- Shutdown preserves existing managed worktrees, branches, committed history, and accepted uncommitted mutations. It does not stash, reset, delete model work, or implicitly commit it. Dirty preserved contexts retain the ordinary admission requirement on restart.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Stdio Process Lifecycle](Tools.md#mcp-stdio-process-lifecycle)
+---
+
+### MCP Stdio Transport Specification
+
+Standard input and output transport provides a client-managed Reqvire process for a selected local project.
+
+#### Details
+- `reqvire mcp --transport stdio` uses the RMCP stdio transport, with UTF-8 newline-delimited JSON-RPC on stdin and stdout, standard initialization and initialized notification handling, and protocol errors for invalid requests. No HTTP listener is created.
+- Default and mutation-enabled tool names, complete input/output schemas, annotations, resources, resource templates, prompts, tool results, resource result metadata, and permission checks match the corresponding HTTP mode. Only transport/session metadata and process-specific workspace metadata may differ.
+- Read/report tools remain the default. Mutation tools require `--enable-mutations`; commits require `--enable-commits` together with mutations; optional GitHub tools retain their existing availability checks; size estimates remain opt-in.
+- Mutation-enabled startup retains clean-worktree admission, named-branch and valid-model checks, ownership exclusion, and the accepted-snapshot mutation workflow. Stdio does not admit dirty or already-owned contexts.
+- Two processes launched for different absolute workspace roots expose only their selected projects, even when the client launches both from another directory. Project selection does not depend on the npm launcher or the MCP client's working directory when `--workspace` is supplied.
+- The distributed npm launcher preserves the same stdio behavior as the native binary, including initialization, tool calls, EOF shutdown, stderr diagnostics, and exit status. Client configuration uses command/args rather than an HTTP URL; the configuration syntax follows the selected client.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Stdio Transport](Tools.md#mcp-stdio-transport)
+---
+
 ### MCP Streamable HTTP Transport Safety Specification
 
 The HTTP transport is expected to follow MCP Streamable HTTP rules and safe local-server defaults.
@@ -1080,12 +1121,11 @@ Session and streaming rules:
 
 ### MCP Streamable HTTP Transport Specification
 
-The MCP server is expected to use RMCP Streamable HTTP as its protocol transport.
+The MCP server is expected to use RMCP Streamable HTTP as its default network protocol transport.
 
 #### Details
 Transport rules:
-- `reqvire mcp` starts RMCP Streamable HTTP transport.
-- Stdio transport is not supported and is not accepted as a compatibility mode.
+- `reqvire mcp` and `reqvire mcp --transport http` start the same RMCP Streamable HTTP transport.
 - Transport implementation is a server startup concern and is not exposed as an MCP tool.
 - Tool names, input schemas, output schemas, annotations, resources, mutation gating, and Reqvire core behavior are independent from HTTP transport mechanics unless the MCP protocol requires transport-specific metadata.
 - Streamable HTTP transport uses the Rust `rmcp` streamable HTTP server transport according to MCP Streamable HTTP rules.

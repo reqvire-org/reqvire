@@ -8,6 +8,18 @@
       ],
       "env": {}
     },
+    "reqvire": {
+      "type": "stdio",
+      "command": "./target/debug/reqvire",
+      "args": [
+        "--workspace",
+        ".",
+        "mcp",
+        "--transport",
+        "stdio",
+        "--enable-mutations"
+      ]
+    },
     "ads": {
       "type": "stdio",
       "command": "npx",

@@ -67,3 +67,16 @@ export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
 Author model changes through typed MCP tools with mutations enabled. Formatting
 and lint repair use MCP; validation and migration remain CLI commands. Run
 migration before MCP startup when the source is incompatible.
+
+Stdio transport is planned and covered by acceptance tests; it is not available
+in the current implementation. Its command will be:
+
+```bash
+npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/project mcp --transport stdio --enable-mutations
+```
+
+Configure this command and its arguments in the MCP client so it starts Reqvire
+for that project. HTTP remains the default transport. Both transports retain
+normal startup validation and mutation ownership checks, including the clean
+worktree requirement. Installing skills does not opt into mutations or commits.
+See the repository README for the planned stdio client configuration.

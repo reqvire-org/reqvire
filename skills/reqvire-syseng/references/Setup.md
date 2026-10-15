@@ -52,6 +52,20 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Installing skills does not start MCP or grant mutation permissions.
 
+Stdio transport is specified and has acceptance tests, but is not implemented
+yet. The planned local-project startup command is:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace /absolute/path/to/project mcp --transport stdio --enable-mutations
+```
+
+Use a stdio-capable client's command/args configuration and an absolute project
+path when the launch directory is uncertain. HTTP remains the default. Stdio
+will retain validation, clean-worktree admission, ownership checks, and explicit
+mutation/commit/GitHub enablement. HTTP listener/access flags are incompatible
+with stdio. Protocol output is stdout; diagnostics are stderr; client EOF releases
+the process's workers and locks while preserving pending work.
+
 ## Repository assistant instructions
 
 When the user requests repository-specific setup, update the existing assistant

@@ -916,14 +916,16 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 
 #### Details
 - The MCP server command shall start protocol service mode for the current Reqvire workspace.
+- WHEN a supported transport is selected, the system SHALL start that transport for the resolved workspace.
+- IF transport selection or transport-specific options are incompatible, THEN the system SHALL reject startup before model loading or protocol service.
 - The MCP server command shall keep server startup behavior outside the MCP tool surface.
 - The MCP server command shall expose read/report tools by default.
 - The MCP server command shall expose mutation tools only when mutation capability is explicitly enabled at startup.
 - The MCP server command SHALL disable automatic commits by default and SHALL accept an explicit commit opt-in only when mutation capability is enabled.
 - WHEN GitHub publication is requested, the system SHALL apply startup availability checks and expose diagnostic state independently of local mutation and commit enablement.
 - The MCP server command shall support opt-in element size estimates when explicitly enabled at startup.
-- WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
-- WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
+- WHILE HTTP transport is selected, WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
+- WHILE HTTP transport is selected, WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
 
 #### Metadata
   * type: requirement
@@ -1004,14 +1006,37 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
+### MCP Stdio Process Lifecycle
+
+WHILE serving a local MCP client over standard input and output, the system SHALL keep protocol output separate from diagnostics and SHALL release owned runtime resources when the client connection ends or the server is terminated.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+---
+
+### MCP Stdio Transport
+
+WHEN a local MCP client selects standard input and output transport, the system SHALL serve the resolved project workspace through the same typed engineering operations and permission boundaries as the HTTP interface.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+---
+
 ### MCP Streamable HTTP Transport
 
 The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Details
-- The MCP server shall use Streamable HTTP as the only supported MCP transport.
 - The MCP server shall start an RMCP-backed HTTP endpoint by default.
-- The MCP server shall not expose newline-delimited stdio JSON-RPC compatibility mode.
 - MCP transport mechanics shall not change Reqvire tool semantics.
 
 #### Metadata
@@ -1019,7 +1044,6 @@ The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Relations
   * definedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
-  * derive: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)

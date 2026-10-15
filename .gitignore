@@ -1,3 +1,5 @@
+# Generated local artifacts
+/output/
 tests/**/output/
 *Plan.md
 tmpspec

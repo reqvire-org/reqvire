@@ -160,6 +160,36 @@ Example MCP client configuration:
 }
 ```
 
+Stdio support is specified and has e2e acceptance tests, but is not implemented
+yet. The planned `mcp --transport http|stdio` option keeps HTTP as the default.
+For local development, a stdio-capable client will launch one Reqvire process
+for the selected project without a listening port. Planned client configuration:
+
+```json
+{
+  "mcpServers": {
+    "reqvire": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y", "@reqvire-org/reqvire@latest",
+        "--workspace", "/absolute/path/to/project",
+        "mcp", "--transport", "stdio"
+      ]
+    }
+  }
+}
+```
+
+Client configuration syntax varies; use the client's command/args form and an
+absolute workspace path when its launch directory is uncertain. After stdio is
+implemented, append `--enable-mutations` when authoring is required. Mutation
+startup still requires a clean, valid, exclusively owned Git worktree; commits
+remain a separate `--enable-commits` opt-in. HTTP listener and access options
+(`--host`, `--port`, `--allow-origin`, `--allow-host`) will be rejected with stdio.
+Protocol messages use stdout and diagnostics use stderr. Closing stdin ends the
+server session, releases workers and locks, and preserves pending model work.
+
 The MCP server exposes tools, resources, and prompts. Prompt templates include
 regular Reqvire workflows such as model exploration, change planning, and
 verification coverage review, plus semantic workflows for vocabulary-driven

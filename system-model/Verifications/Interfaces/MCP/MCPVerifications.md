@@ -269,7 +269,7 @@ This verification shall prove that the Reqvire MCP HTTP transport preserves MCP 
 Expected checks:
 - Start `reqvire mcp` and verify the server binds to `127.0.0.1` by default.
 - Start `reqvire mcp --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
-- Verify `reqvire mcp --transport stdio` is rejected because stdio compatibility mode is not supported.
+- Initialize default HTTP startup and explicit `--transport http` startup; compare tool, resource, and prompt discovery for equivalent behavior.
 - Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.
 - Compare the complete default and mutation-enabled HTTP tool catalog fixtures against the shared registry in unit tests. Both catalogs include the read-only managed query discovery and validation tools.
 - Verify HTTP requests without an `Origin` header are accepted.
@@ -298,6 +298,7 @@ Cache rebuild races and post-write model/runtime coherence are additionally cove
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [mcp_http.rs](../../../../crates/reqvire-cli/src/mcp_http.rs)
   * satisfiedBy: [mod.rs](../../../../crates/reqvire-core/src/tool_interface/mod.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-http-access/test.sh)
@@ -1143,6 +1144,9 @@ This verification shall prove that `reqvire mcp` starts protocol service mode an
 #### Details
 Expected checks:
 - Start `reqvire mcp` in a fixture workspace.
+- Verify root and MCP help describe `--transport`, both `http` and `stdio`, the HTTP default, and HTTP-only listener/access options.
+- Reject unknown transports and each explicit HTTP-only option in stdio mode before loading an invalid model; diagnostics identify the offending transport or option.
+- Verify explicit absolute workspace selection from an unrelated launch directory isolates two project processes and their model results.
 - Verify startup metadata includes Reqvire version and supported MCP protocol revision.
 - Verify tool discovery does not include `reqvire.mcp`.
 - Verify startup validation failures are forwarded from Reqvire diagnostics and prevent the server from accepting protocol requests.
@@ -1156,6 +1160,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-cli-help-structure/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
@@ -1165,15 +1170,16 @@ Expected checks:
 
 ### MCP Server End-to-End Verification
 
-This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP protocol boundary.
+This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP and stdio protocol boundaries.
 
 #### Details
-The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure including non-read-only annotations on mutation tools such as `reqvire.add_element`, dry-run mutation behavior including read-only `reqvire.format` preview advertising `fix` enum `[false]` in default mode, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
+The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, explicit transport selection and stdio parity, default mutation-tool omission, mutation-mode tool exposure including non-read-only annotations on mutation tools such as `reqvire.add_element`, dry-run mutation behavior including read-only `reqvire.format` preview advertising `fix` enum `[false]` in default mode, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Access Control Baseline](../../../Interfaces/MCP/Tools.md#mcp-access-control-baseline)
   * verify: [MCP Compatibility Versioning](../../../Interfaces/MCP/Tools.md#mcp-compatibility-versioning)
@@ -1273,6 +1279,52 @@ Expected checks:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * verify: [MCP Server Command](../../../Interfaces/MCP/Tools.md#mcp-server-command)
+---
+
+### MCP Stdio Process Lifecycle Verification
+
+This verification proves that client-managed stdio shutdown preserves model work and releases runtime ownership.
+
+#### Details
+Expected checks:
+- Verify invalid model and missing-workspace startup exit nonzero, report diagnostics only on stderr, and emit no successful initialization or non-protocol stdout.
+- After initialization, close stdin and require successful process exit within ten seconds. Verify stderr may contain diagnostics and every emitted stdout line is valid JSON-RPC.
+- Initialize mutation-enabled stdio, close stdin, and reacquire its clean context in a fresh mutation-enabled process.
+- Repeat ownership reacquisition after SIGINT and SIGTERM, allowing platform-specific signal exit status while requiring bounded shutdown.
+- Create a managed worktree, apply an uncommitted fixture mutation, and shut down through EOF. Verify the worktree, branch, file contents, HEAD, and index remain intact.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Stdio Process Lifecycle](../../../Interfaces/MCP/Tools.md#mcp-stdio-process-lifecycle)
+---
+
+### MCP Stdio Transport End-to-End Verification
+
+This verification exercises native and npm-launched stdio processes against the corresponding HTTP protocol surface in isolated project fixtures.
+
+#### Details
+Expected checks:
+- Complete initialize and initialized notification handshakes; parse every stdout line as JSON-RPC and correlate responses by request ID.
+- Compare default HTTP, explicit HTTP, and stdio tool/resource/template/prompt discovery. Compare complete catalogs, representative structured search results, resource metadata, and a retrieved prompt while allowing only process-specific metadata differences.
+- Confirm default stdio omits mutation tools and rejects a direct mutation call without changing source files. Confirm unknown methods and invalid tool arguments return protocol errors.
+- Run two stdio projects concurrently from an unrelated launch directory using absolute workspace paths; confirm each search returns only its own fixture requirement. Hold the default HTTP port occupied while these processes initialize to establish that stdio creates no HTTP listener.
+- Enable mutations and compare the complete tool catalog with mutation-enabled HTTP. Preview an added requirement without changing bytes, then apply it and compare the persisted document with a committed expected fixture. Read the added element and confirm HEAD and the index remain unchanged without commit opt-in.
+- Confirm size estimates are opt-in for stdio and compare their discovery/result behavior with HTTP.
+- Reject dirty and already-owned mutation contexts with stderr diagnostics and no successful initialization.
+- Verify root and MCP help advertise both transport choices and HTTP-only options. Reject unknown transport values and each explicit HTTP-only option, including default host and port values, before loading an invalid model.
+- Launch the real npm wrapper around the captured native binary; verify initialization, a search call, JSON-only stdout, successful EOF shutdown, and propagation of native startup failure status.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [MCP Stdio Transport](../../../Interfaces/MCP/Tools.md#mcp-stdio-transport)
 ---
 
 ### MCP Structured Payload Contracts Verification

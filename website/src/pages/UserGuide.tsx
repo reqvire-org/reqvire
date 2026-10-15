@@ -40,6 +40,13 @@ reqvire --workspace /path/to/workspace mcp`}</CodeBlock>
         <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace validate
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace search --filter-type requirement
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Per-project stdio startup is planned and has acceptance tests, but is
+          not implemented yet. Its command will add <code>--transport stdio</code>
+          to MCP startup. Use an absolute workspace path in a client&apos;s command
+          and arguments. HTTP remains the default transport; mutation startup
+          retains validation and clean-worktree ownership checks.
+        </p>
       </Section>
 
       <Section title="Core Commands">

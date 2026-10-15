@@ -321,7 +321,7 @@ This test verifies production served/exported trace rendering and the shared nat
   * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
   * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
   * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/patterns/reports/useTraceFlowLayout.test.ts)
-  * satisfiedBy: [TraceFlowViewport.test.tsx](../../../../explorer/design-system/showcase/TraceFlowViewport.test.tsx)
+  * satisfiedBy: [TraceFlowViewport.test.tsx](../../../../explorer/design-system/patterns/reports/TraceFlowViewport.test.tsx)
   * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
 ---
 

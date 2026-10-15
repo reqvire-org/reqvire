@@ -29,7 +29,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
 
       <Section title="HTTP Transport">
         <p className="text-zinc-600 mb-4">
-          The server uses MCP Streamable HTTP. The endpoint is fixed at{" "}
+          HTTP is the default MCP transport. The endpoint is fixed at{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             /mcp
           </code>
@@ -57,6 +57,46 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
           Requests without an Origin header and HTTP(S) loopback origins are
           accepted by default. Add other browser origins explicitly with the
           repeatable <code>--allow-origin</code> option.
+        </p>
+      </Section>
+
+      <Section title="Local Project Stdio (Planned)">
+        <p className="text-zinc-600 mb-4">
+          Stdio support is specified and covered by acceptance tests, but is not
+          implemented yet. A stdio-capable client will launch a dedicated Reqvire
+          process for each configured project without a listening port. HTTP will
+          remain the default; select stdio explicitly in the client&apos;s command
+          and arguments:
+        </p>
+        <CodeBlock>{`{
+  "mcpServers": {
+    "reqvire": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y", "@reqvire-org/reqvire@latest",
+        "--workspace", "/absolute/path/to/project",
+        "mcp", "--transport", "stdio"
+      ]
+    }
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Configuration syntax depends on the client. An absolute workspace path
+          selects the project even when the client launches from another directory.
+          Native startup will also accept <code>reqvire mcp --transport stdio</code>.
+          Both transports will expose the same tools, resources, prompts, and
+          permission checks. Append <code>--enable-mutations</code> for authoring;
+          clean-worktree admission and exclusive ownership still apply, and
+          <code> --enable-commits</code> remains a separate opt-in.
+        </p>
+        <p className="text-zinc-600">
+          HTTP-only options <code>--host</code>, <code>--port</code>,
+          <code> --allow-origin</code>, and <code>--allow-host</code> will be rejected
+          with stdio. Protocol messages use stdout; diagnostics use stderr. Closing
+          stdin will stop the process and its workers, release ownership locks,
+          and preserve pending model changes and managed worktrees. Embedded MCP
+          through <code>serve --enable-mcp</code> continues to use HTTP.
         </p>
       </Section>
 
