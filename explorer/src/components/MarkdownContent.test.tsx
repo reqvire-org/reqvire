@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@/test/render";
 import { describe, expect, it, vi } from "vitest";
 import {
   MarkdownContent,
@@ -37,7 +37,7 @@ describe("MarkdownContent", () => {
         markdown={[
           "```mermaid",
           "graph TD",
-          "  classDef capability fill:var(--capability),stroke:var(--capability-ink),stroke-width:2.5px;",
+          "  classDef capability fill:var(--color-role-capability),stroke:var(--color-role-capability-ink),stroke-width:2.5px;",
           "  A[Capability]:::capability",
           "```",
         ].join("\n")}

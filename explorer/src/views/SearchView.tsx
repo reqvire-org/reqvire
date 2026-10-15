@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { type TargetedSubmitEvent } from "preact";
 import { useStore } from "../store/StoreContext";
-import { ViewFrame } from "./ViewFrame";
 import { MarkdownContent } from "../rendering/MarkdownContent";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import { routeForSearch } from "../router/routes";
 import { useExplorerUiState } from "../state/ExplorerUiState";
 import { useSearchIndex } from "../search/SearchIndexContext";
-import { RouteLayout, RoutePanel, SearchPageToolbar, SearchResults, type SearchResultListItem } from "@ds";
+import { SearchScreen, type SearchResultListItem } from "@ds";
 import { displaySearchKind } from "../lib/searchIndex";
 import type { ProjectStoreSearchDocument } from "../store/types";
 
@@ -34,7 +34,7 @@ export function SearchView({
     setQuery(initialQuery ?? "");
   }, [initialQuery]);
 
-  function submitSearch(event: FormEvent<HTMLFormElement>) {
+  function submitSearch(event: TargetedSubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     window.location.hash = routeForSearch(query);
   }
@@ -125,22 +125,10 @@ export function SearchView({
           ? "No matches."
           : undefined;
 
-  return (
-    <ViewFrame testId="search">
-      <RouteLayout>
-        <RoutePanel>
-          <SearchPageToolbar
-            query={query}
-            resultSummary={searchIndex.status === "ready" ? `${results.length} results` : "Indexing"}
-            statusText={searchStatusText(searchIndex.status, query, searchIndex.documentCount, searchIndex.error ?? searchError)}
-            onQueryChange={setQuery}
-            onSubmit={submitSearch}
-          />
-          <SearchResults results={searchResultItems} emptyMessage={emptyMessage} />
-        </RoutePanel>
-      </RouteLayout>
-    </ViewFrame>
-  );
+  return <SearchScreen query={query}
+    resultSummary={searchIndex.status === "ready" ? `${results.length} results` : "Indexing"}
+    statusText={searchStatusText(searchIndex.status, query, searchIndex.documentCount, searchIndex.error ?? searchError)}
+    onQueryChange={setQuery} onSubmit={submitSearch} results={searchResultItems} emptyMessage={emptyMessage} />;
 }
 
 function searchKindLabel(kind: string): string {

@@ -1,14 +1,14 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import type { ButtonSize, ButtonTone } from "./button_contract";
 import { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./button_contract";
 
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
-  children?: ReactNode;
+export interface ButtonProps extends Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
   tone?: ButtonTone;
   size?: ButtonSize;
-  iconLeft?: ReactNode;
-  iconRight?: ReactNode;
+  iconLeft?: ComponentChildren;
+  iconRight?: ComponentChildren;
   block?: boolean;
 }
 

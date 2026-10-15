@@ -1,39 +1,41 @@
+import type { ComponentChildren } from "preact";
+import { ShowcaseRegion } from "@ds";
 import { Icon, ICON_NAMES, TokenSwatch, type DesignSystemColorToken } from "@ds";
 
 type SwatchProps = { token: DesignSystemColorToken; label?: string };
 
 function Swatch({ token, label }: SwatchProps) {
   return (
-    <div className="showcase-swatch">
-      <TokenSwatch colorToken={token} className="showcase-swatch__color" />
-      <div className="showcase-swatch__name">{label ?? token}</div>
-    </div>
+    <ShowcaseRegion regions={["swatch"]}>
+      <ShowcaseRegion regions={["swatch__color"]} asChild><TokenSwatch variant="sample" colorToken={token}  /></ShowcaseRegion>
+      <ShowcaseRegion regions={["swatch__name"]}>{label ?? token}</ShowcaseRegion>
+    </ShowcaseRegion>
   );
 }
 
-function Section({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
+function Section({ title, desc, children }: { title: string; desc?: string; children: ComponentChildren }) {
   return (
-    <section className="showcase-section">
-      <div className="showcase-section__heading">
-        <div className="showcase-section__title">{title}</div>
-        {desc && <div className="showcase-section__desc">{desc}</div>}
-      </div>
+    <ShowcaseRegion regions={["section"]} as="section">
+      <ShowcaseRegion regions={["section__heading"]}>
+        <ShowcaseRegion regions={["section__title"]}>{title}</ShowcaseRegion>
+        {desc && <ShowcaseRegion regions={["section__desc"]}>{desc}</ShowcaseRegion>}
+      </ShowcaseRegion>
       {children}
-    </section>
+    </ShowcaseRegion>
   );
 }
 
 const ELEMENT_TYPES = [
-  { name: "capability", fill: "--capability", tint: "--capability-tint", ink: "--capability-ink" },
-  { name: "requirement", fill: "--requirement", tint: "--requirement-tint", ink: "--requirement-ink" },
-  { name: "contract", fill: "--contract", tint: "--contract-tint", ink: "--contract-ink" },
-  { name: "verification", fill: "--verification", tint: "--verification-tint", ink: "--verification-ink" },
-  { name: "ontology", fill: "--ontology", tint: "--ontology-tint", ink: "--ontology-ink" },
-  { name: "concept", fill: "--concept", tint: "--concept-tint", ink: "--concept-ink" },
-  { name: "concept-scheme", fill: "--concept-scheme", tint: "--concept-scheme-tint", ink: "--concept-scheme-ink" },
-  { name: "concept-reference", fill: "--concept-reference", tint: "--concept-reference-tint", ink: "--concept-reference-ink" },
-  { name: "resource", fill: "--resource", tint: "--resource-tint", ink: "--resource-ink" },
-  { name: "other", fill: "--other", tint: "--other-tint", ink: "--other-ink" },
+  { name: "capability", fill: "--color-role-capability", tint: "--color-role-capability-tint", ink: "--color-role-capability-ink" },
+  { name: "requirement", fill: "--color-role-requirement", tint: "--color-role-requirement-tint", ink: "--color-role-requirement-ink" },
+  { name: "contract", fill: "--color-role-contract", tint: "--color-role-contract-tint", ink: "--color-role-contract-ink" },
+  { name: "verification", fill: "--color-role-verification", tint: "--color-role-verification-tint", ink: "--color-role-verification-ink" },
+  { name: "ontology", fill: "--color-role-ontology", tint: "--color-role-ontology-tint", ink: "--color-role-ontology-ink" },
+  { name: "concept", fill: "--color-role-concept", tint: "--color-role-concept-tint", ink: "--color-role-concept-ink" },
+  { name: "concept-scheme", fill: "--color-role-concept-scheme", tint: "--color-role-concept-scheme-tint", ink: "--color-role-concept-scheme-ink" },
+  { name: "concept-reference", fill: "--color-role-concept-reference", tint: "--color-role-concept-reference-tint", ink: "--color-role-concept-reference-ink" },
+  { name: "resource", fill: "--color-role-resource", tint: "--color-role-resource-tint", ink: "--color-role-resource-ink" },
+  { name: "other", fill: "--color-role-other", tint: "--color-role-other-tint", ink: "--color-role-other-ink" },
 ] as const;
 
 const SURFACE_TOKENS = [
@@ -58,13 +60,13 @@ const STATUS_TOKENS = [
 ] as const satisfies readonly { token: DesignSystemColorToken; label: string }[];
 
 const EDGE_TOKENS = [
-  "--edge-default", "--edge-derive", "--edge-satisfy", "--edge-trace", "--edge-bind", "--concept-reference",
+  "--color-role-edge-default", "--color-role-edge-derive", "--color-role-edge-satisfy", "--color-role-edge-trace", "--color-role-edge-bind", "--color-role-concept-reference",
 ] as const satisfies readonly DesignSystemColorToken[];
 
 const RDF_TOKENS = [
-  "--rdf-class", "--rdf-concept", "--rdf-concept-scheme", "--rdf-objprop", "--rdf-dtprop", "--rdf-rdfprop",
-  "--rdf-individual", "--rdf-datatype", "--rdf-restriction", "--rdf-classexpr",
-  "--rdf-nodeshape", "--rdf-propshape", "--rdf-resource",
+  "--color-role-rdf-class", "--color-role-rdf-concept", "--color-role-rdf-concept-scheme", "--color-role-rdf-objprop", "--color-role-rdf-dtprop", "--color-role-rdf-rdfprop",
+  "--color-role-rdf-individual", "--color-role-rdf-datatype", "--color-role-rdf-restriction", "--color-role-rdf-classexpr",
+  "--color-role-rdf-nodeshape", "--color-role-rdf-propshape", "--color-role-rdf-resource",
 ] as const satisfies readonly DesignSystemColorToken[];
 
 const TYPE_SCALE = [
@@ -98,135 +100,135 @@ const SHADOWS = [
 
 export function TokensPage() {
   return (
-    <div className="showcase-page">
+    <ShowcaseRegion regions={["page"]}>
       <Section title="Element-type colors" desc="Semantic hues encode the model vocabulary. Never repurpose for decoration.">
         {ELEMENT_TYPES.map((t) => (
           <div key={t.name}>
-            <div className="showcase-label showcase-label--spaced">{t.name}</div>
-            <div className="showcase-swatch-grid showcase-swatch-grid--fixed-3">
+            <ShowcaseRegion regions={["label", "label--spaced"]}>{t.name}</ShowcaseRegion>
+            <ShowcaseRegion regions={["swatch-grid", "swatch-grid--fixed-3"]}>
               <Swatch token={t.fill} label="fill" />
               <Swatch token={t.tint} label="tint" />
               <Swatch token={t.ink} label="ink" />
-            </div>
+            </ShowcaseRegion>
           </div>
         ))}
       </Section>
 
       <Section title="Surfaces" desc="Semantic surface aliases — always use these, not raw ramp values.">
-        <div className="showcase-swatch-grid">
+        <ShowcaseRegion regions={["swatch-grid"]}>
           {SURFACE_TOKENS.map((t) => <Swatch key={t} token={t} />)}
-        </div>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Text">
-        <div className="showcase-swatch-grid">
+        <ShowcaseRegion regions={["swatch-grid"]}>
           {TEXT_TOKENS.map((t) => (
-            <div key={t} className="showcase-swatch">
-              <TokenSwatch colorToken={t} className="showcase-swatch__color" />
-              <div className="showcase-swatch__name">{t}</div>
-            </div>
+            <ShowcaseRegion key={t} regions={["swatch"]}>
+              <ShowcaseRegion regions={["swatch__color"]} asChild><TokenSwatch variant="sample" colorToken={t}  /></ShowcaseRegion>
+              <ShowcaseRegion regions={["swatch__name"]}>{t}</ShowcaseRegion>
+            </ShowcaseRegion>
           ))}
-        </div>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Borders &amp; accent">
-        <div className="showcase-row">
-          <div className="showcase-col">
-            <div className="showcase-label">Borders</div>
-            <div className="showcase-swatch-grid showcase-swatch-grid--fixed-5">
+        <ShowcaseRegion regions={["row"]}>
+          <ShowcaseRegion regions={["col"]}>
+            <ShowcaseRegion regions={["label"]}>Borders</ShowcaseRegion>
+            <ShowcaseRegion regions={["swatch-grid", "swatch-grid--fixed-5"]}>
               {BORDER_TOKENS.map((t) => <Swatch key={t} token={t} />)}
-            </div>
-          </div>
-          <div className="showcase-col">
-            <div className="showcase-label">Accent (rose)</div>
-            <div className="showcase-swatch-grid showcase-swatch-grid--fixed-4">
+            </ShowcaseRegion>
+          </ShowcaseRegion>
+          <ShowcaseRegion regions={["col"]}>
+            <ShowcaseRegion regions={["label"]}>Accent (rose)</ShowcaseRegion>
+            <ShowcaseRegion regions={["swatch-grid", "swatch-grid--fixed-4"]}>
               {ACCENT_TOKENS.map((t) => <Swatch key={t} token={t} />)}
-            </div>
-          </div>
-        </div>
+            </ShowcaseRegion>
+          </ShowcaseRegion>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Status">
-        <div className="showcase-swatch-grid">
+        <ShowcaseRegion regions={["swatch-grid"]}>
           {STATUS_TOKENS.map((t) => <Swatch key={t.token} token={t.token} label={t.label} />)}
-        </div>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Graph edges &amp; RDF palette">
-        <div className="showcase-col">
-          <div className="showcase-label">Graph edges</div>
-          <div className="showcase-swatch-grid showcase-swatch-grid--fixed-5">
+        <ShowcaseRegion regions={["col"]}>
+          <ShowcaseRegion regions={["label"]}>Graph edges</ShowcaseRegion>
+          <ShowcaseRegion regions={["swatch-grid", "swatch-grid--fixed-5"]}>
             {EDGE_TOKENS.map((t) => <Swatch key={t} token={t} />)}
-          </div>
-        </div>
-        <div className="showcase-col">
-          <div className="showcase-label">RDF / ontology</div>
-          <div className="showcase-swatch-grid">
+          </ShowcaseRegion>
+        </ShowcaseRegion>
+        <ShowcaseRegion regions={["col"]}>
+          <ShowcaseRegion regions={["label"]}>RDF / ontology</ShowcaseRegion>
+          <ShowcaseRegion regions={["swatch-grid"]}>
             {RDF_TOKENS.map((t) => <Swatch key={t} token={t} />)}
-          </div>
-        </div>
+          </ShowcaseRegion>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Typography" desc="Geist (UI) + Geist Mono (code/IDs). Dense product: default UI text is 13px.">
-        <div className="showcase-type-stack">
+        <ShowcaseRegion regions={["type-stack"]}>
           {TYPE_SCALE.map(({ token, label, note }) => (
-            <div key={token} className="showcase-type-row">
-              <span className="showcase-type-row__label">{token}</span>
-              <span className="showcase-type-sample" data-type-token={token}>
+            <ShowcaseRegion key={token} regions={["type-row"]}>
+              <ShowcaseRegion regions={["type-row__label"]} as="span">{token}</ShowcaseRegion>
+              <ShowcaseRegion regions={["type-sample"]} as="span" data-type-token={token}>
                 {label}
-              </span>
-              {note && <span className="showcase-type-note">{note}</span>}
-            </div>
+              </ShowcaseRegion>
+              {note && <ShowcaseRegion regions={["type-note"]} as="span">{note}</ShowcaseRegion>}
+            </ShowcaseRegion>
           ))}
-        </div>
-        <div className="showcase-row showcase-row--spaced">
-          <div className="showcase-col">
-            <div className="showcase-label">Geist (sans)</div>
-            <div className="showcase-font-sample showcase-font-sample--sans">
+        </ShowcaseRegion>
+        <ShowcaseRegion regions={["row", "row--spaced"]}>
+          <ShowcaseRegion regions={["col"]}>
+            <ShowcaseRegion regions={["label"]}>Geist (sans)</ShowcaseRegion>
+            <ShowcaseRegion regions={["font-sample", "font-sample--sans"]}>
               The quick brown fox jumps over the lazy dog
-            </div>
-          </div>
-          <div className="showcase-col">
-            <div className="showcase-label">Geist Mono</div>
-            <div className="showcase-font-sample showcase-font-sample--mono">
+            </ShowcaseRegion>
+          </ShowcaseRegion>
+          <ShowcaseRegion regions={["col"]}>
+            <ShowcaseRegion regions={["label"]}>Geist Mono</ShowcaseRegion>
+            <ShowcaseRegion regions={["font-sample", "font-sample--mono"]}>
               system-model/Capabilities.md:3
-            </div>
-          </div>
-        </div>
+            </ShowcaseRegion>
+          </ShowcaseRegion>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Spacing" desc="4px base grid.">
-        <div className="showcase-space-stack">
+        <ShowcaseRegion regions={["space-stack"]}>
           {SPACE_SCALE.map(({ token, px }) => (
-            <div key={token} className="showcase-space-row">
-              <span className="showcase-space-row__label">{token} — {px}px</span>
-              <div className="showcase-space-row__bar" data-space-token={token} />
-            </div>
+            <ShowcaseRegion key={token} regions={["space-row"]}>
+              <ShowcaseRegion regions={["space-row__label"]} as="span">{token} — {px}px</ShowcaseRegion>
+              <ShowcaseRegion regions={["space-row__bar"]} data-space-token={token} />
+            </ShowcaseRegion>
           ))}
-        </div>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Elevation" desc="Shadows are soft and low. Dark mode deepens all shadows.">
-        <div className="showcase-shadow-grid">
+        <ShowcaseRegion regions={["shadow-grid"]}>
           {SHADOWS.map(({ token, label }) => (
-            <div key={token} className="showcase-shadow-card" data-shadow-token={token}>
-              <span className="showcase-label">{label}</span>
-              <span className="showcase-swatch__name">{token}</span>
-            </div>
+            <ShowcaseRegion key={token} regions={["shadow-card"]} data-shadow-token={token}>
+              <ShowcaseRegion regions={["label"]} as="span">{label}</ShowcaseRegion>
+              <ShowcaseRegion regions={["swatch__name"]} as="span">{token}</ShowcaseRegion>
+            </ShowcaseRegion>
           ))}
-        </div>
+        </ShowcaseRegion>
       </Section>
 
       <Section title="Iconography" desc={`${ICON_NAMES.length} Lucide-geometry icons. Use <Icon name="…" />.`}>
-        <div className="showcase-icon-grid">
+        <ShowcaseRegion regions={["icon-grid"]}>
           {ICON_NAMES.map((name) => (
-            <div key={name} className="showcase-icon-item">
+            <ShowcaseRegion key={name} regions={["icon-item"]}>
               <Icon name={name} size={20} />
-              <span className="showcase-icon-item__name">{name}</span>
-            </div>
+              <ShowcaseRegion regions={["icon-item__name"]} as="span">{name}</ShowcaseRegion>
+            </ShowcaseRegion>
           ))}
-        </div>
+        </ShowcaseRegion>
       </Section>
-    </div>
+    </ShowcaseRegion>
   );
 }

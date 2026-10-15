@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "preact/compat";
 
 const LOCATION_CHANGE = "reqvire:location-change";
 const readLocation = () => window.location.href;

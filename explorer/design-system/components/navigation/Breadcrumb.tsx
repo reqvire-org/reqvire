@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type NavHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { Icon } from "../core/Icon";
 
@@ -78,11 +78,11 @@ const skinX = css`
 `;
 
 export interface BreadcrumbItem {
-  label: ReactNode;
+  label: ComponentChildren;
   onClick?: () => void;
 }
 
-export interface BreadcrumbProps extends Omit<HTMLAttributes<HTMLElement>, "style"> {
+export interface BreadcrumbProps extends Omit<(NavHTMLAttributes<HTMLElement> & { className?: string }), "style"> {
   items?: BreadcrumbItem[];
 }
 

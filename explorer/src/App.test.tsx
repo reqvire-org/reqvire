@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { devFixture } from "./store/devFixture";
@@ -48,7 +48,8 @@ describe("Explorer worktree navigation", () => {
     fireEvent.keyDown(trigger, { key: "Tab" });
     expect(screen.queryByRole("listbox")).toBeNull();
     fireEvent.click(trigger);
-    fireEvent.pointerDown(document.body);
+    // Exercise the document listener with the native lower-case event name.
+    fireEvent(document.body, new Event("pointerdown", { bubbles: true }));
     expect(screen.queryByRole("listbox")).toBeNull();
     view.unmount();
   });

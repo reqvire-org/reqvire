@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type TargetedMouseEvent, type ComponentChildren } from "preact";
 import { Badge } from "../core/Badge";
 import { TokenSwatch } from "../data/TokenVisual";
 import type { DesignSystemColorToken } from "../../palette";
@@ -188,11 +188,11 @@ const skinFilterX = css`
   }
 `;
 
-export type ToggleRowProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onToggle" | "style"> & {
-  label: ReactNode;
+export type ToggleRowProps = Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "onToggle" | "style"> & {
+  label: ComponentChildren;
   colorToken?: DesignSystemColorToken;
-  icon?: ReactNode;
-  meta?: ReactNode;
+  icon?: ComponentChildren;
+  meta?: ComponentChildren;
   on?: boolean;
   line?: boolean;
   static?: boolean;
@@ -215,7 +215,7 @@ export function ToggleRow({
   ...props
 }: ToggleRowProps) {
   const hasStaticClass = className.split(/\s+/).includes("ds-togglerow--static");
-  const toggle = (event: MouseEvent<HTMLButtonElement>) => {
+  const toggle = (event: TargetedMouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (!event.defaultPrevented) onToggle?.();
   };

@@ -1,5 +1,6 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useEffect } from "react";
+import type { ComponentType } from "preact";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@/test/render";
+import { useEffect } from "preact/hooks";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ElkNode } from "elkjs/lib/elk-api";
 import ELK from "elkjs/lib/elk.bundled.js";
@@ -22,7 +23,7 @@ vi.mock("@xyflow/react", async importOriginal => {
   return { ...original, Handle: () => null, ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
     nodes: { id: string; type: string; data: unknown }[];
     edges: { id: string; source: string; target: string; label: string }[];
-    nodeTypes: Record<string, React.ComponentType<{ data: unknown }>>;
+    nodeTypes: Record<string, ComponentType<{ data: unknown }>>;
     onInit: (flow: unknown) => void;
   }) => {
     useEffect(() => { onInit(instance); }, [onInit]);

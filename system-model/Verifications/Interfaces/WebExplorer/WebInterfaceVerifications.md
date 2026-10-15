@@ -266,11 +266,11 @@ Expected checks:
 
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [MockShell.test.tsx](../../../../explorer/design-system/showcase/MockShell.test.tsx)
+  * satisfiedBy: [ExplorerCoverage.integration.test.tsx](../../../../explorer/src/test/ExplorerCoverage.integration.test.tsx)
   * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
   * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/src/state/CoverageNavigation.test.tsx)
   * satisfiedBy: [CoverageView.test.tsx](../../../../explorer/src/views/CoverageView.test.tsx)
-  * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/design-system/product-patterns/reports/CoverageNavigation.test.tsx)
+  * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/design-system/patterns/reports/CoverageNavigation.test.tsx)
   * satisfiedBy: [routes.test.ts](../../../../explorer/src/router/routes.test.ts)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
   * satisfiedBy: [browser-navigation.mjs](../../../../tests/test-scoped-coverage/browser-navigation.mjs)
@@ -316,13 +316,13 @@ This test verifies production served/exported trace rendering and the shared nat
   * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)
   * satisfiedBy: [browser-flow.mjs](../../../../tests/test-verification-traces/browser-flow.mjs)
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
-  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/product-patterns/reports/TraceFlow.test.ts)
-  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/product-patterns/reports/traceFlowLayoutInput.test.ts)
+  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.test.ts)
+  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.test.ts)
   * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
   * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
-  * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/product-patterns/reports/useTraceFlowLayout.test.ts)
+  * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/patterns/reports/useTraceFlowLayout.test.ts)
   * satisfiedBy: [TraceFlowViewport.test.tsx](../../../../explorer/design-system/showcase/TraceFlowViewport.test.tsx)
-  * satisfiedBy: [TraceFlowMock.test.tsx](../../../../explorer/design-system/showcase/TraceFlowMock.test.tsx)
+  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
 ---
 
 ### Explorer Design System Styling Demonstration
@@ -458,11 +458,11 @@ Verify the Model Flow mode through the same application and design-system patter
   * verify: [Model-Centric View Generation](../../../Interfaces/WebExplorer/Capabilities.md#model-centric-view-generation)
   * verify: [Model View Element Navigation](../../../Interfaces/WebExplorer/Capabilities.md#model-view-element-navigation)
   * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
-  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/product-patterns/reports/TraceFlow.test.ts)
-  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/product-patterns/reports/traceFlowLayoutInput.test.ts)
+  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.test.ts)
+  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.test.ts)
   * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
   * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
-  * satisfiedBy: [TraceFlowMock.test.tsx](../../../../explorer/design-system/showcase/TraceFlowMock.test.tsx)
+  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
   * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
 ---
 
@@ -834,7 +834,7 @@ The Rust worktree and HTTP router regressions exercise on-demand admission, dirt
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
-  * satisfiedBy: [WorktreeLoadDialog.test.tsx](../../../../explorer/design-system/product-patterns/shell/WorktreeLoadDialog.test.tsx)
+  * satisfiedBy: [WorktreeLoadDialog.test.tsx](../../../../explorer/design-system/patterns/shell/WorktreeLoadDialog.test.tsx)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
   * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
   * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)

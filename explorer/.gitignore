@@ -12,3 +12,5 @@ design-system/showcase/public/assets/project-store.js
 *.local
 .vite/
 coverage/
+
+.ds/

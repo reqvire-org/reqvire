@@ -1,18 +1,7 @@
-import {
-  cloneElement,
-  createContext,
-  isValidElement,
-  useContext,
-  useEffect,
-  type ButtonHTMLAttributes,
-  type ComponentProps,
-  type HTMLAttributes,
-  type ReactElement,
-  type ReactNode,
-  type Ref,
-} from "react";
+import { cloneElement, createContext, isValidElement, type ButtonHTMLAttributes, type ComponentProps, type HeadingHTMLAttributes, type TargetedMouseEvent, type HTMLAttributes, type VNode, type ComponentChildren, type Ref } from "preact";
+import { useContext, useEffect } from "preact/hooks";
 import { css, cx } from "@linaria/atomic";
-import { createPortal } from "react-dom";
+import { createPortal } from "preact";
 
 interface ModalContextValue {
   open: boolean;
@@ -117,7 +106,7 @@ export function Modal({
 }: {
   open: boolean;
   onOpenChange?: (open: boolean) => void;
-  children: ReactNode;
+  children: ComponentChildren;
 }) {
   useEffect(() => {
     if (!open) return undefined;
@@ -144,8 +133,8 @@ export function ModalContent({
   size = "default",
   "aria-describedby": ariaDescribedBy,
   ...props
-}: HTMLAttributes<HTMLDivElement> & {
-  children: ReactNode;
+}: (HTMLAttributes<HTMLDivElement> & { className?: string }) & {
+  children: ComponentChildren;
   showCloseButton?: boolean;
   centered?: boolean;
   size?: "default" | "compact";
@@ -186,7 +175,7 @@ export function ModalHeader({
   className = "",
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+}: (HTMLAttributes<HTMLDivElement> & { className?: string }) & { children: ComponentChildren }) {
   return (
     <div className={cx("ds-modal__head", headerBaseUX, className)} {...props}>
       {children}
@@ -198,7 +187,7 @@ export function ModalBody({
   className = "",
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+}: (HTMLAttributes<HTMLDivElement> & { className?: string }) & { children: ComponentChildren }) {
   return (
     <div className={cx("ds-modal__body", bodyBaseUX, className)} {...props}>
       {children}
@@ -210,7 +199,7 @@ export function ModalFooter({
   className = "",
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
+}: (HTMLAttributes<HTMLDivElement> & { className?: string }) & { children: ComponentChildren }) {
   return (
     <div className={cx("ds-modal__foot", footerBaseUX, className)} {...props}>
       {children}
@@ -222,7 +211,7 @@ export function ModalTitle({
   className = "",
   children,
   ...props
-}: HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) {
+}: (HeadingHTMLAttributes<HTMLHeadingElement> & { className?: string }) & { children: ComponentChildren }) {
   return (
     <h2 className={cx("ds-modal__title", titleBaseUX, className)} {...props}>
       {children}
@@ -234,7 +223,7 @@ export function ModalDescription({
   className = "",
   children,
   ...props
-}: HTMLAttributes<HTMLParagraphElement> & { children: ReactNode }) {
+}: (HTMLAttributes<HTMLParagraphElement> & { className?: string }) & { children: ComponentChildren }) {
   return (
     <p className={cx("ds-modal__description", descriptionBaseUX, className)} {...props}>
       {children}
@@ -247,18 +236,18 @@ export function ModalClose({
   children,
   onClick,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
+}: (ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }) & {
   asChild?: boolean;
-  children?: ReactNode;
+  children?: ComponentChildren;
 }) {
   const context = useContext(ModalContentContext);
   const close = () => context?.onOpenChange?.(false);
 
   if (asChild && isValidElement(children)) {
-    const child = children as ReactElement<ComponentProps<"button">>;
+    const child = children as VNode<ComponentProps<"button">>;
     return cloneElement(child, {
       ...props,
-      onClick: (event) => {
+      onClick: (event: TargetedMouseEvent<HTMLButtonElement>) => {
         child.props.onClick?.(event);
         onClick?.(event);
         if (!event.defaultPrevented) close();

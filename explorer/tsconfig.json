@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -16,12 +20,35 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals"],
+    "types": [
+      "vitest/globals"
+    ],
     "baseUrl": ".",
     "paths": {
-      "@ds": ["design-system/index.ts"],
-      "@/*": ["src/*"]
-    }
+      "@ds": [
+        "design-system/index.ts"
+      ],
+      "@/*": [
+        "src/*"
+      ],
+      "react": [
+        "./node_modules/preact/compat"
+      ],
+      "react-dom": [
+        "./node_modules/preact/compat"
+      ],
+      "react/jsx-runtime": [
+        "./node_modules/preact/jsx-runtime"
+      ]
+    },
+    "jsxImportSource": "preact"
   },
-  "include": ["src", "design-system", "vite.config.ts", "vitest.config.ts", "design-system/vite.bundle.config.ts"]
+  "include": [
+    "src",
+    "design-system",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "design-system/vite.bundle.config.ts",
+    "preact.config.ts"
+  ]
 }

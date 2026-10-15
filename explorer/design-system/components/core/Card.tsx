@@ -1,9 +1,9 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import type { DesignSystemColorToken } from "../../palette";
 
-export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
-  children: ReactNode;
+export interface CardProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
+  children: ComponentChildren;
   interactive?: boolean;
   selected?: boolean;
   padded?: boolean;
@@ -66,14 +66,14 @@ const accentUX = css`
 
 const accentTokenSkinX = css`
   &[data-accent-token="--accent"] { --ds-card-accent-color: var(--accent); }
-  &[data-accent-token="--capability"] { --ds-card-accent-color: var(--capability); }
-  &[data-accent-token="--requirement"] { --ds-card-accent-color: var(--requirement); }
-  &[data-accent-token="--contract"] { --ds-card-accent-color: var(--contract); }
-  &[data-accent-token="--semantic-contract"] { --ds-card-accent-color: var(--semantic-contract); }
-  &[data-accent-token="--verification"] { --ds-card-accent-color: var(--verification); }
-  &[data-accent-token="--ontology"] { --ds-card-accent-color: var(--ontology); }
-  &[data-accent-token="--resource"] { --ds-card-accent-color: var(--resource); }
-  &[data-accent-token="--other"] { --ds-card-accent-color: var(--other); }
+  &[data-accent-token="--color-role-capability"] { --ds-card-accent-color: var(--color-role-capability); }
+  &[data-accent-token="--color-role-requirement"] { --ds-card-accent-color: var(--color-role-requirement); }
+  &[data-accent-token="--color-role-contract"] { --ds-card-accent-color: var(--color-role-contract); }
+  &[data-accent-token="--color-role-semantic-contract"] { --ds-card-accent-color: var(--color-role-semantic-contract); }
+  &[data-accent-token="--color-role-verification"] { --ds-card-accent-color: var(--color-role-verification); }
+  &[data-accent-token="--color-role-ontology"] { --ds-card-accent-color: var(--color-role-ontology); }
+  &[data-accent-token="--color-role-resource"] { --ds-card-accent-color: var(--color-role-resource); }
+  &[data-accent-token="--color-role-other"] { --ds-card-accent-color: var(--color-role-other); }
 `;
 
 export function Card({

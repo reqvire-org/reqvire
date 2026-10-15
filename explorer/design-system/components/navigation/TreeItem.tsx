@@ -1,4 +1,4 @@
-import type { MouseEvent, HTMLAttributes, ReactNode, Ref } from "react";
+import { type TargetedMouseEvent, type HTMLAttributes, type ComponentChildren, type Ref } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { Badge } from "../core/Badge";
 
@@ -132,13 +132,13 @@ const skinX = css`
 `;
 
 const fileSkinX = css`
-  --ds-treeitem-icon-color: var(--resource-ink);
+  --ds-treeitem-icon-color: var(--color-role-resource-ink);
 
   .ds-treeitem__icon {
     width: var(--icon-md);
     height: var(--icon-md);
     border-radius: var(--radius-xs);
-    background: var(--resource-tint);
+    background: var(--color-role-resource-tint);
   }
 
   .ds-treeitem__label {
@@ -146,8 +146,8 @@ const fileSkinX = css`
   }
 
   &.is-selected .ds-treeitem__icon {
-    color: var(--resource-ink);
-    background: var(--resource-tint);
+    color: var(--color-role-resource-ink);
+    background: var(--color-role-resource-tint);
   }
 `;
 
@@ -170,11 +170,11 @@ const elementSkinX = css`
   }
 `;
 
-export type TreeItemProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & {
+export type TreeItemProps = Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> & {
   ref?: Ref<HTMLDivElement>;
-  label: ReactNode;
-  icon?: ReactNode;
-  count?: ReactNode;
+  label: ComponentChildren;
+  icon?: ComponentChildren;
+  count?: ComponentChildren;
   depth?: number;
   open?: boolean;
   selected?: boolean;
@@ -200,7 +200,7 @@ export function TreeItem({
   ...props
 }: TreeItemProps) {
   const depthClass = `ds-treeitem--depth-${Math.min(Math.max(0, depth), 6)}`;
-  const select = (event: MouseEvent<HTMLDivElement>) => {
+  const select = (event: TargetedMouseEvent<HTMLDivElement>) => {
     onClick?.(event);
     if (!event.defaultPrevented) onSelect?.();
   };
@@ -230,7 +230,7 @@ export function TreeItem({
         }}
       >
         {expandable ? (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m9 18 6-6-6-6" />
           </svg>
         ) : null}

@@ -1,4 +1,5 @@
-import { createContext, useContext } from "react";
+import { createContext } from "preact";
+import { useContext } from "preact/hooks";
 
 /** The adopted store owns asset routing, even while a different URL selection is loading. */
 export const WorktreeUrlContext = createContext<string | undefined>(undefined);

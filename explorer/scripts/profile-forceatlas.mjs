@@ -34,8 +34,8 @@ assert(['swiftshader', 'native'].includes(gpuBackend), 'GPU must be swiftshader 
 assert(sizes.every(n => Number.isInteger(n) && n >= 2 && n <= 2000), 'Sizes must be 2..2000');
 assert(Number.isInteger(trials) && trials >= 1 && trials <= 5, 'Trials must be 1..5');
 const files = {
-  knowledge: path.join(root, 'src/views/GraphLibraryViews.tsx'),
-  ontology: path.join(root, 'src/lib/ontologyGraphRenderer.ts'),
+  knowledge: path.join(root, 'design-system/patterns/graphs/KnowledgeGraphCanvasImpl.tsx'),
+  ontology: path.join(root, 'design-system/patterns/graphs/ontologyGraphRendererImpl.ts'),
 };
 // Read saved renderer sources for an isolated baseline without replacing files
 // in the shared checkout. All other imports still come from the current tree.

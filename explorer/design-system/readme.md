@@ -30,11 +30,59 @@ and automatic-refresh errors. The compact dialog left-aligns its heading and
 labelled branch context, separates recovery guidance from selectable diagnostic
 details, and keeps Close visible when lengthy details scroll.
 
+## Toast notifications
+
+Use the local `Toaster` and `toast` exports for transient feedback.
+See the [component guide](components/core/toast/README.md) for usage, stacking,
+motion, validation, Sonner references, and the retained MIT notice. The app and
+showcase mount the same project-owned implementation.
+
 ## Sources
 
 - **Product site:** https://www.reqvire.org/
 - **Reference UI:** Explorer screenshots provided by the project owner (`uploads/explorer-*.png`) — Model browser, element modal, Graph, Ontologies, Search, and Traces. These are the source of truth for layout and the element-type semantics.
-- The canonical implementation lives in this repository under `explorer/design-system/` and is documented in `../DS.md`.
+- The canonical implementation lives in this repository under `explorer/design-system/`; its public API is [index.ts](index.ts).
+
+## Source and tooling
+
+Use DS skills for implementation workflows: `ds-designer` for UI changes,
+`ds-assimilate` for a library reference, `ds-import` for another project's DS,
+`ds-motion` for animation, and `ds-break-ui` for difficult content and states.
+They can be installed or read through the configured DS MCP server. This guide
+records Reqvire-specific conventions; shared architecture belongs to the
+[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/DS.md).
+
+[ds.config.json](../ds.config.json) identifies this directory and the public
+`@ds` alias. It registers Toast usage rules and the Sonner import restriction,
+measured-renderer file/property boundaries, and documented non-state component
+variables. Changes to those exceptions belong in that configuration.
+See [Explorer build and commands](../README.md#build--embed-flow) for validation
+and running the showcase.
+
+- [index.ts](index.ts) exposes components, patterns, palette helpers and types.
+- [styles.css](styles.css) is the foundation entry, imported by `src/main.tsx`.
+  Token values and theme definitions live in [tokens/](tokens/).
+- [palette.ts](palette.ts) maps model element types to semantic roles and colors.
+- [patterns/readme.md](patterns/readme.md) identifies the product layers; the
+  shell, graph, report and feedback folders have their own behavior guides.
+- [showcase/](showcase/) demonstrates public UI with local fixtures and state.
+  Full-application integration harnesses live in `src/test/fixtures/`.
+
+For element coloring, use `elementRole(type, family)`, `roleColorToken(role,
+channel)` or `roleColorValue(role, channel)` from `@ds`, rather than copying the
+type-to-color mapping. `ElementIcon` and `TypeBadge` use this same palette.
+`cssVar()` and `getMermaidClassDefs()` need a mounted browser document with the
+foundation CSS loaded to resolve actual colors; `cssVar()` returns a `var(...)`
+fallback outside the browser. `replaceCssVarsForMermaid()` resolves references
+to hex values because Mermaid's parser does not accept CSS variables.
+
+The application and showcase HTML entries contain document mount mechanics
+only: full-height `html`, `body` and `#root`, plus body overflow. Foundation
+typography, colors, reset and scrollbar rules live in `tokens/base.css`.
+DOM tests load the real `styles.css?inline` through Vite; the
+[test setup](../src/test/setupCssTokens.ts) unwraps its base cascade layer for
+jsdom without synthesizing token values. Browser/build checks inspect the real
+CSS and Linaria output.
 
 ---
 
@@ -98,19 +146,19 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 - `SKILL.md` — Agent-Skill manifest for downloading this system into Claude Code.
 
 **Components** (`components/<group>/` — TSX source exported via `index.ts`)
-- `core/` — **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
+- `core/` — **Toast**, **Toaster**, **toast**, **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
 - `data/` — **CodeRef**, **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
 - `controls/` — **ToggleRow**, **SegmentedControl**, **SearchInput**, **Tabs**
 - `navigation/` — **TreeItem**, **Breadcrumb**, **SidebarSection**
 
-**Product patterns** (`product-patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
+**Product patterns** (`patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
 - `shell/` — **AppShell**, **ShellPane**, **PaneResizer**, **ShellMain**, **RouteFrame**, **RouteLayout**, **RoutePanel**
 - `chrome/`, `files/`, `resources/`, `search/`, `reports/`, `side-pane/`, `detail/`, `content/`, `feedback/` — reusable UX/product visual patterns
 
 **Ownership**
 - `ds-*` classes and `--ds-*` component variables are design-system-only.
 - `ux-*` classes and `--ux-*` variables are owned by the UX/product-pattern layer,
-  under `design-system/product-patterns/`.
+  under `design-system/patterns/`.
 - Consumers import primitives, product patterns, and palette symbols from `@ds` only.
 - Consumers do not target design-system internals; customization happens through documented props or `--ds-*` variables.
 

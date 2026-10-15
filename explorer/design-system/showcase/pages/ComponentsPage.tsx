@@ -1,15 +1,16 @@
-import { ControlsPage } from "./ControlsPage";
-import { CorePage } from "./CorePage";
-import { DataPage } from "./DataPage";
-import { NavigationPage } from "./NavigationPage";
+import { ShowcaseRegion } from "@ds";
+import { ControlsExamples } from "../examples/components/ControlsExamples";
+import { CoreExamples } from "../examples/components/CoreExamples";
+import { DataExamples } from "../examples/components/DataExamples";
+import { NavigationExamples } from "../examples/components/NavigationExamples";
 
 export function ComponentsPage() {
   return (
-    <div className="showcase-components-page">
-      <CorePage />
-      <DataPage />
-      <ControlsPage />
-      <NavigationPage />
-    </div>
+    <ShowcaseRegion regions={["components-page"]}>
+      <CoreExamples />
+      <DataExamples />
+      <ControlsExamples />
+      <NavigationExamples />
+    </ShowcaseRegion>
   );
 }

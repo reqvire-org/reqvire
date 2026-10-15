@@ -124,7 +124,7 @@ def cargo_fresh(rebuild=False):
     public = repo / "explorer/public"
     public.mkdir()
     (public / ".gitkeep").touch()
-    authored = [".stylelintrc.json", ".oxlintignore", "vitest.config.ts", "design-system/showcase/fixture.ts", "design-system/vite.showcase.config.ts"]
+    authored = ["ds.config.json", "biome.css.json", ".oxlintignore", "vitest.config.ts", "design-system/showcase/fixture.ts", "design-system/vite.showcase.config.ts"]
     for name in authored:
         source = repo / "explorer" / name
         source.parent.mkdir(parents=True, exist_ok=True)

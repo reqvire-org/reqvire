@@ -5,7 +5,7 @@ const requirement: CoverageDrilldownTarget = {
   elementType: "requirement", href: "#/elements/REQ-DET-042", external: false,
 };
 
-// Presentation data only. The Mocks tab mounts the real App with its generated Project Store.
+// Fixture data for the public coverage patterns. Application integration tests own full Project Stores.
 export const COVERAGE_PATTERN_ITEMS: CoverageDrilldownItem[] = [{
   target: { id: "example-capability", label: "Traceability Reporting", kind: "element",
     elementType: "capability", href: null, external: false },

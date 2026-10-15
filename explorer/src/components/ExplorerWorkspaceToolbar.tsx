@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
+import { type ComponentChildren } from "preact";
 import { WorkspaceToolbar } from "@ds";
 
 export interface ExplorerWorkspaceToolbarProps {
   ariaLabel: string;
   className?: string;
-  children: ReactNode;
+  children: ComponentChildren;
 }
 
 export function ExplorerWorkspaceToolbar({

@@ -1,6 +1,6 @@
-import { act, cleanup, renderHook } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { type ReactNode } from "react";
+import { type ComponentChildren } from "preact";
 import { ExplorerUiStateProvider, useExplorerUiState } from "./ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
@@ -15,7 +15,7 @@ describe("worktree navigation and assets", () => {
     let store = structuredClone(devFixture);
     store.project.worktree_id = "a";
     const identifier = store.elements[0].id;
-    const wrapper = ({ children }: { children: ReactNode }) => <StoreProvider store={store} schemaMismatch={null}>
+    const wrapper = ({ children }: { children: ComponentChildren }) => <StoreProvider store={store} schemaMismatch={null}>
       <ExplorerUiStateProvider>{children}</ExplorerUiStateProvider>
     </StoreProvider>;
     const hook = renderHook(() => useExplorerUiState(), { wrapper });
@@ -36,7 +36,7 @@ describe("worktree navigation and assets", () => {
   it("preserves valid thesaurus IRIs rather than treating them as element identifiers", () => {
     const store = structuredClone(devFixture);
     store.project.worktree_id = "a";
-    const wrapper = ({ children }: { children: ReactNode }) => <StoreProvider store={store} schemaMismatch={null}>
+    const wrapper = ({ children }: { children: ComponentChildren }) => <StoreProvider store={store} schemaMismatch={null}>
       <ExplorerUiStateProvider>{children}</ExplorerUiStateProvider>
     </StoreProvider>;
     const hook = renderHook(() => useExplorerUiState(), { wrapper });

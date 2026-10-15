@@ -1,5 +1,4 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { render } from "preact";
 import { App } from "./App";
 import "../design-system/styles.css";
 
@@ -70,9 +69,5 @@ function projectStoreSeedCandidates() {
 }
 
 loadProjectStoreSeed().then(() => {
-  createRoot(container).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  );
+  render(<App />, container);
 });

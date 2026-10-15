@@ -17,6 +17,12 @@ export { Icon, ICON_NAMES } from "./components/core/Icon";
 export type { IconName, IconProps } from "./components/core/Icon";
 export { IconButton } from "./components/core/IconButton";
 export type { IconButtonProps } from "./components/core/IconButton";
+export { Toast } from "./components/core/Toast";
+export type { ToastProps } from "./components/core/Toast";
+export { Toaster } from "./components/core/Toaster";
+export type { ToasterProps } from "./components/core/Toaster";
+export { toast } from "./components/core/toast/store";
+export type { ToastAction, ToastId, ToastOptions, ToastPosition, ToastPromise, ToastPromiseOptions, ToastUpdate, ToastVariant } from "./components/core/toast/types";
 export { Spinner } from "./components/core/Spinner";
 export type { SpinnerProps } from "./components/core/Spinner";
 export {
@@ -231,7 +237,7 @@ export {
   CODE_PREVIEW_FALLBACK_CLASS,
   MARKDOWN_TABLE_WRAP_CLASS,
   railMarkClass,
-} from "./product-patterns";
+} from "./patterns";
 export type {
   AppShellProps,
   ContractBindingListProps,
@@ -365,9 +371,70 @@ export type {
   WorkspaceShellProps,
   TraceVerificationCardProps,
   WorkspaceToolbarProps,
-} from "./product-patterns";
-export { WorktreeSelector } from "./product-patterns/shell/WorktreeSelector";
-export type { WorktreeSelectorProps } from "./product-patterns/shell/WorktreeSelector";
+} from "./patterns";
+export { WorktreeSelector } from "./patterns/shell/WorktreeSelector";
+export type { WorktreeSelectorProps } from "./patterns/shell/WorktreeSelector";
 
-export { WorktreeLoadDialog } from "./product-patterns/shell/WorktreeLoadDialog";
-export type { WorktreeLoadDialogProps } from "./product-patterns/shell/WorktreeLoadDialog";
+export { WorktreeLoadDialog } from "./patterns/shell/WorktreeLoadDialog";
+export type { WorktreeLoadDialogProps } from "./patterns/shell/WorktreeLoadDialog";
+
+export { ShowcaseRegion, ShowcaseNavigation, ShowcaseHeader } from "./patterns/showcase/Showcase";
+export type { ShowcaseRegionName, ShowcaseRegionProps, ShowcaseNavigationItem, ShowcaseNavigationProps, ShowcaseHeaderProps } from "./patterns/showcase/Showcase";
+export { CodeFallback } from "./patterns/content/CodePreviewFrame";
+
+export { TextLink } from "./components/core/TextLink";
+export type { TextLinkProps } from "./components/core/TextLink";
+
+export { ThesaurusPane } from "./patterns/thesaurus/ThesaurusPane";
+export type { ThesaurusPaneProps } from "./patterns/thesaurus/ThesaurusPane";
+
+export { ExplorerWorkspace } from "./patterns/shell/ExplorerWorkspace";
+export type { ExplorerWorkspaceProps } from "./patterns/shell/ExplorerWorkspace";
+
+export { CoverageReportScreen, COVERAGE_ISSUES, COVERAGE_SOURCE_LABELS } from "./patterns/reports/CoverageReportScreen";
+export type { CoverageReportScreenProps, CoverageReportProjection, CoverageReportSummary } from "./patterns/reports/CoverageReportScreen";
+
+export { TracesScreen } from "./patterns/reports/TracesScreen";
+export type { TracesScreenProps, TraceOverviewFile } from "./patterns/reports/TracesScreen";
+
+export { useExplorerPane } from "./patterns/shell/useExplorerPane";
+
+export { forceAtlasProfile, runForceAtlasLayout } from "./patterns/graphs/forceAtlasLayout";
+export type { ForceAtlasInput, ForceAtlasPositions } from "./patterns/graphs/forceAtlasLayout";
+export { forceAtlasInput, forceAtlasLayoutEngine } from "./patterns/graphs/forceAtlasLayoutEngine";
+export type { ForceAtlasTask, ForceAtlasEngine } from "./patterns/graphs/forceAtlasLayoutEngine";
+export { ForceAtlasLayoutOwner } from "./patterns/graphs/forceAtlasLayoutOwner";
+export { mountOntologyGraph } from "./patterns/graphs/ontologyGraphRenderer";
+export type { OntologyGraphRendererHandle } from "./patterns/graphs/ontologyGraphRenderer";
+export type { OntologyGraphData, OntologyGraphNode, OntologyGraphEdge, OntologyGraphSource, OntologyGraphTypeEvidence, OntologyGraphSlotFacet, OntologyGraphConstructDetail } from "./patterns/graphs/types";
+export { OntologyGraphScreen } from "./patterns/graphs/OntologyGraphScreen";
+export type { OntologyGraphScreenProps } from "./patterns/graphs/OntologyGraphScreen";
+
+export type { KnowledgeGraphNode, KnowledgeGraphFact, KnowledgeGraphSubmodel, KnowledgeGraphProjection } from "./patterns/graphs/types";
+export { KnowledgeGraphCanvas } from "./patterns/graphs/KnowledgeGraphCanvas";
+export type { KnowledgeGraphCanvasProps } from "./patterns/graphs/KnowledgeGraphCanvas";
+
+export { FileBrowserScreen } from "./patterns/files/FileBrowserScreen";
+export type { FileBrowserScreenProps } from "./patterns/files/FileBrowserScreen";
+export { ModelFlowScreen, ModelGraphScreen, ModelModeSelector } from "./patterns/shell/ModelScreen";
+export type { ModelFlowScreenProps, ModelGraphScreenProps, ModelScreenMode, ModelModeSelectorProps } from "./patterns/shell/ModelScreen";
+
+export { TraceNavigation } from "./patterns/reports/TraceNavigation";
+export type { TraceNavigationProps } from "./patterns/reports/TraceNavigation";
+
+export { ModelGraphControls, OntologyControlsPane, ONTOLOGY_CONSTRUCT_FILTERS, ONTOLOGY_ORIGIN_FILTERS,
+  ONTOLOGY_LAYER_FILTERS, ONTOLOGY_DEFAULT_FILTERS } from "./patterns/graphs/GraphControlsPane";
+export type { ModelGraphControlsProps, OntologyControlsPaneProps } from "./patterns/graphs/GraphControlsPane";
+
+export { SearchScreen } from "./patterns/search/SearchScreen";
+export type { SearchScreenProps } from "./patterns/search/SearchScreen";
+
+export { FileNavigation } from "./patterns/files/FileNavigation";
+export type { FileNavigationProps, FileNavigationFolder, FileNavigationElement, FileNavigationFile, FileNavigationResource } from "./patterns/files/FileNavigation";
+
+export { CoverageNavigationPane } from "./patterns/reports/CoverageNavigation";
+export type { CoverageNavigationPaneProps } from "./patterns/reports/CoverageNavigation";
+export { SearchControlsPane } from "./patterns/search/SearchControlsPane";
+export type { SearchControlsPaneProps, SearchResultKind } from "./patterns/search/SearchControlsPane";
+
+export { flowLayoutEngine } from "./patterns/reports/flowLayoutEngine";

@@ -1,5 +1,5 @@
-import { act, cleanup, renderHook } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { act, cleanup, renderHook } from "@/test/render";
+import { type ComponentChildren } from "preact";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
@@ -14,7 +14,7 @@ function setup(hash: string, routing = false) {
   window.history.replaceState(null, "", `/${routing ? '?worktree_id=a' : ''}${hash}`);
   const verification = devFixture.elements.find(node => node.element_type === "test-verification")!;
   let store = { ...devFixture, traces: { files: { [verification.file_path]: { verifications: [{ identifier: verification.id, name: verification.name, file: verification.file_path }] } } }, project: { ...devFixture.project, worktree_id: "a" } };
-  const wrapper = ({ children }: { children: ReactNode }) => <StoreProvider store={store} schemaMismatch={null}>
+  const wrapper = ({ children }: { children: ComponentChildren }) => <StoreProvider store={store} schemaMismatch={null}>
     <ExplorerUiStateProvider worktreeRouting={routing}>{children}</ExplorerUiStateProvider>
   </StoreProvider>;
   const hook = renderHook(() => ({ ui: useExplorerUiState(), router: useHashRoute() }), { wrapper });

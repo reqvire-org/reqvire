@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ComponentChildren } from "preact";
 import { RouteFrame } from "@ds";
 
 /*
@@ -12,7 +12,7 @@ export function ViewFrame({
   children,
 }: {
   testId: string;
-  children: ReactNode;
+  children: ComponentChildren;
 }) {
   return <RouteFrame viewId={testId}>{children}</RouteFrame>;
 }

@@ -22,7 +22,7 @@ Apply this workflow to engineering obligations. Cosmetic adjustments reuse exist
 This guide is split into domain-specific guides for better organization:
 
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
-- **[explorer/DS.md](explorer/DS.md)** - Read before visual Explorer changes. Shared design-system components, product patterns, and tokens own sizing and layout constraints; application views consume their public APIs.
+- **Explorer UI** - Use the DS workflow skills for visual changes. The [local design-system guide](explorer/design-system/readme.md) records Reqvire conventions and source locations; component and pattern guides document their APIs and behavior.
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
 ## Building and Running Reqvire

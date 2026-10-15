@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { Icon, Tabs } from "@ds";
+import { Icon, ShowcaseRegion, ShowcaseHeader, ShowcaseNavigation } from "@ds";
+import { useEffect, useState } from "preact/hooks";
+import { Toaster, type ToastPosition } from "@ds";
+import { ToastDemoSettingsContext } from "./toastDemoSettings";
 import { ComponentsPage } from "./pages/ComponentsPage";
 import { MocksPage } from "./pages/MocksPage";
-import { ProductPatternsPage } from "./pages/ProductPatternsPage";
+import { PatternsPage } from "./pages/PatternsPage";
 import { TokensPage } from "./pages/TokensPage";
 
 type Tab = "tokens" | "components" | "patterns" | "mocks";
@@ -25,23 +27,24 @@ export function ShowcaseApp() {
     window.history.replaceState(null, "", url);
     setTab(value);
   };
+  const [toastPosition, setToastPosition] = useState<ToastPosition>("bottom-right");
+  const [toastExpand, setToastExpand] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
   const isMocks = tab === "mocks";
 
   return (
-    <div className="showcase-app">
-      <div className="showcase-topbar">
-        <div className="showcase-topbar__brand">
-          <span className="showcase-topbar__brand-mark">RQ</span>
-          Design System
-        </div>
-        <Tabs items={TABS} value={tab} onChange={selectTab} />
-      </div>
-      <div className={isMocks ? "showcase-body showcase-body--full" : "showcase-body"}>
+    <ToastDemoSettingsContext.Provider value={{ position: toastPosition, setPosition: setToastPosition, expand: toastExpand, setExpand: setToastExpand }}>
+    <ShowcaseRegion regions={["app"]}>
+      <ShowcaseHeader title="Reqvire Design System" navigation={<ShowcaseNavigation items={TABS} value={tab} onChange={selectTab} />} theme={theme} onThemeChange={setTheme} />
+      <ShowcaseRegion regions={isMocks ? ["body", "body--full"] : ["body"]}>
         {tab === "tokens" && <TokensPage />}
         {tab === "components" && <ComponentsPage />}
-        {tab === "patterns" && <ProductPatternsPage />}
-        {tab === "mocks" && <MocksPage />}
-      </div>
-    </div>
+        {tab === "patterns" && <PatternsPage />}
+        {tab === "mocks" && <MocksPage theme={theme} onThemeChange={setTheme} />}
+      </ShowcaseRegion>
+    </ShowcaseRegion>
+    <Toaster position={toastPosition} expand={toastExpand} />
+    </ToastDemoSettingsContext.Provider>
   );
 }

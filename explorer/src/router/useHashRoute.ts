@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useExplorerLocation, writeExplorerHash } from "./location";
 import {
   DEFAULT_VIEW,

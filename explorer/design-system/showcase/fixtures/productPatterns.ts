@@ -132,10 +132,10 @@ export const PANE_FILTER_ROWS = [
 ] as const satisfies readonly { id: string; icon: IconName; label: string; count: number }[];
 
 export const PANE_LEGEND_ROWS = [
-  { id: "capability", label: "Capabilities", colorToken: "--capability" },
-  { id: "requirement", label: "Requirements", colorToken: "--requirement" },
-  { id: "verification", label: "Verifications", colorToken: "--verification" },
-  { id: "trace", label: "Trace relation", colorToken: "--edge-trace", line: true },
+  { id: "capability", label: "Capabilities", colorToken: "--color-role-capability" },
+  { id: "requirement", label: "Requirements", colorToken: "--color-role-requirement" },
+  { id: "verification", label: "Verifications", colorToken: "--color-role-verification" },
+  { id: "trace", label: "Trace relation", colorToken: "--color-role-edge-trace", line: true },
 ] as const satisfies readonly PaneLegendRow[];
 
 export const PANE_NOTATION_ROWS = [
@@ -239,8 +239,8 @@ export const MODEL_TREE_ROWS: ShowcaseTreeRow[] = [
 ];
 
 export const WORKSPACE_STATS = [
-  { label: "Requirements", value: 128, token: "--requirement" },
-  { label: "Verified", value: "86%", token: "--verification" },
+  { label: "Requirements", value: 128, token: "--color-role-requirement" },
+  { label: "Verified", value: "86%", token: "--color-role-verification" },
   { label: "Open gaps", value: 12, token: "--accent" },
 ] as const satisfies readonly { label: string; value: string | number; token: DesignSystemColorToken }[];
 

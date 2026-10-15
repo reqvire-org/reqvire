@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useStore } from "../store/StoreContext";
 import { DEFAULT_VIEW, parseHash, routeForSelection } from "../router/routes";
 import { useExplorerLocation, writeExplorerUrl } from "../router/location";
@@ -103,7 +103,7 @@ export function useSelectionNavigation(worktreeRouting: boolean) {
   const active = view ? selections[view] : null;
   const activeSerialized = JSON.stringify(active);
   useEffect(() => {
-    if (!displayed || !view || !active) return;
+    if (!displayed || !view || !active || window.location.href !== location) return;
     if (JSON.stringify(selectionRef.current[view]) !== activeSerialized) return;
     const unchanged = JSON.stringify(preferences[view]) === activeSerialized;
     update(view, active, missing ? missingNotice : unchanged ? preferences.notice ?? null : null);

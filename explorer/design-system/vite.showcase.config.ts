@@ -1,7 +1,7 @@
 import path from "path";
 import { defineConfig } from "vite";
 import wyw from "@wyw-in-js/vite";
-import react from "@vitejs/plugin-react";
+import { preactAliases, preactRuntimeGuard } from "../preact.config";
 import { assetMergePlugin } from "./vite.assetMerge";
 
 const __dirname = import.meta.dirname;
@@ -20,9 +20,11 @@ const watchIgnored = [
 export default defineConfig({
   root: path.resolve(__dirname, "showcase"),
   base: "./",
+  esbuild: { jsx: "automatic", jsxImportSource: "preact" },
   publicDir: path.resolve(__dirname, "showcase/public"),
   cacheDir: path.resolve(explorerRoot, ".vite/showcase-cache"),
   plugins: [
+    preactRuntimeGuard(),
     assetMergePlugin({
       dsAssetsDir: path.resolve(__dirname, "assets"),
       publicAssetsDir: path.resolve(__dirname, "showcase/public/assets"),
@@ -33,12 +35,13 @@ export default defineConfig({
       include: ["**/*.{ts,tsx}"],
       exclude: ["**/node_modules/**"],
     }),
-    react(),
   ],
   resolve: {
-    alias: {
-      "@ds": path.resolve(__dirname, "index.ts"),
-    },
+    dedupe: ["preact"],
+    alias: [
+      ...preactAliases,
+      { find: "@ds", replacement: path.resolve(__dirname, "index.ts") },
+    ],
   },
   server: {
     fs: {

@@ -1,4 +1,4 @@
-import { act, cleanup, renderHook } from "@testing-library/react";
+import { act, cleanup, renderHook } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useLiveStore } from "./useLiveStore";
 import { ManifestStoreClient } from "./manifestRefresh";
@@ -104,6 +104,7 @@ describe("visible Explorer manifest polling", () => {
     await act(async () => {
       timeout.abort(Object.assign(new Error("Timed out"), { name: "TimeoutError" }));
     });
+    await tick();
     expect(hook.result.current.refreshError).toBe("The server did not respond within 15 seconds.");
     expect(window.reqvireProjectStore).toBe(seed.store);
     expect(window.reqvireLiveRefresh?.revision).toBe(seed.revision);
@@ -126,14 +127,14 @@ describe("visible Explorer manifest polling", () => {
     });
     await tick(5000);
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
-    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    act(() => { document.dispatchEvent(new Event("visibilitychange")); });
     expect(pendingSignal.aborted).toBe(true);
     await tick(5000);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const latest = update("After returning.");
     fetchMock.mockImplementation(transport);
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
-    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    act(() => { document.dispatchEvent(new Event("visibilitychange")); });
     await tick();
     expect(window.reqvireProjectStore).toEqual(latest.store);
     await act(async () => { release(manifestResponse(before)); });
@@ -160,12 +161,13 @@ describe("visible Explorer manifest polling", () => {
     expect(window.reqvireProjectStore).toBe(seed.store);
   });
 
-  it("survives StrictMode effect cleanup without committing the abandoned request", async () => {
+  it("survives unmount/remount cleanup without committing the abandoned request", async () => {
     const { fetchMock, update } = backend();
-    renderHook(() => useLiveStore(), { reactStrictMode: true });
+    renderHook(() => useLiveStore()).unmount();
+    renderHook(() => useLiveStore());
     await tick();
     expect(fetchMock.mock.calls[0][1]?.signal?.aborted).toBe(true);
-    const latest = update("StrictMode update.");
+    const latest = update("Remounted update.");
     await tick(5000);
     expect(window.reqvireProjectStore).toEqual(latest.store);
   });
@@ -283,13 +285,13 @@ describe("worktree selection", () => {
     const { b, fetchMock } = contexts();
     const hook = renderHook(() => useLiveStore()); await tick();
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
-    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    act(() => { document.dispatchEvent(new Event("visibilitychange")); });
     fetchMock.mockClear();
     act(() => hook.result.current.selectWorktree("b")); await tick();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(hook.result.current.switching).toBe(true);
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
-    act(() => document.dispatchEvent(new Event("visibilitychange"))); await tick();
+    act(() => { document.dispatchEvent(new Event("visibilitychange")); }); await tick();
     expect(fetchMock.mock.calls.some(([url]) => url === "/api/worktrees/load")).toBe(true);
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
     expect(hook.result.current.switching).toBe(false);

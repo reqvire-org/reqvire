@@ -1,8 +1,8 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
-export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
-  children?: ReactNode;
+export interface AlertProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
   variant?: "default" | "danger" | "warning" | "success" | "info";
 }
 

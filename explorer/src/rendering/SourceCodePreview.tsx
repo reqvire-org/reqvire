@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { codeToHtml } from "shiki";
 import {
   CODE_PREVIEW_CODE_CLASS,

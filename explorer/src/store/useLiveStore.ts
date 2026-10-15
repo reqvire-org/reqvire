@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { loadStore } from "./loadStore";
 import { devFixture } from "./devFixture";
 import { ManifestStoreClient } from "./manifestRefresh";

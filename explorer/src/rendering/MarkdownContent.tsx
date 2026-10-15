@@ -1,15 +1,8 @@
+import { h, type AnchorHTMLAttributes, type ImgHTMLAttributes } from "preact";
 import { useWorktreeUrl } from "../store/worktreeUrls";
-import {
-  Children,
-  isValidElement,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { Children } from "preact/compat";
+import { isValidElement, type VNode, type ComponentChildren } from "preact";
+import { useEffect, useId, useMemo, useRef, useState } from "preact/hooks";
 import * as d3 from "d3";
 import ReactMarkdown, {
   defaultUrlTransform,
@@ -272,24 +265,16 @@ function markdownComponents({
   const inlineReferences = inlineOpenConceptReference
     ? buildInlineConceptReferences(conceptReferences)
     : [];
-  const inlineChildren = (children: ReactNode) => {
+  const inlineChildren = (children: ComponentChildren) => {
     if (!inlineOpenConceptReference || inlineReferences.length === 0) return children;
     return renderInlineConceptReferences(children, inlineReferences, inlineOpenConceptReference);
   };
   const components: Components = {
-  a({ href, children, node: _node, ...props }) {
+  a({ href, children, node: _node, ...props }: AnchorHTMLAttributes<HTMLAnchorElement> & { node?: unknown }) {
     void _node;
-    const external = Boolean(href && /^[a-z][a-z0-9+.-]*:/i.test(href));
-    return (
-      <a
-        {...props}
-        href={href}
-        target={external ? "_blank" : undefined}
-        rel={external ? "noreferrer" : undefined}
-      >
-        {children}
-      </a>
-    );
+    const external = Boolean(href && /^[a-z][a-z0-9+.-]*:/i.test(String(href)));
+    return h("a", { ...props, href, target: external ? "_blank" : undefined,
+      rel: external ? "noreferrer" : undefined }, children);
   },
   table({ children, node: _node, ...props }) {
     void _node;
@@ -299,10 +284,10 @@ function markdownComponents({
       </div>
     );
   },
-  img({ src, alt, node: _node, ...props }) {
+  img({ src, alt, node: _node, ...props }: ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) {
     void _node;
     if (!src) return null;
-    return <img {...props} src={src} alt={alt ?? ""} />;
+    return h("img", { ...props, src, alt: alt ?? "" });
   },
   p({ children, node: _node, ...props }) {
     void _node;
@@ -412,10 +397,10 @@ function conceptLabelVariants(label: string): string[] {
 }
 
 function renderInlineConceptReferences(
-  children: ReactNode,
+  children: ComponentChildren,
   references: readonly InlineReferenceMatch[],
   onOpenConceptReference: (reference: DetailConceptReferenceItem) => void,
-): ReactNode {
+): ComponentChildren {
   return Children.toArray(children).flatMap((child, childIndex) => {
     if (typeof child !== "string") return child;
     return renderInlineConceptReferenceText(child, references, onOpenConceptReference, childIndex);
@@ -427,8 +412,8 @@ function renderInlineConceptReferenceText(
   references: readonly InlineReferenceMatch[],
   onOpenConceptReference: (reference: DetailConceptReferenceItem) => void,
   childIndex: number,
-): ReactNode[] {
-  const rendered: ReactNode[] = [];
+): ComponentChildren[] {
+  const rendered: ComponentChildren[] = [];
   let cursor = 0;
 
   while (cursor < text.length) {
@@ -486,11 +471,11 @@ function isWordChar(value: string | undefined): boolean {
 }
 
 function codeBlockFromPreChildren(
-  children: ReactNode,
+  children: ComponentChildren,
 ): { language: string; code: string } | null {
   const child = Children.toArray(children)[0];
   if (!isValidElement(child)) return null;
-  const element = child as ReactElement<{ className?: string; children?: ReactNode }>;
+  const element = child as VNode<{ className?: string; children?: ComponentChildren }>;
   const language = /language-([a-z0-9-]+)/i.exec(element.props.className ?? "")?.[1] ?? "";
   if (!language) return null;
   return {
@@ -1053,7 +1038,7 @@ function renderD3Hierarchy(
         .x((node) => node.y)
         .y((node) => node.x))
       .attr("fill", "none")
-      .attr("stroke", cssVar("--edge-default"));
+      .attr("stroke", cssVar("--color-role-edge-default"));
     const nodes = group.selectAll("g")
       .data(laidOut.descendants())
       .join("g")

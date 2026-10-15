@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { ReactNode } from "react";
+import { type ComponentChildren } from "preact";
 
 const baseUX = css`
   display: inline-flex;
@@ -63,8 +63,8 @@ const skinX = css`
 
 export interface SegmentedControlItem<T extends string> {
   value: T;
-  label?: ReactNode;
-  icon?: ReactNode;
+  label?: ComponentChildren;
+  icon?: ComponentChildren;
 }
 
 export interface SegmentedControlProps<T extends string> {

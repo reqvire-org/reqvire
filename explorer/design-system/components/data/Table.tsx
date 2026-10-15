@@ -1,11 +1,4 @@
-import type {
-  ButtonHTMLAttributes,
-  HTMLAttributes,
-  ReactNode,
-  TableHTMLAttributes,
-  TdHTMLAttributes,
-  ThHTMLAttributes,
-} from "react";
+import { type ButtonHTMLAttributes, type HTMLAttributes, type ComponentChildren, type TableHTMLAttributes, type TdHTMLAttributes, type ThHTMLAttributes } from "preact";
 import { css, cx } from "@linaria/atomic";
 
 const baseUXViewport = css`
@@ -119,15 +112,15 @@ const skinXSort = css`
   }
 `;
 
-export type TableViewportProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & { children: ReactNode };
-export type TableProps = Omit<TableHTMLAttributes<HTMLTableElement>, "style"> & { children: ReactNode };
-export type TableHeaderGroupProps = Omit<HTMLAttributes<HTMLTableSectionElement>, "style"> & { children: ReactNode };
-export type TableBodyProps = Omit<HTMLAttributes<HTMLTableSectionElement>, "style"> & { children: ReactNode };
-export type TableRowProps = Omit<HTMLAttributes<HTMLTableRowElement>, "style"> & { children: ReactNode; selected?: boolean };
-export type TableHeaderCellProps = Omit<ThHTMLAttributes<HTMLTableCellElement>, "style"> & { children: ReactNode };
-export type TableCellProps = Omit<TdHTMLAttributes<HTMLTableCellElement>, "style"> & { children: ReactNode };
-export type TableSortButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> & {
-  children: ReactNode;
+export type TableViewportProps = Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableProps = Omit<(TableHTMLAttributes<HTMLTableElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableHeaderGroupProps = Omit<(HTMLAttributes<HTMLTableSectionElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableBodyProps = Omit<(HTMLAttributes<HTMLTableSectionElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableRowProps = Omit<(HTMLAttributes<HTMLTableRowElement> & { className?: string }), "style"> & { children: ComponentChildren; selected?: boolean };
+export type TableHeaderCellProps = Omit<(ThHTMLAttributes<HTMLTableCellElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableCellProps = Omit<(TdHTMLAttributes<HTMLTableCellElement> & { className?: string }), "style"> & { children: ComponentChildren };
+export type TableSortButtonProps = Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style"> & {
+  children: ComponentChildren;
   direction?: "asc" | "desc";
 };
 

@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { useEffect } from "react";
+import { fireEvent, render, screen, within } from "@/test/render";
+import { useEffect } from "preact/hooks";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
@@ -69,13 +69,13 @@ describe("FilesView", () => {
     </StoreProvider>;
     const { rerender } = render(scene(initial));
     expect(screen.getByRole("button", { name: /Original label/ })).toBeTruthy();
-    fireEvent.change(screen.getByRole("searchbox", { name: "Filter project tree" }), { target: { value: "Renamed target" } });
+    fireEvent.input(screen.getByRole("searchbox", { name: "Filter project tree" }), { target: { value: "Renamed target" } });
     const tree = screen.getByRole("tree", { name: "Project tree" });
     expect(within(tree).queryByText("Original label")).toBeNull();
     const edited = { ...initial, elements: [{ ...original, name: "Renamed target", element_type: "capability", type_family: "capability" }] };
     rerender(scene(edited));
     expect(within(tree).getByText("Renamed target")).toBeTruthy();
-    fireEvent.change(screen.getByRole("searchbox", { name: "Filter project tree" }), { target: { value: "capability" } });
+    fireEvent.input(screen.getByRole("searchbox", { name: "Filter project tree" }), { target: { value: "capability" } });
     expect(within(tree).getByText("Renamed target")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Renamed target/ }));
     expect(onOpenElement).toHaveBeenCalledWith(original.id);

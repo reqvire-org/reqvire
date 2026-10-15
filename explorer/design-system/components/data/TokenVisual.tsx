@@ -1,15 +1,16 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import type { DesignSystemColorToken } from "../../palette";
 
-export interface TokenSwatchProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
+export interface TokenSwatchProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
   colorToken: DesignSystemColorToken;
+  variant?: "inline" | "sample";
 }
 
-export interface DonutMeterProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
+export interface DonutMeterProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
   percent: number;
   colorToken: DesignSystemColorToken;
-  children?: ReactNode;
+  children?: ComponentChildren;
 }
 
 export interface ConicSwatchSegment {
@@ -17,16 +18,16 @@ export interface ConicSwatchSegment {
   colorToken: DesignSystemColorToken;
 }
 
-export interface ConicSwatchProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
+export interface ConicSwatchProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
   segments: readonly ConicSwatchSegment[];
 }
 
-export interface BarMeterFillProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
+export interface BarMeterFillProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
   value: number;
   colorToken: DesignSystemColorToken;
 }
 
-export interface SegmentedMeterProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
+export interface SegmentedMeterProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
   segments: readonly { label: string; value: number; colorToken: DesignSystemColorToken }[];
 }
 
@@ -38,6 +39,12 @@ const tokenSwatchUX = css`
   border-radius: var(--ds-token-swatch-radius, var(--radius-xs));
   background: var(--ds-token-swatch-color);
   box-shadow: inset 0 0 0 var(--border-w) var(--ds-token-swatch-ring, var(--border-strong));
+`;
+
+const sampleSwatchUX = css`
+  width: 100%;
+  height: var(--space-20);
+  border-radius: var(--radius-md);
 `;
 
 const colorTokenSkinX = css`
@@ -109,116 +116,116 @@ const colorTokenSkinX = css`
   .ds-token-segment[data-color-token="--border-focus"] { --ds-token-color: var(--border-focus); }
   &[data-color-token="--border-selected"],
   .ds-token-segment[data-color-token="--border-selected"] { --ds-token-color: var(--border-selected); }
-  &[data-color-token="--capability"],
-  .ds-token-segment[data-color-token="--capability"] { --ds-token-color: var(--capability); }
-  &[data-color-token="--capability-tint"],
-  .ds-token-segment[data-color-token="--capability-tint"] { --ds-token-color: var(--capability-tint); }
-  &[data-color-token="--capability-ink"],
-  .ds-token-segment[data-color-token="--capability-ink"] { --ds-token-color: var(--capability-ink); }
-  &[data-color-token="--requirement"],
-  .ds-token-segment[data-color-token="--requirement"] { --ds-token-color: var(--requirement); }
-  &[data-color-token="--requirement-tint"],
-  .ds-token-segment[data-color-token="--requirement-tint"] { --ds-token-color: var(--requirement-tint); }
-  &[data-color-token="--requirement-ink"],
-  .ds-token-segment[data-color-token="--requirement-ink"] { --ds-token-color: var(--requirement-ink); }
-  &[data-color-token="--contract"],
-  .ds-token-segment[data-color-token="--contract"] { --ds-token-color: var(--contract); }
-  &[data-color-token="--contract-tint"],
-  .ds-token-segment[data-color-token="--contract-tint"] { --ds-token-color: var(--contract-tint); }
-  &[data-color-token="--contract-ink"],
-  .ds-token-segment[data-color-token="--contract-ink"] { --ds-token-color: var(--contract-ink); }
-  &[data-color-token="--semantic-contract"],
-  .ds-token-segment[data-color-token="--semantic-contract"] { --ds-token-color: var(--semantic-contract); }
-  &[data-color-token="--semantic-contract-tint"],
-  .ds-token-segment[data-color-token="--semantic-contract-tint"] { --ds-token-color: var(--semantic-contract-tint); }
-  &[data-color-token="--semantic-contract-ink"],
-  .ds-token-segment[data-color-token="--semantic-contract-ink"] { --ds-token-color: var(--semantic-contract-ink); }
-  &[data-color-token="--verification"],
-  .ds-token-segment[data-color-token="--verification"] { --ds-token-color: var(--verification); }
-  &[data-color-token="--verification-tint"],
-  .ds-token-segment[data-color-token="--verification-tint"] { --ds-token-color: var(--verification-tint); }
-  &[data-color-token="--verification-ink"],
-  .ds-token-segment[data-color-token="--verification-ink"] { --ds-token-color: var(--verification-ink); }
-  &[data-color-token="--verification-type-test"],
-  .ds-token-segment[data-color-token="--verification-type-test"] { --ds-token-color: var(--verification-type-test); }
-  &[data-color-token="--verification-type-formal-proof"],
-  .ds-token-segment[data-color-token="--verification-type-formal-proof"] { --ds-token-color: var(--verification-type-formal-proof); }
-  &[data-color-token="--verification-type-analysis"],
-  .ds-token-segment[data-color-token="--verification-type-analysis"] { --ds-token-color: var(--verification-type-analysis); }
-  &[data-color-token="--verification-type-inspection"],
-  .ds-token-segment[data-color-token="--verification-type-inspection"] { --ds-token-color: var(--verification-type-inspection); }
-  &[data-color-token="--verification-type-demonstration"],
-  .ds-token-segment[data-color-token="--verification-type-demonstration"] { --ds-token-color: var(--verification-type-demonstration); }
-  &[data-color-token="--ontology"],
-  .ds-token-segment[data-color-token="--ontology"] { --ds-token-color: var(--ontology); }
-  &[data-color-token="--ontology-tint"],
-  .ds-token-segment[data-color-token="--ontology-tint"] { --ds-token-color: var(--ontology-tint); }
-  &[data-color-token="--ontology-ink"],
-  .ds-token-segment[data-color-token="--ontology-ink"] { --ds-token-color: var(--ontology-ink); }
-  &[data-color-token="--resource"],
-  .ds-token-segment[data-color-token="--resource"] { --ds-token-color: var(--resource); }
-  &[data-color-token="--resource-tint"],
-  .ds-token-segment[data-color-token="--resource-tint"] { --ds-token-color: var(--resource-tint); }
-  &[data-color-token="--resource-ink"],
-  .ds-token-segment[data-color-token="--resource-ink"] { --ds-token-color: var(--resource-ink); }
-  &[data-color-token="--other"],
-  .ds-token-segment[data-color-token="--other"] { --ds-token-color: var(--other); }
-  &[data-color-token="--other-tint"],
-  .ds-token-segment[data-color-token="--other-tint"] { --ds-token-color: var(--other-tint); }
-  &[data-color-token="--other-ink"],
-  .ds-token-segment[data-color-token="--other-ink"] { --ds-token-color: var(--other-ink); }
-  &[data-color-token="--edge-default"],
-  .ds-token-segment[data-color-token="--edge-default"] { --ds-token-color: var(--edge-default); }
-  &[data-color-token="--edge-derive"],
-  .ds-token-segment[data-color-token="--edge-derive"] { --ds-token-color: var(--edge-derive); }
-  &[data-color-token="--edge-satisfy"],
-  .ds-token-segment[data-color-token="--edge-satisfy"] { --ds-token-color: var(--edge-satisfy); }
-  &[data-color-token="--edge-trace"],
-  .ds-token-segment[data-color-token="--edge-trace"] { --ds-token-color: var(--edge-trace); }
-  &[data-color-token="--edge-bind"],
-  .ds-token-segment[data-color-token="--edge-bind"] { --ds-token-color: var(--edge-bind); }
-  &[data-color-token="--rdf-class"],
-  .ds-token-segment[data-color-token="--rdf-class"] { --ds-token-color: var(--rdf-class); }
-  &[data-color-token="--rdf-concept"],
-  .ds-token-segment[data-color-token="--rdf-concept"] { --ds-token-color: var(--rdf-concept); }
-  &[data-color-token="--rdf-concept-scheme"],
-  .ds-token-segment[data-color-token="--rdf-concept-scheme"] { --ds-token-color: var(--rdf-concept-scheme); }
-  &[data-color-token="--concept"],
-  .ds-token-segment[data-color-token="--concept"] { --ds-token-color: var(--concept); }
-  &[data-color-token="--concept-ink"],
-  .ds-token-segment[data-color-token="--concept-ink"] { --ds-token-color: var(--concept-ink); }
-  &[data-color-token="--concept-tint"],
-  .ds-token-segment[data-color-token="--concept-tint"] { --ds-token-color: var(--concept-tint); }
-  &[data-color-token="--concept-scheme"],
-  .ds-token-segment[data-color-token="--concept-scheme"] { --ds-token-color: var(--concept-scheme); }
-  &[data-color-token="--concept-scheme-ink"],
-  .ds-token-segment[data-color-token="--concept-scheme-ink"] { --ds-token-color: var(--concept-scheme-ink); }
-  &[data-color-token="--concept-scheme-tint"],
-  .ds-token-segment[data-color-token="--concept-scheme-tint"] { --ds-token-color: var(--concept-scheme-tint); }
-  &[data-color-token="--concept-reference"],
-  .ds-token-segment[data-color-token="--concept-reference"] { --ds-token-color: var(--concept-reference); }
-  &[data-color-token="--rdf-objprop"],
-  .ds-token-segment[data-color-token="--rdf-objprop"] { --ds-token-color: var(--rdf-objprop); }
-  &[data-color-token="--rdf-dtprop"],
-  .ds-token-segment[data-color-token="--rdf-dtprop"] { --ds-token-color: var(--rdf-dtprop); }
-  &[data-color-token="--rdf-rdfprop"],
-  .ds-token-segment[data-color-token="--rdf-rdfprop"] { --ds-token-color: var(--rdf-rdfprop); }
-  &[data-color-token="--rdf-individual"],
-  .ds-token-segment[data-color-token="--rdf-individual"] { --ds-token-color: var(--rdf-individual); }
-  &[data-color-token="--rdf-datatype"],
-  .ds-token-segment[data-color-token="--rdf-datatype"] { --ds-token-color: var(--rdf-datatype); }
-  &[data-color-token="--rdf-restriction"],
-  .ds-token-segment[data-color-token="--rdf-restriction"] { --ds-token-color: var(--rdf-restriction); }
-  &[data-color-token="--rdf-classexpr"],
-  .ds-token-segment[data-color-token="--rdf-classexpr"] { --ds-token-color: var(--rdf-classexpr); }
-  &[data-color-token="--rdf-nodeshape"],
-  .ds-token-segment[data-color-token="--rdf-nodeshape"] { --ds-token-color: var(--rdf-nodeshape); }
-  &[data-color-token="--rdf-propshape"],
-  .ds-token-segment[data-color-token="--rdf-propshape"] { --ds-token-color: var(--rdf-propshape); }
-  &[data-color-token="--rdf-resource"],
-  .ds-token-segment[data-color-token="--rdf-resource"] { --ds-token-color: var(--rdf-resource); }
-  &[data-color-token="--rdf-shacl"],
-  .ds-token-segment[data-color-token="--rdf-shacl"] { --ds-token-color: var(--rdf-shacl); }
+  &[data-color-token="--color-role-capability"],
+  .ds-token-segment[data-color-token="--color-role-capability"] { --ds-token-color: var(--color-role-capability); }
+  &[data-color-token="--color-role-capability-tint"],
+  .ds-token-segment[data-color-token="--color-role-capability-tint"] { --ds-token-color: var(--color-role-capability-tint); }
+  &[data-color-token="--color-role-capability-ink"],
+  .ds-token-segment[data-color-token="--color-role-capability-ink"] { --ds-token-color: var(--color-role-capability-ink); }
+  &[data-color-token="--color-role-requirement"],
+  .ds-token-segment[data-color-token="--color-role-requirement"] { --ds-token-color: var(--color-role-requirement); }
+  &[data-color-token="--color-role-requirement-tint"],
+  .ds-token-segment[data-color-token="--color-role-requirement-tint"] { --ds-token-color: var(--color-role-requirement-tint); }
+  &[data-color-token="--color-role-requirement-ink"],
+  .ds-token-segment[data-color-token="--color-role-requirement-ink"] { --ds-token-color: var(--color-role-requirement-ink); }
+  &[data-color-token="--color-role-contract"],
+  .ds-token-segment[data-color-token="--color-role-contract"] { --ds-token-color: var(--color-role-contract); }
+  &[data-color-token="--color-role-contract-tint"],
+  .ds-token-segment[data-color-token="--color-role-contract-tint"] { --ds-token-color: var(--color-role-contract-tint); }
+  &[data-color-token="--color-role-contract-ink"],
+  .ds-token-segment[data-color-token="--color-role-contract-ink"] { --ds-token-color: var(--color-role-contract-ink); }
+  &[data-color-token="--color-role-semantic-contract"],
+  .ds-token-segment[data-color-token="--color-role-semantic-contract"] { --ds-token-color: var(--color-role-semantic-contract); }
+  &[data-color-token="--color-role-semantic-contract-tint"],
+  .ds-token-segment[data-color-token="--color-role-semantic-contract-tint"] { --ds-token-color: var(--color-role-semantic-contract-tint); }
+  &[data-color-token="--color-role-semantic-contract-ink"],
+  .ds-token-segment[data-color-token="--color-role-semantic-contract-ink"] { --ds-token-color: var(--color-role-semantic-contract-ink); }
+  &[data-color-token="--color-role-verification"],
+  .ds-token-segment[data-color-token="--color-role-verification"] { --ds-token-color: var(--color-role-verification); }
+  &[data-color-token="--color-role-verification-tint"],
+  .ds-token-segment[data-color-token="--color-role-verification-tint"] { --ds-token-color: var(--color-role-verification-tint); }
+  &[data-color-token="--color-role-verification-ink"],
+  .ds-token-segment[data-color-token="--color-role-verification-ink"] { --ds-token-color: var(--color-role-verification-ink); }
+  &[data-color-token="--color-role-verification-type-test"],
+  .ds-token-segment[data-color-token="--color-role-verification-type-test"] { --ds-token-color: var(--color-role-verification-type-test); }
+  &[data-color-token="--color-role-verification-type-formal-proof"],
+  .ds-token-segment[data-color-token="--color-role-verification-type-formal-proof"] { --ds-token-color: var(--color-role-verification-type-formal-proof); }
+  &[data-color-token="--color-role-verification-type-analysis"],
+  .ds-token-segment[data-color-token="--color-role-verification-type-analysis"] { --ds-token-color: var(--color-role-verification-type-analysis); }
+  &[data-color-token="--color-role-verification-type-inspection"],
+  .ds-token-segment[data-color-token="--color-role-verification-type-inspection"] { --ds-token-color: var(--color-role-verification-type-inspection); }
+  &[data-color-token="--color-role-verification-type-demonstration"],
+  .ds-token-segment[data-color-token="--color-role-verification-type-demonstration"] { --ds-token-color: var(--color-role-verification-type-demonstration); }
+  &[data-color-token="--color-role-ontology"],
+  .ds-token-segment[data-color-token="--color-role-ontology"] { --ds-token-color: var(--color-role-ontology); }
+  &[data-color-token="--color-role-ontology-tint"],
+  .ds-token-segment[data-color-token="--color-role-ontology-tint"] { --ds-token-color: var(--color-role-ontology-tint); }
+  &[data-color-token="--color-role-ontology-ink"],
+  .ds-token-segment[data-color-token="--color-role-ontology-ink"] { --ds-token-color: var(--color-role-ontology-ink); }
+  &[data-color-token="--color-role-resource"],
+  .ds-token-segment[data-color-token="--color-role-resource"] { --ds-token-color: var(--color-role-resource); }
+  &[data-color-token="--color-role-resource-tint"],
+  .ds-token-segment[data-color-token="--color-role-resource-tint"] { --ds-token-color: var(--color-role-resource-tint); }
+  &[data-color-token="--color-role-resource-ink"],
+  .ds-token-segment[data-color-token="--color-role-resource-ink"] { --ds-token-color: var(--color-role-resource-ink); }
+  &[data-color-token="--color-role-other"],
+  .ds-token-segment[data-color-token="--color-role-other"] { --ds-token-color: var(--color-role-other); }
+  &[data-color-token="--color-role-other-tint"],
+  .ds-token-segment[data-color-token="--color-role-other-tint"] { --ds-token-color: var(--color-role-other-tint); }
+  &[data-color-token="--color-role-other-ink"],
+  .ds-token-segment[data-color-token="--color-role-other-ink"] { --ds-token-color: var(--color-role-other-ink); }
+  &[data-color-token="--color-role-edge-default"],
+  .ds-token-segment[data-color-token="--color-role-edge-default"] { --ds-token-color: var(--color-role-edge-default); }
+  &[data-color-token="--color-role-edge-derive"],
+  .ds-token-segment[data-color-token="--color-role-edge-derive"] { --ds-token-color: var(--color-role-edge-derive); }
+  &[data-color-token="--color-role-edge-satisfy"],
+  .ds-token-segment[data-color-token="--color-role-edge-satisfy"] { --ds-token-color: var(--color-role-edge-satisfy); }
+  &[data-color-token="--color-role-edge-trace"],
+  .ds-token-segment[data-color-token="--color-role-edge-trace"] { --ds-token-color: var(--color-role-edge-trace); }
+  &[data-color-token="--color-role-edge-bind"],
+  .ds-token-segment[data-color-token="--color-role-edge-bind"] { --ds-token-color: var(--color-role-edge-bind); }
+  &[data-color-token="--color-role-rdf-class"],
+  .ds-token-segment[data-color-token="--color-role-rdf-class"] { --ds-token-color: var(--color-role-rdf-class); }
+  &[data-color-token="--color-role-rdf-concept"],
+  .ds-token-segment[data-color-token="--color-role-rdf-concept"] { --ds-token-color: var(--color-role-rdf-concept); }
+  &[data-color-token="--color-role-rdf-concept-scheme"],
+  .ds-token-segment[data-color-token="--color-role-rdf-concept-scheme"] { --ds-token-color: var(--color-role-rdf-concept-scheme); }
+  &[data-color-token="--color-role-concept"],
+  .ds-token-segment[data-color-token="--color-role-concept"] { --ds-token-color: var(--color-role-concept); }
+  &[data-color-token="--color-role-concept-ink"],
+  .ds-token-segment[data-color-token="--color-role-concept-ink"] { --ds-token-color: var(--color-role-concept-ink); }
+  &[data-color-token="--color-role-concept-tint"],
+  .ds-token-segment[data-color-token="--color-role-concept-tint"] { --ds-token-color: var(--color-role-concept-tint); }
+  &[data-color-token="--color-role-concept-scheme"],
+  .ds-token-segment[data-color-token="--color-role-concept-scheme"] { --ds-token-color: var(--color-role-concept-scheme); }
+  &[data-color-token="--color-role-concept-scheme-ink"],
+  .ds-token-segment[data-color-token="--color-role-concept-scheme-ink"] { --ds-token-color: var(--color-role-concept-scheme-ink); }
+  &[data-color-token="--color-role-concept-scheme-tint"],
+  .ds-token-segment[data-color-token="--color-role-concept-scheme-tint"] { --ds-token-color: var(--color-role-concept-scheme-tint); }
+  &[data-color-token="--color-role-concept-reference"],
+  .ds-token-segment[data-color-token="--color-role-concept-reference"] { --ds-token-color: var(--color-role-concept-reference); }
+  &[data-color-token="--color-role-rdf-objprop"],
+  .ds-token-segment[data-color-token="--color-role-rdf-objprop"] { --ds-token-color: var(--color-role-rdf-objprop); }
+  &[data-color-token="--color-role-rdf-dtprop"],
+  .ds-token-segment[data-color-token="--color-role-rdf-dtprop"] { --ds-token-color: var(--color-role-rdf-dtprop); }
+  &[data-color-token="--color-role-rdf-rdfprop"],
+  .ds-token-segment[data-color-token="--color-role-rdf-rdfprop"] { --ds-token-color: var(--color-role-rdf-rdfprop); }
+  &[data-color-token="--color-role-rdf-individual"],
+  .ds-token-segment[data-color-token="--color-role-rdf-individual"] { --ds-token-color: var(--color-role-rdf-individual); }
+  &[data-color-token="--color-role-rdf-datatype"],
+  .ds-token-segment[data-color-token="--color-role-rdf-datatype"] { --ds-token-color: var(--color-role-rdf-datatype); }
+  &[data-color-token="--color-role-rdf-restriction"],
+  .ds-token-segment[data-color-token="--color-role-rdf-restriction"] { --ds-token-color: var(--color-role-rdf-restriction); }
+  &[data-color-token="--color-role-rdf-classexpr"],
+  .ds-token-segment[data-color-token="--color-role-rdf-classexpr"] { --ds-token-color: var(--color-role-rdf-classexpr); }
+  &[data-color-token="--color-role-rdf-nodeshape"],
+  .ds-token-segment[data-color-token="--color-role-rdf-nodeshape"] { --ds-token-color: var(--color-role-rdf-nodeshape); }
+  &[data-color-token="--color-role-rdf-propshape"],
+  .ds-token-segment[data-color-token="--color-role-rdf-propshape"] { --ds-token-color: var(--color-role-rdf-propshape); }
+  &[data-color-token="--color-role-rdf-resource"],
+  .ds-token-segment[data-color-token="--color-role-rdf-resource"] { --ds-token-color: var(--color-role-rdf-resource); }
+  &[data-color-token="--color-role-rdf-shacl"],
+  .ds-token-segment[data-color-token="--color-role-rdf-shacl"] { --ds-token-color: var(--color-role-rdf-shacl); }
 
   --ds-token-swatch-color: var(--ds-token-color);
   --ds-donut-color: var(--ds-token-color);
@@ -300,10 +307,10 @@ function clampPercent(value: number) {
   return Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
 }
 
-export function TokenSwatch({ colorToken, className = "", ...props }: TokenSwatchProps) {
+export function TokenSwatch({ colorToken, variant = "inline", className = "", ...props }: TokenSwatchProps) {
   return (
     <span
-      className={cx("ds-token-swatch", tokenSwatchUX, colorTokenSkinX, className)}
+      className={cx("ds-token-swatch", tokenSwatchUX, colorTokenSkinX, variant === "sample" && sampleSwatchUX, className)}
       data-color-token={colorToken}
       {...props}
     />
@@ -328,7 +335,7 @@ export function DonutMeter({
           cy="50"
           r="40"
           pathLength={100}
-          strokeDasharray={`${clamped} ${100 - clamped}`}
+          stroke-dasharray={`${clamped} ${100 - clamped}`}
         />
       </svg>
       <span className="ds-donut__content">{children}</span>
@@ -355,8 +362,8 @@ export function ConicSwatch({ segments, className = "", ...props }: ConicSwatchP
               cy="50"
               r="38"
               pathLength={100}
-              strokeDasharray={`${percent} ${100 - percent}`}
-              strokeDashoffset={dashOffset}
+              stroke-dasharray={`${percent} ${100 - percent}`}
+              stroke-dashoffset={dashOffset}
             />
           );
         })}

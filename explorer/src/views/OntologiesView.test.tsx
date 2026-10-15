@@ -1,5 +1,6 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useState } from "react";
+import { runForceAtlasLayout } from "@ds";
+import { act, fireEvent, render, screen, waitFor } from "@/test/render";
+import { useState } from "preact/hooks";
 import type Graph from "graphology";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerUiStateProvider, ONTOLOGY_DEFAULT_FILTERS } from "../state/ExplorerUiState";
@@ -29,9 +30,8 @@ const mockNoverlapAssign = vi.hoisted(() => vi.fn());
 const mockForceAtlasAssign = vi.hoisted(() => vi.fn());
 const mockForceAtlasEngine = vi.hoisted(() => vi.fn());
 
-vi.mock("../workers/forceAtlasLayoutEngine", async importOriginal => {
+vi.mock("../../design-system/patterns/graphs/forceAtlasLayoutEngine", async importOriginal => {
   const original = await importOriginal<typeof import("../workers/forceAtlasLayoutEngine")>();
-  const { runForceAtlasLayout } = await import("../lib/forceAtlasLayout");
   mockForceAtlasEngine.mockImplementation(input => ({ result: Promise.resolve(runForceAtlasLayout(input)), cancel: vi.fn() }));
   return { ...original, forceAtlasLayoutEngine: mockForceAtlasEngine };
 });
@@ -101,13 +101,11 @@ function renderWithStore(store: ExplorerProjectStore = devFixture) {
   setupWebGLMock();
   resetSigmaState();
   return render(
-    <>
       <StoreProvider store={store} schemaMismatch={null}>
         <ExplorerUiStateProvider>
           <OntologiesView />
         </ExplorerUiStateProvider>
-      </StoreProvider>
-    </>,
+      </StoreProvider>,
   );
 }
 
@@ -140,7 +138,7 @@ describe("OntologiesView", () => {
     mockForceAtlasEngine.mockImplementationOnce(() => ({ result: new Promise(yes => { resolve = yes; }), cancel: vi.fn() }));
     const data = semanticQueryStore.ontology.graph_data!;
     const onLayoutState = vi.fn();
-    const handle = mountOntologyGraph(document.createElement("div"), {
+    const handle = await mountOntologyGraph(document.createElement("div"), {
       ...data, nodes: [...data.nodes!, { ...data.nodes![1], id: "urn:hidden", full_uri: "urn:hidden", layer: "external-source" }],
     }, { onLayoutState, ...(mode === "empty" ? { initialFilters: [] } : {}) });
     try {
@@ -184,7 +182,7 @@ describe("OntologiesView", () => {
     setupWebGLMock(); resetSigmaState();
     const data = semanticQueryStore.ontology.graph_data!;
     const onLayoutState = vi.fn();
-    const handle = mountOntologyGraph(document.createElement("div"), {
+    const handle = await mountOntologyGraph(document.createElement("div"), {
       ...data, nodes: [...data.nodes!, { ...data.nodes![1], id: "urn:hidden", full_uri: "urn:hidden", layer: "external-source" }],
     }, { onLayoutState });
     try {
@@ -218,7 +216,7 @@ describe("OntologiesView", () => {
   it.each(["selection", "clear", "filter", "reset", "drag", "dispose"])("cancels an active focus animation on %s", async action => {
     setupWebGLMock(); resetSigmaState();
     const onLayoutState = vi.fn();
-    const handle = mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!, { onLayoutState });
+    const handle = await mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!, { onLayoutState });
     try {
       await waitFor(() => expect(onLayoutState).toHaveBeenLastCalledWith("ready"));
       let cancelled = false;
@@ -313,13 +311,13 @@ describe("OntologiesView", () => {
     expect(sigmaState.graphs[1].getNodeAttribute(queryId, "x")).not.toBe(9999);
   });
 
-  it("excludes hidden layers and disabled query endpoints from the first ForceAtlas input", () => {
+  it("excludes hidden layers and disabled query endpoints from the first ForceAtlas input", async () => {
     setupWebGLMock();
     resetSigmaState();
     const data = semanticQueryStore.ontology.graph_data!;
     const template = data.nodes![1];
     const container = document.createElement("div");
-    const handle = mountOntologyGraph(container, {
+    const handle = await mountOntologyGraph(container, {
       nodes: [...data.nodes!, { ...template, id: "urn:hidden", full_uri: "urn:hidden", layer: "external-source" }],
       edges: [...data.edges!, { source: template.id, target: "urn:hidden", label: "subclass", layer: "external-source", source_kind: "ontology" }],
     }, { initialFilters: ONTOLOGY_DEFAULT_FILTERS.filter(value => value !== "semantic-query") });
@@ -337,11 +335,11 @@ describe("OntologiesView", () => {
     } finally { handle.destroy(); }
   });
 
-  it("uses the caller's initial layer membership before running any layout", () => {
+  it("uses the caller's initial layer membership before running any layout", async () => {
     setupWebGLMock();
     resetSigmaState();
     const data = semanticQueryStore.ontology.graph_data!;
-    const handle = mountOntologyGraph(document.createElement("div"), data, { initialFilters: [] });
+    const handle = await mountOntologyGraph(document.createElement("div"), data, { initialFilters: [] });
     try {
       const input = mockForceAtlasAssign.mock.calls[0][0] as Graph;
       expect(input.order).toBe(0);
@@ -353,8 +351,8 @@ describe("OntologiesView", () => {
     setupWebGLMock(); resetSigmaState();
     const cancellations = [vi.fn(), vi.fn(), vi.fn()];
     for (const cancel of cancellations) mockForceAtlasEngine.mockImplementationOnce(() => ({ result: new Promise(() => {}), cancel }));
-    const first = mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!);
-    const second = mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!);
+    const first = await mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!);
+    const second = await mountOntologyGraph(document.createElement("div"), semanticQueryStore.ontology.graph_data!);
     first.resetLayout();
     expect(cancellations[0]).toHaveBeenCalledOnce();
     expect(cancellations[1]).not.toHaveBeenCalled();
@@ -554,7 +552,7 @@ describe("OntologiesView", () => {
     setupWebGLMock(); resetSigmaState();
     const data = semanticQueryStore.ontology.graph_data!;
     const onLayoutState = vi.fn();
-    const handle = mountOntologyGraph(document.createElement("div"), {
+    const handle = await mountOntologyGraph(document.createElement("div"), {
       ...data, nodes: [...data.nodes!,
         { ...data.nodes![1], id: "urn:unrelated", full_uri: "urn:unrelated" },
         { ...data.nodes![1], id: "urn:hidden", full_uri: "urn:hidden", layer: "external-source" },

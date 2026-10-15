@@ -12,8 +12,9 @@ output = Path(sys.argv[1]).resolve()
 output.mkdir(parents=True, exist_ok=True)
 npm = shutil.which("npm")
 assert npm, "Node/npm must be on PATH"
-guards = ["lint:artifacts", "lint:adherence", "lint:style", "lint:css-ownership"]
+guards = ["lint:ds", "lint:style"]
 checked = [*guards, "typecheck"]
+built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "icons", "app"]
 checks = []
 
 
@@ -34,7 +35,7 @@ def fixture(name):
     # Keep the production composition and real npm dispatcher, replacing only leaves.
     package.pop("dependencies", None)
     package.pop("devDependencies", None)
-    for guard in guards:
+    for guard in [*guards, "assets:ds"]:
         package["scripts"][guard] = f"node stage.cjs {guard}"
     package["scripts"]["generate:icons"] = "node stage.cjs icons"
     (app / "package.json").write_text(json.dumps(package))
@@ -91,10 +92,10 @@ def composition(command, expected):
 
 
 def failures():
-    for stage in [*checked, "icons", "app", "kit"]:
+    for stage in [*built, "kit"]:
         _, app, trace, env = fixture("failure-" + stage.replace(':', '-'))
         result = invoke(app, [npm, "run", "build:all"], {**env, "FAIL_STAGE": stage})
-        expected = [*checked, "icons", "app", "kit"]
+        expected = [*built, "kit"]
         assert result.returncode != 0, f"accepted {stage} failure"
         assert calls(trace) == expected[:expected.index(stage) + 1], (stage, calls(trace))
 
@@ -115,14 +116,14 @@ def make_dependencies():
         return invoke(repo, ["make"] if default else ["make", "explorer"], {**env, "FAIL_STAGE": "ci" if fail else ""})
 
     assert make(default=True).returncode == 0
-    assert calls(trace) == ["ci", *checked, "icons", "app"], calls(trace)
+    assert calls(trace) == ["ci", *built], calls(trace)
     assert make().returncode == 0
-    assert calls(trace) == [*checked, "icons", "app"], calls(trace)
+    assert calls(trace) == built, calls(trace)
     for filename in ["package.json", "package-lock.json"]:
         path = app / filename
         path.write_text(path.read_text() + "\n")
         assert make().returncode == 0
-        assert calls(trace) == ["ci", *checked, "icons", "app"], (filename, calls(trace))
+        assert calls(trace) == ["ci", *built], (filename, calls(trace))
         assert make().returncode == 0
         assert "ci" not in calls(trace), calls(trace)
     # A failed reinstall must also retire an older success receipt, including
@@ -132,10 +133,10 @@ def make_dependencies():
     assert make(True).returncode != 0
     assert calls(trace) == ["ci"], calls(trace)
     assert make().returncode == 0
-    assert calls(trace) == ["ci", *checked, "icons", "app"], calls(trace)
+    assert calls(trace) == ["ci", *built], calls(trace)
     shutil.rmtree(app / "node_modules")
     assert make().returncode == 0
-    assert calls(trace) == ["ci", *checked, "icons", "app"], calls(trace)
+    assert calls(trace) == ["ci", *built], calls(trace)
 
 
 def workflow_stages():
@@ -149,7 +150,9 @@ def workflow_stages():
             part = part.strip()
             if part.startswith("npm run "):
                 name = part.split()[2]
-                if name in [*guards, "typecheck", "generate:icons", "build:ds-bundle"]:
+                if "pre" + name in scripts:
+                    stages.extend(expand(scripts["pre" + name]))
+                if name in [*guards, "assets:ds", "typecheck", "generate:icons", "build:ds-bundle"]:
                     stages.append(name)
                 else:
                     stages.extend(expand(scripts[name]))
@@ -178,9 +181,9 @@ def workflow_stages():
 
 
 for command, expected in [
-    ("build", [*checked, "icons", "app"]), ("check", checked),
+    ("build", built), ("check", checked),
     ("build:app", ["icons", "app"]), ("build:ds-bundle", ["kit"]),
-    ("build:all", [*checked, "icons", "app", "kit"]),
+    ("build:all", [*built, "kit"]),
 ]:
     record("pipeline-" + command, lambda c=command, e=expected: composition(c, e))
 record("pipeline-stops-on-failure", failures)
