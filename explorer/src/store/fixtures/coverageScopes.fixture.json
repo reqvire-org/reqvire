@@ -1,0 +1,126 @@
+{
+  "Alpha Root": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#alpha-root",
+    "capability_name": "Alpha Root",
+    "capability_ids": [
+      "specifications/Capabilities.md#alpha-left",
+      "specifications/Capabilities.md#alpha-right",
+      "specifications/Capabilities.md#alpha-root",
+      "specifications/Capabilities.md#empty-branch",
+      "specifications/Capabilities.md#shared-branch"
+    ],
+    "requirement_ids": [
+      "specifications/Alpha.md#alpha-contract-owner",
+      "specifications/Alpha.md#alpha-gap",
+      "specifications/Alpha.md#alpha-implemented",
+      "specifications/Alpha.md#alpha-local",
+      "specifications/Alpha.md#alpha-middle",
+      "specifications/Alpha.md#alpha-parent"
+    ],
+    "verification_ids": [
+      "specifications/Verifications.md#gap-check",
+      "specifications/Verifications.md#middle-demonstration",
+      "specifications/Verifications.md#parent-review",
+      "specifications/Verifications.md#shared-check",
+      "specifications/Verifications.md#shared-proof"
+    ],
+    "orphaned_verifications_scope": "whole_model_only"
+  },
+  "Alpha Left": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#alpha-left",
+    "capability_name": "Alpha Left",
+    "capability_ids": [
+      "specifications/Capabilities.md#alpha-left",
+      "specifications/Capabilities.md#shared-branch"
+    ],
+    "requirement_ids": [
+      "specifications/Alpha.md#alpha-contract-owner",
+      "specifications/Alpha.md#alpha-gap",
+      "specifications/Alpha.md#alpha-implemented",
+      "specifications/Alpha.md#alpha-middle",
+      "specifications/Alpha.md#alpha-parent"
+    ],
+    "verification_ids": [
+      "specifications/Verifications.md#gap-check",
+      "specifications/Verifications.md#middle-demonstration",
+      "specifications/Verifications.md#parent-review",
+      "specifications/Verifications.md#shared-check",
+      "specifications/Verifications.md#shared-proof"
+    ],
+    "orphaned_verifications_scope": "whole_model_only"
+  },
+  "Alpha Right": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#alpha-right",
+    "capability_name": "Alpha Right",
+    "capability_ids": [
+      "specifications/Capabilities.md#alpha-right",
+      "specifications/Capabilities.md#shared-branch"
+    ],
+    "requirement_ids": [
+      "specifications/Alpha.md#alpha-gap",
+      "specifications/Alpha.md#alpha-implemented",
+      "specifications/Alpha.md#alpha-middle",
+      "specifications/Alpha.md#alpha-parent"
+    ],
+    "verification_ids": [
+      "specifications/Verifications.md#gap-check",
+      "specifications/Verifications.md#middle-demonstration",
+      "specifications/Verifications.md#parent-review",
+      "specifications/Verifications.md#shared-check"
+    ],
+    "orphaned_verifications_scope": "whole_model_only"
+  },
+  "Shared Branch": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#shared-branch",
+    "capability_name": "Shared Branch",
+    "capability_ids": [
+      "specifications/Capabilities.md#shared-branch"
+    ],
+    "requirement_ids": [
+      "specifications/Alpha.md#alpha-gap",
+      "specifications/Alpha.md#alpha-implemented",
+      "specifications/Alpha.md#alpha-middle",
+      "specifications/Alpha.md#alpha-parent"
+    ],
+    "verification_ids": [
+      "specifications/Verifications.md#gap-check",
+      "specifications/Verifications.md#middle-demonstration",
+      "specifications/Verifications.md#parent-review",
+      "specifications/Verifications.md#shared-check"
+    ],
+    "orphaned_verifications_scope": "whole_model_only"
+  },
+  "Empty Branch": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#empty-branch",
+    "capability_name": "Empty Branch",
+    "capability_ids": [
+      "specifications/Capabilities.md#empty-branch"
+    ],
+    "requirement_ids": [],
+    "verification_ids": [],
+    "orphaned_verifications_scope": "whole_model_only"
+  },
+  "Beta Root": {
+    "kind": "capability",
+    "capability_identifier": "specifications/Capabilities.md#beta-root",
+    "capability_name": "Beta Root",
+    "capability_ids": [
+      "specifications/Capabilities.md#beta-root"
+    ],
+    "requirement_ids": [
+      "specifications/Beta.md#beta-consumer",
+      "specifications/Beta.md#beta-gap"
+    ],
+    "verification_ids": [
+      "specifications/Verifications.md#beta-analysis",
+      "specifications/Verifications.md#shared-check",
+      "specifications/Verifications.md#shared-proof"
+    ],
+    "orphaned_verifications_scope": "whole_model_only"
+  }
+}

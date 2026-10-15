@@ -1,12 +1,22 @@
 {
   "mcpServers": {
-        "playwright": {
-          "type": "stdio",
-          "command": "npx",
-          "args": [
-            "@playwright/mcp@latest"
-          ],
-          "env": {}
-        }
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "ds": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "explorer/node_modules/@reqvire-org/ds/dist/cli.mjs",
+        "mcp",
+        "explorer",
+        "--mutations"
+      ]
+    }
   }
 }

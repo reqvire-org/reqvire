@@ -1,7 +1,7 @@
 import { testFlowLayoutEngine } from "../../test/flowLayoutEngine";
 import { describe, expect, it } from "vitest";
 import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
-import { SPLIT_MERGE_TRACE } from "../../showcase/fixtures/traces";
+import { SPLIT_MERGE_TRACE } from "./fixtures/traces";
 
 const trace: TraceFlowData = {
   verification: { id: "v", name: "Check", type: "test-verification", file: "Checks.md" },

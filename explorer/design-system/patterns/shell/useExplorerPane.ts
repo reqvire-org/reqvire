@@ -11,12 +11,15 @@ export function useExplorerPane() {
   const [leftPaneResizing, setLeftPaneResizing] = useState(false);
   const [leftPaneWidth, setLeftPaneWidth] = useState(readStoredLeftPaneWidth);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const cancelDrag = useRef<(() => void) | null>(null);
   const leftPaneWidthRef = useRef(leftPaneWidth);
   useEffect(() => {
     leftPaneWidthRef.current = leftPaneWidth;
     shellRef.current?.style.setProperty("--ux-left-pane-width", `${leftPaneWidth}px`);
-    window.localStorage.setItem(LEFT_PANE_WIDTH_STORAGE_KEY, String(leftPaneWidth));
+    try { window.localStorage.setItem(LEFT_PANE_WIDTH_STORAGE_KEY, String(leftPaneWidth)); }
+    catch { /* Sandboxed Apps and restricted browsers retain session-local geometry. */ }
   }, [leftPaneWidth]);
+  useEffect(() => () => cancelDrag.current?.(), []);
 
   useEffect(() => {
     function handleResize() {
@@ -33,6 +36,7 @@ export function useExplorerPane() {
 
   function handleLeftPaneResizePointerDown(event: TargetedPointerEvent<HTMLDivElement>) {
     if (!leftPaneOpen || event.button !== 0) return;
+    cancelDrag.current?.();
 
     const startX = event.clientX;
     const startWidth = leftPaneWidthRef.current;
@@ -47,12 +51,17 @@ export function useExplorerPane() {
       shellRef.current?.style.setProperty("--ux-left-pane-width", `${nextWidth}px`);
     }
 
-    function finishPointerDrag() {
+    function clearPointerDrag() {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", finishPointerDrag);
       window.removeEventListener("pointercancel", finishPointerDrag);
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
+      cancelDrag.current = null;
+    }
+
+    function finishPointerDrag() {
+      clearPointerDrag();
       setLeftPaneResizing(false);
       leftPaneWidthRef.current = nextWidth;
       setLeftPaneWidth(nextWidth);
@@ -61,6 +70,7 @@ export function useExplorerPane() {
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", finishPointerDrag);
     window.addEventListener("pointercancel", finishPointerDrag);
+    cancelDrag.current = clearPointerDrag;
   }
 
   function handleLeftPaneResizeKeyDown(event: TargetedKeyboardEvent<HTMLDivElement>) {
@@ -82,8 +92,13 @@ export function useExplorerPane() {
 function readStoredLeftPaneWidth() {
   if (typeof window === "undefined") return LEFT_PANE_WIDTH_DEFAULT;
 
-  const stored = Number(window.localStorage.getItem(LEFT_PANE_WIDTH_STORAGE_KEY));
-  return clampLeftPaneWidth(Number.isFinite(stored) ? stored : LEFT_PANE_WIDTH_DEFAULT);
+  try {
+    const value = window.localStorage.getItem(LEFT_PANE_WIDTH_STORAGE_KEY);
+    const stored = value === null ? LEFT_PANE_WIDTH_DEFAULT : Number(value);
+    return clampLeftPaneWidth(Number.isFinite(stored) ? stored : LEFT_PANE_WIDTH_DEFAULT);
+  } catch {
+    return clampLeftPaneWidth(LEFT_PANE_WIDTH_DEFAULT);
+  }
 }
 
 function clampLeftPaneWidth(width: number) {

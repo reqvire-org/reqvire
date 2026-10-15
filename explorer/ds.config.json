@@ -22,7 +22,7 @@
         {
           "rootFiles": [
             "src/App.tsx",
-            "design-system/showcase/ShowcaseApp.tsx"
+            "design-system/components/core/Toast.scenario.tsx"
           ]
         }
       ],
@@ -104,6 +104,12 @@
         "file": "design-system/palette.ts",
         "properties": [
           "color"
+        ]
+      },
+      {
+        "file": "design-system/patterns/tokens/TokenSamples.tsx",
+        "properties": [
+          "--ux-token-sample-value"
         ]
       }
     ],
@@ -210,5 +216,20 @@
       "mstile-150x150.png",
       "site.webmanifest"
     ]
+  },
+  "framework": "preact",
+  "mcp": {
+    "previewManifest": ".ds/preview/manifest.json",
+    "previewWatch": {
+      "command": "npm",
+      "args": [
+        "run",
+        "build:mcp-previews",
+        "--",
+        "--watch"
+      ]
+    },
+    "apps": [],
+    "showcaseTitle": "Reqvire Design System"
   }
 }

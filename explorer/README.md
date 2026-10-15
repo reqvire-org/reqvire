@@ -37,9 +37,9 @@ implementation workflows; shared rules belong to the
 [DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/DS.md).
 
 The public `ExplorerWorkspace` and screen patterns are shared by production
-adapters and the fixture showcase. Run `npm run dev:showcase` and open the Mocks
-tab to inspect the real UI with local data. Tokens, Components and Patterns
-provide the smaller examples. Fixture code has no application imports; full-app
+adapters and the fixture showcase. Run `npm run dev:showcase` and select Composition → Explorer workspace to inspect
+the real UI with local data. Tokens, Components and Patterns provide independently
+mountable scenarios. Fixture code has no application imports; full-app
 routing/store tests remain under `src/test/`.
 
 Owned UI uses native Preact imports, hooks, DOM events and JSX. ReactFlow and
@@ -96,8 +96,11 @@ npm run dev        # local dev server (uses src/store/devFixture.ts)
 npm run typecheck  # tsc --noEmit
 npm run test       # vitest (route parsing, store loader, component tests)
 npm run build      # lint + typecheck + generated DS artifacts + vite build -> dist/
-npm run dev:showcase    # checked live showcase; open Vite's printed URL
-npm run build:showcase  # checked static showcase -> design-system/dist-showcase/
+npm run ds-mcp          # stdio MCP + showcase; guarded editing enabled
+npm run ds-read-mcp     # stdio MCP + showcase; read-only
+npm run dev:showcase    # MCP client showcase; open the printed URL
+npm run build:showcase  # checked MCP preview resource graph -> .ds/preview/
+npm run build:mcp-previews -- --watch  # advanced: compiler without the managed host
 ```
 
 ---
@@ -145,8 +148,44 @@ window.reqvireProjectStore = { /* ExplorerProjectStore JSON */ };
 Explorer owns the browser shell and design system. Rust owns normalized Project
 Store data and the embedded Vite bundle served by `reqvire serve`.
 
-The showcase has the standard Tokens, Components, Patterns, and Mocks pages,
-with neutral navigation, section icons, theme switching, and a collapsible header.
-Mocks compose public DS patterns with local fixture data; full-app harnesses and
-route/store interaction tests belong under `src/test/`. Run `npm run dev:showcase`
-and open Vite's printed URL.
+The showcase is DS tooling's minimal MCP client and Apps host. It discovers
+Tokens, Components, Patterns and Composition scenarios; the project owns their
+implementations, fixture inputs and native Preact mount adapter. No second
+catalogue app or hand-maintained registry is needed. Colocated `.scenario.tsx`
+and `.fixture.ts` files render the public `@ds` API. Shared normalized example
+records and callback adapters live with the workspace composition; focused
+screen scenarios supply their own initial view/mode. Full application route and
+store harnesses remain under `src/test/`.
+
+`ds.config.json` declares `framework: "preact"`, the `.ds/preview/manifest.json`
+resource graph and its managed watcher. Starting DS MCP also starts the website
+and compiler; use the URL from `ds_status`. Components, styles, fonts and runtime
+execute only inside the sandboxed App. The host's theme selects the project's
+own skin. Failed checks/builds retain the previous preview with stale diagnostics.
+
+## Local DS development
+
+The current DS 0.3 tooling is not published yet. This checkout uses the sibling
+`../../design-system-template` as a local npm file dependency. Build that tool
+before installing Explorer dependencies:
+
+```sh
+cd ../design-system-template
+npm ci
+npm run build
+cd ../reqvire/explorer
+npm ci
+npm run ds-mcp -- --port 4191
+```
+
+Open **http://127.0.0.1:4191/**. Use `npm run ds-read-mcp -- --port 4191` instead
+for read-only MCP; run one command at a time. Both start the showcase and managed
+preview compiler with the installed tool. `npm run dev:showcase` starts the
+browser-only runtime. MCP clients launching the npm scripts should use
+`npm --silent run ds-mcp` or `npm --silent run ds-read-mcp` to keep stdout
+exclusive to JSON-RPC. The repository's `.mcp.json` launches the installed
+DS CLI for `explorer/` with guarded mutations enabled; it uses the same local
+tool and preview compiler. After changing tool source, rebuild the sibling tool
+and restart the MCP connection/showcase. When 0.3 is published, replace the file
+dependency with `npm install --save-dev @reqvire-org/ds@0.3.0`; the runtime and
+scenario configuration stay the same.

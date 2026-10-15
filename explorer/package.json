@@ -14,8 +14,10 @@
     "build:app": "npm run generate:icons && vite build",
     "build:all": "npm run build && npm run build:ds-bundle",
     "build:ds-bundle": "vite build --config design-system/vite.bundle.config.ts",
-    "dev:showcase": "npm run lint && npm run generate:icons && vite --config design-system/vite.showcase.config.ts",
-    "build:showcase": "npm run lint:style && npm run typecheck && npm run generate:icons && vite build --config design-system/vite.showcase.config.ts",
+    "ds-mcp": "ds mcp --mutations",
+    "ds-read-mcp": "ds mcp",
+    "dev:showcase": "ds showcase",
+    "build:showcase": "npm run build:mcp-previews",
     "generate:icons": "node scripts/generate-icons.mjs",
     "generate:coverage-showcase": "python3 scripts/generate-coverage-showcase.py",
     "lint": "npm run lint:ds && npm run lint:style",
@@ -27,7 +29,8 @@
     "lint:ds": "ds lint-config . && ds check . && oxlint --deny-warnings --config .ds/oxlintrc.json 'src' 'design-system'",
     "assets:ds": "ds assets",
     "prebuild": "npm run lint:ds && npm run assets:ds",
-    "prebuild:showcase": "npm run lint:ds && npm run assets:ds"
+    "prebuild:showcase": "npm run lint:ds && npm run assets:ds",
+    "build:mcp-previews": "node scripts/build-mcp-previews.mjs"
   },
   "dependencies": {
     "@linaria/atomic": "^8.0.0",
@@ -46,20 +49,21 @@
     "graphology-layout-noverlap": "^0.4.2",
     "mermaid": "^12.2.0",
     "minisearch": "^7.2.0",
+    "preact": "11.0.1",
+    "react": "npm:@preact/compat@18.3.2",
+    "react-dom": "npm:@preact/compat@18.3.2",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "shiki": "^4.2.0",
-    "sigma": "^3.0.0",
-    "preact": "11.0.1",
-    "react": "npm:@preact/compat@18.3.2",
-    "react-dom": "npm:@preact/compat@18.3.2"
+    "sigma": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@biomejs/biome": "2.5.15",
-    "@reqvire-org/ds": "0.1.1",
+    "@reqvire-org/ds": "file:../../design-system-template",
+    "@testing-library/preact": "3.2.4",
     "@types/node": "^25.9.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -70,7 +74,6 @@
     "sharp": "^0.35.4",
     "typescript": "^5.6.3",
     "vite": "^6.0.7",
-    "vitest": "^4.1.11",
-    "@testing-library/preact": "3.2.4"
+    "vitest": "^4.1.11"
   }
 }

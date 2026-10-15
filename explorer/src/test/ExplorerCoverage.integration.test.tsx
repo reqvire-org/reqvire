@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ExplorerFixtureApp as MockShell } from "./fixtures/ExplorerFixtureApp";
-import { PatternsPage as ProductPatternsPage } from "../../design-system/showcase/pages/PatternsPage";
+import WorktreeSelectorScenario from "../../design-system/patterns/shell/WorktreeSelector.scenario";
+import WorktreeDialogScenario from "../../design-system/patterns/shell/WorktreeLoadDialog.scenario";
+const ProductPatternsPage = () => <><WorktreeSelectorScenario /><WorktreeDialogScenario /></>;
 
 // Coverage uses the real application. JSDOM only substitutes unavailable WebGL and worker APIs.
 vi.mock("../views/GraphLibraryViews", () => ({ KnowledgeGraphView: () => null }));

@@ -24,7 +24,7 @@ shell. Coverage starts its pane with the Model-style quick filter above the Whol
 Model tree, without a separate Capabilities heading. Coverage issue rows show
 their type badge on the right without a duplicate leading element icon.
 
-Patterns includes a Worktree Loading and Errors section using the exported
+Patterns includes a Worktree Loading and Errors scenario using the exported
 Explorer dialog. Preview loading, connection failures, long validation diagnostics
 and automatic-refresh errors. The compact dialog left-aligns its heading and
 labelled branch context, separates recovery guidance from selectable diagnostic
@@ -175,3 +175,23 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 1. **Fonts** are Geist and Geist Mono, vendored in `assets/fonts/*.woff2` and referenced relatively from `tokens/fonts.css`, so the kit and standalone artifacts work offline with no app server.
 2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `npm run generate:icons`.
 3. **Canonical source.** This directory is source, not an exported artifact. Generated bundles, generated CSS, generated browser icons, and showcase dist output must be rebuilt, not edited.
+
+## Scenarios and MCP showcase
+
+Run `npm run dev:showcase` from `explorer/`, or open the MCP-reported showcase
+URL. DS owns the neutral host and its Tokens, Components, Patterns and Composition
+navigation. This project owns the compiled Preact views inside its preview App.
+
+Each owner has a colocated `*.scenario.tsx` and `*.fixture.ts` (or `.tsx`).
+Token fixtures enumerate all real foundation names and use the public
+`TokenSamples` review pattern; computed CSS supplies values. `composition/Workspace/`
+contains the larger fixture workspace and reusable local state/callback adapter.
+Focused screen/navigation entries supply their own view/mode through local fixtures.
+The compiler adapter is `showcase/mcp/main.tsx`; it unmounts the native root on
+switch/rebuild. `scripts/build-mcp-previews.mjs` reuses production Vite, Linaria,
+framework aliases and runtime guards, while keeping renderers/workers lazy.
+
+Every public renderable export and declared token must have reachable scenario
+coverage. Preview metadata does not establish behavior: inspect standalone views,
+interactions, dark/light themes, cleanup and constrained sizes in the real host.
+Full application providers, routes and network/store tests belong under `src/test/`.

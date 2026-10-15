@@ -8,8 +8,8 @@ import { ExplorerApplication } from "../../App";
 import { devFixture } from "../../store/devFixture";
 import type { ExplorerProjectStore } from "../../store/types";
 import scopedCoverage from "../../store/fixtures/scopedCoverage.json";
-import { TRACE_CAPABILITY, TRACE_EXAMPLES, traceExampleElements, traceExampleSource } from "../../../design-system/showcase/fixtures/traces";
-import { SHOWCASE_WORKTREES } from "../../../design-system/showcase/fixtures/productPatterns";
+import { TRACE_CAPABILITY, TRACE_EXAMPLES, traceExampleElements, traceExampleSource } from "../../../design-system/patterns/reports/fixtures/traces";
+import { SHOWCASE_WORKTREES } from "../../../design-system/composition/Workspace/fixture";
 import { worktreeUrl } from "../../router/routes";
 import { writeExplorerUrl } from "../../router/location";
 

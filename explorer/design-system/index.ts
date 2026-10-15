@@ -438,3 +438,6 @@ export { SearchControlsPane } from "./patterns/search/SearchControlsPane";
 export type { SearchControlsPaneProps, SearchResultKind } from "./patterns/search/SearchControlsPane";
 
 export { flowLayoutEngine } from "./patterns/reports/flowLayoutEngine";
+
+export { TokenSamples } from "./patterns/tokens/TokenSamples";
+export type { TokenSamplesProps, TokenSampleKind, TokenSampleName } from "./patterns/tokens/TokenSamples";

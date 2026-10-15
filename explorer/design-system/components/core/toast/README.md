@@ -36,9 +36,9 @@ appearance; the comparison below records the current behavioral and visual diffe
 
 ## Reqvire integration
 
-`src/App.tsx` mounts the default toaster across routes. The separate showcase root
-mounts the same implementation; its Components → Toast section exercises the
-public API. Existing store, renderer, and worktree errors retain their persistent
+`src/App.tsx` mounts the default toaster across routes. The colocated `../Toast.scenario.tsx`
+mounts the same implementation with local settings; Components → Toast notifications
+exercises its public API in the MCP showcase. Existing store, renderer, and worktree errors retain their persistent
 inline/dialog recovery UI. A toast is for transient feedback, not a replacement
 for information needed to complete or recover a task.
 
@@ -240,15 +240,14 @@ callbacks, scope teardown, promise settlement, and stale updates.
 and rejected lint cases. The build runs the shared lint guards, type checking,
 and the Explorer app and showcase builds.
 
-For browser verification, use the native component in the main showcase and a
-playground built from the current local DS source. Compare with the actual Sonner
+For browser verification, open the native Toast scenario in the MCP showcase. Compare with the actual Sonner
 component in a separate reference page, using identical content and settings.
 Check compact/expanded stacks, timed and persistent cards, hidden-document
 timers, keyboard focus, close/action controls, promises, and mouse/touch swipes.
 Measure animation timing and transforms; also check mobile, dark theme, and
 reduced motion. Run automation in separate browser contexts so it does not
-resize or navigate the user's current showcase. Rebuild a static playground
-after changing the DS source before comparing again.
+resize or navigate the user's current showcase. Wait for the managed compiler and verify its current build revision after source
+changes before comparing again.
 
 Implementation: [Toast.tsx](../Toast.tsx), [Toaster.tsx](../Toaster.tsx),
 [store.ts](store.ts), and [geometry.ts](geometry.ts). Shared architecture

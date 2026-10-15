@@ -113,6 +113,7 @@
 
 /* Scrollable catalogues; mock compositions use the full body. */
 .ux-showcase-body {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;

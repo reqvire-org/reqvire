@@ -399,7 +399,7 @@ export function SegmentedMeter({ segments, className = "", ...props }: Segmented
         const width = values[index] / total * 100;
         const x = offset; offset += width;
         return values[index] > 0 ? <rect key={segment.label} className="ds-token-segment" data-color-token={segment.colorToken}
-          data-segment-label={segment.label} data-segment-value={values[index]} x={x} y="0" width={width} height="1" vectorEffect="non-scaling-stroke">
+          data-segment-label={segment.label} data-segment-value={values[index]} x={x} y="0" width={width} height="1" vector-effect="non-scaling-stroke">
           <title>{segment.label}: {values[index]}</title>
         </rect> : null;
       })}

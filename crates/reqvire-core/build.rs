@@ -46,6 +46,7 @@ fn main() {
         ".oxlintignore",
         "design-system/assets",
         "design-system/components",
+        "design-system/composition",
         "design-system/hooks",
         "design-system/showcase",
         "design-system/patterns",
