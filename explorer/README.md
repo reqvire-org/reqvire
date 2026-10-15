@@ -25,16 +25,16 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ds` is a development dependency configured by `ds.config.json`.
-`npm run lint` runs shared DS architecture checks and core/registered Oxlint
+`@reqvire-org/ads` is a development dependency configured by `ds.config.json`.
+`npm run lint` runs shared ADS architecture checks and core/registered Oxlint
 rules (`lint:ds`), then Biome CSS correctness checks (`lint:style`). Build hooks
 refresh ignored `.ds/oxlintrc.json`, validate source, and generate configured
 icons before application and standalone showcase builds. Renderer exceptions
 and non-state hooks are explicit config; Toast usage rules remain component-owned.
 For the source-level tour, start with the
-[local design-system guide](design-system/readme.md). Use DS skills for
+[local design-system guide](design-system/readme.md). Use ADS skills for
 implementation workflows; shared rules belong to the
-[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/DS.md).
+[ADS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/ADS.md).
 
 The public `ExplorerWorkspace` and screen patterns are shared by production
 adapters and the fixture showcase. Run `npm run dev:showcase` and select Composition → Explorer workspace to inspect
@@ -45,11 +45,11 @@ routing/store tests remain under `src/test/`.
 Owned UI uses native Preact imports, hooks, DOM events and JSX. ReactFlow and
 `react-markdown` use `preact/compat`; npm aliases also resolve their CommonJS
 imports to Preact. `preact.config.ts` shares the bundler aliases across the app,
-showcase and optional DS bundle. No React renderer is shipped. DOM tests use
+showcase and optional design-system bundle. No React renderer is shipped. DOM tests use
 Preact Testing Library with explicit cleanup flushing for Preact 11, and lifecycle
 tests exercise unmount/remount behavior directly.
 
-DS checks have no production runtime. Heavy Sigma renderers stay behind lazy
+ADS checks have no production runtime. Heavy Sigma renderers stay behind lazy
 imports; ELK and ForceAtlas layouts use cancellable local browser workers.
 Application projections, caches, worktree loading and routing remain in app
 adapters. The migration preserves existing layout profiles and lifecycle tests.
@@ -78,7 +78,7 @@ setup only. Remove `explorer/node_modules/.reqvire-deps.stamp` to force a fresh
 install after changing Node or npm configuration. `REQVIRE_BUILD_EXPLORER=1`
 also requests a checked frontend build during Cargo compilation.
 
-The application consumes DS source through `@ds`; it does not require a
+The application consumes design-system source through `@ds`; it does not require a
 standalone kit. `npm run build:all` builds the checked application plus that
 optional kit. `npm run build:ds-bundle` uses
 `design-system/vite.bundle.config.ts` and external Preact globals; its
@@ -95,9 +95,9 @@ npm install
 npm run dev        # local dev server (uses src/store/devFixture.ts)
 npm run typecheck  # tsc --noEmit
 npm run test       # vitest (route parsing, store loader, component tests)
-npm run build      # lint + typecheck + generated DS artifacts + vite build -> dist/
-npm run ds-mcp          # stdio MCP + showcase; guarded editing enabled
-npm run ds-read-mcp     # stdio MCP + showcase; read-only
+npm run build      # lint + typecheck + generated design-system artifacts + vite build -> dist/
+npm run ads-mcp          # stdio MCP + showcase; guarded editing enabled
+npm run ads-read-mcp     # stdio MCP + showcase; read-only
 npm run dev:showcase    # MCP client showcase; open the printed URL
 npm run build:showcase  # checked MCP preview resource graph -> .ds/preview/
 npm run build:mcp-previews -- --watch  # advanced: compiler without the managed host
@@ -148,7 +148,7 @@ window.reqvireProjectStore = { /* ExplorerProjectStore JSON */ };
 Explorer owns the browser shell and design system. Rust owns normalized Project
 Store data and the embedded Vite bundle served by `reqvire serve`.
 
-The showcase is DS tooling's minimal MCP client and Apps host. It discovers
+The showcase is ADS tooling's minimal MCP client and Apps host. It discovers
 Tokens, Components, Patterns and Composition scenarios; the project owns their
 implementations, fixture inputs and native Preact mount adapter. No second
 catalogue app or hand-maintained registry is needed. Colocated `.scenario.tsx`
@@ -158,14 +158,14 @@ screen scenarios supply their own initial view/mode. Full application route and
 store harnesses remain under `src/test/`.
 
 `ds.config.json` declares `framework: "preact"`, the `.ds/preview/manifest.json`
-resource graph and its managed watcher. Starting DS MCP also starts the website
-and compiler; use the URL from `ds_status`. Components, styles, fonts and runtime
+resource graph and its managed watcher. Starting ADS MCP also starts the website
+and compiler; use the URL from `ads_status`. Components, styles, fonts and runtime
 execute only inside the sandboxed App. The host's theme selects the project's
 own skin. Failed checks/builds retain the previous preview with stale diagnostics.
 
-## Local DS development
+## Local ADS development
 
-The current DS 0.3 tooling is not published yet. This checkout uses the sibling
+The current ADS 0.3 tooling is not published yet. This checkout uses the sibling
 `../../design-system-template` as a local npm file dependency. Build that tool
 before installing Explorer dependencies:
 
@@ -175,17 +175,17 @@ npm ci
 npm run build
 cd ../reqvire/explorer
 npm ci
-npm run ds-mcp -- --port 4191
+npm run ads-mcp -- --port 4191
 ```
 
-Open **http://127.0.0.1:4191/**. Use `npm run ds-read-mcp -- --port 4191` instead
+Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler with the installed tool. `npm run dev:showcase` starts the
 browser-only runtime. MCP clients launching the npm scripts should use
-`npm --silent run ds-mcp` or `npm --silent run ds-read-mcp` to keep stdout
+`npm --silent run ads-mcp` or `npm --silent run ads-read-mcp` to keep stdout
 exclusive to JSON-RPC. The repository's `.mcp.json` launches the installed
-DS CLI for `explorer/` with guarded mutations enabled; it uses the same local
+ADS CLI for `explorer/` with guarded mutations enabled; it uses the same local
 tool and preview compiler. After changing tool source, rebuild the sibling tool
 and restart the MCP connection/showcase. When 0.3 is published, replace the file
-dependency with `npm install --save-dev @reqvire-org/ds@0.3.0`; the runtime and
+dependency with `npm install --save-dev @reqvire-org/ads@0.3.0`; the runtime and
 scenario configuration stay the same.

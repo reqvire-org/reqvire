@@ -2,8 +2,8 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { build } from "vite";
-import { runScenarioCompiler } from "@reqvire-org/ds/scenarios/compiler";
-import { createPreviewResources, previewEntriesPlugin } from "@reqvire-org/ds/scenarios/vite";
+import { runScenarioCompiler } from "@reqvire-org/ads/scenarios/compiler";
+import { createPreviewResources, previewEntriesPlugin } from "@reqvire-org/ads/scenarios/vite";
 
 const root = path.resolve(import.meta.dirname, "..");
 const runScript = promisify(execFile);
@@ -22,7 +22,7 @@ await runScenarioCompiler(root, {
       plugins: [previewEntriesPlugin(entries.map(entry => ({ ...entry, root })), mount), track],
       worker: { format: "iife" },
       build: { write: false, cssCodeSplit: true, assetsInlineLimit: 0, modulePreload: false,
-        rollupOptions: { preserveEntrySignatures: "strict", input: Object.fromEntries(entries.map((_entry, index) => [`scenario-${index}`, `ds-preview-entry:${index}`])),
+        rollupOptions: { preserveEntrySignatures: "strict", input: Object.fromEntries(entries.map((_entry, index) => [`scenario-${index}`, `ads-preview-entry:${index}`])),
           output: { entryFileNames: "assets/preview-[name]-[hash].js", chunkFileNames: "assets/[name]-[hash].js", assetFileNames: "assets/[name]-[hash][extname]" } } },
     });
     return createPreviewResources(output, options, entries);

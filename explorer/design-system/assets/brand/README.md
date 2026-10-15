@@ -19,9 +19,9 @@ to the SVG path relative to the DS folder, for example:
 { "assets": { "iconSource": "assets/brand/app-icon.svg" } }
 ```
 
-After `ds init`, the normal npm or Bun build generates `favicon.svg`,
+After `ads init`, the normal npm or Bun build generates `favicon.svg`,
 `favicon.ico` (16/32/48), `apple-touch-icon.png` (180), `icon-192.png`, and
-`icon-512.png` in ignored `.ds/assets/`. Run `ds assets` to regenerate manually.
+`icon-512.png` in ignored `.ds/assets/`. Run `ads assets` to regenerate manually.
 Outputs retain the artwork's colors and transparent background; provide an
 appropriate source background if a platform needs one. Mount this directory
 through the application's existing bundler and keep app manifest metadata in

@@ -45,12 +45,12 @@ showcase mount the same project-owned implementation.
 
 ## Source and tooling
 
-Use DS skills for implementation workflows: `ds-designer` for UI changes,
-`ds-assimilate` for a library reference, `ds-import` for another project's DS,
-`ds-motion` for animation, and `ds-break-ui` for difficult content and states.
-They can be installed or read through the configured DS MCP server. This guide
+Use ADS skills for implementation workflows: `ads-designer` for UI changes,
+`ads-assimilate` for a library reference, `ads-import` for another project's DS,
+`ads-motion` for animation, and `ads-break-ui` for difficult content and states.
+They can be installed or read through the configured ADS MCP server. This guide
 records Reqvire-specific conventions; shared architecture belongs to the
-[DS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/DS.md).
+[ADS tooling contract](https://github.com/reqvire-org/design-system/blob/main/docs/ADS.md).
 
 [ds.config.json](../ds.config.json) identifies this directory and the public
 `@ds` alias. It registers Toast usage rules and the Sonner import restriction,
@@ -179,7 +179,7 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 ## Scenarios and MCP showcase
 
 Run `npm run dev:showcase` from `explorer/`, or open the MCP-reported showcase
-URL. DS owns the neutral host and its Tokens, Components, Patterns and Composition
+URL. ADS owns the neutral host and its Tokens, Components, Patterns and Composition
 navigation. This project owns the compiled Preact views inside its preview App.
 
 Each owner has a colocated `*.scenario.tsx` and `*.fixture.ts` (or `.tsx`).

@@ -8,11 +8,11 @@
       ],
       "env": {}
     },
-    "ds": {
+    "ads": {
       "type": "stdio",
       "command": "node",
       "args": [
-        "explorer/node_modules/@reqvire-org/ds/dist/cli.mjs",
+        "explorer/node_modules/@reqvire-org/ads/dist/cli.mjs",
         "mcp",
         "explorer",
         "--mutations"

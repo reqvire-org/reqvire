@@ -1,9 +1,9 @@
 # Reqvire Explorer design-system guide
 
-Use the DS workflow skills served by the configured MCP server. Start with
-`ds_status`, discover public APIs with `ds_catalog`, and inspect their discovered
+Use the ADS workflow skills served by the configured MCP server. Start with
+`ads_status`, discover public APIs with `ads_catalog`, and inspect their discovered
 scenario IDs before editing. The local source guide is [readme.md](readme.md);
-shared ownership and tooling rules belong to the DS tooling contract.
+shared ownership and tooling rules belong to the ADS tooling contract.
 
 - Owned UI uses native Preact 11 JSX, hooks, DOM events (`onInput` for live text)
   and SVG attributes (`stroke-width`, `vector-effect`). React-only dependencies
@@ -24,9 +24,9 @@ shared ownership and tooling rules belong to the DS tooling contract.
   records and state/callback adapters there. Focused pattern entries own their
   initial fixture settings. Render the same public screen as production; never
   rebuild a second screen from primitives.
-- The showcase shell belongs to DS tooling. Do not add project browser pages,
+- The showcase shell belongs to ADS tooling. Do not add project browser pages,
   navigation replicas or a second preview pipeline. `npm run dev:showcase` starts
-  its MCP runtime and managed compiler. Reuse an existing `ds_status.showcaseUrl`.
+  its MCP runtime and managed compiler. Reuse an existing `ads_status.showcaseUrl`.
 - `showcase/mcp/main.tsx` mounts/unmounts native Preact inside the App iframe.
   The outer host never receives project CSS/runtime. Preserve theme updates,
   independently mountable scenarios and complete teardown of listeners, timers,
@@ -43,7 +43,7 @@ shared ownership and tooling rules belong to the DS tooling contract.
   the owner-local README. Toast's Sonner notice stays in `components/core/toast/`.
 
 MCP guarded editing is enabled in the repository `.mcp.json`. Discover units with
-`ds_units`, read targeted source ranges, and submit one owner as a Git unified
-patch through `ds_apply_patch`. Mandatory architecture, registered lint, type and
+`ads_units`, read targeted source ranges, and submit one owner as a Git unified
+patch through `ads_apply_patch`. Mandatory architecture, registered lint, type and
 preview-build checks run before application. Other editors must run the same
-normal project gates. Local DS development setup is in [../README.md](../README.md).
+normal project gates. Local ADS development setup is in [../README.md](../README.md).

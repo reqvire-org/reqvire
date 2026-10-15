@@ -3,7 +3,7 @@
 `Toast` is the standalone visual primitive. `Toaster` owns the stack and lifecycle;
 `toast` creates notifications from application code. This is a native DS
 implementation with stacking, motion, and input behavior adapted from Sonner's
-source references. The implementation was ported from the DS tooling proof of
+source references. The implementation was ported from the ADS tooling proof of
 concept into Reqvire Explorer; credits and notices stay with this component.
 
 ## References and credits
@@ -204,7 +204,7 @@ Toast-specific Oxlint rules are colocated in
 [toast.oxlint.mjs](toast.oxlint.mjs).
 [oxlint-design-system.mjs](../../../../scripts/oxlint-design-system.mjs) exposes
 them as a project plugin. [ds.config.json](../../../../ds.config.json) registers
-and enables them; `ds lint-config` refreshes ignored `.ds/oxlintrc.json` during
+and enables them; `ads lint-config` refreshes ignored `.ds/oxlintrc.json` during
 `npm run lint:ds` and the normal build. These tooling modules are not exported
 by the runtime barrel or bundled into the application.
 
