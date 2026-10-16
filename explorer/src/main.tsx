@@ -1,5 +1,6 @@
 import { render } from "preact";
 import { App } from "./App";
+import { documentClasses } from "@ds";
 import "../design-system/styles.css";
 
 type MermaidApi = typeof import("mermaid").default;
@@ -69,5 +70,6 @@ function projectStoreSeedCandidates() {
 }
 
 loadProjectStoreSeed().then(() => {
+  document.body.classList.add(...documentClasses().split(" "));
   render(<App />, container);
 });

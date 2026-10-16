@@ -1,4 +1,5 @@
 export { Alert } from "./components/core/Alert";
+export { documentClasses } from "./patterns/shell/DocumentSkin";
 export type { AlertProps } from "./components/core/Alert";
 export { useLatestRef } from "./hooks/useLatestRef";
 export { Badge } from "./components/core/Badge";

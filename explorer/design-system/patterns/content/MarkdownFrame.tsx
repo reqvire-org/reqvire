@@ -91,10 +91,15 @@ const markdownBaseUX = css`
     min-height: var(--control-sm);
     align-items: center;
     justify-content: center;
-    border: var(--border-w) solid transparent;
+    border-width: var(--border-w);
+    border-style: solid;
+    border-color: transparent;
     border-radius: var(--radius-xs);
     padding: 0 var(--space-3);
-    font: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    font-variant: inherit;
+    font-stretch: inherit;
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     line-height: var(--leading-tight);

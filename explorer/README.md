@@ -25,13 +25,19 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.0` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.12` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
+The app, MCP preview compiler and optional design-system bundle share the ADS
+Linaria tag resolver to preserve custom-property arithmetic during extraction.
 `npm run lint` runs shared ADS architecture checks and core/registered Oxlint
 rules (`lint:ds`), then Biome CSS correctness checks (`lint:style`). Build hooks
 refresh ignored `.ds/oxlintrc.json`, validate source, and generate configured
 icons before application and standalone showcase builds. Renderer exceptions
 and non-state hooks are explicit config; Toast usage rules remain component-owned.
+Document presentation is owned by the Linaria `documentClasses()` helper in
+`patterns/shell/DocumentSkin.ts`, applied to the body by both browser mounts.
+Its base cascade layer preserves component precedence and styles portals too.
+The foundation keeps document defaults, native normalization and accessibility.
 For the source-level tour, start with the
 [local design-system guide](design-system/readme.md). Use ADS skills for
 implementation workflows; shared rules belong to the
@@ -163,6 +169,10 @@ resource graph and its managed watcher. Starting ADS MCP also starts the website
 and compiler; use the URL from `ads_status`. Components, styles, fonts and runtime
 execute only inside the sandboxed App. The host's theme selects the project's
 own skin. Failed checks/builds retain the previous preview with stale diagnostics.
+Token fixtures declare literal `{ token, property, probe }` samples. The public
+`TokenSamples` pattern applies each real token to its declared CSS property;
+the App audits the rendered bindings in addition to static coverage. Build
+freshness checks source revisions as well as emitted resources.
 
 ## ADS MCP and showcase
 
@@ -177,14 +187,14 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.0`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.12`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.0 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.12 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or

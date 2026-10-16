@@ -5,10 +5,11 @@ import { css, cx } from "@linaria/atomic";
 import { SearchInput } from "../../components/controls/SearchInput";
 
 export type TokenSampleName = `--${string}`;
+export interface TokenSampleBinding { token: TokenSampleName; property: string; probe: string; }
 export type TokenSampleKind = "color" | "text" | "typography" | "spacing" | "shadow" | "shape" | "value";
 export interface TokenSamplesProps {
   title: string;
-  tokens: readonly TokenSampleName[];
+  samples: readonly TokenSampleBinding[];
   kind: TokenSampleKind;
   text: string;
   compactText: string;
@@ -29,10 +30,10 @@ const layout = css`
   .ux-token-summary:focus-visible { outline: var(--focus-w) solid var(--border-focus); outline-offset: var(--focus-offset); }
   .ux-token-name { font-family: var(--font-mono); font-size: var(--text-caption); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .ux-token-grid[data-kind="typography"] .ux-token-name, .ux-token-grid[data-kind="spacing"] .ux-token-name { flex: 0 0 var(--space-showcase-input-demo-lg-w); white-space: normal; overflow-wrap: anywhere; }
-  .ux-token-grid[data-kind="value"] .ux-token-summary { display: grid; grid-template-columns: minmax(0, var(--space-showcase-input-demo-lg-w)) minmax(0, 1fr); align-items: start; }
-  .ux-token-grid[data-kind="value"] .ux-token-name { white-space: normal; overflow-wrap: anywhere; }
-  .ux-token-grid[data-kind="value"] .ux-token-note { font-family: var(--font-mono); overflow-wrap: anywhere; }
-  .ux-token-grid[data-kind="value"] [data-effect="color"] { display: none; }
+  .ux-token-grid[data-kind="value"] .ux-token-summary { display: grid; grid-template-columns: minmax(0, var(--space-showcase-input-demo-lg-w)) minmax(0, 1fr) minmax(0, 1fr); align-items: center; }
+  .ux-token-grid[data-kind="value"] .ux-token-name { grid-column: 1; grid-row: 1; white-space: normal; overflow-wrap: anywhere; }
+  .ux-token-grid[data-kind="value"] [data-effect] { grid-column: 2; grid-row: 1; }
+  .ux-token-grid[data-kind="value"] .ux-token-note { grid-column: 3; grid-row: 1; font-family: var(--font-mono); overflow-wrap: anywhere; }
   .ux-token-grid[data-kind="shadow"] .ux-token-summary { flex-direction: column; align-items: stretch; }
   .ux-token-grid[data-kind="shadow"] .ux-token-name { white-space: normal; overflow-wrap: anywhere; }
   .ux-token-value { margin: var(--space-6) 0; padding: var(--space-6); border: var(--border-w) solid var(--border-subtle); border-radius: var(--radius-xs); overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--text-caption); }
@@ -47,10 +48,20 @@ const layout = css`
     .ux-token-summary { flex-wrap: wrap; }
     .ux-token-grid[data-kind="typography"] .ux-token-name, .ux-token-grid[data-kind="spacing"] .ux-token-name { flex-basis: 100%; }
     .ux-token-grid[data-kind="value"] .ux-token-summary { grid-template-columns: minmax(0, 1fr); }
+    .ux-token-grid[data-kind="value"] .ux-token-summary > * { grid-column: auto; grid-row: auto; }
   }
 `;
 
 const sampleStyle = css`
+  position: relative;
+  &[data-effect="z-index"] { z-index: var(--ux-token-sample-value); }
+  &[data-effect="filter"] { filter: var(--ux-token-sample-value); }
+  &[data-effect="animation-duration"] { animation-duration: var(--ux-token-sample-value); }
+  &[data-effect="animation-timing-function"] { animation-timing-function: var(--ux-token-sample-value); }
+  &[data-effect="opacity"] { opacity: var(--ux-token-sample-value); }
+  &[data-effect="margin"] { margin: var(--ux-token-sample-value); }
+  &[data-effect="margin-top"] { margin-top: var(--ux-token-sample-value); }
+  &[data-effect="grid-template-columns"] { display: inline-grid; grid-template-columns: var(--ux-token-sample-value); gap: var(--space-2); }
   display: inline-block;
   flex: none;
   max-width: 100%;
@@ -68,30 +79,20 @@ const sampleStyle = css`
   &[data-effect="radius"] { width: var(--space-32); height: var(--space-32); border: var(--border-w) solid var(--border-default); border-radius: var(--ux-token-sample-value); }
 `;
 
-function Sample({ token, children, className, ...props }: { token: TokenSampleName; children?: ComponentChildren; className?: string; "data-effect": string; "aria-hidden"?: "true" }) {
+function Sample({ token, property, children, className, ...props }: { token: TokenSampleName; property: string; children?: ComponentChildren; className?: string; "data-effect": string; "aria-hidden"?: "true" }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => { ref.current?.style.setProperty("--ux-token-sample-value", `var(${token})`); }, [token]);
-  return <span ref={ref} className={cx(sampleStyle, className)} {...props}>{children}</span>;
+  return <span ref={ref} className={cx(sampleStyle, className)} data-ads-token={token} data-ads-property={property} {...props}>{children}</span>;
 }
 
-function effect(token: TokenSampleName, value: string, kind: TokenSampleKind) {
-  if (typeof CSS === "undefined" || !value) return "value";
-  if (CSS.supports("color", value)) return kind === "text" ? "text" : "color";
-  if (kind === "typography") {
-    if (token.startsWith("--font-") && CSS.supports("font-family", value)) return "font";
-    if ((token.startsWith("--weight-") || token.endsWith("-weight")) && CSS.supports("font-weight", value)) return "weight";
-    if (token.startsWith("--leading-") && CSS.supports("line-height", value)) return "leading";
-    if (token.startsWith("--tracking-") && CSS.supports("letter-spacing", value)) return "tracking";
-    if (CSS.supports("font-size", value)) return "size";
-  }
-  if (kind === "shadow" && CSS.supports("box-shadow", value)) return "shadow";
-  if (kind === "shape" && token.startsWith("--radius-") && CSS.supports("border-radius", value)) return "radius";
-  if (kind === "spacing" && CSS.supports("width", value)) return "spacing";
-  return "value";
+function effect(property: string) {
+  const roles: Record<string, string> = { "background-color": "color", "color": "text", "font-family": "font", "font-size": "size", "font-weight": "weight", "line-height": "leading", "letter-spacing": "tracking", "width": "spacing", "box-shadow": "shadow", "border-radius": "radius" };
+  return roles[property] ?? property;
 }
 
 /** Project-owned review pattern. Inputs name real tokens; foundation CSS supplies values. */
-export function TokenSamples({ title, tokens, kind, text, compactText, multilineText }: TokenSamplesProps) {
+export function TokenSamples({ title, samples, kind, text, compactText, multilineText }: TokenSamplesProps) {
+  const tokens = samples.map(sample => sample.token);
   const [search, setSearch] = useState("");
   const [values, setValues] = useState<Record<string, string>>({});
   useEffect(() => {
@@ -100,20 +101,23 @@ export function TokenSamples({ title, tokens, kind, text, compactText, multiline
     const observer = new MutationObserver(read);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     return () => observer.disconnect();
-  }, [tokens]);
+  }, [samples]);
   const visible = tokens.filter(token => token.toLowerCase().includes(search.toLowerCase()));
   const primary = kind === "spacing" ? visible.filter(token => /^--space-\d+$/.test(token)) : kind === "typography" ? visible.filter(token => /^--(?:text-|font-)/.test(token)) : visible;
   const secondary = visible.filter(token => !primary.includes(token));
   function renderToken(token: TokenSampleName) {
       const value = values[token] ?? "";
-      const mode = effect(token, value, kind);
+      const property = samples.find(sample => sample.token === token)!.property;
+      const mode = effect(property);
       return <details key={token} data-token={token}>
         <summary className="ux-token-summary" title={`${token}: ${value}`}>
-          {mode === "color" && <Sample token={token} data-effect={mode} aria-hidden="true" />}
-          {mode === "text" && <Sample token={token} data-effect={mode} className="ux-token-contexts" aria-hidden="true"><span className="ux-token-light">{compactText}</span><span className="ux-token-dark">{compactText}</span></Sample>}
+          {mode === "color" && <Sample token={token} property={property} data-effect={mode} aria-hidden="true" />}
+          {mode === "text" && <Sample token={token} property={property} data-effect={mode} className="ux-token-contexts" aria-hidden="true"><span className="ux-token-light">{compactText}</span><span className="ux-token-dark">{compactText}</span></Sample>}
           <code className="ux-token-name">{token}{mode === "spacing" ? ` — ${value}` : ""}</code>
-          {["size", "font", "weight", "leading", "tracking"].includes(mode) && <Sample token={token} data-effect={mode}>{mode === "leading" ? multilineText : text}</Sample>}
-          {["spacing", "shadow", "radius"].includes(mode) && <Sample token={token} data-effect={mode} aria-hidden="true" />}
+          {["size", "font", "weight", "leading", "tracking"].includes(mode) && <Sample token={token} property={property} data-effect={mode}>{mode === "leading" ? multilineText : text}</Sample>}
+          {["spacing", "shadow", "radius"].includes(mode) && <Sample token={token} property={property} data-effect={mode} aria-hidden="true" />}
+          {mode === "grid-template-columns" && <Sample token={token} property={property} data-effect={mode}><span>{compactText}</span><span>{compactText}</span></Sample>}
+          {!["color", "text", "size", "font", "weight", "leading", "tracking", "spacing", "shadow", "radius", "grid-template-columns"].includes(mode) && <Sample token={token} property={property} data-effect={mode}>{compactText}</Sample>}
           {(mode === "value" || kind === "value") && <span className="ux-token-note">{value || "Conditional or unset"}</span>}
         </summary>
         <p className="ux-token-value">{value || "Conditional or unset"}</p>

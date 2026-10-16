@@ -4,17 +4,17 @@ export const fixture = {
   "text": "The quick brown fox jumps over the lazy dog",
   "compactText": "Aa",
   "multilineText": "The quick brown fox\njumps over the lazy dog",
-  "tokens": [
-    "--bg-active",
-    "--bg-canvas",
-    "--bg-floating",
-    "--bg-hover",
-    "--bg-overlay",
-    "--bg-rail",
-    "--bg-raised",
-    "--bg-scrim",
-    "--bg-selected",
-    "--bg-sunken",
-    "--bg-surface"
+  "samples": [
+    {"token":"--bg-active","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-canvas","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-floating","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-hover","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-overlay","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-rail","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-raised","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-scrim","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-selected","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-sunken","property":"background-color","probe":"rgb(31, 97, 163)"},
+    {"token":"--bg-surface","property":"background-color","probe":"rgb(31, 97, 163)"}
   ]
 } as const;

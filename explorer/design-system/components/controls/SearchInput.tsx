@@ -87,7 +87,7 @@ const skinX = css`
 const sizeLgUX = css`
   .ds-search__input {
     height: var(--control-lg);
-    padding-left: calc(var(--space-16) + var(--space-3));
+    padding: var(--ds-search-input-p, 0 var(--space-8) 0 calc(var(--space-16) + var(--space-3)));
     font-size: var(--text-base);
   }
 

@@ -17,7 +17,8 @@ export const sideContentAppClass = css`
   width: 100%;
   height: 100%;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
 `;
 
 export const treeClass = css`
@@ -34,7 +35,10 @@ export const treeClass = css`
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 0 0 var(--space-7);
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: var(--space-7);
+  padding-left: 0;
   scrollbar-gutter: stable;
 `;
 
@@ -57,7 +61,10 @@ export const treeTabMarkClass = css`
 export const globalSearchClass = css`
   box-sizing: border-box;
   flex: 0 0 auto;
-  margin: var(--space-12) var(--side-pane-content-inset-inline) var(--side-pane-search-content-gap);
+  margin-top: var(--space-12);
+  margin-right: var(--side-pane-content-inset-inline);
+  margin-bottom: var(--side-pane-search-content-gap);
+  margin-left: var(--side-pane-content-inset-inline);
 `;
 
 export const globalSearchControlClass = css`
@@ -77,7 +84,10 @@ export const paneControlsClass = css`
   gap: var(--space-4);
   overflow-x: hidden;
   overflow-y: auto;
-  padding: var(--space-6) var(--side-pane-content-inset-inline) var(--space-7);
+  padding-top: var(--space-6);
+  padding-right: var(--side-pane-content-inset-inline);
+  padding-bottom: var(--space-7);
+  padding-left: var(--side-pane-content-inset-inline);
   scrollbar-gutter: stable;
   --ds-togglerow-jc: flex-start;
   --ds-togglerow-min-h: var(--control-md);
@@ -103,7 +113,10 @@ export const paneControlsClass = css`
 
 export const paneControlsTitleClass = css`
   box-sizing: border-box;
-  margin: 0 0 var(--space-7);
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: var(--space-7);
+  margin-left: 0;
   font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
   letter-spacing: 0;
@@ -123,8 +136,14 @@ export const paneSummaryClass = css`
 export const paneSummaryFooterClass = css`
   box-sizing: border-box;
   flex: 0 0 auto;
-  margin: auto 0 0;
-  padding: var(--space-12) var(--side-pane-content-inset-inline) var(--space-12);
+  margin-top: auto;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  padding-top: var(--space-12);
+  padding-right: var(--side-pane-content-inset-inline);
+  padding-bottom: var(--space-12);
+  padding-left: var(--side-pane-content-inset-inline);
 `;
 
 export const summaryClass = css`
@@ -144,7 +163,8 @@ export const summaryClass = css`
 
   .ux-summary__label {
     min-width: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     color: var(--text-muted);
     font-size: var(--text-caption);
     text-overflow: ellipsis;
@@ -168,7 +188,8 @@ export const paneNavListClass = css`
 
 export const paneNavRowLabelClass = css`
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-overflow: ellipsis;
@@ -183,7 +204,10 @@ export const paneNavRowClass = css`
   gap: var(--space-5);
   width: 100%;
   min-height: var(--control-md);
-  padding: 0 var(--space-5);
+  padding-top: 0;
+  padding-right: var(--space-5);
+  padding-bottom: 0;
+  padding-left: var(--space-5);
   appearance: none;
   border: 0;
   border-radius: var(--radius-md);
@@ -228,7 +252,6 @@ export const paneNavRowCountClass = css`
   height: var(--control-xs);
   align-items: center;
   justify-content: center;
-  padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
@@ -240,7 +263,10 @@ export const paneActionRowClass = css`
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-5);
-  margin: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
 `;
 
 export const paneGhostLinkClass = css`
@@ -249,7 +275,10 @@ export const paneGhostLinkClass = css`
   height: var(--control-sm);
   align-items: center;
   gap: var(--space-4);
-  padding: 0 var(--space-6);
+  padding-top: 0;
+  padding-right: var(--space-6);
+  padding-bottom: 0;
+  padding-left: var(--space-6);
   border-radius: var(--radius-sm);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
@@ -281,7 +310,10 @@ export const paneLegendRowClass = css`
   align-items: center;
   gap: var(--space-6);
   min-height: var(--control-sm);
-  padding: 0 var(--space-7);
+  padding-top: 0;
+  padding-right: var(--space-7);
+  padding-bottom: 0;
+  padding-left: var(--space-7);
 `;
 
 export const paneLegendTextClass = css`
@@ -331,10 +363,17 @@ export const paneSelectedElementLinkClass = css`
   gap: var(--space-3);
   border: var(--border-w) solid var(--border-default);
   border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-6);
+  padding-top: var(--space-2);
+  padding-right: var(--space-6);
+  padding-bottom: var(--space-2);
+  padding-left: var(--space-6);
   background: var(--bg-surface);
   color: var(--text-body);
-  font: inherit;
+  font-family: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+  font-stretch: inherit;
+  line-height: inherit;
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-align: left;
@@ -362,7 +401,8 @@ export const paneSelectionNameClass = css`
   box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 `;
@@ -370,9 +410,13 @@ export const paneSelectionNameClass = css`
 export const paneSelectionKindClass = css`
   box-sizing: border-box;
   flex: 0 0 auto;
-  overflow: visible;
+  overflow-x: visible;
+  overflow-y: visible;
   border-radius: var(--radius-pill);
-  padding: var(--space-1) var(--space-3);
+  padding-top: var(--space-1);
+  padding-right: var(--space-3);
+  padding-bottom: var(--space-1);
+  padding-left: var(--space-3);
   background: var(--bg-sunken);
   color: var(--text-muted);
   font-size: var(--text-micro);
@@ -388,7 +432,10 @@ export const paneSelectionOpenClass = css`
 
 export const paneSelectionHintClass = css`
   box-sizing: border-box;
-  margin: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
   color: var(--text-muted);
   font-size: var(--text-caption);
 `;
@@ -396,7 +443,10 @@ export const paneSelectionHintClass = css`
 export const paneSectionLabelClass = css`
   box-sizing: border-box;
   display: block;
-  margin: var(--space-6) 0 var(--space-2);
+  margin-top: var(--space-6);
+  margin-right: 0;
+  margin-bottom: var(--space-2);
+  margin-left: 0;
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tracking-pane-chrome-letter-spacing);
@@ -423,7 +473,8 @@ export const baseUX = css`
   width: var(--ux-current-left-width);
   box-sizing: border-box;
   flex-direction: row;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: hidden;
 
   &.is-standalone {
     --ux-left-pane-width: var(--space-left-pane-width);
@@ -445,7 +496,6 @@ export const baseUX = css`
     justify-content: center;
     padding-top: var(--space-5);
     border: 0;
-    border-left: 0;
     cursor: pointer;
   }
 
@@ -492,8 +542,14 @@ export const baseUX = css`
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    margin: var(--space-4) 0 0;
-    padding: var(--space-2);
+    margin-top: var(--space-4);
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: var(--space-2);
+    padding-right: var(--space-2);
+    padding-bottom: var(--space-2);
+    padding-left: var(--space-2);
     list-style: none;
     scrollbar-gutter: stable;
   }
@@ -512,7 +568,10 @@ export const baseUX = css`
     width: 100%;
     box-sizing: border-box;
     gap: var(--space-1);
-    padding: var(--space-3) var(--space-4);
+    padding-top: var(--space-3);
+    padding-right: var(--space-4);
+    padding-bottom: var(--space-3);
+    padding-left: var(--space-4);
     border: 0;
     border-radius: var(--radius-sm);
     text-align: left;
@@ -533,7 +592,10 @@ export const baseUX = css`
     min-width: 0;
     gap: var(--space-3);
     border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
+    padding-top: var(--space-3);
+    padding-right: var(--space-4);
+    padding-bottom: var(--space-3);
+    padding-left: var(--space-4);
     cursor: pointer;
     font-size: var(--text-caption);
     list-style: none;
@@ -554,7 +616,8 @@ export const baseUX = css`
   .${globalSearchResultsClass} .ontology-graph-result-label,
   .ontology-graph-results .ontology-graph-result-label {
     min-width: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -569,7 +632,10 @@ export const baseUX = css`
     height: var(--control-xs);
     border-radius: var(--radius-pill);
     border: var(--border-w) solid var(--border-subtle);
-    padding: 0 var(--space-3);
+    padding-top: 0;
+    padding-right: var(--space-3);
+    padding-bottom: 0;
+    padding-left: var(--space-3);
     font-size: var(--text-micro);
     font-weight: var(--weight-bold);
     line-height: 1;
@@ -579,7 +645,10 @@ export const baseUX = css`
     display: grid;
     flex: 0 0 auto;
     gap: var(--space-4);
-    padding: var(--space-6) var(--side-pane-content-inset-inline) var(--space-7);
+    padding-top: var(--space-6);
+    padding-right: var(--side-pane-content-inset-inline);
+    padding-bottom: var(--space-7);
+    padding-left: var(--side-pane-content-inset-inline);
     --ds-togglerow-jc: flex-start;
     --ds-togglerow-min-h: var(--control-md);
     --ds-togglerow-border: 0;
@@ -604,11 +673,17 @@ export const baseUX = css`
 
   .ux-app & .${paneControlsClass} {
     gap: var(--stack-gap-compact);
-    padding: var(--space-8) var(--side-pane-content-inset-inline) var(--space-16);
+    padding-top: var(--space-8);
+    padding-right: var(--side-pane-content-inset-inline);
+    padding-bottom: var(--space-16);
+    padding-left: var(--side-pane-content-inset-inline);
   }
 
   .${paneControlsTitleClass} {
-    margin: 0 0 var(--space-7);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: var(--space-7);
+    margin-left: 0;
     font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     letter-spacing: 0;
@@ -617,7 +692,10 @@ export const baseUX = css`
 
   .${paneSectionLabelClass} {
     display: block;
-    margin: var(--space-6) 0 var(--space-2);
+    margin-top: var(--space-6);
+    margin-right: 0;
+    margin-bottom: var(--space-2);
+    margin-left: 0;
     font-size: var(--text-micro);
     font-weight: var(--weight-semibold);
     letter-spacing: var(--tracking-pane-chrome-letter-spacing);
@@ -625,8 +703,14 @@ export const baseUX = css`
   }
 
   .ux-app & .${paneSectionLabelClass} {
-    margin: var(--space-12) 0 var(--space-5);
-    padding: 0 var(--space-2);
+    margin-top: var(--space-12);
+    margin-right: 0;
+    margin-bottom: var(--space-5);
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: var(--space-2);
+    padding-bottom: 0;
+    padding-left: var(--space-2);
     letter-spacing: var(--tracking-label);
     line-height: 1;
   }
@@ -679,26 +763,50 @@ export const baseUX = css`
     flex-wrap: nowrap;
     align-items: stretch;
     gap: var(--space-5);
-    margin: 0 0 var(--space-10);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: var(--space-10);
+    margin-left: 0;
   }
 
   .ux-app & .${paneSummaryClass}.${paneSummaryFooterClass} {
-    margin: auto 0 0;
-    padding: var(--space-12) var(--side-pane-content-inset-inline) var(--space-12);
+    margin-top: auto;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: var(--space-12);
+    padding-right: var(--side-pane-content-inset-inline);
+    padding-bottom: var(--space-12);
+    padding-left: var(--side-pane-content-inset-inline);
   }
 
   .ux-app & .ux-pane-summary--footer {
-    margin: auto 0 0;
-    padding: var(--space-12) var(--side-pane-content-inset-inline) var(--space-12);
+    margin-top: auto;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: var(--space-12);
+    padding-right: var(--side-pane-content-inset-inline);
+    padding-bottom: var(--space-12);
+    padding-left: var(--side-pane-content-inset-inline);
   }
 
   .${paneSummaryClass} .${paneSectionLabelClass} {
-    margin: 0 var(--space-1) 0 0;
+    margin-top: 0;
+    margin-right: var(--space-1);
+    margin-bottom: 0;
+    margin-left: 0;
   }
 
   .ux-app & .${paneSummaryClass} .${paneSectionLabelClass} {
-    margin: 0;
-    padding: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 
   .${paneLegendRowClass} {
@@ -706,7 +814,10 @@ export const baseUX = css`
     align-items: center;
     gap: var(--space-6);
     min-height: var(--control-sm);
-    padding: 0 var(--space-7);
+    padding-top: 0;
+    padding-right: var(--space-7);
+    padding-bottom: 0;
+    padding-left: var(--space-7);
   }
 
   .${paneLegendTextClass} {
@@ -727,7 +838,10 @@ export const baseUX = css`
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0 0 var(--space-7);
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: var(--space-7);
+    padding-left: 0;
     scrollbar-gutter: stable;
   }
 
@@ -753,7 +867,10 @@ export const baseUX = css`
 
   .${treeNodeClass} {
     min-width: 0;
-    margin: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
   }
 
   .${treeNodeClass} > summary {
@@ -767,11 +884,17 @@ export const baseUX = css`
   .${paneSelectedElementClass} {
     display: grid;
     gap: var(--space-5);
-    margin: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
   }
 
   .${paneSelectedElementClass} .${paneSectionLabelClass} {
-    margin: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
   }
 
   .${paneSelectedElementLinkClass} {
@@ -781,7 +904,10 @@ export const baseUX = css`
     align-items: center;
     justify-content: flex-start;
     gap: var(--space-3);
-    padding: var(--space-2) var(--space-6);
+    padding-top: var(--space-2);
+    padding-right: var(--space-6);
+    padding-bottom: var(--space-2);
+    padding-left: var(--space-6);
     border-radius: var(--radius-sm);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
@@ -795,7 +921,8 @@ export const baseUX = css`
 
   .${paneSelectedElementLinkClass} span:last-child {
     min-width: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -814,15 +941,20 @@ export const baseUX = css`
   .${paneSelectionNameClass} {
     flex: 1 1 auto;
     min-width: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .${paneSelectionKindClass} {
     flex: 0 0 auto;
-    overflow: visible;
-    padding: var(--space-1) var(--space-3);
+    overflow-x: visible;
+    overflow-y: visible;
+    padding-top: var(--space-1);
+    padding-right: var(--space-3);
+    padding-bottom: var(--space-1);
+    padding-left: var(--space-3);
     border-radius: var(--radius-pill);
     font-size: var(--text-micro);
     font-weight: var(--weight-semibold);
@@ -834,7 +966,10 @@ export const baseUX = css`
   }
 
   .${paneSelectionHintClass} {
-    margin: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
     font-size: var(--text-caption);
   }
 
@@ -842,7 +977,10 @@ export const baseUX = css`
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-5);
-    margin: 0;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
   }
 
   .${paneGhostLinkClass} {
@@ -850,7 +988,10 @@ export const baseUX = css`
     height: var(--control-sm);
     align-items: center;
     gap: var(--space-4);
-    padding: 0 var(--space-6);
+    padding-top: 0;
+    padding-right: var(--space-6);
+    padding-bottom: 0;
+    padding-left: var(--space-6);
     border-radius: var(--radius-sm);
     font-size: var(--text-caption);
     font-weight: var(--weight-medium);

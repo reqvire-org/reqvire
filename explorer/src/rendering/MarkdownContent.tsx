@@ -900,6 +900,7 @@ function initializeMermaidInteraction(container: HTMLDivElement, sourceCode: str
   svg.addEventListener("pointermove", onPointerMove);
   svg.addEventListener("pointerup", onPointerUp);
   svg.addEventListener("pointercancel", onPointerUp);
+  svg.addEventListener("lostpointercapture", onPointerUp);
   enableMermaidEdgeHighlight(svg);
 
   return () => {
@@ -910,6 +911,7 @@ function initializeMermaidInteraction(container: HTMLDivElement, sourceCode: str
     svg.removeEventListener("pointermove", onPointerMove);
     svg.removeEventListener("pointerup", onPointerUp);
     svg.removeEventListener("pointercancel", onPointerUp);
+    svg.removeEventListener("lostpointercapture", onPointerUp);
   };
 }
 

@@ -11,7 +11,9 @@ const baseUX = css`
   align-items: flex-start;
   gap: var(--space-5);
   padding: var(--space-7) var(--space-8);
-  border: var(--border-w) solid var(--border-subtle);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--border-subtle);
   border-radius: var(--radius-md);
 
   svg {

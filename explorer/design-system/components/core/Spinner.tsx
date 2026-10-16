@@ -28,8 +28,9 @@ const baseUX = css`
 `;
 
 const skinX = css`
-  border: var(--border-w) solid var(--border-default);
-  border-top-color: var(--accent);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--accent) var(--border-default) var(--border-default);
   color: var(--accent);
 `;
 

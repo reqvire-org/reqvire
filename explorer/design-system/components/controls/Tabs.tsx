@@ -86,7 +86,10 @@ const tabSkinUnderlineX = css`
 const skinPillX = css`
   gap: var(--space-2);
   padding: calc(var(--space-1) + var(--border-w));
-  border: 0;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
   border-radius: var(--radius-md);
   background: var(--bg-sunken);
 `;

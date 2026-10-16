@@ -188,7 +188,7 @@ export const relationListUX = css`
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   column-gap: var(--space-5);
-  gap: var(--stack-gap-compact);
+  row-gap: var(--stack-gap-compact);
 `;
 
 export const relationDisclosureBaseUX = css`
@@ -280,8 +280,6 @@ export const inlineConceptReferenceBaseUX = css`
   border-radius: 0;
   padding: 0;
   font: inherit;
-  font-weight: inherit;
-  line-height: inherit;
   vertical-align: baseline;
   text-decoration-line: underline;
   text-decoration-style: dotted;

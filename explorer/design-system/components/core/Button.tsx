@@ -19,7 +19,9 @@ const baseUX = css`
   justify-content: center;
   gap: var(--space-4);
   padding: 0 var(--space-8);
-  border: var(--border-w) solid transparent;
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-family: var(--font-sans);
@@ -159,7 +161,9 @@ const iconUX = css`
 const linkSkinX = css`
   height: auto;
   padding: var(--space-2) 0;
-  border: 0;
+  border-width: 0;
+  border-style: none;
+  border-color: currentColor;
   background: transparent;
   color: var(--text-secondary);
 

@@ -67,6 +67,9 @@
   --toast-width: 356px;
   --toast-swipe-threshold: 45px;
 
+  --space-breadcrumb-item-max-w: 28ch;
+  --space-modal-description-max-w: 76ch;
+
   /* Borders */
   --border-w:       1px;
   --border-w-2:     1.5px;

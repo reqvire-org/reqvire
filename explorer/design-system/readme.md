@@ -46,7 +46,7 @@ showcase mount the same project-owned implementation.
 ## Source and tooling
 
 Use ADS skills for implementation workflows: `ads-designer` for UI changes,
-`ads-assimilate` for a library reference, `ads-import` for another project's DS,
+`ads-migrate` for a library reference, `ads-import` for another project's DS,
 `ads-motion` for animation, and `ads-break-ui` for difficult content and states.
 They can be installed or read through the configured ADS MCP server. This guide
 records Reqvire-specific conventions; shared architecture belongs to the
@@ -78,11 +78,23 @@ to hex values because Mermaid's parser does not accept CSS variables.
 
 The application and showcase HTML entries contain document mount mechanics
 only: full-height `html`, `body` and `#root`, plus body overflow. Foundation
-typography, colors, reset and scrollbar rules live in `tokens/base.css`.
+defaults, colors and resets live in `tokens/base.css`. Scoped document styling,
+including scrollbars, lives in `patterns/shell/DocumentSkin.ts` and its public
+`documentClasses()` helper; both browser mounts apply it to the body.
 DOM tests load the real `styles.css?inline` through Vite; the
 [test setup](../src/test/setupCssTokens.ts) unwraps its base cascade layer for
 jsdom without synthesizing token values. Browser/build checks inspect the real
 CSS and Linaria output.
+
+Atomic styles use matching property names across composed bases and variants.
+Separate border width/style/color, use paired logical padding sides for tree
+indentation, keep side-pane margins/padding/overflow in consistent longhands,
+and avoid resetting `font` or `gap` alongside their individual overrides.
+The SearchInput padding hook replaces the complete padding in either size;
+the large size supplies its wider icon inset as the default. ToggleRow combines
+its disabled label decoration, color and thickness into one declaration.
+Review actual computed styles in built component and composition scenarios,
+including hover, selected/disabled states, themes and RTL tree indentation.
 
 ---
 
@@ -183,8 +195,9 @@ URL. ADS owns the neutral host and its Tokens, Components, Patterns and Composit
 navigation. This project owns the compiled Preact views inside its preview App.
 
 Each owner has a colocated `*.scenario.tsx` and `*.fixture.ts` (or `.tsx`).
-Token fixtures enumerate all real foundation names and use the public
-`TokenSamples` review pattern; computed CSS supplies values. `composition/Workspace/`
+Token fixtures declare literal `{ token, property, probe }` bindings for all real
+foundation names and use the public `TokenSamples` review pattern. The App checks
+the rendered effects against those probes; computed CSS supplies values. `composition/Workspace/`
 contains the larger fixture workspace and reusable local state/callback adapter.
 Focused screen/navigation entries supply their own view/mode through local fixtures.
 The compiler adapter is `showcase/mcp/main.tsx`; it unmounts the native root on

@@ -302,7 +302,6 @@
     --scroll-thumb:   var(--slate-300);
     --scroll-track:   transparent;
 
-    color-scheme: light;
   }
 
   /* ── Dark theme — navy-slate ────────────────────────────────────
@@ -363,11 +362,10 @@
       --focus-ring:    rgba(251,113,133,0.55);
       --scroll-thumb:  #2f3b4c;
 
-      color-scheme: dark;
     }
   }
 
-  [data-theme="dark"], .dark {
+  :root[data-theme="dark"], :root.dark {
     --color-role-capability-ink:    #90caf9;
     --color-role-requirement-ink:   #b39ddb;
     --color-role-contract-ink:      #ffb74d;
@@ -420,7 +418,6 @@
     --focus-ring:    rgba(251,113,133,0.55);
     --scroll-thumb:  #2f3b4c;
 
-    color-scheme: dark;
   }
 }
 

@@ -65,9 +65,10 @@ beforeEach(() => {
   Object.defineProperty(SVGElement.prototype, "getBBox", { configurable: true, value: () => ({ x: 0, y: 0, width: 100, height: 28 }) });
   vi.stubGlobal("ResizeObserver", class {
     targets = new Set<Element>();
-    notify = () => this.callback([...this.targets].map(target => ({ target })));
-    constructor(private callback: (entries: { target: Element }[]) => void) {}
-    observe(target: Element) { this.targets.add(target); resizeNotifications.add(this.notify); queueMicrotask(() => { if (this.targets.has(target)) this.callback([{ target }]); }); }
+    entry = (target: Element) => ({ target, contentRect: new DOMRect(0, 0, (target as HTMLElement).offsetWidth, (target as HTMLElement).offsetHeight) });
+    notify = () => this.callback([...this.targets].map(this.entry));
+    constructor(private callback: (entries: Pick<ResizeObserverEntry, "target" | "contentRect">[]) => void) {}
+    observe(target: Element) { this.targets.add(target); resizeNotifications.add(this.notify); queueMicrotask(() => { if (this.targets.has(target)) this.callback([this.entry(target)]); }); }
     unobserve(target: Element) { this.targets.delete(target); }
     disconnect() { this.targets.clear(); resizeNotifications.delete(this.notify); }
   });

@@ -15,11 +15,22 @@ shared ownership and tooling rules belong to the ADS tooling contract.
   branding are project-owned. No inline visual styles or consumer overrides of
   primitive internals. Measured renderer writes and documented non-state hooks
   are explicitly configured in `../ds.config.json`.
+- Atomic base and variant styles use matching property names: separate border
+  width/style/color, paired start/end padding, individual side-pane spacing and
+  explicit font properties where variants override typography. Keep the existing
+  token hooks. Review computed sizes, colors and states in built previews;
+  portal and variant-tracing limits require rendered inspection too.
 - Colocate `Owner.scenario.tsx` and `Owner.fixture.ts`/`.tsx` with runtime source.
   Scenarios use public `@ds` entities and zero-input default views, with literal
   `scenario` metadata. Helpers use `.scenario-adapter.tsx` or `fixtures/`.
-- Token fixtures enumerate real foundation names and render `TokenSamples`.
-  Keep token metadata and reachable fixture lists complete when changing tokens.
+- Token fixtures declare literal `{ token, property, probe }` samples and render
+  `TokenSamples`. Keep bindings and coverage complete; every sample must visibly
+  apply the real token to its declared property. The App checks rendered effects.
+- Shared document presentation belongs to the Linaria `documentClasses()` helper
+  in `patterns/shell/DocumentSkin.ts`. Both browser mounts apply it to the body,
+  including portals; keep its base cascade layer so component styles win.
+  Token sheets contain definitions. `base.css` has document defaults, native
+  normalization, focus/selection and reduced-motion accessibility only.
 - Larger previews live under `composition/`. Workspace scenarios share normalized
   records and state/callback adapters there. Focused pattern entries own their
   initial fixture settings. Render the same public screen as production; never
@@ -37,7 +48,8 @@ shared ownership and tooling rules belong to the ADS tooling contract.
 - Tests belong beside owners or under `src/test/`; app harnesses remain under
   `src/test/fixtures/`. Use `@/test/render` for Preact 11 cleanup flushing.
 - Run `npm run check`, relevant tests, `npm run build` and preview compilation.
-  After edits, inspect MCP build freshness and the real scenario; source coverage
+  After edits, inspect MCP build freshness (`current`, `stale`, `sourceRevision`)
+  and the real scenario; source coverage
   cannot prove visual, behavioral or production-screen parity.
 - Keep APIs, behavior, validation, source references and applicable licenses in
   the owner-local README. Toast's Sonner notice stays in `components/core/toast/`.

@@ -25,7 +25,9 @@ const baseUX = css`
 
 const skinX = css`
   background: var(--bg-raised);
-  border: var(--border-w) solid var(--border-subtle);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
 `;

@@ -11,7 +11,7 @@ const baseUX = css`
   align-items: center;
   gap: var(--ds-treeitem-gap, var(--space-4));
   padding-block: 0;
-  padding-inline: var(--ds-treeitem-pr, var(--space-6));
+  padding-inline-end: var(--ds-treeitem-pr, var(--space-6));
   padding-inline-start: calc(var(--ds-treeitem-pl-base, var(--space-5)) + var(--ds-treeitem-depth-indent, var(--space-0)));
   border-left: var(--ds-treeitem-border-l, var(--border-w-thick) solid transparent);
   border-radius: var(--ds-treeitem-radius, 0);

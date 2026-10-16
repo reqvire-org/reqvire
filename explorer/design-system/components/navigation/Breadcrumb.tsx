@@ -20,7 +20,7 @@ const baseUX = css`
   .ds-crumbs__item {
     display: inline-flex;
     min-width: 0;
-    max-width: 28ch;
+    max-width: var(--space-breadcrumb-item-max-w);
     align-items: center;
     overflow: hidden;
     text-overflow: ellipsis;

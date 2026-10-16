@@ -106,7 +106,8 @@ const baseUX = css`
     height: var(--ux-trace-node-height);
     padding: var(--space-6);
     gap: var(--space-4);
-    border: var(--border-w) solid;
+    border-width: var(--border-w);
+    border-style: solid;
     border-radius: var(--radius-lg);
   }
   .ux-trace-flow-node-identity {
@@ -124,7 +125,10 @@ const baseUX = css`
     overflow: hidden;
     min-width: 0;
     text-align: left;
-    font: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    font-variant: inherit;
+    font-stretch: inherit;
     font-size: var(--text-base);
     font-weight: var(--weight-semibold);
     line-height: var(--leading-snug);

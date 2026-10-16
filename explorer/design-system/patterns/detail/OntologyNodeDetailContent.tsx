@@ -626,7 +626,9 @@ const ontologyTermSkinX = css`
 `;
 
 const ontologyRdfBadgeSkinX = css`
-  border: var(--border-w) solid var(--border-default);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--border-default);
   background: var(--bg-surface);
   color: var(--text-secondary);
 `;

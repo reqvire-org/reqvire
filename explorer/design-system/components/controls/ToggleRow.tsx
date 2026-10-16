@@ -114,9 +114,7 @@ const skinX = css`
   }
 
   &.is-off .ds-togglerow__label {
-    text-decoration: var(--ds-togglerow-off-label-td, none);
-    text-decoration-color: var(--ds-togglerow-off-label-td-color);
-    text-decoration-thickness: var(--ds-togglerow-off-label-td-w);
+    text-decoration: var(--ds-togglerow-off-label-td, none) var(--ds-togglerow-off-label-td-color, currentColor) var(--ds-togglerow-off-label-td-w, auto);
   }
 
   &.is-off .ds-togglerow__swatch {
@@ -158,7 +156,8 @@ const skinLineX = css`
 
   .ds-togglerow__swatch {
     height: 0;
-    border-top: var(--border-w-thick) solid;
+    border-top-width: var(--border-w-thick);
+    border-top-style: solid;
     border-color: var(--ds-togglerow-line-swatch-border, var(--ds-token-swatch-color, currentColor));
     border-radius: 0;
     background: var(--ds-togglerow-line-swatch-bg, transparent) !important;

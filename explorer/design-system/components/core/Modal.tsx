@@ -93,7 +93,7 @@ const titleBaseUX = css`
 `;
 
 const descriptionBaseUX = css`
-  max-width: 76ch;
+  max-width: var(--space-modal-description-max-w);
   color: var(--text-body);
   font-size: var(--text-base);
   line-height: var(--leading-normal);

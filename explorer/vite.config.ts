@@ -1,6 +1,7 @@
 import path from "path";
 import { defineConfig } from "vite";
 import wyw from "@wyw-in-js/vite";
+import { linariaTagResolver } from "@reqvire-org/ads/linaria";
 import { preactAliases, preactRuntimeGuard } from "./preact.config";
 import { assetMergePlugin } from "./design-system/vite.assetMerge";
 
@@ -25,6 +26,7 @@ export default defineConfig({
       label: "Explorer",
     }),
     wyw({
+      tagResolver: linariaTagResolver,
       include: ["**/*.{ts,tsx}"],
       exclude: ["**/node_modules/**"],
     }),
