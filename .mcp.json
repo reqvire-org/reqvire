@@ -25,7 +25,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@reqvire-org/ads@0.3.12",
+        "@reqvire-org/ads@0.3.13",
         "mcp",
         "explorer",
         "--mutations"

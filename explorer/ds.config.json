@@ -230,6 +230,9 @@
       ]
     },
     "apps": [],
-    "showcaseTitle": "Reqvire Design System"
+    "showcaseTitle": "Reqvire Design System",
+    "capture": {
+      "channel": "chrome"
+    }
   }
 }

@@ -25,7 +25,7 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.12` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.13` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
 The app, MCP preview compiler and optional design-system bundle share the ADS
 Linaria tag resolver to preserve custom-property arithmetic during extraction.
@@ -187,16 +187,26 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.12`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.13`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.12 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.13 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
 `npm --silent run ads-read-mcp` to keep stdout exclusive to JSON-RPC. Restart the
 MCP connection after changing client configuration or upgrading ADS.
+
+For visual review through MCP, discover a scenario with `ads_scenarios` and call
+`ads_capture` with its exact ID. Screenshot-enabled patch/transaction dry runs
+produce current/candidate PNG resources without applying source changes. Captures
+are requested explicitly; ADS retains at most these two slots per scenario/target.
+Read `ads://guides/captures` for settings, named targets and resource freshness.
+The project declares Playwright as a development dependency and configures
+`mcp.capture.channel: "chrome"`, which requires a locally installed Google Chrome.
+To use Playwright Chromium instead, remove that channel setting and run
+`npx playwright install chromium` from `explorer/`.

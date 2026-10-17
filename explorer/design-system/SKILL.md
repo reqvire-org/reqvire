@@ -58,4 +58,9 @@ MCP guarded editing is enabled in the repository `.mcp.json`. Discover units wit
 `ads_units`, read targeted source ranges, and submit one owner as a Git unified
 patch through `ads_apply_patch`. Mandatory architecture, registered lint, type and
 preview-build checks run before application. Other editors must run the same
-normal project gates. Local ADS development setup is in [../README.md](../README.md).
+normal project gates. Use `ads_capture` with a discovered scenario ID for an
+on-demand screenshot. A guarded dry run with `screenshot: true` and explicit
+`captures` selections produces current/candidate images without applying source.
+Read the returned PNG resources and freshness metadata; images do not replace
+behavior checks. Load the served `ads://guides/captures` reference for the full
+contract. Local ADS development setup is in [../README.md](../README.md).
