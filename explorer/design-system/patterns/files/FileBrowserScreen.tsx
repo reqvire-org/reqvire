@@ -7,6 +7,8 @@ import { FileBrowserFrame, FileBrowserToolbar, FileBrowserMissingFile,
 
 export interface FileBrowserScreenProps extends Omit<FileBrowserToolbarProps, "resultCount">,
   Pick<FileBrowserListProps, "items" | "sortKey" | "sortDirection" | "onSort" | "onOpenFile"> {
+  /** Grid navigation when the consumer has not supplied in-place selection. Table rows retain native links. */
+  onNavigateFile: (path: string) => void;
   missingPath?: string;
   elements?: readonly { id: string; name: string; type?: string; family?: string }[];
   onOpenElement: (id: string) => void;
@@ -15,13 +17,13 @@ export interface FileBrowserScreenProps extends Omit<FileBrowserToolbarProps, "r
 
 /** Shared production file/grid screen; file selection and routing are adapters. */
 export function FileBrowserScreen({ missingPath, items, sortKey, sortDirection, onSort,
-  onOpenFile, onOpenElement, elements, preview, ...toolbar }: FileBrowserScreenProps) {
+  onOpenFile, onNavigateFile, onOpenElement, elements, preview, ...toolbar }: FileBrowserScreenProps) {
   return <RouteFrame viewId="files"><FileBrowserFrame>
     <FileBrowserToolbar {...toolbar} resultCount={items.length} />
     {missingPath ? <FileBrowserMissingFile path={missingPath} /> : <>
       {toolbar.layout === "list" ? <FileBrowserList items={items} sortKey={sortKey}
         sortDirection={sortDirection} onSort={onSort} onOpenFolder={toolbar.onOpenFolder} onOpenFile={onOpenFile} />
-        : <FileBrowserGrid items={items} onOpenFolder={toolbar.onOpenFolder} onOpenFile={onOpenFile} />}
+        : <FileBrowserGrid items={items} onOpenFolder={toolbar.onOpenFolder} onOpenFile={onOpenFile ?? onNavigateFile} />}
       <FileBrowserElementsPanel>
         {elements === undefined ? <FileBrowserEmptyState>Select a file row to inspect its modeled elements.</FileBrowserEmptyState>
           : elements.length === 0 ? preview

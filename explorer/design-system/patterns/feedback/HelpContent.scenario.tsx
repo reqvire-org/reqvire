@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { Button, ElementDetailMissingState, HelpContent, HelpDialog, StoreNotice } from "@ds";
 import { fixture } from "./HelpContent.fixture";
-export const scenario = {"title":"Feedback Patterns","covers":["ShowcaseRegion","HelpContent","ElementDetailMissingState","StoreNotice","HelpDialog"]};
+export const scenario = {"title":"Feedback Patterns",covers: ["HelpContent","ElementDetailMissingState","StoreNotice","HelpDialog"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

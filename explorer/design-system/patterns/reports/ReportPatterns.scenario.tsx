@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { DetailDialog, ElementDetailContent, CoverageDashboard, CoverageDrilldown, CoveragePanel } from "@ds";
 import { fixture, COVERAGE_PATTERN_ITEMS, SHOWCASE_DETAIL_ELEMENTS } from "./ReportPatterns.fixture";
-export const scenario = {"title":"Coverage Drill-down","covers":["ShowcaseRegion","CoverageDashboard","CoveragePanel","CoverageDrilldown"]};
+export const scenario = {"title":"Coverage Drill-down",covers: ["CoverageDashboard","CoveragePanel","CoverageDrilldown"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

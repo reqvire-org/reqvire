@@ -1,8 +1,8 @@
 import type { ComponentChildren } from "preact";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { Badge, Button } from "@ds";
 import { fixture } from "./Badge.fixture";
-export const scenario = {"title":"Badge","covers":["Badge","Button"]};
+export const scenario = {"title":"Badge",covers: ["Badge","Button"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

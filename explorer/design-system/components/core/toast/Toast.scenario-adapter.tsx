@@ -1,4 +1,4 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { Button, ToggleRow, Toast, toast, type ToastOptions, type ToastPosition } from "@ds";
 import { useToastDemoSettings } from "./settings.scenario-adapter";

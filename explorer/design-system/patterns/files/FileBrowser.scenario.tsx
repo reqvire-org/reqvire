@@ -1,8 +1,8 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { type ComponentChildren } from "preact";
 import { FileBrowserFrame, FileBrowserList, FileBrowserToolbar } from "@ds";
 import { fixture, FILE_BROWSER_BREADCRUMBS, FILE_BROWSER_ITEMS } from "./FileBrowser.fixture";
-export const scenario = {"title":"File Browser","covers":["ShowcaseRegion","FileBrowserFrame","FileBrowserToolbar","FileBrowserList"]};
+export const scenario = {"title":"File Browser",covers: ["FileBrowserFrame","FileBrowserToolbar","FileBrowserList"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

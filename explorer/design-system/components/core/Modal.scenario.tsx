@@ -1,10 +1,10 @@
 import type { ComponentChildren } from "preact";
 import { TextLink } from "@ds";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { Button, Icon, Modal, ModalBody, ModalDescription, ModalClose, ModalContent, ModalFooter, ModalHeader, ModalTitle } from "@ds";
 import { fixture } from "./Modal.fixture";
-export const scenario = {"title":"Modal","covers":["Button","Modal","ModalContent","ModalHeader","ModalTitle","ModalBody","ModalDescription","ModalFooter","TextLink","Icon","ModalClose"]};
+export const scenario = {"title":"Modal",covers: ["Button","Modal","ModalContent","ModalHeader","ModalTitle","ModalBody","ModalDescription","ModalFooter","TextLink","Icon","ModalClose"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

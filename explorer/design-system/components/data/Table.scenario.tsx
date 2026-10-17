@@ -1,8 +1,8 @@
 import type { ComponentChildren } from "preact";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { CodeRef, Table, TableBody, TableCell, TableHeaderCell, TableHeaderGroup, TableRow, TableSortButton, TableViewport } from "@ds";
 import { fixture, TABLE_ROWS } from "./Table.fixture";
-export const scenario = {"title":"Table","covers":["TableViewport","Table","TableHeaderGroup","TableRow","TableHeaderCell","TableSortButton","TableBody","TableCell","CodeRef"]};
+export const scenario = {"title":"Table",covers: ["TableViewport","Table","TableHeaderGroup","TableRow","TableHeaderCell","TableSortButton","TableBody","TableCell","CodeRef"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

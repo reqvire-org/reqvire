@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ExplorerFixtureApp as MockShell } from "./fixtures/ExplorerFixtureApp";
-import WorktreeSelectorScenario from "../../design-system/patterns/shell/WorktreeSelector.scenario";
+import WorktreeSelectorScenario from "../../design-system/components/controls/WorktreeSelector.scenario";
 import WorktreeDialogScenario from "../../design-system/patterns/shell/WorktreeLoadDialog.scenario";
-const ProductPatternsPage = () => <><WorktreeSelectorScenario /><WorktreeDialogScenario /></>;
+const WorktreePreviews = () => <><WorktreeSelectorScenario /><WorktreeDialogScenario /></>;
 
 // Coverage uses the real application. JSDOM only substitutes unavailable WebGL and worker APIs.
 vi.mock("../views/GraphLibraryViews", () => ({ KnowledgeGraphView: () => null }));
@@ -95,8 +95,8 @@ describe("showcase application coverage", () => {
     } finally { view.unmount(); history.replaceState(null, "", "/"); }
   });
 
-  it("previews branch labels and unavailable choices in Patterns", () => {
-    const view = render(<ProductPatternsPage />);
+  it("previews branch labels and unavailable choices in Components", () => {
+    const view = render(<WorktreePreviews />);
     try {
       const selector = screen.getAllByRole("combobox", { name: "Branch" })[0];
       expectBranch("main");
@@ -110,7 +110,7 @@ describe("showcase application coverage", () => {
 
   it("previews real worktree dialogs with connection, validation and refresh diagnostics", () => {
     vi.useFakeTimers();
-    const view = render(<ProductPatternsPage />);
+    const view = render(<WorktreePreviews />);
     try {
       fireEvent.click(screen.getByRole("button", { name: "Preview worktree loading" }));
       const loading = screen.getByRole("dialog", { name: "Loading worktree" });

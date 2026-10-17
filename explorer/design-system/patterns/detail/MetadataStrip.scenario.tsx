@@ -1,7 +1,8 @@
-import { ShowcaseRegion, MetadataStrip } from "@ds";
+import { MetadataStrip } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./MetadataStrip.fixture";
-export const scenario = {"title": "MetadataStrip", "covers": ["MetadataStrip"]};
+export const scenario = {"title": "MetadataStrip", covers: ["MetadataStrip"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

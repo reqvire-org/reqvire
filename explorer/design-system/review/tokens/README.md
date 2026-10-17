@@ -1,6 +1,6 @@
 # Token samples
 
-Project-owned token review pattern. Receives literal `{ token, property, probe }`
+Project-owned token review helper. Receives literal `{ token, property, probe }`
 samples and text from colocated scenario fixtures, and reads values from the real foundation CSS.
 Theme changes refresh computed values. The measured sample boundary writes only
 `--ux-token-sample-value`; presentation remains in this pattern's Linaria styles.

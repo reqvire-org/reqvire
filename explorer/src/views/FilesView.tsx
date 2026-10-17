@@ -172,7 +172,8 @@ export function FilesView({
     selectedFile={selectedFile && selectedFileLabel ? { name: selectedFileLabel, title: selectedFile.display_path || selectedFile.path } : undefined}
     layout={layout} showResultCount={!stateDriven} onOpenFolder={openFolder} onLayoutChange={changeLayout}
     items={browserItems} sortKey={sortKey} sortDirection={sortDirection} onSort={updateSort}
-    onOpenFile={stateDriven ? openFile : undefined} onOpenElement={onOpenElement}
+    onOpenFile={stateDriven ? openFile : undefined}
+    onNavigateFile={filePath => { window.location.hash = routeForFile(filePath); }} onOpenElement={onOpenElement}
     missingPath={path && !selectedFile ? path : undefined}
     elements={selectedFile?.element_ids.map(id => { const element = elementById(id);
       return { id, name: element?.name ?? id, type: element?.element_type, family: element?.type_family };

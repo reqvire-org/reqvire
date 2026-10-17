@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { InlineConceptReference, OntologyNodeDetailDialog } from "@ds";
 import { fixture, ONTOLOGY_NODES, ONTOLOGY_REQUIREMENT_NODE } from "./InlineConceptReference.fixture";
-export const scenario = {"title":"Inline concept reference","covers":["ShowcaseRegion","InlineConceptReference","OntologyNodeDetailDialog"]};
+export const scenario = {"title":"Inline concept reference",covers: ["InlineConceptReference","OntologyNodeDetailDialog"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

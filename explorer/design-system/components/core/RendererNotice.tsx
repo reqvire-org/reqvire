@@ -77,8 +77,8 @@ export function RendererNotice({
   if (inline) {
     return (
       <span
-        className={cx("ux-renderer-notice", inlineUX, inlineSkinX, className)}
-        data-product-pattern="renderer-notice"
+        className={cx("ds-renderer-notice", inlineUX, inlineSkinX, className)}
+        data-component="renderer-notice"
         data-tone={tone}
         {...(props as (HTMLAttributes<HTMLSpanElement> & { className?: string }))}
       >
@@ -90,8 +90,8 @@ export function RendererNotice({
 
   return (
     <div
-      className={cx("ux-renderer-notice", blockUX, blockSkinX, className)}
-      data-product-pattern="renderer-notice"
+      className={cx("ds-renderer-notice", blockUX, blockSkinX, className)}
+      data-component="renderer-notice"
       data-tone={tone}
       {...(props as (HTMLAttributes<HTMLDivElement> & { className?: string }))}
     >

@@ -15,7 +15,7 @@ and mocks compose public DS patterns with local fixture data. Full application
 integration harnesses and their route/store tests live under `src/test/`.
 
 The header/navigation adapts the DS tooling repository's working example:
-https://github.com/reqvire-org/ads/tree/main/design-system/patterns/showcase
+https://github.com/reqvire-org/ads/tree/main/design-system/review/showcase
 Its MIT notice is retained in `LICENSE.source.md`. This source is project-owned;
 the installed DS tool does not supply a UI catalogue.
 

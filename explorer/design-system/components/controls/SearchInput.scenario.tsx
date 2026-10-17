@@ -1,9 +1,9 @@
 import type { ComponentChildren } from "preact";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { SearchInput } from "@ds";
 import { fixture } from "./SearchInput.fixture";
-export const scenario = {"title":"SearchInput","covers":["SearchInput"]};
+export const scenario = {"title":"SearchInput",covers: ["SearchInput"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useEffect, useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { Button, WorktreeLoadDialog } from "@ds";
 import { fixture, SHOWCASE_WORKTREE_DIALOGS } from "./WorktreeLoadDialog.fixture";
-export const scenario = {"title":"Worktree Loading and Errors","covers":["ShowcaseRegion","WorktreeLoadDialog"]};
+export const scenario = {"title":"Worktree Loading and Errors",covers: ["WorktreeLoadDialog"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

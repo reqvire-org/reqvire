@@ -30,6 +30,19 @@ and automatic-refresh errors. The compact dialog left-aligns its heading and
 labelled branch context, separates recovery guidance from selectable diagnostic
 details, and keeps Close visible when lengthy details scroll.
 
+## Components and patterns
+
+Components provide one cohesive UI capability, including the branch/worktree
+selector and renderer notices. Patterns arrange components and content slots into
+reusable structures and workflows: the Explorer workspace, search, report screens,
+and document frames. Components can reuse components; their count does not decide
+the layer. Application adapters own store access, route state and navigation
+callbacks. Scenarios can compose several controls to demonstrate one capability.
+
+`WorktreeSelector` is reviewed at `?scenario=components/controls/WorktreeSelector`;
+`RendererNotice` at `?scenario=components/core/RendererNotice`. Public imports remain
+available through `@ds`.
+
 ## Toast notifications
 
 Use the local `Toaster` and `toast` exports for transient feedback.
@@ -208,3 +221,11 @@ Every public renderable export and declared token must have reachable scenario
 coverage. Preview metadata does not establish behavior: inspect standalone views,
 interactions, dark/light themes, cleanup and constrained sizes in the real host.
 Full application providers, routes and network/store tests belong under `src/test/`.
+
+## Development review UI
+
+Demo framing and token renderers live in `review/`, imported through `@ds/review`.
+They are absent from the production public entry and product catalogue. Scenarios
+render the actual components/patterns with fixture inputs. Application code must
+not import review implementations, types or styles. Preview mounting stays inside
+the MCP App; the host shell contains no project runtime or styling.

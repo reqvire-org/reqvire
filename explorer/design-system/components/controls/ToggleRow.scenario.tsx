@@ -1,8 +1,8 @@
 import type { ComponentChildren } from "preact";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { ToggleRow } from "@ds";
 import { fixture } from "./ToggleRow.fixture";
-export const scenario = {"title":"ToggleRow","covers":["ToggleRow"]};
+export const scenario = {"title":"ToggleRow",covers: ["ToggleRow"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

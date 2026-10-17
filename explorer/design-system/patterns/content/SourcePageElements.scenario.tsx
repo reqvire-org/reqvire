@@ -1,7 +1,8 @@
-import { ShowcaseRegion, SourcePageElements, SourcePageElement } from "@ds";
+import { SourcePageElements, SourcePageElement } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./SourcePageElements.fixture";
-export const scenario = {"title": "SourcePageElements", "covers": ["SourcePageElements", "SourcePageElement"]};
+export const scenario = {"title": "SourcePageElements", covers: ["SourcePageElements", "SourcePageElement"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

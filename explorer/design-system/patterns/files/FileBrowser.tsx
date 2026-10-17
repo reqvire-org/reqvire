@@ -71,7 +71,8 @@ export interface FileBrowserListProps {
 export interface FileBrowserGridProps {
   items: FileBrowserItem[];
   onOpenFolder: (path: string) => void;
-  onOpenFile?: (path: string) => void;
+  /** The consumer owns navigation or in-place selection for file cards. */
+  onOpenFile: (path: string) => void;
 }
 
 export interface FileBrowserElementsPanelProps {
@@ -842,26 +843,20 @@ function FileBrowserContentLink({
 function openFileBrowserItem(
   item: FileBrowserItem,
   onOpenFolder: (path: string) => void,
-  onOpenFile?: (path: string) => void,
+  onOpenFile: (path: string) => void,
 ) {
   if (item.kind === "folder") {
     onOpenFolder(item.path);
     return;
   }
-  if (onOpenFile) {
-    onOpenFile(item.path);
-    return;
-  }
-  if (item.href) {
-    window.location.hash = item.href.startsWith("#") ? item.href.slice(1) : item.href;
-  }
+  onOpenFile(item.path);
 }
 
 function handleFileBrowserCardKeyDown(
   event: TargetedKeyboardEvent<HTMLDivElement>,
   item: FileBrowserItem,
   onOpenFolder: (path: string) => void,
-  onOpenFile?: (path: string) => void,
+  onOpenFile: (path: string) => void,
 ) {
   if (event.key !== "Enter" && event.key !== " ") return;
   event.preventDefault();

@@ -1,7 +1,8 @@
-import { ShowcaseRegion, Spinner } from "@ds";
+import { Spinner } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./Spinner.fixture";
-export const scenario = {"title": "Spinner", "covers": ["Spinner"]};
+export const scenario = {"title": "Spinner", covers: ["Spinner"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

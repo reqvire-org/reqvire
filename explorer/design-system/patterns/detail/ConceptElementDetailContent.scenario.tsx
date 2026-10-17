@@ -1,7 +1,8 @@
-import { ShowcaseRegion, ConceptElementDetailContent } from "@ds";
+import { ConceptElementDetailContent } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./ConceptElementDetailContent.fixture";
-export const scenario = {"title": "ConceptElementDetailContent", "covers": ["ConceptElementDetailContent"]};
+export const scenario = {"title": "ConceptElementDetailContent", covers: ["ConceptElementDetailContent"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

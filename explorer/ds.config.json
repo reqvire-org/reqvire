@@ -107,7 +107,7 @@
         ]
       },
       {
-        "file": "design-system/patterns/tokens/TokenSamples.tsx",
+        "file": "design-system/review/tokens/TokenSamples.tsx",
         "properties": [
           "--ux-token-sample-value"
         ]

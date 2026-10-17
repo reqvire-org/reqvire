@@ -1,7 +1,8 @@
-import { ShowcaseRegion, TextLink } from "@ds";
+import { TextLink } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./TextLink.fixture";
-export const scenario = {"title": "TextLink", "covers": ["TextLink"]};
+export const scenario = {"title": "TextLink", covers: ["TextLink"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

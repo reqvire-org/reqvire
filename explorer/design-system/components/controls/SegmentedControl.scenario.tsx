@@ -1,9 +1,9 @@
 import type { ComponentChildren } from "preact";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { Icon, SegmentedControl } from "@ds";
 import { fixture } from "./SegmentedControl.fixture";
-export const scenario = {"title":"SegmentedControl","covers":["SegmentedControl","Icon"]};
+export const scenario = {"title":"SegmentedControl",covers: ["SegmentedControl","Icon"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

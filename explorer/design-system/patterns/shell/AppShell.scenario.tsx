@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { AppShell, SidePaneFrame, WorktreeSelector } from "@ds";
 import { fixture, SHOWCASE_WORKTREES, SHELL_PATTERN_NAVIGATION, SHELL_PATTERN_ACTIONS } from "./AppShell.fixture";
-export const scenario = {"title":"Explorer Shell","covers":["ShowcaseRegion","AppShell","WorktreeSelector","SidePaneFrame"]};
+export const scenario = {"title":"Explorer Shell",covers: ["AppShell","SidePaneFrame"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

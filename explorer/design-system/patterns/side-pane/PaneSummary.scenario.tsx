@@ -1,7 +1,8 @@
-import { ShowcaseRegion, PaneSummary } from "@ds";
+import { PaneSummary } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./PaneSummary.fixture";
-export const scenario = {"title": "PaneSummary", "covers": ["PaneSummary"]};
+export const scenario = {"title": "PaneSummary", covers: ["PaneSummary"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

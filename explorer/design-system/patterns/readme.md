@@ -9,6 +9,13 @@ the primitive `ds-*` component layer and below app containers.
 - `patterns/` owns reusable UX/product patterns, `ux-*` hooks, and `--ux-*` product variables.
 - Product patterns may accept domain-shaped data and callbacks.
 - Product patterns must not import from `src/` or use application store/router hooks.
+- A component provides one cohesive UI capability; a pattern arranges capabilities
+  into a reusable structure or workflow. Component count is not a classification rule.
+  `WorktreeSelector` and `RendererNotice` live in `components/`; the workspace and
+  document patterns compose them through public APIs. Layout parts may arrange slots
+  without importing other components.
+- Navigation destinations and navigation callbacks come from the application.
+  Patterns render supplied links or invoke callbacks rather than writing router state.
 - UI-owned renderer and layout services may use browser APIs and local workers. Keep their lifecycles cancellable and graph-only dependencies lazy. Application data caches, worktree loading and routing remain application-owned.
 - Application and showcase code import product patterns from the public `@ds` barrel.
 

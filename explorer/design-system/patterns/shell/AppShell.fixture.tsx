@@ -1,5 +1,5 @@
 import type { WorktreeSelectorProps } from "@ds";
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { type ShellActionItem, type ShellNavigationItem } from "@ds";
 
 export const fixture = {"title":"Explorer Shell","description":"Shared shell with pane-aligned branding and view tabs, and a branch control at the far right after header actions. The real Explorer mock supports pane resizing and collapse with this same header."};

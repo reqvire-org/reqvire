@@ -1,7 +1,8 @@
-import { ShowcaseRegion, PaneActionRow, Button, PaneGhostLink } from "@ds";
+import { PaneActionRow, Button, PaneGhostLink } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./PaneActionRow.fixture";
-export const scenario = {"title": "PaneActionRow", "covers": ["PaneActionRow", "PaneGhostLink"]};
+export const scenario = {"title": "PaneActionRow", covers: ["PaneActionRow", "PaneGhostLink"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

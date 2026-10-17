@@ -1,8 +1,8 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { type ComponentChildren } from "preact";
 import { ResourceDetailCard, ResourceEmptyState, ResourcePageHeader, ResourceList } from "@ds";
 import { fixture } from "./ResourcePatterns.fixture";
-export const scenario = {"title":"Resources","covers":["ShowcaseRegion","ResourcePageHeader","ResourceList","ResourceDetailCard","ResourceEmptyState"]};
+export const scenario = {"title":"Resources",covers: ["ResourcePageHeader","ResourceList","ResourceDetailCard","ResourceEmptyState"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

@@ -8,6 +8,7 @@ import { ExplorerSidePane } from "../components/ExplorerSidePane";
 import { ExplorerUiStateProvider, useExplorerUiState } from "../state/ExplorerUiState";
 import type { ExplorerProjectStore } from "../store/types";
 import * as fileTrees from "../lib/fileTrees";
+import { FileBrowserGrid } from "@ds";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -48,6 +49,26 @@ function renderFilesWithStore(store: typeof devFixture, path: string | null = nu
 beforeEach(() => { localStorage.clear(); window.history.replaceState(null, "", "/#/model"); });
 
 describe("FilesView", () => {
+  it.each(["click", "Enter", " "])("routes grid file activation through the application (%s)", action => {
+    renderFiles("system-model/Specifications.md");
+    const row = screen.getAllByRole("link").find(link => link.getAttribute("href") === "#/files/system-model/Specifications.md")!;
+    expect(row.getAttribute("href")).toBe("#/files/system-model/Specifications.md");
+    fireEvent.click(screen.getByRole("button", { name: "Grid", exact: true }));
+    const card = screen.getByRole("button", { name: "Open Specifications.md" });
+    if (action === "click") fireEvent.click(card);
+    else fireEvent.keyDown(card, { key: action });
+    expect(window.location.hash).toBe("#/files/system-model/Specifications.md");
+  });
+
+  it("lets the grid consumer choose file behavior without changing the route", () => {
+    const onOpenFile = vi.fn();
+    render(<FileBrowserGrid items={[{ kind: "file", id: "item", name: "Item.md", path: "Item.md",
+      displayPath: "Item.md", elementCount: 0, childCount: 0, href: "#/other-route" }]}
+      onOpenFolder={vi.fn()} onOpenFile={onOpenFile} />);
+    fireEvent.click(screen.getByRole("button", { name: "Open Item.md" }));
+    expect(onOpenFile).toHaveBeenCalledExactlyOnceWith("Item.md");
+    expect(window.location.hash).toBe("#/model");
+  });
   it("keeps filtering and the selected element current without rebuilding file topology", () => {
     const sidebarBuild = vi.spyOn(fileTrees, "buildProjectFileTree");
     const managerBuild = vi.spyOn(fileTrees, "buildFileManagerModel");

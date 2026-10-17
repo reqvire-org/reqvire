@@ -1,8 +1,9 @@
-import { ShowcaseRegion, PaneResizer } from "@ds";
+import { PaneResizer } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 
 import { fixture } from "./PaneResizer.fixture";
-export const scenario = {"title": "PaneResizer", "covers": ["PaneResizer"]};
+export const scenario = {"title": "PaneResizer", covers: ["PaneResizer"]};
 export default function Scenario() {
 const [width,setWidth] = useState(320);
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

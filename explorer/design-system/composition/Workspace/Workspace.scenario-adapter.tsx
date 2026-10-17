@@ -152,7 +152,7 @@ files: {breadcrumbs:crumbs,layout:modelMode === "list" ? "list" : "grid",showRes
         selectedFile:selectedFile?{name:selectedFile.name,title:selectedFile.displayPath}:undefined,
         onOpenFolder:path=>setSelection(path==="__root__"?path:`folder:${path}`),onLayoutChange:setModelMode,
         items:browserItems,sortKey,sortDirection,onSort:key=>{if(key===sortKey)setSortDirection(value=>value==="asc"?"desc":"asc");else{setSortKey(key);setSortDirection("asc");}},
-        onOpenFile:path=>setSelection(`file:${path}`),onOpenElement:openElement,
+        onOpenFile:path=>setSelection(`file:${path}`),onNavigateFile:path=>setSelection(`file:${path}`),onOpenElement:openElement,
         elements:selectedFile?.element_ids.map(id=>({id,name:elementById(id)?.name??id,type:elementById(id)?.element_type,family:elementById(id)?.type_family}))},
 fileNavigation: {tree:fixture.tree as FileNavigationFolder,elementById,activeView:view,onNavigate:navigate,
         onOpenElement:openElement,modelMode,modelSelectionId:selection,setModelSelectionId:setSelection,

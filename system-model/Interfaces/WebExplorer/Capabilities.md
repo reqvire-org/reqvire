@@ -57,9 +57,9 @@ Selection SHALL resolve the branch to an existing or newly created isolated work
 
 #### Relations
   * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
+  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/components/controls/WorktreeSelector.tsx)
   * satisfiedBy: [AppShell.tsx](../../../explorer/design-system/patterns/shell/AppShell.tsx)
   * satisfiedBy: [WorktreeLoadDialog.tsx](../../../explorer/design-system/patterns/shell/WorktreeLoadDialog.tsx)
-  * satisfiedBy: [WorktreeSelector.tsx](../../../explorer/design-system/patterns/shell/WorktreeSelector.tsx)
   * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
   * satisfiedBy: [ExplorerUiState.tsx](../../../explorer/src/state/ExplorerUiState.tsx)
   * satisfiedBy: [manifestRefresh.ts](../../../explorer/src/store/manifestRefresh.ts)
@@ -683,9 +683,9 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/patterns/reports/CoverageDrilldown.tsx)
   * satisfiedBy: [CoverageNavigation.tsx](../../../explorer/design-system/patterns/reports/CoverageNavigation.tsx)
+  * satisfiedBy: [CoverageReportScreen.scenario.tsx](../../../explorer/design-system/patterns/reports/CoverageReportScreen.scenario.tsx)
   * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/patterns/reports/ReportPatterns.tsx)
   * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/patterns/side-pane/PaneControls.tsx)
-  * satisfiedBy: [CoverageReportScreen.scenario.tsx](../../../explorer/design-system/patterns/reports/CoverageReportScreen.scenario.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
   * satisfiedBy: [ExplorerSidePane.tsx](../../../explorer/src/components/ExplorerSidePane.tsx)
   * satisfiedBy: [coverage.ts](../../../explorer/src/lib/coverage.ts)

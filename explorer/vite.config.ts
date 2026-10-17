@@ -35,6 +35,7 @@ export default defineConfig({
     dedupe: ["preact"],
     alias: [
       ...preactAliases,
+      { find: "@ds/review", replacement: path.resolve(__dirname, "./design-system/review/index.ts") },
       { find: "@ds", replacement: path.resolve(__dirname, "./design-system/index.ts") },
       { find: "@", replacement: path.resolve(__dirname, "./src") },
     ],

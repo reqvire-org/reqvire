@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { DetailDialog, Button, ElementDetailContent, MarkdownFrame, OntologyMetadata, OntologyNodeDetailContent, OntologyNodeDetailDialog, RelationList, TypeBadge } from "@ds";
 import { fixture, DETAIL_META_BADGES, DETAIL_RELATIONS, ONTOLOGY_COMPACT_NODE, ONTOLOGY_NODES, ONTOLOGY_REQUIREMENT_NODE, PRIMARY_DETAIL_ELEMENT_ID, SHOWCASE_DETAIL_ELEMENTS } from "./ElementDetailContent.fixture";
-export const scenario = {"title":"Detail Patterns","covers":["DetailDialog","ShowcaseRegion","ElementDetailContent","MarkdownFrame","RelationList","OntologyNodeDetailContent","OntologyMetadata","OntologyNodeDetailDialog"]};
+export const scenario = {"title":"Detail Patterns",covers: ["DetailDialog","ElementDetailContent","MarkdownFrame","RelationList","OntologyNodeDetailContent","OntologyMetadata","OntologyNodeDetailDialog"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

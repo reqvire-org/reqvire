@@ -1,7 +1,8 @@
-import { ShowcaseRegion, OntologyConstructRows, OntologyPropertyUsages, OntologySourceList, OntologyTermList } from "@ds";
+import { OntologyConstructRows, OntologyPropertyUsages, OntologySourceList, OntologyTermList } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 import { fixture } from "./OntologyNodeDetailContent.fixture";
-export const scenario = {"title": "OntologyNodeDetailContent", "covers": ["OntologyConstructRows", "OntologyPropertyUsages", "OntologySourceList", "OntologyTermList"]};
+export const scenario = {"title": "OntologyNodeDetailContent", covers: ["OntologyConstructRows", "OntologyPropertyUsages", "OntologySourceList", "OntologyTermList"]};
 export default function Scenario() {
 
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

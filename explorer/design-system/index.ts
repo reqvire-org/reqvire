@@ -170,7 +170,6 @@ export {
   PaneTree,
   PaneTreeNode,
   PaneResizer,
-  RendererNotice,
   ReportEmptyNote,
   ReportRouteLayout,
   ResourceDetailCard,
@@ -327,8 +326,6 @@ export type {
   PaneSummaryProps,
   PaneTreeNodeProps,
   PaneTreeProps,
-  RendererNoticeProps,
-  RendererNoticeTone,
   ReportRouteLayoutProps,
   CoverageNavigationProps,
   CoverageNavigationScope,
@@ -373,14 +370,14 @@ export type {
   TraceVerificationCardProps,
   WorkspaceToolbarProps,
 } from "./patterns";
-export { WorktreeSelector } from "./patterns/shell/WorktreeSelector";
-export type { WorktreeSelectorProps } from "./patterns/shell/WorktreeSelector";
+export { WorktreeSelector } from "./components/controls/WorktreeSelector";
+export type { WorktreeSelectorProps } from "./components/controls/WorktreeSelector";
 
 export { WorktreeLoadDialog } from "./patterns/shell/WorktreeLoadDialog";
 export type { WorktreeLoadDialogProps } from "./patterns/shell/WorktreeLoadDialog";
 
-export { ShowcaseRegion, ShowcaseNavigation, ShowcaseHeader } from "./patterns/showcase/Showcase";
-export type { ShowcaseRegionName, ShowcaseRegionProps, ShowcaseNavigationItem, ShowcaseNavigationProps, ShowcaseHeaderProps } from "./patterns/showcase/Showcase";
+
+
 export { CodeFallback } from "./patterns/content/CodePreviewFrame";
 
 export { TextLink } from "./components/core/TextLink";
@@ -440,5 +437,8 @@ export type { SearchControlsPaneProps, SearchResultKind } from "./patterns/searc
 
 export { flowLayoutEngine } from "./patterns/reports/flowLayoutEngine";
 
-export { TokenSamples } from "./patterns/tokens/TokenSamples";
-export type { TokenSamplesProps, TokenSampleKind, TokenSampleName } from "./patterns/tokens/TokenSamples";
+
+
+
+export { RendererNotice } from "./components/core/RendererNotice";
+export type { RendererNoticeProps, RendererNoticeTone } from "./components/core/RendererNotice";

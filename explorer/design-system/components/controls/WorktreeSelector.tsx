@@ -2,7 +2,7 @@ import { css } from "@linaria/core";
 import { cx } from "@linaria/atomic";
 import { useLayoutEffect, useEffect, useId, useRef, useState } from "preact/hooks";
 import { type TargetedKeyboardEvent } from "preact";
-import { Icon } from "../../components/core/Icon";
+import { Icon } from "../core/Icon";
 
 const selectorClass = css`
   position: relative;
@@ -180,7 +180,7 @@ export function WorktreeSelector({ density = "default", menuAlign = "start", val
     }
   }
 
-  return <div ref={root} data-density={density} className={cx("ux-worktree-selector", selectorClass)} onBlur={event => {
+  return <div ref={root} data-density={density} className={cx("ds-worktree-selector", selectorClass)} onBlur={event => {
     if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) setOpen(false);
   }}>
     <button ref={trigger} type="button" role="combobox" aria-label="Branch" aria-haspopup="listbox"

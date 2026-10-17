@@ -1,8 +1,9 @@
-import { ShowcaseRegion, SearchPageToolbar, SearchResults, SearchEmptyState } from "@ds";
+import { SearchPageToolbar, SearchResults, SearchEmptyState } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 
 import { fixture } from "./SearchPatterns.fixture";
-export const scenario = {"title": "SearchPatterns", "covers": ["SearchPageToolbar", "SearchResults", "SearchEmptyState"]};
+export const scenario = {"title": "SearchPatterns", covers: ["SearchPageToolbar", "SearchResults", "SearchEmptyState"]};
 export default function Scenario() {
 const [query,setQuery] = useState("");
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

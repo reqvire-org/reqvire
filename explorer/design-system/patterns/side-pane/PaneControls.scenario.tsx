@@ -1,8 +1,9 @@
-import { ShowcaseRegion, PaneControlSection, PaneSearchForm, PaneFilterGroup, PaneFilterGrid, ToggleRow, PaneFilterNavList, PaneFilterNavRow } from "@ds";
+import { PaneControlSection, PaneSearchForm, PaneFilterGroup, PaneFilterGrid, ToggleRow, PaneFilterNavList, PaneFilterNavRow } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 
 import { fixture } from "./PaneControls.fixture";
-export const scenario = {"title": "PaneControls", "covers": ["PaneControlSection", "PaneSearchForm", "PaneFilterGroup", "PaneFilterGrid", "PaneFilterNavList", "PaneFilterNavRow"]};
+export const scenario = {"title": "PaneControls", covers: ["PaneControlSection", "PaneSearchForm", "PaneFilterGroup", "PaneFilterGrid", "PaneFilterNavList", "PaneFilterNavRow"]};
 export default function Scenario() {
 const [query,setQuery] = useState(""); const [enabled,setEnabled] = useState(true);
 return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>

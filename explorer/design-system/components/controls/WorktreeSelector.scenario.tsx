@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { WorktreeSelector } from "@ds";
 import { fixture, SHOWCASE_WORKTREES } from "./WorktreeSelector.fixture";
-export const scenario = {"title":"Worktree Selector","covers":["ShowcaseRegion","WorktreeSelector"]};
+export const scenario = {"title":"Worktree Selector",covers: ["WorktreeSelector"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

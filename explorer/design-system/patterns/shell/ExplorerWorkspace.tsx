@@ -1,6 +1,6 @@
 import { forwardRef } from "preact/compat";
 import { AppShell, type AppShellProps, type ShellNavigationItem } from "./AppShell";
-import { WorktreeSelector, type WorktreeSelectorProps } from "./WorktreeSelector";
+import { WorktreeSelector, type WorktreeSelectorProps } from "../../components/controls/WorktreeSelector";
 import { SidePaneFrame } from "../side-pane/SidePaneFrame";
 import { ThesaurusExplorer, type ThesaurusExplorerProps } from "../thesaurus/ThesaurusExplorer";
 import { ThesaurusPane, type ThesaurusPaneProps } from "../thesaurus/ThesaurusPane";

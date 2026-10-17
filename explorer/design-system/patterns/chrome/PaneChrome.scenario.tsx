@@ -1,8 +1,8 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { type ComponentChildren } from "preact";
 import { Icon, PaneChromeHeader, PaneTree, PaneTreeNode, ReqvireRailMark, TreeItem } from "@ds";
 import { fixture, MODEL_TREE_ROWS } from "./PaneChrome.fixture";
-export const scenario = {"title":"Pane Chrome And Trees","covers":["ShowcaseRegion","PaneChromeHeader","ReqvireRailMark","PaneTree","PaneTreeNode"]};
+export const scenario = {"title":"Pane Chrome And Trees",covers: ["PaneChromeHeader","ReqvireRailMark","PaneTree","PaneTreeNode"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

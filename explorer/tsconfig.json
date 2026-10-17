@@ -25,6 +25,9 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@ds/review": [
+        "design-system/review/index.ts"
+      ],
       "@ds": [
         "design-system/index.ts"
       ],

@@ -1,9 +1,9 @@
-import { ShowcaseRegion } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 import { useState } from "preact/hooks";
 import { type ComponentChildren } from "preact";
 import { CodeBody, CodePreviewFrame, CodeToolbar, CodeFallback, DiagramBlockFrame, DocumentPanel, MarkdownFrame, RendererNotice } from "@ds";
 import { fixture, CODE_SAMPLE } from "./DocumentPanel.fixture";
-export const scenario = {"title":"Content Renderer Frames","covers":["ShowcaseRegion","DocumentPanel","MarkdownFrame","DiagramBlockFrame","RendererNotice","CodePreviewFrame","CodeToolbar","CodeBody","CodeFallback"]};
+export const scenario = {"title":"Content Renderer Frames",covers: ["DocumentPanel","MarkdownFrame","DiagramBlockFrame","CodePreviewFrame","CodeToolbar","CodeBody","CodeFallback"]};
 function Section({ title, desc, children }: {
     title: string;
     desc?: string;

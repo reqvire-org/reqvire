@@ -1,6 +1,7 @@
 import { render, type ComponentType } from "preact";
 import "../../styles.css";
-import { documentClasses, ShowcaseRegion } from "@ds";
+import { documentClasses } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
 
 export function mountScenario(Scenario: ComponentType, container: HTMLElement) {
   const classes = documentClasses().split(" ").filter(name => !document.body.classList.contains(name));
