@@ -25,8 +25,10 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.20` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.21` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
+Oxlint is pinned to `1.72.0` so guarded candidate linting also works inside the
+ignored `.ds/` workspace; `1.69.0` can incorrectly select no source files there.
 The app, MCP preview compiler and optional design-system bundle share the ADS
 Linaria tag resolver to preserve custom-property arithmetic during extraction.
 `npm run lint` runs shared ADS architecture checks and core/registered Oxlint
@@ -187,14 +189,14 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.20`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.21`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.20 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.21 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
