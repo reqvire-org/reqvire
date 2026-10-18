@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ExplorerFixtureApp as MockShell } from "./fixtures/ExplorerFixtureApp";
-import WorktreeSelectorScenario from "../../design-system/components/controls/WorktreeSelector.scenario";
-import WorktreeDialogScenario from "../../design-system/patterns/shell/WorktreeLoadDialog.scenario";
+import WorktreeSelectorScenario from "../../design-system/components/controls/WorktreeSelector.ads.scenario";
+import WorktreeDialogScenario from "../../design-system/patterns/shell/WorktreeLoadDialog.ads.scenario";
 const WorktreePreviews = () => <><WorktreeSelectorScenario /><WorktreeDialogScenario /></>;
 
 // Coverage uses the real application. JSDOM only substitutes unavailable WebGL and worker APIs.

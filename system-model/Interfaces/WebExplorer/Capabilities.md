@@ -683,7 +683,7 @@ While demonstrating coverage in the showcase, the system SHALL use the same Cove
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [CoverageDrilldown.tsx](../../../explorer/design-system/patterns/reports/CoverageDrilldown.tsx)
   * satisfiedBy: [CoverageNavigation.tsx](../../../explorer/design-system/patterns/reports/CoverageNavigation.tsx)
-  * satisfiedBy: [CoverageReportScreen.scenario.tsx](../../../explorer/design-system/patterns/reports/CoverageReportScreen.scenario.tsx)
+  * satisfiedBy: [CoverageReportScreen.ads.scenario.tsx](../../../explorer/design-system/patterns/reports/CoverageReportScreen.ads.scenario.tsx)
   * satisfiedBy: [ReportPatterns.tsx](../../../explorer/design-system/patterns/reports/ReportPatterns.tsx)
   * satisfiedBy: [PaneControls.tsx](../../../explorer/design-system/patterns/side-pane/PaneControls.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)

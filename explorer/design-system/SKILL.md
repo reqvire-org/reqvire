@@ -20,9 +20,11 @@ shared ownership and tooling rules belong to the ADS tooling contract.
   explicit font properties where variants override typography. Keep the existing
   token hooks. Review computed sizes, colors and states in built previews;
   portal and variant-tracing limits require rendered inspection too.
-- Colocate `Owner.scenario.tsx` and `Owner.fixture.ts`/`.tsx` with runtime source.
+- Colocate `Owner.ads.scenario.tsx` and `Owner.ads.fixture.ts`/`.tsx` with runtime source.
   Scenarios use public `@ds` entities and zero-input default views, with literal
-  `scenario` metadata. Helpers use `.scenario-adapter.tsx` or `fixtures/`.
+  `scenario` metadata. Helpers use `.ads.helpers.ts[x]`; tests use `.ads.test.ts[x]`.
+  Optional static owner registration lives in `.ads.contract.ts`; reusable demo
+  framing lives in development-only `review/` and is imported from `@ds/review`.
 - Token fixtures declare literal `{ token, property, probe }` samples and render
   `TokenSamples`. Keep bindings and coverage complete; every sample must visibly
   apply the real token to its declared property. The App checks rendered effects.

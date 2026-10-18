@@ -36,7 +36,7 @@ appearance; the comparison below records the current behavioral and visual diffe
 
 ## Reqvire integration
 
-`src/App.tsx` mounts the default toaster across routes. The colocated `../Toast.scenario.tsx`
+`src/App.tsx` mounts the default toaster across routes. The colocated `../Toast.ads.scenario.tsx`
 mounts the same implementation with local settings; Components → Toast notifications
 exercises its public API in the MCP showcase. Existing store, renderer, and worktree errors retain their persistent
 inline/dialog recovery UI. A toast is for transient feedback, not a replacement

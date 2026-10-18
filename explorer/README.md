@@ -25,7 +25,7 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + build:app
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.21` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.24` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
 Oxlint is pinned to `1.72.0` so guarded candidate linting also works inside the
 ignored `.ds/` workspace; `1.69.0` can incorrectly select no source files there.
@@ -160,8 +160,8 @@ Store data and the embedded Vite bundle served by `reqvire serve`.
 The showcase is ADS tooling's minimal MCP client and Apps host. It discovers
 Tokens, Components, Patterns and Composition scenarios; the project owns their
 implementations, fixture inputs and native Preact mount adapter. No second
-catalogue app or hand-maintained registry is needed. Colocated `.scenario.tsx`
-and `.fixture.ts` files render the public `@ds` API. Shared normalized example
+catalogue app or hand-maintained registry is needed. Colocated `.ads.scenario.tsx`
+and `.ads.fixture.ts` files render the public `@ds` API. Shared normalized example
 records and callback adapters live with the workspace composition; focused
 screen scenarios supply their own initial view/mode. Full application route and
 store harnesses remain under `src/test/`.
@@ -189,14 +189,14 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.21`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.24`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.21 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.24 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or

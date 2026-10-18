@@ -207,11 +207,18 @@ Run `npm run dev:showcase` from `explorer/`, or open the MCP-reported showcase
 URL. ADS owns the neutral host and its Tokens, Components, Patterns and Composition
 navigation. This project owns the compiled Preact views inside its preview App.
 
-Each owner has a colocated `*.scenario.tsx` and `*.fixture.ts` (or `.tsx`).
+Each demonstrated owner has a colocated `<Name>.ads.scenario.tsx` and
+`<Name>.ads.fixture.ts` (or `.tsx`). Development adapters use `.ads.helpers.ts[x]`
+and colocated tests use `.ads.test.ts[x]`; none enter the production public entry.
+Optional `<Owner>.ads.contract.ts` files register actual owner token, paint or
+behavior contracts. This project has no legacy JSON owner manifests to convert;
+shared token definitions stay in CSS. `ds.config.json` remains tooling
+configuration, and `.ads.fixture.json` remains ordinary example data.
 Token fixtures declare literal `{ token, property, probe }` bindings for all real
-foundation names and use the public `TokenSamples` review pattern. The App checks
+foundation names and use the project-owned `TokenSamples` review renderer. The App checks
 the rendered effects against those probes; computed CSS supplies values. `composition/Workspace/`
-contains the larger fixture workspace and reusable local state/callback adapter.
+contains `Workspace.ads.scenario.tsx`, its fixtures and `Workspace.ads.helpers.tsx`
+for the larger fixture workspace and reusable local state/callback adapter.
 Focused screen/navigation entries supply their own view/mode through local fixtures.
 The compiler adapter is `showcase/mcp/main.tsx`; it unmounts the native root on
 switch/rebuild. `scripts/build-mcp-previews.mjs` reuses production Vite, Linaria,

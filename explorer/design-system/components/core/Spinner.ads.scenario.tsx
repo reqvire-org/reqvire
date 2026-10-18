@@ -1,0 +1,11 @@
+import { Spinner } from "@ds";
+import { ShowcaseRegion } from "@ds/review";
+
+import { fixture } from "./Spinner.ads.fixture";
+export const scenario = {"title": "Spinner", covers: ["Spinner"]};
+export default function Scenario() {
+
+return <ShowcaseRegion regions={["page"]}><h1>{fixture.title}</h1>
+<Spinner label="Loading project" /><Spinner size="sm" label="Loading compact preview" />
+</ShowcaseRegion>;
+}

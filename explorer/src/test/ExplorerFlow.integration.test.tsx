@@ -1,4 +1,4 @@
-import { testFlowLayoutEngine } from "../../design-system/test/flowLayoutEngine";
+import { testFlowLayoutEngine } from "../../design-system/test/flowLayoutEngine.ads.helpers";
 import { act, cleanup, fireEvent, render, screen, within, waitFor } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ElementFlow, type ElementFlowData } from "@ds";

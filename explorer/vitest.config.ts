@@ -23,7 +23,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     css: true,
-    include: ["src/**/*.{test,spec}.{ts,tsx}", "design-system/*.test.ts", "design-system/patterns/**/*.{test,spec}.{ts,tsx}", "design-system/review/**/*.{test,spec}.{ts,tsx}"],
+    include: ["src/**/*.{test,spec}.{ts,tsx}", "design-system/**/*.ads.{test,spec}.{ts,tsx}"],
     setupFiles: ["src/test/setupCssTokens.ts"],
   },
 });

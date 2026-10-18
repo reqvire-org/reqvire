@@ -186,14 +186,120 @@ Verify automatic refresh through the compiled Explorer in a real browser rather 
 
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [manifestRefresh.test.ts](../../../../explorer/src/store/manifestRefresh.test.ts)
-  * satisfiedBy: [StoreContext.test.tsx](../../../../explorer/src/store/StoreContext.test.tsx)
-  * satisfiedBy: [FilesView.test.tsx](../../../../explorer/src/views/FilesView.test.tsx)
   * satisfiedBy: [SearchIndexContext.test.tsx](../../../../explorer/src/search/SearchIndexContext.test.tsx)
-  * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)
+  * satisfiedBy: [StoreContext.test.tsx](../../../../explorer/src/store/StoreContext.test.tsx)
+  * satisfiedBy: [manifestRefresh.test.ts](../../../../explorer/src/store/manifestRefresh.test.ts)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * satisfiedBy: [FilesView.test.tsx](../../../../explorer/src/views/FilesView.test.tsx)
+  * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Explorer Automatic Store Refresh](../../../Interfaces/WebExplorer/Capabilities.md#explorer-automatic-store-refresh)
+---
+
+### Explorer Design System Styling Demonstration
+
+Demonstrate that the built Explorer uses local design-system CSS, fonts, tokens, and shared controls consistently across its views and showcase mock.
+
+#### Details
+
+##### Demonstration Procedure
+- Open the built, served Explorer and the design-system showcase mock. Disable external network access while allowing the local server, reload, and inspect browser network requests for the local compiled Explorer stylesheet and Geist font assets.
+- Visit Model, Ontologies, Traces, Coverage, Search, and source content. Open element details and a worktree-loading/error pattern, and compare typography, warm-neutral surfaces, semantic colors, buttons, tree rows, badges, tabs, and dialogs with the shared showcase patterns in light and dark themes.
+- Resize the desktop viewport and left pane, and collapse/reopen the pane. Confirm the shared controls and graph legends retain consistent styling and usable placement as the available workspace width changes.
+- Confirm the application and mock use the same component/token treatment rather than separate visual implementations.
+
+##### Acceptance Criteria
+The Explorer remains styled after reload with external networking unavailable; required CSS and font requests are local and successful. Shared controls, typography, semantic colors, and responsive desktop layouts match the design-system patterns across the inspected views. Missing assets, inconsistent component styling, or unusable controls fail the demonstration. Record the build/model revision, inspected views and widths, network observations, and result when performing it.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * verify: [Explorer Design System Styling](../../../Interfaces/WebExplorer/ExplorerRendering.md#explorer-design-system-styling)
+---
+
+### Explorer Model Flow Verification
+
+Verify the Model Flow mode through the same application and design-system patterns used by the showcase.
+
+#### Details
+- Select Flow from the existing Model layout selector, switch between all four modes, and retain the selected folder, file, or element.
+- Select an element and a capability in the left project tree while Flow is active: the right workspace updates to that selection's relation scope and retains the Model route. The detail dialog opens only after activating a Flow card name or body, independently of tree selection.
+- At the project root, assert that Flow starts with root capabilities above their child capabilities and specifying requirements, then descends through requirement decomposition to verification and evidence. Switch to horizontal layout and retain that ordering. Assert corresponding inverse labels for the displayed direction and unchanged canonical store facts; Traces keep their verification-to-ancestor direction.
+- Compare Flow nodes and labelled directed connections with the Project Store, including different element types, evidence endpoints, contract bindings and references, and generated inverse relations. Shared endpoints appear once; different relations between the same endpoints remain distinct.
+- Select a file or folder and assert that its elements and their immediate relation endpoints remain reachable, together with requirement and capability ancestry back to the owning root capabilities. Select an element and assert its full incoming and outgoing paths across repeated splits and merges. Include an isolated element, an empty folder, and a cyclic non-hierarchical relation graph.
+- Switch between horizontal and vertical layout and exercise path focus and clearing. Hover or keyboard-focus a card and inspect full-path highlighting through splits and merges, accent lines and arrowheads, faded unrelated connections, and unchanged card positions.
+- Click a card body and name to open the existing element-detail modal, inspect metadata and incoming/outgoing relations, navigate a related element, go back, and close to the same Flow workspace. Source and focus controls perform their own actions.
+- Confirm React Flow's rendered node wrapper and card accept pointer input while node dragging and selection are disabled. Check pointer eligibility before dispatching card and hover interactions so synthetic events cannot mask a browser hit-testing failure.
+- Render a large Model Flow requiring less than 20% zoom on desktop and narrow canvases. Assert that initial framing and Fit keep all cards inside the canvas in both directions, manual zoom-out remains available, and Fit restores the overview after 100%. Resize the canvas and select a small scope to check updated framing and the 100% fitting cap. Confirm complete layout bounds include connection routes and relation labels.
+- Hold canvas initialization and automatic-fit scheduling in a controlled renderer fixture. Navigation remains unavailable before the current-direction canvas initializes; a user zoom after readiness survives queued animation-frame callbacks. Repeat across a direction change and rapid switch back; delayed initialization callbacks from unmounted canvases cannot replace the current canvas handle.
+- Check connection rendering after wheel and toolbar zoom, pan, Fit, actual size, canvas resizing, and overlay changes. Preserve routing, centered labels, arrowheads, node identity, pinned path, and keyboard focus. Include oversized and zero-sized SVG text measurements in regression tests. Inspect long routes and the compact outlines around label text in the browser immediately after navigation, with the pointer away from cards, to verify continuity at the new scale.
+- Open and close the full-page Flow overlay using its controls and Escape. Assert that scope, direction, pinned path, and canvas identity are retained. Verify overlay keyboard focus containment and focus restoration, usable flow controls, and shared element details above the overlay; closing the detail modal leaves Flow expanded. Source navigation exits to the requested source page.
+- Exercise the shared Flow worker cancellation, isolation, and recovery checks from Explorer Native Trace Flow Verification. In served Explorer, open Model Flow and switch orientation; node identities must survive, and the worker must load from the local packaged asset. Execute the exported worker in a real thread and verify routing, error responses, deterministic output, empty graphs, and a responsive main thread during large layout.
+- Run the projection and application interaction tests, design-system adherence checks, and both Explorer and showcase builds.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [TraceFlow.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.ads.test.ts)
+  * satisfiedBy: [traceFlowLayoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.ads.test.ts)
+  * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
+  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
+  * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
+  * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
+  * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
+  * verify: [Model-Centric View Generation](../../../Interfaces/WebExplorer/Capabilities.md#model-centric-view-generation)
+  * verify: [Model View Element Navigation](../../../Interfaces/WebExplorer/Capabilities.md#model-view-element-navigation)
+---
+
+### Explorer Native Trace Flow Verification
+
+This test verifies production served/exported trace rendering and the shared native trace-flow pattern used by the design-system mock.
+
+#### Details
+- Open the compiled production `#/traces` route in both served and exported Explorer. Assert real React Flow cards and locally packaged worker layout replace the former Mermaid roll-up. Compare all canonical node identifiers and directed labeled edges against the CLI trace projection for reconvergent requirement graphs, directly verified ancestors, owning capabilities, and capability parents. Count unique requirements separately from capabilities.
+- Select a verification and its file overview using the production left pane. File overviews remain interactive without flow preparation or workers for unselected traces. Empty projections and deleted selections remain usable. Unrelated Coverage refreshes reuse shared trace grouping and flow preparation.
+- In the real served/exported browser, exercise direction changes, canonical element-detail routes, modal Close/Back, source-file routes and return to Traces. No navigation reloads the document; actual packaged worker assets are local and load successfully. Repeat graph equality checks after direction changes.
+- Replace immutable trace/element inputs with changed labels, source files, membership, and edges under reused identifiers. Switch workspace/worktree context while old layout is pending and assert cancellation, rejection of delayed results, and absence of the previous context's map. Worker failure exposes retry and successful retry recovers the selected flow.
+- From the Mocks Explorer shell, the Traces navigation item opens the native trace map. Direct loading of `#/traces` and returning from another Explorer view use the same entry point. The mock presents one Explorer navigation menu with shared shell theme controls.
+- A simple trace retains verification-to-requirement `verifies` and child-to-ancestor `derivedFrom` direction.
+- Branching traces merge shared requirement identifiers into one node and count unique requirements, preserving all distinct relations.
+- A trace that splits, merges, splits again, and merges again preserves every relation, including a shortcut across intermediate ranks. Cards and relation labels remain separate, and routed connections avoid unrelated card interiors.
+- Reordering requirements and parent identifiers leaves graph positions and routes unchanged.
+- Compare complete ELK input against the per-node scan semantics for splits/merges, parallel relations, self-loops, isolated nodes, empty graphs, escaped identifiers, and both orientations. Count endpoint reads on increasing sparse graphs to confirm a single edge pass after sorting. Switching direction or replacing topology must not reuse stale ports or mutate input data.
+- The direction control switches between Left to right and Top to bottom. Both preserve node identities, relation direction, counts, branch disclosure, and pinned path focus. ELK layout places incoming/outgoing connections on west/east sides for horizontal flow and north/south sides for vertical flow, with orthogonal segments and distinct relation labels.
+- While layout is pending, the current map remains available. Out-of-order layout completions and failures cannot replace a newer result, including rapid switches between layout directions. Layout failures display a retry action; retry can recover without resetting an already displayed map.
+- Exercise real worker layout in both orientations and verify parity with the layout engine, including splits/merges, parallel edges, self-loops, and empty/isolated graphs. Replacing scope, context, or direction and unmounting terminates obsolete workers; simultaneous flows remain independent. Check worker startup, execution, message, and loading errors, retry, stale results, and cleanup after success/failure. Verify served/exported and showcase worker assets are local and loadable, and measure main-thread responsiveness separately from layout duration.
+- Collapsing a branch hides only nodes no longer reachable through the visible trace and preserves full-trace counts; Expand all restores its nodes and relations.
+- Graph node names appear beside the colored element glyph, with context labels below. Clicking the name or card body opens the application's Model element-detail modal through the canonical element route, displaying fixture content, type, metadata, and incoming/outgoing relations. Related-element navigation and Back preserve the trace behind the modal; Close returns to the trace. Source navigation opens the fixture source page. Focus and disclosure controls do not open the modal. Selecting a file shows its verification overview.
+- Check that the rendered node wrapper and card accept pointer input before exercising name clicks, card clicks, and hover, including when node dragging and selection are disabled.
+- Hover and keyboard focus highlight connections into and out of the chosen node to the end of every visible directed path, including repeated splits and merges. Highlighted lines and arrowheads use the accent token and stronger stroke treatment, while sibling-only paths remain dimmed. Pointer exit clears temporary highlighting. A separate Focus path action pins the highlight after pointer exit; clearing restores all paths without moving cards or resetting zoom.
+- The mock provides simple, branching, long-name, and empty examples through the public design-system pattern, with pan/zoom controls and light/dark theme selection.
+- Nodes use shared glyphs and token-based styling. Fitting caps zoom at actual size; zoom controls allow inspecting dense traces at reading scale.
+- For a large layout that needs less than 20% zoom, assert that initial framing and Fit include all card bounds on desktop and narrow canvases. Check both directions, manual zoom-out, returning from 100%, canvas resize, and switching back to a small scope. Verify layout bounds contain routed connections and relation labels as well as cards.
+- Exercise wheel zoom, toolbar zoom, actual size, Fit, and pan in both directions while leaving the pointer away from cards. Verify that viewport navigation retains routed geometry, labels, arrowheads, card identity, pinned paths, and keyboard focus. Simulate oversized and zero-sized SVG text measurements and assert that labels remain visible at their centered route positions with a compact outline around the text. In a browser, inspect long connections for continuous rendering immediately after navigation, including in the expanded view.
+- Expand the active trace to a full-page overlay. Verify that the same canvas remains mounted, direction and branch disclosure persist, and pinned paths remain highlighted. Exercise direction, zoom, Fit, card detail, and source actions from the overlay. Close and Escape return to the embedded view with focus restored to Expand flow. Escape in an element-detail modal closes those details while keeping the expanded flow open.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [TraceFlow.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.ads.test.ts)
+  * satisfiedBy: [TraceFlowViewport.ads.test.tsx](../../../../explorer/design-system/patterns/reports/TraceFlowViewport.ads.test.tsx)
+  * satisfiedBy: [traceFlowLayoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.ads.test.ts)
+  * satisfiedBy: [useTraceFlowLayout.ads.test.ts](../../../../explorer/design-system/patterns/reports/useTraceFlowLayout.ads.test.ts)
+  * satisfiedBy: [traceFlow.test.ts](../../../../explorer/src/lib/traceFlow.test.ts)
+  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
+  * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)
+  * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
+  * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
+  * satisfiedBy: [browser-flow.mjs](../../../../tests/test-verification-traces/browser-flow.mjs)
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
+  * verify: [Traces View Generation](../../../Interfaces/WebExplorer/Capabilities.md#traces-view-generation)
 ---
 
 ### Explorer Route Identifier Resolution Verification
@@ -266,86 +372,37 @@ Expected checks:
 
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [ExplorerCoverage.integration.test.tsx](../../../../explorer/src/test/ExplorerCoverage.integration.test.tsx)
-  * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
-  * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/src/state/CoverageNavigation.test.tsx)
-  * satisfiedBy: [CoverageView.test.tsx](../../../../explorer/src/views/CoverageView.test.tsx)
-  * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/design-system/patterns/reports/CoverageNavigation.test.tsx)
+  * satisfiedBy: [CoverageNavigation.ads.test.tsx](../../../../explorer/design-system/patterns/reports/CoverageNavigation.ads.test.tsx)
   * satisfiedBy: [routes.test.ts](../../../../explorer/src/router/routes.test.ts)
+  * satisfiedBy: [CoverageNavigation.test.tsx](../../../../explorer/src/state/CoverageNavigation.test.tsx)
+  * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * satisfiedBy: [ExplorerCoverage.integration.test.tsx](../../../../explorer/src/test/ExplorerCoverage.integration.test.tsx)
+  * satisfiedBy: [CoverageView.test.tsx](../../../../explorer/src/views/CoverageView.test.tsx)
   * satisfiedBy: [browser-navigation.mjs](../../../../tests/test-scoped-coverage/browser-navigation.mjs)
   * satisfiedBy: [test.sh](../../../../tests/test-scoped-coverage/test.sh)
   * verify: [Explorer Scoped Coverage](../../../Interfaces/WebExplorer/Capabilities.md#explorer-scoped-coverage)
 ---
 
-### Explorer Native Trace Flow Verification
+### Explorer Semantic Query Presentation Verification
 
-This test verifies production served/exported trace rendering and the shared native trace-flow pattern used by the design-system mock.
+Verify managed query identity and vocabulary context across Explorer and the shared design system.
 
 #### Details
-- Open the compiled production `#/traces` route in both served and exported Explorer. Assert real React Flow cards and locally packaged worker layout replace the former Mermaid roll-up. Compare all canonical node identifiers and directed labeled edges against the CLI trace projection for reconvergent requirement graphs, directly verified ancestors, owning capabilities, and capability parents. Count unique requirements separately from capabilities.
-- Select a verification and its file overview using the production left pane. File overviews remain interactive without flow preparation or workers for unselected traces. Empty projections and deleted selections remain usable. Unrelated Coverage refreshes reuse shared trace grouping and flow preparation.
-- In the real served/exported browser, exercise direction changes, canonical element-detail routes, modal Close/Back, source-file routes and return to Traces. No navigation reloads the document; actual packaged worker assets are local and load successfully. Repeat graph equality checks after direction changes.
-- Replace immutable trace/element inputs with changed labels, source files, membership, and edges under reused identifiers. Switch workspace/worktree context while old layout is pending and assert cancellation, rejection of delayed results, and absence of the previous context's map. Worker failure exposes retry and successful retry recovers the selected flow.
-- From the Mocks Explorer shell, the Traces navigation item opens the native trace map. Direct loading of `#/traces` and returning from another Explorer view use the same entry point. The mock presents one Explorer navigation menu with shared shell theme controls.
-- A simple trace retains verification-to-requirement `verifies` and child-to-ancestor `derivedFrom` direction.
-- Branching traces merge shared requirement identifiers into one node and count unique requirements, preserving all distinct relations.
-- A trace that splits, merges, splits again, and merges again preserves every relation, including a shortcut across intermediate ranks. Cards and relation labels remain separate, and routed connections avoid unrelated card interiors.
-- Reordering requirements and parent identifiers leaves graph positions and routes unchanged.
-- Compare complete ELK input against the per-node scan semantics for splits/merges, parallel relations, self-loops, isolated nodes, empty graphs, escaped identifiers, and both orientations. Count endpoint reads on increasing sparse graphs to confirm a single edge pass after sorting. Switching direction or replacing topology must not reuse stale ports or mutate input data.
-- The direction control switches between Left to right and Top to bottom. Both preserve node identities, relation direction, counts, branch disclosure, and pinned path focus. ELK layout places incoming/outgoing connections on west/east sides for horizontal flow and north/south sides for vertical flow, with orthogonal segments and distinct relation labels.
-- While layout is pending, the current map remains available. Out-of-order layout completions and failures cannot replace a newer result, including rapid switches between layout directions. Layout failures display a retry action; retry can recover without resetting an already displayed map.
-- Exercise real worker layout in both orientations and verify parity with the layout engine, including splits/merges, parallel edges, self-loops, and empty/isolated graphs. Replacing scope, context, or direction and unmounting terminates obsolete workers; simultaneous flows remain independent. Check worker startup, execution, message, and loading errors, retry, stale results, and cleanup after success/failure. Verify served/exported and showcase worker assets are local and loadable, and measure main-thread responsiveness separately from layout duration.
-- Collapsing a branch hides only nodes no longer reachable through the visible trace and preserves full-trace counts; Expand all restores its nodes and relations.
-- Graph node names appear beside the colored element glyph, with context labels below. Clicking the name or card body opens the application's Model element-detail modal through the canonical element route, displaying fixture content, type, metadata, and incoming/outgoing relations. Related-element navigation and Back preserve the trace behind the modal; Close returns to the trace. Source navigation opens the fixture source page. Focus and disclosure controls do not open the modal. Selecting a file shows its verification overview.
-- Check that the rendered node wrapper and card accept pointer input before exercising name clicks, card clicks, and hover, including when node dragging and selection are disabled.
-- Hover and keyboard focus highlight connections into and out of the chosen node to the end of every visible directed path, including repeated splits and merges. Highlighted lines and arrowheads use the accent token and stronger stroke treatment, while sibling-only paths remain dimmed. Pointer exit clears temporary highlighting. A separate Focus path action pins the highlight after pointer exit; clearing restores all paths without moving cards or resetting zoom.
-- The mock provides simple, branching, long-name, and empty examples through the public design-system pattern, with pan/zoom controls and light/dark theme selection.
-- Nodes use shared glyphs and token-based styling. Fitting caps zoom at actual size; zoom controls allow inspecting dense traces at reading scale.
-- For a large layout that needs less than 20% zoom, assert that initial framing and Fit include all card bounds on desktop and narrow canvases. Check both directions, manual zoom-out, returning from 100%, canvas resize, and switching back to a small scope. Verify layout bounds contain routed connections and relation labels as well as cards.
-- Exercise wheel zoom, toolbar zoom, actual size, Fit, and pan in both directions while leaving the pointer away from cards. Verify that viewport navigation retains routed geometry, labels, arrowheads, card identity, pinned paths, and keyboard focus. Simulate oversized and zero-sized SVG text measurements and assert that labels remain visible at their centered route positions with a compact outline around the text. In a browser, inspect long connections for continuous rendering immediately after navigation, including in the expanded view.
-- Expand the active trace to a full-page overlay. Verify that the same canvas remains mounted, direction and branch disclosure persist, and pinned paths remain highlighted. Exercise direction, zoom, Fit, card detail, and source actions from the overlay. Close and Escape return to the embedded view with focus restored to Expand flow. Escape in an element-detail modal closes those details while keeping the expanded flow open.
+Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their circular Q marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture. Verify that query hover and selection render `uses vocabulary` and `declares output` connectors with their property targets, that query/layer filters hide them, and that re-enabling filters restores eligible focused relations.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [Traces View Generation](../../../Interfaces/WebExplorer/Capabilities.md#traces-view-generation)
-  * satisfiedBy: [traceFlow.test.ts](../../../../explorer/src/lib/traceFlow.test.ts)
-  * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)
-  * satisfiedBy: [browser-flow.mjs](../../../../tests/test-verification-traces/browser-flow.mjs)
-  * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
-  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.test.ts)
-  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.test.ts)
-  * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
-  * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
-  * satisfiedBy: [useTraceFlowLayout.test.ts](../../../../explorer/design-system/patterns/reports/useTraceFlowLayout.test.ts)
-  * satisfiedBy: [TraceFlowViewport.test.tsx](../../../../explorer/design-system/patterns/reports/TraceFlowViewport.test.tsx)
-  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
----
-
-### Explorer Design System Styling Demonstration
-
-Demonstrate that the built Explorer uses local design-system CSS, fonts, tokens, and shared controls consistently across its views and showcase mock.
-
-#### Details
-
-##### Demonstration Procedure
-- Open the built, served Explorer and the design-system showcase mock. Disable external network access while allowing the local server, reload, and inspect browser network requests for the local compiled Explorer stylesheet and Geist font assets.
-- Visit Model, Ontologies, Traces, Coverage, Search, and source content. Open element details and a worktree-loading/error pattern, and compare typography, warm-neutral surfaces, semantic colors, buttons, tree rows, badges, tabs, and dialogs with the shared showcase patterns in light and dark themes.
-- Resize the desktop viewport and left pane, and collapse/reopen the pane. Confirm the shared controls and graph legends retain consistent styling and usable placement as the available workspace width changes.
-- Confirm the application and mock use the same component/token treatment rather than separate visual implementations.
-
-##### Acceptance Criteria
-The Explorer remains styled after reload with external networking unavailable; required CSS and font requests are local and successful. Shared controls, typography, semantic colors, and responsive desktop layouts match the design-system patterns across the inspected views. Missing assets, inconsistent component styling, or unusable controls fail the demonstration. Record the build/model revision, inspected views and widths, network observations, and result when performing it.
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [Explorer Design System Styling](../../../Interfaces/WebExplorer/ExplorerRendering.md#explorer-design-system-styling)
+  * satisfiedBy: [semantic_queries.rs](../../../../crates/reqvire-core/tests/semantic_queries.rs)
+  * satisfiedBy: [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx)
+  * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-queries/test.sh)
+  * verify: [Ontology Property-Centric Visualization](../../../Interfaces/WebExplorer/Capabilities.md#ontology-property-centric-visualization)
+  * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
+  * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
 ---
 
 ### Explorer Serve Verification
@@ -400,6 +457,101 @@ This test verifies that the system serves the native SPA Explorer shell with Mod
   * verify: [Served Explorer Browser Interface](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-browser-interface)
 ---
 
+### Explorer Shareable Selection Navigation Verification
+
+Verify persistent selections through the shared route and preference contract in served and exported Explorer views.
+
+#### Details
+Acceptance checks:
+- Round-trip canonical element identifiers, file paths and semantic IRIs containing fragments, Unicode, spaces, percent and plus characters. Model mode and selection, Traces verification/file overview, Thesaurus canonical concept and Ontologies node must resolve correctly; Coverage scope retains its owning browser checks.
+- Explicit links override saved preferences. Bare routes resume valid context preferences. Select twice and assert one history entry, then exercise copied links, reload, Back/Forward, view return and element-modal close. Traces file/verification updates must be atomic.
+- Reject wrong-kind, missing and deleted identities with an explained overview fallback and replacement history. Exercise overlapping identifiers in different worktrees and avoid rewriting the target selection from the retained model while loading.
+- Functional browser checks compare selected identifiers, routes and published data in actual served/exported bundles; visual screenshot comparison is not required.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [routes.test.ts](../../../../explorer/src/router/routes.test.ts)
+  * satisfiedBy: [SelectionNavigation.test.tsx](../../../../explorer/src/state/SelectionNavigation.test.tsx)
+  * satisfiedBy: [browser-flow.mjs](../../../../tests/test-verification-traces/browser-flow.mjs)
+  * verify: [Explorer Shareable Selection Navigation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-shareable-selection-navigation)
+  * verify: [Model Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#model-selection-sharing)
+  * verify: [Ontology Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#ontology-selection-sharing)
+  * verify: [Thesaurus Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-selection-sharing)
+  * verify: [Trace Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#trace-selection-sharing)
+---
+
+### Explorer Worktree Runtime Isolation Verification
+
+Verify that the served Explorer runtime fulfills its shared context-isolation and live-store implementation obligations.
+
+#### Details
+- After a real worker persistence/recovery failure, keep the selected accepted store, manifest/chunks and ontology bytes readable with the same hashes. Assert recovery metadata and `X-Reqvire-Recovery-Required` on both changed and `304` manifest responses. Raw local assets must reject with that context's diagnostic. Worker exit still makes the context unavailable; another context remains usable.
+- In Explorer hook and shell tests, retain the last accepted snapshot and show the recovery warning through unchanged polls and fresh loads. Switching contexts must not carry another branch's warning; failed or aborted requests must not overwrite adopted context state. The warning must identify disabled writes without claiming that a successful snapshot read failed.
+Acceptance checks:
+- In writable and read-only serving, admit two contexts with colliding identifiers and filenames but different content. Assert inventory, seed, manifest, chunks, full store, ontology download, source rendering, and eligible asset routes return only the selected context and carry matching identity.
+- Exercise missing selectors on legacy original-context routes and explicit unknown, removed, stopped, and runtime-unavailable IDs. Explicit failures must never return another branch's data or the SPA fallback shell. Reject path traversal, encoded traversal, and symlink escapes under the existing asset boundary.
+- Confirm reused and newly created worktrees initialize on demand through the same fixed-root worker pipeline after the mode's admission checks, with concurrent identical loads sharing one preparation outside the asynchronous request executor. Startup/inventory never initialize unrequested worktrees. Unchanged read-only demand loads reuse existing core cache entries; changed inputs rebuild only the selected context under existing invalidation rules. Mutation-mode reads reuse accepted snapshots; manifest/chunk transfer and inventory do not initiate model scans/builds. Successful mutations replace only their own runtime, failed generation retains labelled last-valid data, and a later allowed initialization/refresh recovers.
+- Interleave publication and context removal with in-flight reads; each response retains one captured immutable snapshot or reports that context unavailable. Identical model fingerprints must not conflate context identity or request routing.
+- Verify branch/HEAD status after explicit commit or push without misreporting a model revision change, and exercise both commit policies. Backend requests cannot change another browser's selection or switch an existing Git checkout; preparing a missing worktree is isolated to the selected branch.
+- Use disposable Git worktrees with actual private worker processes and the embedded HTTP router for backend checks. Run the HTTP/browser E2E suite against the built binary for transport and browser integration.
+- Construct the serving state through the production startup path and confirm Git-backed modes retain only their worker-backed runtime. Initial seed, store, manifest and chunk responses must agree with that published snapshot and unchanged reads must reuse it.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
+---
+
+### Explorer Worktree Selection Verification
+
+Verify one branch-browsing experience backed by independent worktree contexts with plain serving, read-only MCP, and writable MCP.
+
+#### Details
+Acceptance checks:
+- Start two admitted contexts with different models and assets but overlapping relative filenames and element identifiers. Verify the shell selector uses shared controls, labels branches, supports keyboard selection, and lists local branches without loading them or creating worktrees during inventory reads. Mutation-enabled first selection must complete ordinary admission before loading its target.
+- Confirm one compact branch picker is last at the far right of the shared header after Search, theme and Help across all views, including when the left pane is collapsed or resized. No separate full-width branch toolbar or repeated "Viewing" label is rendered. Check light/dark themes, constrained viewports and long branch/path values: the trigger truncates while complete values remain inspectable in the opened menu and tooltip. Header tabs reflow into a separate scrollable row at constrained widths; the right-anchored picker menu opens inward, and the picker, menu and header actions remain usable without horizontal clipping. Assert production and design-system mocks share the header context slot and compact picker.
+- Inspect the shared shell on desktop while resizing the expanded pane by keyboard and pointer, including during a drag before release. Its brand segment divider and view-tab origin follow the pane boundary; right-side actions and the bounded branch picker retain their positions. Collapse and expand the pane and retain readable branding, the picker and actions. Check the second-row navigation retains pane alignment at intermediate widths and spans the header at narrow widths. Verify resizing/collapse preserves the selected view, worktree, scope and URL. The real mock uses these same shell patterns and runtime resize handlers; visual E2E comparisons are not required.
+- Exercise arrow keys, Home/End, type-ahead, Enter/Space, Escape, Tab, and outside dismissal. Unavailable choices cannot be selected. During pending and failed switches, the trigger and selection marker continue identifying the displayed model even when worktrees share a branch label.
+- In design-system Patterns, select different available branches and verify labels and disabled unavailable choices. In Mocks, switch between distinct fixture models from the same shell selector; assert the model and branch change together, view navigation remains available, prior-context modals close, and URL/history/reload retain the chosen fixture without contacting MCP.
+- Exercise the exported worktree dialog through Patterns loading, connection-error, long validation-error and refresh-error examples. Assert the branch is explicitly labelled, the complete diagnostic is retained separately from the recovery explanation, and keyboard focus cycles within the scrollable details and Close action. Pending loading cannot be dismissed; error dismissal and focus restoration retain their existing semantics. Review compact left alignment and readable constrained layouts without adding visual E2E comparisons.
+- Open two browser tabs, select different contexts, and exercise Model, Flow, Ontologies, Traces, Coverage, search, element modals, source pages, and asset downloads. Each result and label must belong to the selected context; neither selection changes Git checkouts, MCP routing, or the other tab.
+- Mutate each context through MCP and verify only its selected views refresh; test both automatic-commit policies. Confirm inventory reads do not scan/build models and requests for initialized runtimes do not rebuild them.
+- Delay a previous context's manifest, chunks, source response, and asset request while switching. Confirm target publication is atomic, late responses cannot overwrite it, and cache keys include context even when fingerprints match. Validate path traversal and wrong-context requests are rejected.
+- Check URL selection, reload, back/forward, per-context coverage scope, retained view mode, closed old-context modals, and invalid selection explanations. Remove or fail a selected context and assert a labelled stale/unavailable view rather than fallback to another branch.
+- Hold target loading and assert a centered loading dialog, branch label, spinner, inert background and retained model; pending outside/Escape interaction cannot dismiss it. Release successful publication and assert the new model appears and dialog closes. Inject a failure, verify the diagnostic and dismiss through Close, Escape and outside click; retain the prior model and restore its URL/focus. Periodic refresh must not retry the failed selection; explicit retry and superseding requests must recover without stale adoption.
+- Inject target runtime generation, manifest, chunk, and network failures; keep the prior valid model and label together, then recover by explicit selection. Check no switch tool appears in MCP discovery.
+- Visit, remove, and recreate many context IDs with overlapping element identifiers. After successful inventory, revisiting an inactive absent ID requires a fresh client and complete chunk validation; listed IDs retain their cached identities. Keep displayed/selected clients through pending and failed switches, then release absent prior contexts once unprotected. Failed or malformed inventories, HTTP-success inventory error payloads, and late cancelled/timed-out responses cannot evict clients or replace choices. A delayed inventory cannot evict clients created after that request began. Pruning itself issues no model loads or chunk downloads.
+- Populate several existing worktrees and branches without worktrees, including an invalid unselected model. Measure worker starts and model/runtime builds: startup loads only the original context, inventory loads none, and selecting a branch loads only that target. In every serving mode, the same picker lists all choices without prevalidation. First selection of a branch without a worktree creates one managed worktree, applies the mode's admission rules, and loads its model, ontology and assets through the common pipeline. Repeated unchanged and concurrent selections reuse its worktree, completed model, and runtime. Changing its local branch tip before first selection uses the current tip.
+- Confirm preparing a missing worktree leaves existing checkouts, indexes, files, branch refs, and other clients' routing unchanged while registering only the required worktree. Read-only selection takes no ownership; mutation-enabled selection takes ownership only through normal admission. Race preparation with another checkout and require reuse or an explicit conflict without forcing duplicate checkouts. Failed preparation releases only ownership acquired by that attempt and cleans up only newly created unchanged assets, preserving pre-existing work and reporting residual paths. Normal shutdown preserves successful worktrees and their changes.
+- In plain and read-only embedded serving, exercise the same loading and cache checks against reused and newly created worktrees. Include valid dirty content, repeat unchanged selections, then edit selected-context sources, root exclusions, and used external ontology inputs. The next demand load/read must follow existing invalidation and rebuild rules without restart; equal-length preserved-timestamp edits remain detectable. Invalid changed inputs return diagnostics rather than stale success, and repaired inputs recover. Other branches are not scanned or loaded, mutation tools remain unavailable, and no new periodic model polling is introduced. Static exports retain one snapshot.
+- In mutation-enabled serving, attempt first selection of targets with staged, unstaged, and non-ignored untracked changes. Each fails before model parsing/runtime construction, retains the displayed branch and all files/index/refs, and offers no read-only fallback. After changes are resolved, normal admission validates and loads the branch; author-identity and ownership conflicts retain their existing failure behavior. Exercise both reused and newly created worktrees.
+- With either automatic-commit policy, reselect a healthy active context and reuse its accepted model without source freshness scans or rebuilds. With commits disabled, accepted uncommitted writes must not cause a new clean-start failure on reselection. External edits must not be imported into that accepted model. Accepted mutations update only their context's runtime and derived cache state. Stop and restart with pending changes to confirm the existing clean-start rule still rejects admission.
+
+##### Evidence scope
+The Rust worktree and HTTP router regressions exercise on-demand admission, dirty-target rejection, accepted-snapshot reuse, read-only source/exclusion/preview invalidation, and repair recovery. Explorer hook and application tests cover explicit loading, cached periodic reads, failed-switch retention, and retry selection. The HTTP/browser cases in `tests/test-mcp-worktrees` execute the compiled Explorer in plain, read-only embedded and writable serving, including held target loading, scrim/background behavior, error dismissal and independent-tab navigation.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [WorktreeLoadDialog.ads.test.tsx](../../../../explorer/design-system/patterns/shell/WorktreeLoadDialog.ads.test.tsx)
+  * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)
+---
+
 ### Export Command Verification
 
 This test verifies that the export command writes a complete self-contained static Explorer site to the specified output directory.
@@ -428,42 +580,6 @@ This test verifies that the export command writes a complete self-contained stat
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-export-command/test.sh)
   * verify: [Export Command](../../../Interfaces/WebExplorer/Capabilities.md#export-command)
----
-
-### Explorer Model Flow Verification
-
-Verify the Model Flow mode through the same application and design-system patterns used by the showcase.
-
-#### Details
-- Select Flow from the existing Model layout selector, switch between all four modes, and retain the selected folder, file, or element.
-- Select an element and a capability in the left project tree while Flow is active: the right workspace updates to that selection's relation scope and retains the Model route. The detail dialog opens only after activating a Flow card name or body, independently of tree selection.
-- At the project root, assert that Flow starts with root capabilities above their child capabilities and specifying requirements, then descends through requirement decomposition to verification and evidence. Switch to horizontal layout and retain that ordering. Assert corresponding inverse labels for the displayed direction and unchanged canonical store facts; Traces keep their verification-to-ancestor direction.
-- Compare Flow nodes and labelled directed connections with the Project Store, including different element types, evidence endpoints, contract bindings and references, and generated inverse relations. Shared endpoints appear once; different relations between the same endpoints remain distinct.
-- Select a file or folder and assert that its elements and their immediate relation endpoints remain reachable, together with requirement and capability ancestry back to the owning root capabilities. Select an element and assert its full incoming and outgoing paths across repeated splits and merges. Include an isolated element, an empty folder, and a cyclic non-hierarchical relation graph.
-- Switch between horizontal and vertical layout and exercise path focus and clearing. Hover or keyboard-focus a card and inspect full-path highlighting through splits and merges, accent lines and arrowheads, faded unrelated connections, and unchanged card positions.
-- Click a card body and name to open the existing element-detail modal, inspect metadata and incoming/outgoing relations, navigate a related element, go back, and close to the same Flow workspace. Source and focus controls perform their own actions.
-- Confirm React Flow's rendered node wrapper and card accept pointer input while node dragging and selection are disabled. Check pointer eligibility before dispatching card and hover interactions so synthetic events cannot mask a browser hit-testing failure.
-- Render a large Model Flow requiring less than 20% zoom on desktop and narrow canvases. Assert that initial framing and Fit keep all cards inside the canvas in both directions, manual zoom-out remains available, and Fit restores the overview after 100%. Resize the canvas and select a small scope to check updated framing and the 100% fitting cap. Confirm complete layout bounds include connection routes and relation labels.
-- Hold canvas initialization and automatic-fit scheduling in a controlled renderer fixture. Navigation remains unavailable before the current-direction canvas initializes; a user zoom after readiness survives queued animation-frame callbacks. Repeat across a direction change and rapid switch back; delayed initialization callbacks from unmounted canvases cannot replace the current canvas handle.
-- Check connection rendering after wheel and toolbar zoom, pan, Fit, actual size, canvas resizing, and overlay changes. Preserve routing, centered labels, arrowheads, node identity, pinned path, and keyboard focus. Include oversized and zero-sized SVG text measurements in regression tests. Inspect long routes and the compact outlines around label text in the browser immediately after navigation, with the pointer away from cards, to verify continuity at the new scale.
-- Open and close the full-page Flow overlay using its controls and Escape. Assert that scope, direction, pinned path, and canvas identity are retained. Verify overlay keyboard focus containment and focus restoration, usable flow controls, and shared element details above the overlay; closing the detail modal leaves Flow expanded. Source navigation exits to the requested source page.
-- Exercise the shared Flow worker cancellation, isolation, and recovery checks from Explorer Native Trace Flow Verification. In served Explorer, open Model Flow and switch orientation; node identities must survive, and the worker must load from the local packaged asset. Execute the exported worker in a real thread and verify routing, error responses, deterministic output, empty graphs, and a responsive main thread during large layout.
-- Run the projection and application interaction tests, design-system adherence checks, and both Explorer and showcase builds.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [Model-Centric View Generation](../../../Interfaces/WebExplorer/Capabilities.md#model-centric-view-generation)
-  * verify: [Model View Element Navigation](../../../Interfaces/WebExplorer/Capabilities.md#model-view-element-navigation)
-  * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
-  * satisfiedBy: [TraceFlow.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.test.ts)
-  * satisfiedBy: [traceFlowLayoutInput.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.test.ts)
-  * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
-  * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
-  * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
-  * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
 ---
 
 ### Model View Element Navigation Test
@@ -632,13 +748,13 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-explorer-build/test.sh)
+  * satisfiedBy: [forceAtlasLayout.test.ts](../../../../explorer/src/lib/forceAtlasLayout.test.ts)
   * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
-  * satisfiedBy: [VisualizationParity.test.tsx](../../../../explorer/src/views/VisualizationParity.test.tsx)
   * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
-  * satisfiedBy: [forceAtlasLayout.test.ts](../../../../explorer/src/lib/forceAtlasLayout.test.ts)
+  * satisfiedBy: [VisualizationParity.test.tsx](../../../../explorer/src/views/VisualizationParity.test.tsx)
   * satisfiedBy: [forceAtlasLayoutEngine.test.ts](../../../../explorer/src/workers/forceAtlasLayoutEngine.test.ts)
+  * satisfiedBy: [test.sh](../../../../tests/test-explorer-build/test.sh)
   * satisfiedBy: [check-forceatlas-worker.mjs](../../../../tests/test-export-command/check-forceatlas-worker.mjs)
   * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
@@ -688,9 +804,9 @@ This test verifies that the serve command starts an HTTP server for the embedded
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [startup-check.py](../../../../tests/test-serve-command/scripts/startup-check.py)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Serve Command](../../../Interfaces/WebExplorer/Capabilities.md#serve-command)
-  * satisfiedBy: [startup-check.py](../../../../tests/test-serve-command/scripts/startup-check.py)
   * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
 ---
 
@@ -735,9 +851,9 @@ MCP Cache and Runtime Coherence Verification owns the additional rejected-mutati
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [live_store.rs](../../../../crates/reqvire-cli/src/live_store.rs)
-  * satisfiedBy: [explorer_runtime.rs](../../../../crates/reqvire-core/src/explorer_runtime.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
+  * satisfiedBy: [explorer_runtime.rs](../../../../crates/reqvire-core/src/explorer_runtime.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Served Explorer Runtime Freshness](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-runtime-freshness)
 ---
@@ -771,125 +887,9 @@ This test verifies that the Thesaurus Explorer route is backed by a native Proje
   * type: test-verification
 
 #### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [thesaurus.test.ts](../../../../explorer/src/lib/thesaurus.test.ts)
   * satisfiedBy: [VisualizationParity.test.tsx](../../../../explorer/src/views/VisualizationParity.test.tsx)
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [test.sh](../../../../tests/test-thesaurus-project-store/test.sh)
   * verify: [Thesaurus View Generation](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-view-generation)
----
-
-### Explorer Semantic Query Presentation Verification
-
-Verify managed query identity and vocabulary context across Explorer and the shared design system.
-
-#### Details
-Check that semantic-query icons and badges use the shared Q marker, that native queries occur once in ontology graph data with source provenance and vocabulary/output edges, and that graph rendering preserves their circular Q marker, name, filter behavior, and property dependency targets. Inspect query form, exact text, used ontologies, declared outputs, and source navigation in the detail dialog. Exercise exported Project Store generation from a native query fixture. Verify that query hover and selection render `uses vocabulary` and `declares output` connectors with their property targets, that query/layer filters hide them, and that re-enabling filters restores eligible focused relations.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [OWL Semantic Ontology Projection](../../../Interfaces/WebExplorer/Capabilities.md#owl-semantic-ontology-projection)
-  * verify: [Ontology Property-Centric Visualization](../../../Interfaces/WebExplorer/Capabilities.md#ontology-property-centric-visualization)
-  * verify: [Ontology Symbol and Badge Vocabulary](../../../Interfaces/WebExplorer/Capabilities.md#ontology-symbol-and-badge-vocabulary)
-  * satisfiedBy: [semantic_queries.rs](../../../../crates/reqvire-core/tests/semantic_queries.rs)
-  * satisfiedBy: [OntologiesView.test.tsx](../../../../explorer/src/views/OntologiesView.test.tsx)
-  * satisfiedBy: [OntologyNodeDetailModal.test.tsx](../../../../explorer/src/components/OntologyNodeDetailModal.test.tsx)
-  * satisfiedBy: [test.sh](../../../../tests/test-semantic-queries/test.sh)
----
-
-### Explorer Worktree Selection Verification
-
-Verify one branch-browsing experience backed by independent worktree contexts with plain serving, read-only MCP, and writable MCP.
-
-#### Details
-Acceptance checks:
-- Start two admitted contexts with different models and assets but overlapping relative filenames and element identifiers. Verify the shell selector uses shared controls, labels branches, supports keyboard selection, and lists local branches without loading them or creating worktrees during inventory reads. Mutation-enabled first selection must complete ordinary admission before loading its target.
-- Confirm one compact branch picker is last at the far right of the shared header after Search, theme and Help across all views, including when the left pane is collapsed or resized. No separate full-width branch toolbar or repeated "Viewing" label is rendered. Check light/dark themes, constrained viewports and long branch/path values: the trigger truncates while complete values remain inspectable in the opened menu and tooltip. Header tabs reflow into a separate scrollable row at constrained widths; the right-anchored picker menu opens inward, and the picker, menu and header actions remain usable without horizontal clipping. Assert production and design-system mocks share the header context slot and compact picker.
-- Inspect the shared shell on desktop while resizing the expanded pane by keyboard and pointer, including during a drag before release. Its brand segment divider and view-tab origin follow the pane boundary; right-side actions and the bounded branch picker retain their positions. Collapse and expand the pane and retain readable branding, the picker and actions. Check the second-row navigation retains pane alignment at intermediate widths and spans the header at narrow widths. Verify resizing/collapse preserves the selected view, worktree, scope and URL. The real mock uses these same shell patterns and runtime resize handlers; visual E2E comparisons are not required.
-- Exercise arrow keys, Home/End, type-ahead, Enter/Space, Escape, Tab, and outside dismissal. Unavailable choices cannot be selected. During pending and failed switches, the trigger and selection marker continue identifying the displayed model even when worktrees share a branch label.
-- In design-system Patterns, select different available branches and verify labels and disabled unavailable choices. In Mocks, switch between distinct fixture models from the same shell selector; assert the model and branch change together, view navigation remains available, prior-context modals close, and URL/history/reload retain the chosen fixture without contacting MCP.
-- Exercise the exported worktree dialog through Patterns loading, connection-error, long validation-error and refresh-error examples. Assert the branch is explicitly labelled, the complete diagnostic is retained separately from the recovery explanation, and keyboard focus cycles within the scrollable details and Close action. Pending loading cannot be dismissed; error dismissal and focus restoration retain their existing semantics. Review compact left alignment and readable constrained layouts without adding visual E2E comparisons.
-- Open two browser tabs, select different contexts, and exercise Model, Flow, Ontologies, Traces, Coverage, search, element modals, source pages, and asset downloads. Each result and label must belong to the selected context; neither selection changes Git checkouts, MCP routing, or the other tab.
-- Mutate each context through MCP and verify only its selected views refresh; test both automatic-commit policies. Confirm inventory reads do not scan/build models and requests for initialized runtimes do not rebuild them.
-- Delay a previous context's manifest, chunks, source response, and asset request while switching. Confirm target publication is atomic, late responses cannot overwrite it, and cache keys include context even when fingerprints match. Validate path traversal and wrong-context requests are rejected.
-- Check URL selection, reload, back/forward, per-context coverage scope, retained view mode, closed old-context modals, and invalid selection explanations. Remove or fail a selected context and assert a labelled stale/unavailable view rather than fallback to another branch.
-- Hold target loading and assert a centered loading dialog, branch label, spinner, inert background and retained model; pending outside/Escape interaction cannot dismiss it. Release successful publication and assert the new model appears and dialog closes. Inject a failure, verify the diagnostic and dismiss through Close, Escape and outside click; retain the prior model and restore its URL/focus. Periodic refresh must not retry the failed selection; explicit retry and superseding requests must recover without stale adoption.
-- Inject target runtime generation, manifest, chunk, and network failures; keep the prior valid model and label together, then recover by explicit selection. Check no switch tool appears in MCP discovery.
-- Visit, remove, and recreate many context IDs with overlapping element identifiers. After successful inventory, revisiting an inactive absent ID requires a fresh client and complete chunk validation; listed IDs retain their cached identities. Keep displayed/selected clients through pending and failed switches, then release absent prior contexts once unprotected. Failed or malformed inventories, HTTP-success inventory error payloads, and late cancelled/timed-out responses cannot evict clients or replace choices. A delayed inventory cannot evict clients created after that request began. Pruning itself issues no model loads or chunk downloads.
-- Populate several existing worktrees and branches without worktrees, including an invalid unselected model. Measure worker starts and model/runtime builds: startup loads only the original context, inventory loads none, and selecting a branch loads only that target. In every serving mode, the same picker lists all choices without prevalidation. First selection of a branch without a worktree creates one managed worktree, applies the mode's admission rules, and loads its model, ontology and assets through the common pipeline. Repeated unchanged and concurrent selections reuse its worktree, completed model, and runtime. Changing its local branch tip before first selection uses the current tip.
-- Confirm preparing a missing worktree leaves existing checkouts, indexes, files, branch refs, and other clients' routing unchanged while registering only the required worktree. Read-only selection takes no ownership; mutation-enabled selection takes ownership only through normal admission. Race preparation with another checkout and require reuse or an explicit conflict without forcing duplicate checkouts. Failed preparation releases only ownership acquired by that attempt and cleans up only newly created unchanged assets, preserving pre-existing work and reporting residual paths. Normal shutdown preserves successful worktrees and their changes.
-- In plain and read-only embedded serving, exercise the same loading and cache checks against reused and newly created worktrees. Include valid dirty content, repeat unchanged selections, then edit selected-context sources, root exclusions, and used external ontology inputs. The next demand load/read must follow existing invalidation and rebuild rules without restart; equal-length preserved-timestamp edits remain detectable. Invalid changed inputs return diagnostics rather than stale success, and repaired inputs recover. Other branches are not scanned or loaded, mutation tools remain unavailable, and no new periodic model polling is introduced. Static exports retain one snapshot.
-- In mutation-enabled serving, attempt first selection of targets with staged, unstaged, and non-ignored untracked changes. Each fails before model parsing/runtime construction, retains the displayed branch and all files/index/refs, and offers no read-only fallback. After changes are resolved, normal admission validates and loads the branch; author-identity and ownership conflicts retain their existing failure behavior. Exercise both reused and newly created worktrees.
-- With either automatic-commit policy, reselect a healthy active context and reuse its accepted model without source freshness scans or rebuilds. With commits disabled, accepted uncommitted writes must not cause a new clean-start failure on reselection. External edits must not be imported into that accepted model. Accepted mutations update only their context's runtime and derived cache state. Stop and restart with pending changes to confirm the existing clean-start rule still rejects admission.
-
-##### Evidence scope
-The Rust worktree and HTTP router regressions exercise on-demand admission, dirty-target rejection, accepted-snapshot reuse, read-only source/exclusion/preview invalidation, and repair recovery. Explorer hook and application tests cover explicit loading, cached periodic reads, failed-switch retention, and retry selection. The HTTP/browser cases in `tests/test-mcp-worktrees` execute the compiled Explorer in plain, read-only embedded and writable serving, including held target loading, scrim/background behavior, error dismissal and independent-tab navigation.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
-  * satisfiedBy: [WorktreeLoadDialog.test.tsx](../../../../explorer/design-system/patterns/shell/WorktreeLoadDialog.test.tsx)
-  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
-  * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
-  * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)
----
-
-### Explorer Worktree Runtime Isolation Verification
-
-Verify that the served Explorer runtime fulfills its shared context-isolation and live-store implementation obligations.
-
-#### Details
-- After a real worker persistence/recovery failure, keep the selected accepted store, manifest/chunks and ontology bytes readable with the same hashes. Assert recovery metadata and `X-Reqvire-Recovery-Required` on both changed and `304` manifest responses. Raw local assets must reject with that context's diagnostic. Worker exit still makes the context unavailable; another context remains usable.
-- In Explorer hook and shell tests, retain the last accepted snapshot and show the recovery warning through unchanged polls and fresh loads. Switching contexts must not carry another branch's warning; failed or aborted requests must not overwrite adopted context state. The warning must identify disabled writes without claiming that a successful snapshot read failed.
-Acceptance checks:
-- In writable and read-only serving, admit two contexts with colliding identifiers and filenames but different content. Assert inventory, seed, manifest, chunks, full store, ontology download, source rendering, and eligible asset routes return only the selected context and carry matching identity.
-- Exercise missing selectors on legacy original-context routes and explicit unknown, removed, stopped, and runtime-unavailable IDs. Explicit failures must never return another branch's data or the SPA fallback shell. Reject path traversal, encoded traversal, and symlink escapes under the existing asset boundary.
-- Confirm reused and newly created worktrees initialize on demand through the same fixed-root worker pipeline after the mode's admission checks, with concurrent identical loads sharing one preparation outside the asynchronous request executor. Startup/inventory never initialize unrequested worktrees. Unchanged read-only demand loads reuse existing core cache entries; changed inputs rebuild only the selected context under existing invalidation rules. Mutation-mode reads reuse accepted snapshots; manifest/chunk transfer and inventory do not initiate model scans/builds. Successful mutations replace only their own runtime, failed generation retains labelled last-valid data, and a later allowed initialization/refresh recovers.
-- Interleave publication and context removal with in-flight reads; each response retains one captured immutable snapshot or reports that context unavailable. Identical model fingerprints must not conflate context identity or request routing.
-- Verify branch/HEAD status after explicit commit or push without misreporting a model revision change, and exercise both commit policies. Backend requests cannot change another browser's selection or switch an existing Git checkout; preparing a missing worktree is isolated to the selected branch.
-- Use disposable Git worktrees with actual private worker processes and the embedded HTTP router for backend checks. Run the HTTP/browser E2E suite against the built binary for transport and browser integration.
-- Construct the serving state through the production startup path and confirm Git-backed modes retain only their worker-backed runtime. Initial seed, store, manifest and chunk responses must agree with that published snapshot and unchanged reads must reuse it.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
-  * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [serve.rs](../../../../crates/reqvire-cli/src/serve.rs)
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
----
-
-### Explorer Shareable Selection Navigation Verification
-
-Verify persistent selections through the shared route and preference contract in served and exported Explorer views.
-
-#### Details
-Acceptance checks:
-- Round-trip canonical element identifiers, file paths and semantic IRIs containing fragments, Unicode, spaces, percent and plus characters. Model mode and selection, Traces verification/file overview, Thesaurus canonical concept and Ontologies node must resolve correctly; Coverage scope retains its owning browser checks.
-- Explicit links override saved preferences. Bare routes resume valid context preferences. Select twice and assert one history entry, then exercise copied links, reload, Back/Forward, view return and element-modal close. Traces file/verification updates must be atomic.
-- Reject wrong-kind, missing and deleted identities with an explained overview fallback and replacement history. Exercise overlapping identifiers in different worktrees and avoid rewriting the target selection from the retained model while loading.
-- Functional browser checks compare selected identifiers, routes and published data in actual served/exported bundles; visual screenshot comparison is not required.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * verify: [Explorer Shareable Selection Navigation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-shareable-selection-navigation)
-  * verify: [Model Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#model-selection-sharing)
-  * verify: [Trace Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#trace-selection-sharing)
-  * verify: [Thesaurus Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#thesaurus-selection-sharing)
-  * verify: [Ontology Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#ontology-selection-sharing)
-  * satisfiedBy: [routes.test.ts](../../../../explorer/src/router/routes.test.ts)
-  * satisfiedBy: [SelectionNavigation.test.tsx](../../../../explorer/src/state/SelectionNavigation.test.tsx)
-  * satisfiedBy: [browser-flow.mjs](../../../../tests/test-verification-traces/browser-flow.mjs)
 ---

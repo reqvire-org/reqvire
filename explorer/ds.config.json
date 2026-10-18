@@ -22,7 +22,7 @@
         {
           "rootFiles": [
             "src/App.tsx",
-            "design-system/components/core/Toast.scenario.tsx"
+            "design-system/components/core/Toast.ads.scenario.tsx"
           ]
         }
       ],
