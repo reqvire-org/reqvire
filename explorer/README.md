@@ -189,14 +189,14 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.24`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.25`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.24 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.25 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
