@@ -60,12 +60,11 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
         </p>
       </Section>
 
-      <Section title="Local Project Stdio (Planned)">
+      <Section title="Local Project Stdio">
         <p className="text-zinc-600 mb-4">
-          Stdio support is specified and covered by acceptance tests, but is not
-          implemented yet. A stdio-capable client will launch a dedicated Reqvire
-          process for each configured project without a listening port. HTTP will
-          remain the default; select stdio explicitly in the client&apos;s command
+          A stdio-capable client launches a dedicated Reqvire process for each
+          configured project without a listening port. HTTP remains the default;
+          select stdio explicitly in the client&apos;s command
           and arguments:
         </p>
         <CodeBlock>{`{
@@ -84,18 +83,18 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Configuration syntax depends on the client. An absolute workspace path
           selects the project even when the client launches from another directory.
-          Native startup will also accept <code>reqvire mcp --transport stdio</code>.
-          Both transports will expose the same tools, resources, prompts, and
+          Native startup also accepts <code>reqvire mcp --transport stdio</code>.
+          Both transports expose the same tools, resources, prompts, and
           permission checks. Append <code>--enable-mutations</code> for authoring;
           clean-worktree admission and exclusive ownership still apply, and
           <code> --enable-commits</code> remains a separate opt-in.
         </p>
         <p className="text-zinc-600">
           HTTP-only options <code>--host</code>, <code>--port</code>,
-          <code> --allow-origin</code>, and <code>--allow-host</code> will be rejected
+          <code> --allow-origin</code>, and <code>--allow-host</code> are rejected
           with stdio. Protocol messages use stdout; diagnostics use stderr. Closing
-          stdin will stop the process and its workers, release ownership locks,
-          and preserve pending model changes and managed worktrees. Embedded MCP
+          stdin stops the process and its workers, releases ownership locks,
+          and preserves pending model changes and managed worktrees. Embedded MCP
           through <code>serve --enable-mcp</code> continues to use HTTP.
         </p>
       </Section>
@@ -397,6 +396,38 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
           assistant should be allowed to modify the model.
         </p>
         <CodeBlock>{`reqvire mcp --enable-mutations`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Use <code>reqvire.update_element</code> for small content edits. Target
+          <code> Element Text</code> for opening prose, or an exact subsection
+          name. Append and replace take <code>content</code>; replace_text takes
+          <code> old_text</code> matching exactly once within that target and
+          <code> new_text</code>. Optional prose subsections support explicit
+          create and delete. Preview first, then apply with
+          <code> expected_model_revision</code> set to the preview's
+          <code> base_model_revision</code> in the same worktree context. Stale
+          revisions are rejected; identity and declarations stay attached.
+        </p>
+        <CodeBlock>{`// MCP tool calls: preview, review the diff, then apply
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", expected_model_revision: "<base_model_revision from preview>"})`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Ontology, Shapes and Query accept only replace or replace_text on their
+          complete fenced Markdown payloads. Declaration sections such as
+          Metadata, Relations, Contract References and Labels are protected.
+          Missing subsections require explicit creation; Element Text cannot be
+          created or deleted. Empty append and same-content replacement return
+          empty diffs without changing the accepted revision.
+        </p>
+        <p className="text-zinc-600 mt-4 mb-4">
+          For a full definition change, use <code>reqvire.add_element</code> with
+          <code> override_existing: true</code> and its complete replacement
+          Markdown. Read the current definition first: omitted authored metadata
+          and outgoing declarations are removed. Incoming children, ownership,
+          contract consumers, and concept references remain when the complete
+          candidate is valid. Preview with <code>dry_run: true</code> before
+          applying the same definition. A cross-file replacement updates incoming
+          destinations; invalid replacements retain the accepted model and files.
+        </p>
         <p className="text-zinc-600 mt-4 mb-4">
           MCP validates the model before starting. Migration remains CLI-only:
           preview with <code>reqvire migrate</code> and apply with{" "}

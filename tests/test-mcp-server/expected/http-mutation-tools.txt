@@ -28,6 +28,7 @@ reqvire.traces
 reqvire.resources
 reqvire.change_impact
 reqvire.format
+reqvire.update_element
 reqvire.add_element
 reqvire.remove_element
 reqvire.move_element

@@ -53,6 +53,11 @@ WHEN documenting model collaboration, the system SHALL explain unified browser b
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
   * [MCP Accepted Change Commit Specification](../MCP/Specifications.md#mcp-accepted-change-commit-specification)
   * [MCP Branch Push Specification](../MCP/Specifications.md#mcp-branch-push-specification)
   * [MCP Coverage Scope Selection Specification](../MCP/Specifications.md#mcp-coverage-scope-selection-specification)
@@ -102,6 +107,11 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
   * [CLI Coverage Scope Selection Specification](../CLI/Specifications.md#cli-coverage-scope-selection-specification)
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [CLI Managed Query Artifacts Specification](../CLI/Specifications.md#cli-managed-query-artifacts-specification)

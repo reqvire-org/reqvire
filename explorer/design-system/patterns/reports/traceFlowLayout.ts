@@ -35,9 +35,8 @@ export interface TraceFlowTopology {
   directCount?: number;
 }
 
-// Shared with the card's CSS custom properties; coordinates are canvas units.
-export const TRACE_NODE_WIDTH = 280;
-export const TRACE_NODE_HEIGHT = 164;
+/** Measured, unscaled card geometry; design values belong to foundation CSS. */
+export interface TraceFlowNodeSize { width: number; height: number }
 export interface TraceFlowPoint { x: number; y: number }
 
 /** Rounded routed polyline; routing itself belongs to the graph layout. */
@@ -180,7 +179,9 @@ const coordinate = (value: number | undefined) => {
 };
 
 /** ELK owns card placement, ports, orthogonal routing, and relation-label space. */
-export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction: TraceFlowDirection, layout: (input: ElkNode) => Promise<ElkNode>) {
+export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction: TraceFlowDirection, layout: (input: ElkNode) => Promise<ElkNode>, nodeSize: TraceFlowNodeSize) {
+  const { width, height } = nodeSize;
+  if (![width, height].every(value => Number.isFinite(value) && value > 0)) throw new Error("Invalid trace node measurements");
   // Canonical insertion order keeps layout independent of model serialization.
   const edges = [...topology.edges].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   const portsByNode = new Map<string, ElkPort[]>();
@@ -211,7 +212,7 @@ export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction
       "elk.randomSeed": "1",
     },
     children: [...topology.nodes].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0).map(node => ({
-      id: node.id, width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
+      id: node.id, width, height,
       layoutOptions: { "elk.portConstraints": "FIXED_SIDE", ...(node.root ? { "elk.layered.layering.layerConstraint": "FIRST" } : {}) },
       ports: portsByNode.get(node.id) ?? [],
     })),
@@ -227,6 +228,7 @@ export async function buildTraceFlowGraph(topology: TraceFlowTopology, direction
   return {
     ...topology,
     direction,
+    nodeSize: { width, height },
     // ELK's complete extent includes detouring connections and relation labels.
     bounds: { x: 0, y: 0, width: coordinate(result.width), height: coordinate(result.height) },
     nodes: topology.nodes.map(node => {

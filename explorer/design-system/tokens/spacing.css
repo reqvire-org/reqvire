@@ -55,6 +55,8 @@
   --content-max:    1180px; /* main column max readable width */
   --row-height-compact: 30px;   /* compact tree/list row height */
   --compact-column-min: 112px; /* minimum readable compact metadata/filter column width */
+  --space-flow-node-width: 280px; /* shared model and verification flow cards */
+  --space-flow-node-height: 164px;
   --stack-gap-compact: var(--space-0); /* contiguous compact stack gap */
   --side-pane-content-inset-inline: var(--space-12); /* shared Explorer side-pane content inset */
   --side-pane-search-content-gap: var(--space-4); /* compact gap from pane quick filter to next pane block */

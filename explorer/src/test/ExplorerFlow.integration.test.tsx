@@ -53,12 +53,16 @@ beforeEach(() => {
   // jsdom has no layout. Supply browser measurements so real React Flow edges mount.
   vi.stubGlobal("DOMMatrixReadOnly", class { m22 = 1; });
   vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
-    const width = getComputedStyle(this).width;
+    const width = this.classList.contains("ux-trace-flow-node-size")
+      ? getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-width")
+      : getComputedStyle(this).width;
     if (width.endsWith("%")) return (this.parentElement?.offsetWidth ?? canvasWidth) * Number.parseFloat(width) / 100;
     return Number.parseFloat(width) || (this.classList.contains("react-flow__handle") ? 6 : canvasWidth);
   });
   vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
-    const height = getComputedStyle(this).height;
+    const height = this.classList.contains("ux-trace-flow-node-size")
+      ? getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-height")
+      : getComputedStyle(this).height;
     if (height.endsWith("%")) return (this.parentElement?.offsetHeight ?? canvasHeight) * Number.parseFloat(height) / 100;
     return Number.parseFloat(height) || (this.classList.contains("react-flow__handle") ? 6 : canvasHeight);
   });

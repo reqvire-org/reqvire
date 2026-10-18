@@ -24,6 +24,7 @@ export default defineConfig({
     environment: "jsdom",
     css: true,
     include: ["src/**/*.{test,spec}.{ts,tsx}", "design-system/**/*.ads.{test,spec}.{ts,tsx}"],
+    exclude: ["**/node_modules/**", "**/*.ads.behavior.spec.ts"],
     setupFiles: ["src/test/setupCssTokens.ts"],
   },
 });

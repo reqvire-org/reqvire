@@ -233,6 +233,7 @@ reqvire:CustomElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for custom other-TYPENAME extensions that cannot author canonical semantic relations." .
 reqvire:ElementIdentity a owl:Class ;
+  reqvire:mapsToConcept concept:ElementIdentity ;
   rdfs:comment "Stable identity concept used to track an element independently of its current file location." .
 reqvire:ElementId a owl:Class ;
   rdfs:subClassOf reqvire:ElementIdentity ;

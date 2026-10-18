@@ -90,8 +90,8 @@ When creating a new element, the system is expected to:
 - Insert the element into the target file following Element Ordering Behavior
 - Reject the operation and report validation errors if validation fails
 - Provide updates report following Diff Output Format Specification
-- The system is expected to support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
-- When override targets an ontology element, the operation is expected to support ontology rebasing by updating `ontology_base` and `ontology_prefix` and rewriting dependent ontology boundaries, inherited prefix declarations, imports, and reachable SHACL references atomically before persistence
+- Ordinary creation applies when the supplied name is absent, including an override-enabled request whose name does not yet exist.
+- Existing-name replacement is governed by the separately owned atomic override behavior; duplicate creation without override remains invalid.
 
 #### Metadata
   * type: specification
@@ -105,6 +105,7 @@ Detailed workflow for deleting existing model elements.
 Resolve the subject by exact name or canonical identifier through the bound element-selection contract before orphan checks or candidate changes.
 
 When deleting an element, the system is expected to:
+- Apply orphan checks to actual deletion of the element. Same-identity replacement retains the element in the completed candidate and is governed by atomic override validation.
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
 - Invoke the shared candidate validation gate before persistence and reject deletion if the remaining model violates the referenced semantic-contract validation rules
@@ -376,6 +377,33 @@ When renaming an element, the system is expected to:
 The system is expected to reject the operation with a clear error message if:
 - The element does not exist
 - The new name conflicts with an existing element
+
+#### Metadata
+  * type: specification
+---
+
+### Focused Element Editing Specification
+
+Contract for selected-content edits on an existing element.
+
+#### Details
+
+##### Targets and Applicability
+- The target is a case-sensitive nonempty string. Element Text selects opening prose before the first subsection recognized by the document grammar. Other values are exact subsection names.
+- Element Text, Details and permitted custom prose subsections support append, replace and replace_text; optional named prose subsections additionally support create and delete. Element-type restrictions still apply, including concept prohibition of Details. Creation appends a new content subsection using canonical document form while preserving existing subsection order and protected declarations.
+- Ontology, Shapes and Query permit replace and replace_text on their complete native Markdown payloads, including the required fenced block. They reject append, create and delete; required payloads and language rules remain enforced. Structured payload content must not escape its subsection.
+- Metadata, Relations, Properties, Contract Bindings, Contract References, Concept References, Labels, Mappings, External Ontology and Produces are protected from all operations here. Other native reserved sections require an explicit supported editing policy rather than falling through as custom prose. Scope Note and Examples may be edited only through their existing element-type syntax and validation. Repeated/ambiguous subsection selection is rejected.
+
+##### Operation Arguments
+- append, replace and create require a string content and reject old_text/new_text arguments. Append retains existing contents and inserts a deterministic paragraph separator when both sides are nonempty. Replace changes only contents; an empty replacement clears them if valid. Create generates the subsection heading and fails if it already exists.
+- replace_text requires nonempty old_text and a string new_text; reject content. Match literal text exactly once within the target and never search the rest of the element or file. Zero or multiple matches are errors. Empty new_text is allowed subject to validation.
+- delete rejects content, old_text and new_text. Delete removes both heading and content, rejects Element Text and required/protected sections, and fails for a missing subsection.
+- All operations except create reject missing subsections. Reject unknown operations, unsupported combinations and structural boundary injection. A missing element never creates an element.
+
+##### Revision and Evidence
+- Application requires expected_model_revision, the existing canonical accepted-model fingerprint for the selected context. Preview may omit it; when supplied it must match for previews too. Check equality within the exclusive mutation transaction before preparing the candidate.
+- Return the base_model_revision for preview/application, selected element identifier/name, target and edit operation, ordinary update diff evidence, dry_run state and changed files. The surrounding MCP context identifies the accepted model revision; successful application advances it only for an effective edit.
+- Same-content replacement or empty append is an explicit no-op with empty diffs/changed files and unchanged accepted revision and pending set. Do not label it as a persisted change. Successful effective edits require nonempty accurate diffs, updated accepted reads and durable source bytes. Existing commit and recovery policy applies.
 
 #### Metadata
   * type: specification

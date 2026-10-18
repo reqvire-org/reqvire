@@ -373,6 +373,8 @@ When guiding contract authoring, refactoring, exploration, implementation planni
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
   * [MCP Formatting Tool Specification](Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](Specifications.md#mcp-lint-fix-tool-specification)
   * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
@@ -1015,6 +1017,8 @@ WHILE serving a local MCP client over standard input and output, the system SHAL
 
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---
 
 ### MCP Stdio Transport
@@ -1029,6 +1033,9 @@ WHEN a local MCP client selects standard input and output transport, the system 
 
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
 ---
 
 ### MCP Streamable HTTP Transport
@@ -1271,4 +1278,24 @@ WHEN a client selects an existing branch, the system SHALL open an eligible work
   * definedBy: [MCP Worktree Opening and Inventory Specification](Specifications.md#mcp-worktree-opening-and-inventory-specification)
   * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Update Element Tool
+
+WHEN a mutation-enabled MCP client requests a focused element edit, the system SHALL expose the shared selected-content editing operation through a typed context-bound tool with preview and revision-aware change evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [Focused Element Editing Specification](../../Operations/ModelOperations/Specifications.md#focused-element-editing-specification)
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Update Element Tool Specification](Specifications.md#mcp-update-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
 ---

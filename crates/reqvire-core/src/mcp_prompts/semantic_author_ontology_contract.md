@@ -7,6 +7,8 @@ Workflow:
 - Establish the system-of-interest scope and the competency questions the ontology must help answer.
 - Decide whether the requested meaning belongs in native concepts, ontology, requirements, requirement-owned contracts, or semantic contracts before authoring terms.
 - For ontology changes, inspect the owning ontology document, inherited `ontology_base`, `ontology_prefix`, external ontology declarations, and dependent semantic contracts.
+- For a focused payload edit, preview `reqvire.update_element` using an exact existing name/canonical identifier, target Ontology/Shapes/Query, operation replace with complete fenced Markdown content or replace_text with exactly one literal old_text match and new_text, and dry_run: true. Apply in the same worktree context with expected_model_revision equal to the preview's base_model_revision. Native payloads reject append/create/delete; protected declarations remain unchanged and complete-candidate semantic validation still applies.
+- Revise a complete existing definition with `reqvire.add_element` and `override_existing: true`; preview with `dry_run: true` before applying. Keep every intended authored metadata field, hierarchy declaration, OWL/SHACL block, and dependency in the payload. Incoming ontology children and consumers remain subject to complete-candidate validation. Namespace rebasing rewrites dependent boundaries, prefixes, imports and reachable SHACL references atomically.
 - For semantic-contract changes, inspect the ontology terms reachable through explicit `use` relations and the requirements reached through `constrain` / `constrainedBy`.
 
 Ontology authoring rules:

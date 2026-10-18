@@ -14,7 +14,6 @@ Operation fixtures use typed MCP authoring requests and compare expected outputs
   * derive: [Atomic Relation Relink Test](#atomic-relation-relink-test)
   * derive: [Create Element Diagnostic Verification](#create-element-diagnostic-verification)
   * derive: [Create Element Duplicate Detection Verification](#create-element-duplicate-detection-verification)
-  * derive: [Create Element Override Test](#create-element-override-test)
   * derive: [Create Element Test](#create-element-test)
   * derive: [Cross-Repository Workspace CRUD Test](#cross-repository-workspace-crud-test)
   * derive: [Delete Element Test](#delete-element-test)
@@ -28,6 +27,38 @@ Operation fixtures use typed MCP authoring requests and compare expected outputs
   * derive: [Relation Cross-Section Conflict Verification](#relation-cross-section-conflict-verification)
   * derive: [Target Location Validation Test](#target-location-validation-test)
   * derive: [Verification Objective Mutation Test](#verification-objective-mutation-test)
+---
+
+### Atomic Element Override Verification Objective
+
+Group verification that complete-definition replacement retains element identity and incoming relationships for valid parent and non-parent candidates.
+
+#### Details
+
+##### Required Acceptance Scenarios
+1. Override a capability with child capabilities and directly specifying requirements, and a requirement with child requirements. Exercise incoming declarations authored in the children's files. Retain their identifiers, ownership, governance inheritance, and expected traceability after a same-identifier prose update.
+2. Exercise target-authored hierarchy declarations separately: supplied outgoing declarations replace the previous definition. Reject a final orphan or invalid ownership, while accepting a valid changed definition; generated inverse records must not resurrect intentionally removed authored declarations.
+3. Override a requirement-owned contract with Contract Reference and Contract Binding consumers. Retain its unique owner and consumers. Override a referenced concept and verification objective while retaining valid incoming Concept References and concrete-verification hierarchy.
+4. Reject replacement types, owners, dependency cycles, hierarchy roots, concept schemes, forbidden prose links, and ontology/SHACL declarations that are incompatible with retained dependencies. Compare complete source trees and accepted model/revision/pending changes before and after every rejection; a subsequent valid operation must succeed.
+5. Preview and then apply the same valid replacement through typed MCP. Preview writes nothing and returns the intended diff. Apply changes only the accepted definition and necessary rewrites, returns update evidence, and makes subsequent read/collect/model/coverage results consistent with a fresh validated reload. Previously captured reads retain their original snapshot.
+6. Preserve cross-file override and ontology boundary-rebasing cases, including prefix/import/SHACL rewrites. Use existing contract-reference and ontology-aware mutation fixtures as the starting evidence families.
+7. Inject a persistence/publication failure and verify existing transaction recovery guarantees, unchanged accepted state, and preservation of unrelated files. Actual deletion of a sole parent must still be rejected; duplicate creation without override and creation of an absent name retain their existing behavior.
+
+##### Evidence Boundary
+Concrete override verification covers the parent and consumer fixture matrix, full-definition replacement, candidate rejection, cross-file rewrites, preview/application parity, and MCP transaction recovery. Contract-reference, ontology-aware mutation, semantic-contract CRUD, and prose-link fixtures provide their focused dependency and semantic-boundary evidence. This grouping objective does not verify or satisfy a requirement by itself.
+
+#### Concept References
+  * [Atomic Model Mutation](../../../Thesaurus/Thesaurus.md#atomic-model-mutation)
+  * [Authored Element Definition](../../../Thesaurus/Thesaurus.md#authored-element-definition)
+  * [Element Override](../../../Thesaurus/Thesaurus.md#element-override)
+  * [Incoming Relation](../../../Thesaurus/Thesaurus.md#incoming-relation)
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derive: [Create Element Override Test](#create-element-override-test)
+  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
 ---
 
 ### Atomic Relation Relink Test
@@ -147,20 +178,34 @@ Test cases:
 
 ### Create Element Override Test
 
-Verify shared create/override behavior against the existing override fixtures.
+Verify atomic full-definition override through typed MCP and the accepted mutation transaction.
 
 #### Details
-- Override existing content and compare the complete resulting source fixture; require the core result to identify an update and the reloaded model to validate.
-- Reject duplicate creation without override and preserve files. Override of a previously absent name acts as creation.
-- Reject an override that would orphan children. Require child names and remediation guidance in the shared error while retaining source bytes.
-- Override a childless element successfully and retain its incoming references and valid ownership.
-- Match core results and unified source diffs. Terminal status wording is renderer evidence, not a required MCP response field; protocol acceptance is planned separately.
+- Override childless existing content and compare the complete resulting source fixture; require the shared result to identify an update and the reloaded model to validate.
+- Reject duplicate creation without override and preserve files. Override of a previously absent name follows ordinary creation.
+- Compare replacement content and explicit target-authored metadata/relations against the supplied full definition, using unified source diffs.
+- Override capability and requirement parents whose children author incoming relations in other files. Compare preview and apply diffs, unchanged incoming documents, stable child identifiers, inherited governance, and fresh model validation. Actual deletion of the sole requirement parent remains rejected.
+- Preserve contract ownership, Contract Reference and Contract Binding consumers, native Concept References, and verification-objective hierarchy. Cross-file overrides rewrite child, owner, reference, binding, and concept destinations to the replacement location.
+- Distinguish incoming declarations from target-authored outgoing hierarchy. Omitting the only authored parent edge rejects an orphan; a valid omitted edge disappears from both graph directions without resurrection from a generated inverse.
+- Reject incompatible target types, missing owners and parents, requirement cycles, mixed capability roots, invalid concept-scheme metadata, and model-element prose links in preview and apply. Compare complete source trees, accepted revisions and pending changes; a valid subsequent override succeeds.
+- Preserve pending accepted work and previously captured reads. Inject automatic Git publication failure and require restored source, index, HEAD, accepted revision and pending state, followed by a successful retry.
+- Retain ontology base/prefix/import/SHACL rebasing and semantic removal rejection through the ontology-aware and semantic-contract CRUD suites.
+
+#### Concept References
+  * [Authored Element Definition](../../../Thesaurus/Thesaurus.md#authored-element-definition)
+  * [Element Override](../../../Thesaurus/Thesaurus.md#element-override)
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-crud/test.sh)
+  * verify: [Atomic Element Override](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
   * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
 ---
 
@@ -200,18 +245,6 @@ The test shall verify that new model elements can be created from a full Markdow
 6. Verify error message indicates which relation target was not found
 7. Verify target file remains unchanged after rejection
 
-**Test Steps - Override with Orphaned Children Prevention:**
-1. Create a parent element with child elements having parent hierarchical relations
-2. Attempt to override the parent element with `override_existing: true`
-3. Verify the operation is rejected with clear error message
-4. Verify the error lists all children that would be orphaned
-5. Verify the error provides resolution guidance
-6. Create a parent element with children having multiple parent hierarchical relations
-7. Override the parent element with `override_existing: true`
-8. Verify the operation succeeds (children have other parents)
-9. Override an element with no children
-10. Verify the operation succeeds
-
 **Test Coverage:**
 - Valid element with all subsections (metadata, relations, details)
 - Valid element with minimal structure (only ### header and content)
@@ -241,9 +274,6 @@ The test shall verify that new model elements can be created from a full Markdow
 - **Non-existent relation targets cause rejection**
 - **Relation paths are normalized to workspace-root-relative format**
 - **External links (http://, https://) bypass validation**
-- Override of parent elements with orphaned children is rejected
-- Error message clearly lists orphaned children with resolution guidance
-- Override succeeds when children have other parent relations
 
 #### Metadata
   * type: test-verification
@@ -820,4 +850,63 @@ Test cases:
   * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
   * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
   * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
+---
+
+### Focused Element Editing Verification Objective
+
+Group acceptance of bounded content changes, declaration preservation, revision preconditions and rejected edits through the production MCP boundary.
+
+#### Details
+The focused-editing suite was authored before implementation. Its initial red run reached a discoverable no-op MCP facade and failed substantive state/diff assertions. Passing discovery, schema checks or rejection cases alone does not prove successful editing. Concrete verifications below require observable effects and transaction recovery; this grouping objective carries no implementation evidence.
+
+Use ten independent scenarios with one primary fixture/server per scenario. Related edits form a single lifecycle; compact rejection tables cover distinct rules without repeating the operation/target/preview cross-product. Capture whole-model declaration and untargeted-content controls once around each scenario, source/revision preservation at each rejected request, and fresh restart checks for semantic payloads and revision/pending work. Shared MCP schema and context validation retain their existing verification ownership.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
+---
+
+### Focused Element Editing Acceptance Test
+
+Verify actual bounded source changes and declaration retention through production stdio MCP calls.
+
+#### Details
+- Exercise append and replace on Element Text and Details, exact-text edits, custom subsection creation/deletion and empty existing text. Compare explicit expected target content, complete source snapshots, stable identity/metadata/relations/dependencies, untouched neighbours and incoming consumers, preview/application diffs and fresh validated reloads. Success-shaped no-ops must fail these cases.
+- Exercise single-element documents, Unicode/CRLF source and fenced literal headings. Preserve literal fenced bytes while normalizing document line endings. New text stays before following reserved sections; code examples do not become structural boundaries.
+- Replace/edit native Ontology, Shapes and Query payloads through valid fixtures; preserve required fences, semantic context and neighbouring declarations. Confirm semantic reads and fresh validation reflect edits.
+- Require base revision evidence, changed accepted revision/pending paths for effective applications, stable HEAD/index without automatic commits, and explicit same-content/empty-append no-ops. Retain an earlier accepted mutation while editing another element. Fresh reads and restart must agree with persisted bytes.
+- Revision checks reject an old revision after a successful edit or another accepted change; retrying the old append cannot duplicate it. Keep pending state and source bytes unchanged after rejection.
+- Inject Git publication failure after a focused edit has prepared source changes. Restore source, index, HEAD, accepted revision and pending state; retry against the same base successfully, then reject that now-stale revision. Captured reads retain the original source and preview/application diffs agree.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
+  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
+---
+
+### Focused Element Editing Rejection Test
+
+Verify rejected focused edits preserve the source tree and accepted model state.
+
+#### Details
+- Use one table for distinct target and operation rules: missing elements, absent append/delete targets, duplicate creation, case/whitespace-sensitive target names, ambiguous/empty/out-of-target exact matches, representative missing or incompatible operation arguments, reserved Element Text create/delete, and forbidden Details on concepts. Exercise missing and stale application revisions, stale preview revisions and retry protection in the revision lifecycle.
+- Cover each protected declaration category once with a valid same-content replacement, so rejection cannot be attributed to malformed payload syntax. Check protected absent Properties creation and representative unsupported Ontology append, required Shapes deletion and Query creation; do not repeat every target against every operation and mode.
+- Reject new element/subsection boundaries, separators and fence escape that would reinterpret neighbours, forbidden prose links and invalid Turtle/SHACL/SPARQL. Keep valid fenced examples as positive controls.
+- Compare source bytes, accepted revision and pending changes after each rejected request with the scenario's shared accepted baseline. Include representative preview and application rejections. Compare HEAD/index, model declarations and untargeted content around the scenario; the revision lifecycle additionally performs a valid edit after rejection. Require MCP tool errors for semantic rejection and the existing invalid-params protocol error for unavailable-tool rejection. Generic field-type, required-field, unknown-field/operation and invalid-context validation remain covered by shared MCP verification rather than duplicated in this suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
+  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
 ---

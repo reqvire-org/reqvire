@@ -3,10 +3,22 @@
 Run the shell suites from the repository root using the locally built CLI:
 
 ```bash
-cargo build --bin reqvire
+cargo build --release --locked --bin reqvire
 ./tests/run_all.sh
 ./tests/run_all.sh test-serve-command
 ```
+
+The runner uses `target/release/reqvire` by default. To select a different build,
+set `REQVIRE_BIN` explicitly, for example for debugging:
+
+```bash
+cargo build --locked --bin reqvire
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_all.sh
+```
+
+Optimized builds reduce CPU time in parsing, validation, and query checks. Suites
+exercising timeouts still include those waits. The runner captures the selected
+executable for the entire run and fails startup if it is missing.
 
 Install ripgrep (`rg`) before running the suites; ontology hygiene checks use it.
 The pull-request workflow installs it explicitly.
@@ -24,6 +36,9 @@ milliseconds, invocation count, exit status, and suite name, in that order.
 The summary reports wall time separately from accumulated process time.
 Interrupting the runner stops its active test processes and removes their
 interrupted fixture while retaining completed failure evidence and logs.
+Suites run noninteractively with stdin connected to `/dev/null`, so dependencies
+cannot suspend a background suite by reading the launching terminal. Tests that
+exercise stdin protocols must supply their own input pipes or files.
 
 Run `./tests/run_all.sh test-model-revision-hashing` for the canonical model
 revision contract. It uses Python 3's standard library to call the real HTTP MCP

@@ -27,18 +27,18 @@ try {
   await wait(() => browser.evaluate(() => document.visibilityState === 'visible'), 'original tab activation');
   const assert = (ok, message) => { if (!ok) throw new Error(message); };
   if (dirty) {
-    await browser.evaluate(() => document.querySelector('.ux-worktree-selector [role="combobox"]').click());
+    await browser.evaluate(() => document.querySelector('[role="combobox"][aria-label="Branch"]').click());
     await wait(() => browser.evaluate(id => Boolean(document.querySelector(`[data-worktree-id="${id}"]`)), dirty), 'dirty branch choice');
     await browser.evaluate(id => document.querySelector(`[data-worktree-id="${id}"]`).click(), dirty);
     await wait(() => browser.evaluate(() => document.body.textContent.includes('clean')), 'dirty branch rejection');
     assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id, original), 'Dirty admission replaced the displayed branch');
-    assert(await browser.evaluate(() => document.querySelector('.ux-worktree-selector [role="combobox"]').getAttribute('aria-busy') !== 'true'), 'Failed admission is still shown as loading');
+    assert(await browser.evaluate(() => document.querySelector('[role="combobox"][aria-label="Branch"]').getAttribute('aria-busy') !== 'true'), 'Failed admission is still shown as loading');
     await browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog').parentElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })));
     await wait(() => browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id && !document.querySelector('.ux-worktree-load-dialog'), original), 'dismiss dirty-branch rejection');
   }
   assert(await browser.evaluate(() => {
     const navigation = document.querySelector('nav[aria-label="Explorer views"]');
-    const selector = document.querySelector('.ux-worktree-selector [role="combobox"]');
+    const selector = document.querySelector('[role="combobox"][aria-label="Branch"]');
     return Boolean(navigation && selector
       && navigation.querySelectorAll('[role="tab"]').length === 5
       && selector.closest('[data-product-pattern-slot="header-context"]')?.previousElementSibling?.getAttribute('data-product-pattern-slot') === 'header-actions'
@@ -70,23 +70,29 @@ try {
     };
   }, secondary);
   for (const action of ['outside', 'escape', 'close']) {
-    await browser.evaluate(() => { window.simulateWorktreeError = true; document.querySelector('.ux-worktree-selector [role="combobox"]').click(); });
+    await browser.evaluate(() => { window.simulateWorktreeError = true; document.querySelector('[role="combobox"][aria-label="Branch"]').click(); });
     await wait(() => browser.evaluate(id => Boolean(document.querySelector(`[data-worktree-id="${id}"]`)), secondary), 'failure target choice');
     await browser.evaluate(id => document.querySelector(`[data-worktree-id="${id}"]`).click(), secondary);
-    await wait(() => browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog [role="alert"]')?.textContent === 'Injected worktree load failure'), 'worktree error dialog');
+    await wait(() => browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog [role="alert"]')?.textContent === 'Injected worktree load failure'), `worktree error dialog (${action})`);
     assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Failure must retain and block the accepted model');
-    if (action === 'escape') await browser.rpc('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+    stage = `dismiss failed switch (${action})`;
+    if (action === 'escape') {
+      // Preact updates the modal's document-level Escape listener after paint.
+      await browser.evaluate(() => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0))));
+      await browser.rpc('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+      await browser.rpc('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+    }
     else await browser.evaluate(action => action === 'outside'
       ? document.querySelector('.ux-worktree-load-dialog').parentElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
       : [...document.querySelectorAll('.ux-worktree-load-dialog button')].find(button => button.textContent.trim() === 'Close').click(), action);
-    await wait(() => browser.evaluate(url => location.href === url && !document.querySelector('.ux-worktree-load-dialog') && !document.querySelector('[data-product-pattern="app-shell"]').inert, retainedUrl), 'dismiss failed switch');
+    await wait(() => browser.evaluate(url => location.href === url && !document.querySelector('.ux-worktree-load-dialog') && !document.querySelector('[data-product-pattern="app-shell"]').inert, retainedUrl), `dismiss failed switch (${action})`);
   }
   await browser.evaluate(() => { window.simulateWorktreeError = false; window.holdWorktreeLoad = true; });
   // Show a detail overlay before changing contexts: it must close on adoption.
   await browser.evaluate(() => { location.hash = '#/elements/' + encodeURIComponent(window.reqvireProjectStore.elements[0].id); });
   await wait(() => browser.evaluate(() => Boolean(document.querySelector('[role="dialog"]'))), 'element detail dialog');
   await browser.evaluate(id => {
-    const select = document.querySelector('.ux-worktree-selector [role="combobox"]');
+    const select = document.querySelector('[role="combobox"][aria-label="Branch"]');
     if (!select) throw new Error('Missing worktree selector');
     select.click();
   }, secondary);

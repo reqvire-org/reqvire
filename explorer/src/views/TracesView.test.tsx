@@ -81,6 +81,15 @@ const cards = () => [...region().querySelectorAll("[data-flow-node]")];
 beforeEach(() => {
   localStorage.clear(); window.history.replaceState(null, "", "/#/traces");
   layoutEngine.mockReset().mockImplementation(testFlowLayoutEngine); onOpenElement.mockReset();
+  // jsdom does not measure the CSS-token sizing probe used before layout starts.
+  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains("ux-trace-flow-node-size")
+      ? Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-width")) : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains("ux-trace-flow-node-size")
+      ? Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-height")) : 0;
+  });
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); window.history.replaceState(null, "", "/"); });

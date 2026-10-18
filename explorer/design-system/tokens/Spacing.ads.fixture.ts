@@ -38,6 +38,8 @@ export const fixture = {
     {"token":"--space-file-row-card-min-h","property":"width","probe":"13.375px"},
     {"token":"--space-file-tile-min-h-compact","property":"width","probe":"13.375px"},
     {"token":"--space-file-tile-min-w","property":"width","probe":"13.375px"},
+    {"token":"--space-flow-node-width","property":"width","probe":"13.375px"},
+    {"token":"--space-flow-node-height","property":"height","probe":"13.375px"},
     {"token":"--space-graph-side-panel-max-h","property":"width","probe":"13.375px"},
     {"token":"--space-graph-side-panel-w","property":"width","probe":"13.375px"},
     {"token":"--space-help-legend-column-min","property":"width","probe":"13.375px"},

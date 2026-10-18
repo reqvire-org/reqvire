@@ -31,7 +31,7 @@ export default function CodingAssistants() {
             },
             {
               name: "MCP server",
-              desc: "Streamable HTTP for MCP-capable clients, with planned stdio support for client-managed project processes. Read/report tools, resources, and prompts are available by default; mutation tools require explicit enablement.",
+              desc: "Streamable HTTP and stdio for client-managed project processes. Read/report tools, resources, and prompts are available by default; mutation tools require explicit enablement.",
             },
           ]}
         />
@@ -121,13 +121,11 @@ reqvire mcp --enable-mutations`}</CodeBlock>
         </p>
         <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          Planned stdio support will let the client start Reqvire for a project
-          automatically. It is specified and tested as an acceptance target, but
-          is not implemented yet. Configure a command and arguments with an
+          Stdio lets the client start Reqvire for a project automatically.
+          Configure a command and arguments with an
           absolute workspace path; see the MCP Server page for the client example.
         </p>
-        <CodeBlock>{`# Planned; not yet implemented
-npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/project mcp --transport stdio`}</CodeBlock>
+        <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/project mcp --transport stdio`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Use{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">

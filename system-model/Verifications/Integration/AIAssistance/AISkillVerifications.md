@@ -41,6 +41,8 @@ Inspect the shared assistant guidance for correct contract ownership, implementa
 - Confirm references remain visible to collection, search, and change-impact review while contributing no implementation evidence, blockers, terminal dependencies, or coverage units.
 - Confirm guidance rejects mixed binding/reference sections on one requirement, file-path reference targets, self-dependencies, and cycles through references, bindings, or requirement ancestry.
 - Confirm command examples use `referenceContract`, `reqvire.unlink` with typed operation fields and `dry_run: false`, and the dedicated binding/reference search filters with identifier globs. Confirm installed packages for both target agents retain the same dependency semantics and use the shared skill names.
+- Review authoring guidance and its complete replacement example against the override acceptance cases: incoming children/consumers survive, omitted authored declarations are removed, requirement parents remain explicit in payloads, invalid candidates preserve accepted state, and actual deletion retains orphan protection.
+- Review setup guidance against native/npm stdio acceptance results, including client-managed startup, HTTP default, absolute workspace selection, permissions, rejected HTTP-only flags and shutdown preservation. Compare installed bytes with the canonical packages.
 
 Review artifact: [SKILL.md](../../../../skills/reqvire-syseng/SKILL.md).
 

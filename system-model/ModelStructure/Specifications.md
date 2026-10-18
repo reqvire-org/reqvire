@@ -133,7 +133,7 @@ The typed MCP link tool with `source`, `relation_type: "referenceContract"` and 
 
 Create, override, link, unlink, relink, move, rename, merge, and removal operations MUST validate resulting references before persistence. Invalid edits MUST preserve source files. Dry runs MUST return reviewable diffs without writing files.
 
-Overriding an element at the same identifier MUST preserve incoming references and externally authored relations, including ownership. Changes to its type or ownership MUST be validated against those retained dependencies. An invalid override MUST preserve the original model and authored files.
+Incoming Contract References and externally authored contract ownership MUST survive replacement of their target in the complete override candidate. Changes to the replacement's type or ownership MUST be checked against those retained contract dependencies; invalid candidates MUST preserve the original model and authored files. General identity, hierarchy, full-definition scope, and transaction semantics belong to the atomic override behavior.
 
 Overriding a referenced contract into another file MUST transfer its incoming references and externally authored ownership relations to the replacement identifier. The replacement content and all rewritten dependencies MUST be validated and persisted atomically. Dry-run output MUST show the replacement and dependency rewrites while preserving authored files.
 

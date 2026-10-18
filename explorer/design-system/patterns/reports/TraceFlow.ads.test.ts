@@ -1,7 +1,9 @@
 import { testFlowLayoutEngine } from "../../test/flowLayoutEngine.ads.helpers";
 import { describe, expect, it } from "vitest";
-import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
+import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
 import { SPLIT_MERGE_TRACE } from "./fixtures/traces.ads.fixture";
+
+const nodeSize = { width: 280, height: 164 };
 
 const trace: TraceFlowData = {
   verification: { id: "v", name: "Check", type: "test-verification", file: "Checks.md" },
@@ -79,7 +81,7 @@ describe("native trace flow", () => {
   it.each(["RIGHT", "DOWN"] as const)("routes shortcuts around cards and reserves relation label space (%s)", async direction => {
     const graph = await layoutTrace(SPLIT_MERGE_TRACE.trace, undefined, direction);
     const cards = graph.nodes.map(node => ({
-      id: node.id, x: node.position.x, y: node.position.y, width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
+      id: node.id, x: node.position.x, y: node.position.y, ...graph.nodeSize,
     }));
     const insideLayout = (rectangle: { x: number; y: number; width: number; height: number }) => {
       expect(rectangle.x).toBeGreaterThanOrEqual(graph.bounds.x);
@@ -191,5 +193,5 @@ describe("native trace flow", () => {
 });
 
 function buildTraceFlowGraph(topology: Parameters<typeof buildGraph>[0], direction: Parameters<typeof buildGraph>[1] = "RIGHT") {
-  return buildGraph(topology, direction, input => testFlowLayoutEngine(input).result);
+  return buildGraph(topology, direction, input => testFlowLayoutEngine(input).result, nodeSize);
 }

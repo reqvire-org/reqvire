@@ -13,8 +13,8 @@ import { SegmentedControl } from "../../components/controls/SegmentedControl";
 import { Spinner } from "../../components/core/Spinner";
 import { ExpandableViewport } from "../../components/core/ExpandableViewport";
 import {
-  buildTraceFlowTopology, traceFlowNeighborhood, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH,
-  type TraceFlowData, type TraceFlowElement, type TraceFlowDirection, type TraceFlowTopology, type ElementFlowData, type FlowLayoutEngine,
+  buildTraceFlowTopology, traceFlowNeighborhood,
+  type TraceFlowData, type TraceFlowElement, type TraceFlowDirection, type TraceFlowTopology, type ElementFlowData, type FlowLayoutEngine, type TraceFlowNodeSize,
 } from "./traceFlowLayout";
 import { useTraceFlowLayout } from "./useTraceFlowLayout";
 
@@ -33,8 +33,8 @@ export interface ElementFlowProps {
 }
 
 const baseUX = css`
-  --ux-trace-node-width: ${TRACE_NODE_WIDTH}px;
-  --ux-trace-node-height: ${TRACE_NODE_HEIGHT}px;
+  --ux-trace-node-width: var(--space-flow-node-width);
+  --ux-trace-node-height: var(--space-flow-node-height);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -82,6 +82,13 @@ const baseUX = css`
     flex: 1 1 auto;
     min-width: 0;
     min-height: 0;
+  }
+  .ux-trace-flow-node-size {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    width: var(--ux-trace-node-width);
+    height: var(--ux-trace-node-height);
   }
   .ux-trace-flow-status {
     position: absolute;
@@ -314,8 +321,10 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
     flow: ReactFlowInstance<FlowNode, FlowEdge>;
   } | null>(null);
   const canvas = useRef<HTMLDivElement>(null);
+  const nodeProbe = useRef<HTMLDivElement>(null);
+  const [nodeSize, setNodeSize] = useState<TraceFlowNodeSize | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const { graph, pending, failed, retry } = useTraceFlowLayout(topology, direction, layoutEngine);
+  const { graph, pending, failed, retry } = useTraceFlowLayout(topology, direction, layoutEngine, nodeSize);
   // React Flow's deferred onInit can arrive after its canvas is unmounted.
   // A generation distinguishes DOWN → RIGHT → DOWN, even with equal directions.
   const canvasGeneration = useMemo(() => ({}), [graph?.direction]);
@@ -333,6 +342,19 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
   const waitingForCanvas = Boolean(graph && !flow);
   const busy = pending || waitingForCanvas;
   const nodeById = useMemo(() => new Map(graph?.nodes.map(node => [node.id, node])), [graph]);
+  useLayoutEffect(() => {
+    const element = nodeProbe.current;
+    if (!element) return;
+    const measure = () => {
+      const width = element.offsetWidth;
+      const height = element.offsetHeight;
+      if (width > 0 && height > 0) setNodeSize(previous => previous?.width === width && previous.height === height ? previous : { width, height });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [expanded]);
   useLayoutEffect(() => {
     const element = canvas.current;
     if (!element) return;
@@ -361,7 +383,7 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
   // Retain node objects during viewport navigation so React Flow keeps measured handles.
   const nodes = useMemo<FlowNode[]>(() => (graph?.nodes ?? []).map(node => ({
     id: node.id, type: "trace", position: node.position,
-    width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
+    width: graph!.nodeSize.width, height: graph!.nodeSize.height,
     data: {
       element: node.element, elementType: node.type,
       direction: graph?.direction ?? direction,
@@ -412,6 +434,8 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
       </div>
     </header>
     <div className="ux-trace-flow-canvas" ref={canvas}>
+      {/* Outside the transformed viewport: layout consumes the actual shared CSS dimensions. */}
+      <div className="ux-trace-flow-node-size" ref={nodeProbe} aria-hidden="true" />
       {graph && <ReactFlow key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={initializeCanvas}
         onNodeClick={(event, node) => {
           // Register with React Flow so read-only nodes retain browser pointer events.

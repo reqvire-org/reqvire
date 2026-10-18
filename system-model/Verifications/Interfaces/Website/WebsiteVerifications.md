@@ -19,6 +19,8 @@ This inspection verifies that endpoint-host and browser-origin setup examples ma
 - Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
 - Build the website and check the examples against command help and the transport verification results.
 - Review mutation examples for default-disabled automatic commits, explicit `--enable-commits`, standalone/embedded prerequisites, unchanged ownership, and resolution of uncommitted changes before a clean restart.
+- Review stdio startup and client configuration across MCP Server, Coding Assistants, User Guide and Integrations: HTTP default, explicit `--transport stdio`, absolute workspace selection, shared permissions, rejected HTTP-only flags, protocol-only stdout and preservation of pending work on shutdown. Compare with the passing native/npm transport and lifecycle acceptance cases.
+- Review full-definition override guidance on MCP Server and User Guide: retained incoming children and consumers, replacement of authored metadata/outgoing declarations, preview/application, cross-file rewrites, invalid-candidate preservation and actual deletion's orphan protection. Compare with the override acceptance matrix.
 
 Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
 

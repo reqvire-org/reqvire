@@ -47,7 +47,7 @@ Access rules:
 Typed interface for `reqvire.add_element` over shared Reqvire operations.
 
 #### Details
-`file` and `content` are required; `override_existing` and `dry_run` default to false. Reuse target admission, Markdown parsing, incoming-reference preservation and ontology-aware override/rebasing from the shared create workflow.
+`file` and `content` are required; `override_existing` and `dry_run` default to false. Reuse the shared creation workflow for absent names and atomic full-definition override for existing names. A valid parent override preserves externally authored incoming relationships, including child hierarchy links, without requiring unlink/relink calls. Replacement metadata and target-authored declarations come from the supplied definition; this is not a body-only edit. Retain ontology rebasing, cross-file incoming-reference rewrites, complete-candidate validation, canonical transaction persistence, and unchanged-state previews through shared core operations. Existing typed arguments remain sufficient for full-definition override. Focused text and subsection edits have a separate typed update contract.
 
 The owning requirement's contract references provide the core workflow, selection, validation and persistence semantics. The adapter maps typed fields to those operations and wraps shared results as MCP evidence. Authoring operations and their `dry_run` previews require mutation enablement; conditional formatting uses the permissions stated above. A rejected candidate or failed transaction preserves source files and the accepted snapshot. Successful writes normalize affected model documents through the canonical persistence contract and refresh only the selected context. No removed CLI command, shell invocation or adapter-local model engine implements this tool.
 
@@ -1245,6 +1245,7 @@ Mutation and maintenance tools:
 - `reqvire.format` (`fix: false` preview; enabled `fix: true` application)
 - `reqvire.lint` (`fix: false` inspection; enabled `fix: true` safe repair on the same tool)
 - `reqvire.add_element`
+- `reqvire.update_element`
 - `reqvire.remove_element`
 - `reqvire.move_element`
 - `reqvire.rename_element`
@@ -1362,6 +1363,7 @@ Local mutation tools:
 - `reqvire.git.commit`
 - `reqvire.git.reconcile`
 - `reqvire.add_element`
+- `reqvire.update_element`
 - `reqvire.remove_element`
 - `reqvire.move_element`
 - `reqvire.rename_element`
@@ -1543,4 +1545,19 @@ Embedded MCP behavior:
 
 #### Relations
   * define: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
+---
+
+### MCP Update Element Tool Specification
+
+Typed interface for reqvire.update_element over shared focused element editing.
+
+#### Details
+- Required arguments: element_name, target and operation. element_name accepts an existing exact name or canonical identifier. target is one string, including the reserved Element Text selector. operation is append, replace, replace_text, create or delete.
+- Optional arguments: content, old_text, new_text, expected_model_revision, dry_run and worktree_id. Operation-specific requirements and exclusions follow the focused-editing contract. dry_run defaults to false; applying requires expected_model_revision. The context wrapper owns worktree_id and passes only core arguments onward.
+- Advertise the same immutable input schema for tools/list and tool_contract, classify this as a mutation, and expose it only with mutations enabled. Preview requires the same permission. Validate schema and operation arguments before side effects; unknown fields are rejected.
+- Route through the existing selected-context worker and shared core mutation boundary. Check revision within the mutation gate, preserve ownership and accepted pending work, and return ordinary structured update evidence with base_model_revision, target and edit_operation. No CLI authoring command or shell proxy is introduced.
+- Effective updates must be observable in subsequent read_element and fresh workspace reads. Discovery or a success-shaped no-op response alone cannot establish implementation fulfillment.
+
+#### Metadata
+  * type: specification
 ---

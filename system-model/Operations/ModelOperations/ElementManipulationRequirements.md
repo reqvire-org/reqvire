@@ -1,5 +1,33 @@
 # Elements
 
+### Atomic Element Override
+
+WHEN an override supplies a replacement definition for an existing element, the system SHALL atomically replace that definition while preserving the element's identity and externally authored incoming relationships whenever the complete candidate model is valid.
+
+IF the replacement candidate is invalid or its persistence fails, THEN the system SHALL retain the previously accepted model and source files under the existing mutation transaction guarantees.
+
+#### Concept References
+  * [Atomic Model Mutation](../../Thesaurus/Thesaurus.md#atomic-model-mutation)
+  * [Authored Element Definition](../../Thesaurus/Thesaurus.md#authored-element-definition)
+  * [Element Override](../../Thesaurus/Thesaurus.md#element-override)
+  * [Incoming Relation](../../Thesaurus/Thesaurus.md#incoming-relation)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Canonical Model Mutation Persistence Specification](Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Element Type Metadata Specification](../../ModelStructure/Specifications.md#element-type-metadata-specification)
+  * [Target Location Constraint](Constraints.md#target-location-constraint)
+
+#### Relations
+  * definedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
+  * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * verifiedBy: [Create Element Override Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#create-element-override-test)
+---
+
 ### Atomic Relation Relink Operation
 
 The system shall provide an atomic relation relink operation that rewires an existing relation target to a new target while preserving model validity.
@@ -61,7 +89,6 @@ The system shall provide the capability to create new model elements by acceptin
   * [Element Type Metadata Specification](../../ModelStructure/Specifications.md#element-type-metadata-specification)
 
 #### Relations
-  * definedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
   * definedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
   * definedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
@@ -76,6 +103,9 @@ The system shall provide the capability to create new model elements by acceptin
 ### Delete Element Operation
 
 The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element, and removing empty files when no elements remain.
+
+#### Concept References
+  * [Element Deletion](../../Thesaurus/Thesaurus.md#element-deletion)
 
 #### Metadata
   * type: requirement
@@ -285,4 +315,34 @@ The system shall define target location validation constraints.
   * satisfiedBy: [crud_ops.rs](../../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
   * satisfiedBy: [utils.rs](../../../crates/reqvire-core/src/utils.rs)
   * verifiedBy: [Target Location Validation Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#target-location-validation-test)
+---
+
+### Focused Element Content Editing
+
+WHEN an author requests a focused edit of existing element text or a permitted subsection, the system SHALL apply only that selected change while retaining element identity and all authored declarations outside the selection.
+
+IF a target, edit, revision precondition, or complete candidate is invalid, THEN the system SHALL reject the request without changing source files or previously accepted model state.
+
+WHEN an author previews a focused edit, the system SHALL return its validated change evidence without applying it.
+
+#### Concept References
+  * [Edit Target](../../Thesaurus/Thesaurus.md#edit-target)
+  * [Element Subsection](../../Thesaurus/Thesaurus.md#element-subsection)
+  * [Element Text](../../Thesaurus/Thesaurus.md#element-text)
+  * [Focused Element Edit](../../Thesaurus/Thesaurus.md#focused-element-edit)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Canonical Model Mutation Persistence Specification](Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [MarkdownStructure](../../ModelStructure/MarkdownStructure.md#markdownstructure)
+  * [Operation Command Contract Specification](../../ModelStructure/Specifications.md#operation-command-contract-specification)
+
+#### Relations
+  * definedBy: [Focused Element Editing Behavior](Behaviors.md#focused-element-editing-behavior)
+  * definedBy: [Focused Element Editing Specification](Specifications.md#focused-element-editing-specification)
+  * derivedFrom: [Element Manipulation Operations](../../ModelStructure/ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [focused_edit.rs](../../../crates/reqvire-core/src/crud/focused_edit.rs)
 ---

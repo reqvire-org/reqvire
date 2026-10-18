@@ -1,6 +1,6 @@
 use crate::mcp;
 use crate::serve;
-use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand, ValueEnum};
 use reqvire::error::ReqvireError;
 use reqvire::exclusions::ExclusionSet as GlobSet;
 use reqvire::explorer_runtime;
@@ -30,6 +30,12 @@ pub struct Args {
 
     #[clap(subcommand)]
     pub command: Option<Commands>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum McpTransport {
+    Http,
+    Stdio,
 }
 
 #[derive(clap::Args, Debug)]
@@ -204,14 +210,18 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]>  Additional endpoint hostname (repeatable)"
+        override_help = "Start Reqvire MCP server\n\nMCP OPTIONS:\n      --transport <TRANSPORT>   MCP transport (default: http; values: http, stdio)\n      --host <HOST>             HTTP bind address (HTTP-only; default: 127.0.0.1)\n      --port <PORT>             HTTP server port (HTTP-only; default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --with-size-estimates     Include element size estimates in model evidence tools\n      --allow-origin <ORIGIN>   Additional browser origin (HTTP-only; repeatable; loopback remains allowed)\n      --allow-host <HOST[:PORT]> Additional endpoint host or host:port (HTTP-only; repeatable)"
     )]
     Mcp {
-        /// HTTP bind address
+        /// MCP transport (default: http; values: http, stdio)
+        #[clap(long, value_enum, default_value = "http", help_heading = "MCP OPTIONS")]
+        transport: McpTransport,
+
+        /// HTTP bind address (HTTP-only)
         #[clap(long, default_value = "127.0.0.1", help_heading = "MCP OPTIONS")]
         host: String,
 
-        /// HTTP server port
+        /// HTTP server port (HTTP-only)
         #[clap(long, default_value = "8081", help_heading = "MCP OPTIONS")]
         port: u16,
 
@@ -240,7 +250,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MCP OPTIONS")]
         with_size_estimates: bool,
 
-        /// Additional browser origin (repeatable; loopback remains allowed)
+        /// Additional browser origin (HTTP-only; repeatable; loopback remains allowed)
         #[clap(
             long = "allow-origin",
             value_name = "ORIGIN",
@@ -248,7 +258,7 @@ pub enum Commands {
         )]
         allowed_origins: Vec<crate::mcp_http::AllowedOrigin>,
 
-        /// Additional endpoint host or host:port (repeatable)
+        /// Additional endpoint host or host:port (HTTP-only; repeatable)
         #[clap(
             long = "allow-host",
             value_name = "HOST[:PORT]",
@@ -614,6 +624,35 @@ pub enum ConceptCommands {
 }
 
 impl Args {
+    fn try_parse_args_from<I, T>(args: I) -> Result<Self, clap::Error>
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<std::ffi::OsString> + Clone,
+    {
+        let matches = Self::command().try_get_matches_from(args)?;
+        if let Some(mcp) = matches.subcommand_matches("mcp") {
+            if mcp.get_one::<McpTransport>("transport") == Some(&McpTransport::Stdio) {
+                for (id, flag) in [
+                    ("host", "--host"),
+                    ("port", "--port"),
+                    ("allowed_origins", "--allow-origin"),
+                    ("allowed_hosts", "--allow-host"),
+                ] {
+                    // Explicit default values are still HTTP-only options.
+                    if mcp.value_source(id) == Some(clap::parser::ValueSource::CommandLine) {
+                        return Err(Self::command().error(
+                            clap::error::ErrorKind::ArgumentConflict,
+                            format!(
+                                "{flag} is HTTP-only and cannot be used with --transport stdio"
+                            ),
+                        ));
+                    }
+                }
+            }
+        }
+        Self::from_arg_matches(&matches)
+    }
+
     pub fn parse_args() -> Self {
         // Check if help was requested before parsing
         let args: Vec<String> = std::env::args().collect();
@@ -622,7 +661,7 @@ impl Args {
             print_custom_help(&cmd);
             std::process::exit(0);
         }
-        match Self::try_parse_from(&args) {
+        match Self::try_parse_args_from(&args) {
             Ok(args) => args,
             Err(error) => {
                 use clap::error::{ContextKind, ContextValue};
@@ -1009,6 +1048,7 @@ pub async fn handle_command(
     }
 
     if let Some(Commands::Mcp {
+        transport,
         host,
         port,
         enable_mutations,
@@ -1020,20 +1060,26 @@ pub async fn handle_command(
         allowed_hosts,
     }) = args.command
     {
-        return mcp::serve_http(
-            mcp::McpOptions {
-                enable_mutations,
-                enable_commits,
-                enable_github,
-                github_remote: github_remote.as_deref().unwrap_or("origin"),
-                with_size_estimates,
-            },
-            excluded_filename_patterns,
-            &host,
-            port,
-            &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
-        )
-        .await
+        let options = mcp::McpOptions {
+            enable_mutations,
+            enable_commits,
+            enable_github,
+            github_remote: github_remote.as_deref().unwrap_or("origin"),
+            with_size_estimates,
+        };
+        return match transport {
+            McpTransport::Http => {
+                mcp::serve_http(
+                    options,
+                    excluded_filename_patterns,
+                    &host,
+                    port,
+                    &crate::mcp_http::HttpAccess::new(&allowed_origins, &allowed_hosts),
+                )
+                .await
+            }
+            McpTransport::Stdio => mcp::serve_stdio(options, excluded_filename_patterns).await,
+        }
         .map(|_| 0);
     }
 
@@ -1616,6 +1662,44 @@ mod tests {
             }
         }
         builder.build().expect("Failed to build glob set")
+    }
+
+    #[test]
+    fn mcp_transport_options_reject_explicit_http_flags_only_for_stdio() {
+        for (flag, value) in [
+            ("--host", "127.0.0.1"),
+            ("--port", "8081"),
+            ("--allow-origin", "https://app.example"),
+            ("--allow-host", "mcp.example"),
+        ] {
+            for transport in ["http", "stdio"] {
+                let result = Args::try_parse_args_from([
+                    "reqvire",
+                    "mcp",
+                    "--transport",
+                    transport,
+                    flag,
+                    value,
+                ]);
+                if transport == "stdio" {
+                    let error = result.expect_err("HTTP-only option accepted with stdio");
+                    assert_eq!(error.kind(), clap::error::ErrorKind::ArgumentConflict);
+                    assert!(error.to_string().contains(flag));
+                } else {
+                    assert!(result.is_ok());
+                }
+            }
+        }
+        assert!(matches!(
+            Args::try_parse_args_from(["reqvire", "mcp"])
+                .expect("default HTTP transport should parse")
+                .command,
+            Some(Commands::Mcp {
+                transport: McpTransport::Http,
+                ..
+            })
+        ));
+        assert!(Args::try_parse_args_from(["reqvire", "mcp", "--transport", "stdio"]).is_ok());
     }
 
     #[test]

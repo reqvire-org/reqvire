@@ -15,6 +15,8 @@ Verify temporary fixture ownership, independent run evidence, interruption clean
 #### Details
 - Run disposable passing and failing suites through a copy of the real runner and timing wrapper. Assert initialized Git state, successful fixture removal, failed fixture retention at the reported path, and accurate pass/fail exit status and counts.
 - Run the same suite concurrently and assert distinct fixture and log directories with both runs' evidence preserved.
+- With no executable override, provide distinct release and debug builds and assert the optimized release build is selected. Remove the release executable and assert startup fails without running a suite or falling back to debug. Explicit executable selection remains covered by the other lifecycle cases.
+- Launch the runner with a controlling pseudo-terminal and make a suite read stdin. Assert it receives EOF and completes within a bounded deadline, without job-control suspension or a leaked successful fixture.
 - Start a run with an executable path containing spaces. Remove that source between calls and replace it with another build before a later suite; every call in the active run MUST retain the captured behavior. A new selected run MUST use the replacement build. Assert cleanup removes the private executable, including runs retaining a failed fixture. Missing or non-executable configured inputs MUST fail before fixture setup and leave no run scratch files.
 - Interrupt an active suite with a child process, a server launched in a separate session, and a child ignoring graceful termination. Assert bounded escalation, no surviving test child, removal of the interrupted fixture, retention of logs, and a signal-derived nonzero result. Confirm unrelated processes remain alive.
 - Make a suite fail during fixture setup and assert it is reported as a failure without running its test body.
@@ -55,7 +57,7 @@ Verify consistent executable selection and bounded browser lifecycle behavior ac
 Verify that CI tests and validates the checked-out revision and propagates failures.
 
 #### Details
-- Execute the workflows' host build and Rust test commands with an empty target and a deliberately stale worker executable. Assert the build precedes tests and `REQVIRE_TEST_BIN` points to the resulting executable in both PR and release jobs.
+- Execute the workflows' host build and Rust test commands with an empty target and a deliberately stale worker executable. Assert an optimized build precedes tests and `REQVIRE_TEST_BIN` points to the resulting release executable in both PR and release jobs. Assert shell E2E checks select that executable and the model-validation artifact is uploaded and downloaded at its release path.
 - Make the build or worker test fail and assert the workflow command sequence fails without proceeding as a success.
 - Confirm PR validation consumes the current run's compiled binary, targets development-branch PRs as well as main, and preserves the required check name.
 - Execute the model validation report command with a valid and an invalid model. The invalid model must fail despite report capture, and the workflow must retain the diagnostic report rather than tolerate the failure.

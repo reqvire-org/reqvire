@@ -18,14 +18,15 @@ present.
 
 ## Build & embed flow
 
-`npm run build` is lint-gated:
+`npm run build` runs source checks, unit/integration tests and registered ADS
+browser checks. Any failure stops the build:
 
 ```
 prebuild: lint:ds + assets:ds
-build:   lint:style + typecheck + build:app
+build:   lint:style + typecheck + test + build:app + test:ads
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.24` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.26` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
 Oxlint is pinned to `1.72.0` so guarded candidate linting also works inside the
 ignored `.ds/` workspace; `1.69.0` can incorrectly select no source files there.
@@ -103,14 +104,48 @@ cd explorer
 npm install
 npm run dev        # local dev server (uses src/store/devFixture.ts)
 npm run typecheck  # tsc --noEmit
-npm run test       # vitest (route parsing, store loader, component tests)
-npm run build      # lint + typecheck + generated design-system artifacts + vite build -> dist/
+npm test           # Vitest application/ADS tests + toast store and usage-rule tests
+npm run test:ads   # registered browser checks through ADS's isolated preview host
+npm run build      # source checks + unit/integration tests + SPA build + ADS browser checks
 npm run ads-mcp          # stdio MCP + showcase; guarded editing enabled
 npm run ads-read-mcp     # stdio MCP + showcase; read-only
 npm run dev:showcase    # MCP client showcase; open the printed URL
 npm run build:showcase  # checked MCP preview resource graph -> .ds/preview/
 npm run build:mcp-previews -- --watch  # advanced: compiler without the managed host
 ```
+
+### Browser verification
+
+`playwright.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
+The owners' `.ads.contract.ts` files register the checks with the `widget`
+profile in `ds.config.json`. `npm run test:ads` calls `ads verify .`, which starts
+and closes an isolated MCP preview host and supplies the selected cases to the
+project's `test:behavior` runner. No running MCP session or fixed port is needed.
+Use `npm run test:ads -- --unit components/controls/WorktreeSelector` to select
+one owner. Run the lower-level `test:behavior` command through ADS so it receives
+the verification request and scenario URLs.
+
+Registered checks cover branch-picker selection/dismissal, toast actions and
+promise/focus transitions, and real trace-worker layout/expanded-view lifecycle.
+They complement the existing Vitest and application browser tests; they do not
+certify unregistered behavior or replace routing, worktree/store and Rust-server
+end-to-end checks. Vitest excludes the Playwright specs and retains the ordinary
+application tests under `src/` and colocated ADS unit tests.
+
+Local browser checks use installed Google Chrome, matching MCP capture settings.
+Set `REQVIRE_TEST_BROWSER` (or `CHROME_BIN`) to an absolute browser executable
+path to use another Chrome/Chromium installation. CI installs the project's
+locked Playwright Chromium with `npx --no-install playwright install --with-deps
+chromium --only-shell` before building. Browser installation is explicit, never
+part of the source build. Failure evidence is saved in `.ds/verification/`.
+`types/ads-verification.d.ts` supplies the missing development-helper declaration
+for the installed ADS helper without relaxing production TypeScript checks.
+
+`build:app` and the MCP preview compiler remain compilation commands; the preview
+compiler validates with `npm run check`, not the test-running `build` command.
+This keeps verification from recursively invoking itself. PR/release workflows
+use the checked build, and PR CI retains the application browser suite after
+building the Rust CLI. The bundle-only commands are for those internal stages.
 
 ---
 
@@ -172,7 +207,7 @@ and compiler; use the URL from `ads_status`. Components, styles, fonts and runti
 execute only inside the sandboxed App. The host's theme selects the project's
 own skin. Failed checks/builds retain the previous preview with stale diagnostics.
 Token fixtures declare literal `{ token, property, probe }` samples. The public
-`TokenSamples` pattern applies each real token to its declared CSS property;
+`TokenSamples` review helper applies each real token to its declared CSS property;
 the App audits the rendered bindings in addition to static coverage. Build
 freshness checks source revisions as well as emitted resources.
 
@@ -189,14 +224,14 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.25`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.26`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.25 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.26 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or

@@ -10,6 +10,33 @@ Curated conceptual vocabulary for Reqvire system-model authoring, search, explan
   * concept_prefix: concept
 ---
 
+### Atomic Model Mutation
+
+A model change whose complete candidate becomes accepted as one indivisible transition, with no partially accepted intermediate model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Mutation](#model-mutation)
+  * related: [Element Deletion](#element-deletion)
+  * related: [Element Override](#element-override)
+---
+
+### Authored Element Definition
+
+The author-supplied content, metadata, and structured declarations of one model element, distinct from generated inverse relations and declarations authored on other elements.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Element](#element)
+  * related: [Element Override](#element-override)
+---
+
 ### Authored Relation Predicate
 
 Source relation predicate that preserves the relation token authored in Reqvire Markdown.
@@ -166,6 +193,58 @@ Addressable Reqvire model item with metadata, prose, sections, and optional rela
   * related: [Model Structure](#model-structure)
 ---
 
+### Element Deletion
+
+A model mutation that removes an existing element and ends its presence in the resulting model.
+
+#### Scope Note
+Deletion can remove dependency targets and leave children without an owner. It is distinct from replacing the definition of an element that retains its identity.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Mutation](#model-mutation)
+  * related: [Element Identity](#element-identity)
+  * related: [Element Override](#element-override)
+---
+
+### Element Identity
+
+The stable association that identifies the same model element across revisions of its authored definition, independently of its current file location.
+
+#### Scope Note
+Reqvire distinguishes the stable name-derived element ID from the workspace-relative file-and-fragment identifier used to address it. An override retains the name-derived identity; relocation changes the address.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Element](#element)
+  * related: [Element Override](#element-override)
+---
+
+### Element Override
+
+An atomic model mutation that replaces the authored definition of an existing element while retaining that element's identity and relationships authored by other elements that point to it.
+
+#### Scope Note
+An override replaces a complete authored definition. Text-only editing and appending a section are narrower editing operations; deletion ends the element's presence.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Atomic Model Mutation](#atomic-model-mutation)
+  * related: [Authored Element Definition](#authored-element-definition)
+  * related: [Element Deletion](#element-deletion)
+  * related: [Element Identity](#element-identity)
+  * related: [Incoming Relation](#incoming-relation)
+---
+
 ### Explorer Interface
 
 Browser-oriented interface for navigating Reqvire model structure, ontology graphs, coverage, traces, resources, and details.
@@ -310,6 +389,23 @@ Implementation coverage describes modeled implementation evidence, not proof tha
   * related: [Verification Coverage](#verification-coverage)
 ---
 
+### Incoming Relation
+
+A directed model relationship viewed from the element it targets, whose declaration is authored on another element.
+
+#### Scope Note
+Incoming direction is relative to the target element. A generated inverse is a view of an authored declaration, not a second independent declaration.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Relation](#model-relation)
+  * related: [Element Override](#element-override)
+  * related: [Traceability](#traceability)
+---
+
 ### Integration
 
 Conceptual area covering interfaces, source markers, external systems, MCP, CLI, Explorer, and other integration surfaces.
@@ -387,6 +483,19 @@ Rule that only workspace-contained files and artifacts inside Git worktrees part
   * related: [Git Worktree](#git-worktree)
   * related: [Model Structure](#model-structure)
   * related: [Workspace Root](#workspace-root)
+---
+
+### Model Mutation
+
+A change to the accepted structure or authored definitions of a system model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Model Change Publication](#model-change-publication)
+  * related: [Model Structure](#model-structure)
 ---
 
 ### Model Relation
@@ -861,4 +970,52 @@ Effective Reqvire process root used as the SOI model path, identifier, diagnosti
   * related: [Git Worktree](#git-worktree)
   * related: [Model Eligibility Boundary](#model-eligibility-boundary)
   * related: [Model Structure](#model-structure)
+---
+
+### Element Text
+
+Opening human-readable content of an element before its first subsection boundary.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
+---
+
+### Element Subsection
+
+Named region within one authored element definition whose content and applicability follow the document grammar and element type.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
+---
+
+### Focused Element Edit
+
+Atomic change confined to selected text or a permitted subsection of one element, retaining its identity and authored declarations outside that selection.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Atomic Model Mutation](#atomic-model-mutation)
+---
+
+### Edit Target
+
+Selected element text or subsection that bounds a focused element edit.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Focused Element Edit](#focused-element-edit)
 ---

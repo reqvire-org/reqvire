@@ -254,3 +254,14 @@ Implementation: [Toast.tsx](../Toast.tsx), [Toaster.tsx](../Toaster.tsx),
 and token ownership are documented in the
 [project guide](../../../readme.md#source-and-tooling), with project boundaries
 and registered rules in [ds.config.json](../../../../ds.config.json).
+
+
+## Registered browser checks
+
+`../Toaster.ads.contract.ts` registers `toast-actions` and `toast-promise-focus`
+against the existing `components/core/Toast` scenario. The colocated browser spec
+checks action callbacks, close controls, promise updates in place and keyboard
+focus restoration through the real MCP App. Run
+`npm run test:ads -- --unit components/core/Toaster` from `explorer/`.
+Store lifecycle and usage-rule tests remain in `npm test`; application browser
+checks still verify the app-root mount and real server integration.

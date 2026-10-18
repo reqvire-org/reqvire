@@ -83,6 +83,12 @@ Instruction contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
   * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
   * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
@@ -104,6 +110,12 @@ Artifact contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
   * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
   * [MCP Prompt Guidance Specification](../../Interfaces/MCP/Specifications.md#mcp-prompt-guidance-specification)

@@ -167,6 +167,181 @@ case!(folder_move_restores_directories_on_publication_failure, {
     );
 });
 
+fn override_parent_fixture(commits: bool) -> SessionFixture {
+    let source = format!("{MODEL}\n### Override Child\n\nChild keeps its parent.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * specify: [Cache Subject](#cache-subject)\n---\n");
+    std::fs::write("Model.md", source).expect("parent fixture");
+    git_test(&["add", "."]);
+    git_test(&["commit", "-qm", "parent override fixture"]);
+    fixture(commits)
+}
+
+fn override_parent_request(dry_run: bool) -> Value {
+    json!({"name":"reqvire.add_element", "arguments":{
+        "file":"Model.md", "content":"### Cache Subject\n\nUpdated parent definition.\n\n#### Metadata\n  * type: capability\n",
+        "override_existing":true, "dry_run":dry_run
+    }})
+}
+
+case!(
+    atomic_override_preserves_pending_changes_and_captured_reads,
+    {
+        let server = override_parent_fixture(false);
+        let pending = server
+            .dispatch("tools/call", add(OTHER, false))
+            .expect("pending mutation");
+        assert_ne!(pending["isError"], true, "{pending}");
+        let before = server.session.lock().expect("session").status();
+        assert_ne!(before["pending_changes"], json!([]));
+        let source = std::fs::read_to_string("Model.md").expect("source");
+        let captured = server
+            .session
+            .lock()
+            .expect("session")
+            .capture_read("reqvire.read_element")
+            .expect("capture original read");
+        let preview = server
+            .dispatch("tools/call", override_parent_request(true))
+            .expect("preview");
+        assert_ne!(preview["isError"], true, "{preview}");
+        assert_eq!(std::fs::read_to_string("Model.md").expect("source"), source);
+        let mut invalid = override_parent_request(false);
+        invalid["arguments"]["content"] =
+            json!("### Cache Subject\n\n#### Metadata\n  * type: specification\n");
+        let rejected = server.dispatch("tools/call", invalid).expect("rejection");
+        assert_eq!(rejected["isError"], true, "{rejected}");
+        let after = server.session.lock().expect("session").status();
+        assert_eq!(after["model_revision"], before["model_revision"]);
+        assert_eq!(after["pending_changes"], before["pending_changes"]);
+        assert_eq!(std::fs::read_to_string("Model.md").expect("source"), source);
+        let accepted = server
+            .dispatch("tools/call", override_parent_request(false))
+            .expect("accepted override");
+        assert_ne!(accepted["isError"], true, "{accepted}");
+        assert_eq!(
+            accepted["structuredContent"]["diffs"],
+            preview["structuredContent"]["diffs"]
+        );
+        assert_ne!(
+            server.session.lock().expect("session").status()["model_revision"],
+            before["model_revision"]
+        );
+        assert_eq!(
+            captured
+                .execute(|| Ok(json!(
+                    reqvire::mutation_io::read_to_string("Model.md").expect("captured source")
+                )))
+                .expect("captured read"),
+            json!(source)
+        );
+        assert!(std::fs::read_to_string("Model.md")
+            .expect("source")
+            .contains("Updated parent definition."));
+        assert!(std::fs::read_to_string("Model.md")
+            .expect("source")
+            .contains("Other Subject"));
+        assert_eq!(git_test(&["rev-parse", "HEAD"]), before["head"]);
+    }
+);
+
+case!(atomic_override_restores_state_after_publication_failure, {
+    let server = override_parent_fixture(true);
+    let before = server.session.lock().expect("session").status();
+    let source = std::fs::read_to_string("Model.md").expect("source");
+    let index = std::fs::read(".git/index").expect("index");
+    reject_reference_publication();
+    let rejected = server
+        .dispatch("tools/call", override_parent_request(false))
+        .expect("rejected publication");
+    assert_eq!(rejected["isError"], true, "{rejected}");
+    assert!(rejected.to_string().contains("publication"), "{rejected}");
+    assert_eq!(
+        std::fs::read_to_string("Model.md").expect("restored source"),
+        source
+    );
+    assert_eq!(std::fs::read(".git/index").expect("restored index"), index);
+    let after = server.session.lock().expect("session").status();
+    for key in ["head", "model_revision", "pending_changes"] {
+        assert_eq!(after[key], before[key], "{key}");
+    }
+    std::fs::remove_file(".git/hooks/reference-transaction").expect("remove failure hook");
+    let accepted = server
+        .dispatch("tools/call", override_parent_request(false))
+        .expect("valid retry");
+    assert_ne!(accepted["isError"], true, "{accepted}");
+    assert_eq!(git_test(&["rev-parse", "HEAD^"]), before["head"]);
+    assert_eq!(git_test(&["status", "--porcelain"]), "");
+});
+
+case!(focused_edit_restores_state_after_publication_failure, {
+    let server = override_parent_fixture(true);
+    let before = server.session.lock().expect("session").status();
+    let source = std::fs::read_to_string("Model.md").expect("source");
+    let index = std::fs::read(".git/index").expect("index");
+    let captured = server
+        .session
+        .lock()
+        .expect("session")
+        .capture_read("reqvire.read_element")
+        .expect("capture read");
+    let request = json!({"name":"reqvire.update_element", "arguments":{
+        "element_name":"Cache Subject", "target":"Element Text", "operation":"append",
+        "content":"Focused addition.", "expected_model_revision":before["model_revision"]
+    }});
+    let mut preview_request = request.clone();
+    preview_request["arguments"]["dry_run"] = json!(true);
+    let preview = server
+        .dispatch("tools/call", preview_request)
+        .expect("preview");
+    assert_ne!(preview["isError"], true, "{preview}");
+    assert!(!preview["structuredContent"]["diffs"]
+        .as_array()
+        .expect("diff array")
+        .is_empty());
+    reject_reference_publication();
+    let rejected = server
+        .dispatch("tools/call", request.clone())
+        .expect("rejected publication");
+    assert_eq!(rejected["isError"], true, "{rejected}");
+    assert!(rejected.to_string().contains("publication"), "{rejected}");
+    assert_eq!(
+        std::fs::read_to_string("Model.md").expect("restored source"),
+        source
+    );
+    assert_eq!(std::fs::read(".git/index").expect("restored index"), index);
+    let after = server.session.lock().expect("session").status();
+    for key in ["head", "model_revision", "pending_changes"] {
+        assert_eq!(after[key], before[key], "{key}");
+    }
+    std::fs::remove_file(".git/hooks/reference-transaction").expect("remove failure hook");
+    let accepted = server
+        .dispatch("tools/call", request.clone())
+        .expect("retry");
+    assert_ne!(accepted["isError"], true, "{accepted}");
+    assert_eq!(
+        accepted["structuredContent"]["diffs"],
+        preview["structuredContent"]["diffs"]
+    );
+    let stale = server.dispatch("tools/call", request).expect("stale retry");
+    assert_eq!(stale["isError"], true, "{stale}");
+    assert_eq!(
+        std::fs::read_to_string("Model.md")
+            .expect("source")
+            .matches("Focused addition.")
+            .count(),
+        1
+    );
+    assert_eq!(
+        captured
+            .execute(|| Ok(json!(
+                reqvire::mutation_io::read_to_string("Model.md").expect("captured source")
+            )))
+            .expect("read"),
+        json!(source)
+    );
+    assert_eq!(git_test(&["rev-parse", "HEAD^"]), before["head"]);
+    assert_eq!(git_test(&["status", "--porcelain"]), "");
+});
+
 case!(lint_repair_uses_the_accepted_candidate_transaction, {
     const BEFORE: &str =
         include_str!("../../../tests/test-interface-boundary/fixtures/Repair.md.fixture");

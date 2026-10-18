@@ -4,7 +4,7 @@ import { ElementFlow } from "@ds";
 
 const renderer = vi.hoisted(() => ({ onInit: (_flow: unknown) => {}, zoom: 1 }));
 const graphs = vi.hoisted(() => Object.fromEntries(["DOWN", "RIGHT"].map(direction => [direction, {
-  direction, bounds: { x: 0, y: 0, width: 300, height: 180 }, edges: [],
+  direction, nodeSize: { width: 300, height: 180 }, bounds: { x: 0, y: 0, width: 300, height: 180 }, edges: [],
   nodes: [{ id: "root", element: { id: "root", name: "Root", file: "Model.md" }, type: "capability", context: "Model", parentCount: 0, position: { x: 0, y: 0 } }],
 }])));
 vi.mock("./useTraceFlowLayout", () => ({

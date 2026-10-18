@@ -22,7 +22,8 @@ explorer/node_modules/.reqvire-deps.stamp: explorer/package.json explorer/packag
 	cd explorer && npm ci
 	touch "$@"
 
-# Build the Preact/Vite Explorer SPA bundle. The served index.html is
+# Test and build the Preact/Vite Explorer SPA bundle, including ADS browser checks.
+# The served index.html is
 # this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.
 explorer: explorer-deps
@@ -51,6 +52,7 @@ test:
 
 # Run end-to-end shell-based test suite.
 e2e:
+	cargo build --release --locked --bin reqvire
 	bash tests/run_all.sh
 
 # Version update targets

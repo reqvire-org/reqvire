@@ -1,10 +1,11 @@
 import { act, renderHook, waitFor, cleanup } from "@/test/render";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ElkNode } from "elkjs/lib/elk-api";
-import { buildTraceFlowTopology, type TraceFlowDirection } from "./traceFlowLayout";
+import { buildTraceFlowTopology, type TraceFlowDirection, type TraceFlowNodeSize } from "./traceFlowLayout";
 import { useTraceFlowLayout } from "./useTraceFlowLayout";
 
 afterEach(cleanup);
+const nodeSize = { width: 260, height: 180 };
 const topology = buildTraceFlowTopology({ verification: { id: "v", name: "Check", type: "test-verification", file: "Checks.md" }, requirements: [] });
 
 function controlledEngine() {
@@ -23,9 +24,33 @@ function controlledEngine() {
 }
 
 describe("cancellable trace layout", () => {
+  it("waits for measurements and replaces obsolete geometry without accepting late results", async () => {
+    const { engine, jobs } = controlledEngine();
+    const { result, rerender } = renderHook((size: TraceFlowNodeSize | null) => useTraceFlowLayout(topology, "RIGHT", engine, size), { initialProps: null as TraceFlowNodeSize | null });
+    expect(engine).not.toHaveBeenCalled();
+    rerender(nodeSize);
+    expect(engine.mock.calls[0][0].children?.[0]).toMatchObject(nodeSize);
+    await act(async () => jobs[0].resolve());
+    await waitFor(() => expect(result.current.graph?.nodeSize).toEqual(nodeSize));
+    const displayed = result.current.graph;
+    rerender({ ...nodeSize });
+    expect(engine).toHaveBeenCalledTimes(1);
+    rerender({ width: 320, height: 200 });
+    expect(result.current.graph).toBe(displayed);
+    rerender({ width: 360, height: 220 });
+    expect(jobs[1].cancel).toHaveBeenCalledOnce();
+    expect(engine.mock.calls[2][0].children?.[0]).toMatchObject({ width: 360, height: 220 });
+    await act(async () => jobs[2].resolve());
+    await waitFor(() => expect(result.current.graph?.nodeSize).toEqual({ width: 360, height: 220 }));
+    const latest = result.current.graph;
+    await act(async () => jobs[1].resolve());
+    expect(result.current.graph).toBe(latest);
+    expect(result.current.pending).toBe(false);
+  });
+
   it("terminates obsolete direction work and ignores its late completion", async () => {
     const { engine, jobs } = controlledEngine();
-    const { result, rerender } = renderHook((direction: TraceFlowDirection) => useTraceFlowLayout(topology, direction, engine), { initialProps: "RIGHT" });
+    const { result, rerender } = renderHook((direction: TraceFlowDirection) => useTraceFlowLayout(topology, direction, engine, nodeSize), { initialProps: "RIGHT" });
     expect(engine).toHaveBeenCalledTimes(1);
     await act(async () => jobs[0].resolve());
     await waitFor(() => expect(result.current.graph).not.toBeNull());
@@ -47,8 +72,8 @@ describe("cancellable trace layout", () => {
 
   it("cancels topology/context replacement and teardown independently for simultaneous flows", async () => {
     const { engine, jobs } = controlledEngine();
-    const first = renderHook(input => useTraceFlowLayout(input, "RIGHT", engine), { initialProps: topology });
-    const second = renderHook(() => useTraceFlowLayout(topology, "DOWN", engine));
+    const first = renderHook(input => useTraceFlowLayout(input, "RIGHT", engine, nodeSize), { initialProps: topology });
+    const second = renderHook(() => useTraceFlowLayout(topology, "DOWN", engine, nodeSize));
     expect(engine).toHaveBeenCalledTimes(2);
     first.rerender(topology);
     expect(engine).toHaveBeenCalledTimes(2);
@@ -71,7 +96,7 @@ describe("cancellable trace layout", () => {
 
   it("retains the valid map on failure and retries without clearing it", async () => {
     const { engine, jobs } = controlledEngine();
-    const { result, rerender } = renderHook(input => useTraceFlowLayout(input, "RIGHT", engine), { initialProps: topology });
+    const { result, rerender } = renderHook(input => useTraceFlowLayout(input, "RIGHT", engine, nodeSize), { initialProps: topology });
     await act(async () => jobs[0].resolve());
     await waitFor(() => expect(result.current.graph).not.toBeNull());
     const previous = result.current.graph;
@@ -92,7 +117,7 @@ describe("cancellable trace layout", () => {
   it("handles synchronous worker creation failure and retries", async () => {
     const { engine, jobs } = controlledEngine();
     engine.mockImplementationOnce(() => { throw new Error("Worker blocked"); });
-    const { result } = renderHook(() => useTraceFlowLayout(topology, "RIGHT", engine));
+    const { result } = renderHook(() => useTraceFlowLayout(topology, "RIGHT", engine, nodeSize));
     await waitFor(() => expect(result.current.failed).toBe(true));
     expect(result.current.graph).toBeNull();
     act(() => result.current.retry());

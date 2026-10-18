@@ -13,6 +13,9 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Component, Path, PathBuf};
 
+mod focused_edit;
+pub use focused_edit::{update_element, FocusedEdit, FocusedEditOperation, FocusedEditResult};
+
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct OntologyTermKey {
     element_identifier: String,
@@ -985,102 +988,60 @@ pub fn add_element(
 ) -> Result<CrudResult, ReqvireError> {
     let (target_file_normalized, _) = resolve_workspace_relative_arg(target_file, git_root)?;
 
-    // Track which files were modified before the operation
-    // IMPORTANT: Must track BEFORE any modifications (including override removal)
+    // Track modified files before constructing the replacement candidate.
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
     let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
-    let mut removed_declaration_source = None;
-
-    // If override is requested, extract element name and remove existing element first
-    if override_existing {
-        // Extract element name from markdown (looks for ### Element Name pattern)
-        let element_name = extract_element_name_from_markdown(element_markdown)?;
-
-        // Check if element exists and remove it
-        // Validation is handled by remove_element_with_cleanup
-        if let Some(existing_element) = model_manager
-            .graph_registry
-            .get_element_by_name(&element_name)
-        {
-            let existing_id = existing_element.identifier.clone();
-            model_manager
-                .graph_registry
-                .remove_element_with_cleanup(&existing_id)?;
-            removed_declaration_source = Some(existing_id);
-        }
-    }
-
-    // Create element using core business logic
-    let element = match model_manager.graph_registry.create_element_from_string(
-        element_markdown,
-        &target_file_normalized,
-        excluded_patterns,
-    ) {
-        Ok(element) => element,
-        Err(error) => {
-            model_manager.graph_registry = registry_snapshot;
-            return Err(error);
-        }
+    let existing_id = if override_existing {
+        let name = extract_element_name_from_markdown(element_markdown)?;
+        registry_snapshot
+            .get_element_by_name(&name)
+            .map(|element| element.identifier.clone())
+    } else {
+        None
     };
-
-    if let Some(existing_id) = &removed_declaration_source {
-        // An override replaces an identity; deletion cleanup must not erase
-        // external ownership or consumers. Relocate their targets when needed.
-        let registry = &mut model_manager.graph_registry;
-        for (id, original) in &registry_snapshot.nodes {
-            if id == existing_id {
-                continue;
-            }
-            if let Some(node) = registry.nodes.get_mut(id) {
-                for (entries, previous) in [
-                    (
-                        &mut node.element.contract_bindings,
-                        &original.element.contract_bindings,
-                    ),
-                    (
-                        &mut node.element.contract_references,
-                        &original.element.contract_references,
-                    ),
-                ] {
-                    entries.clone_from(previous);
-                    for entry in entries {
-                        if let ContractBindingTarget::ElementIdentifier(target) = &mut entry.target
-                        {
-                            if target == existing_id {
-                                target.clone_from(&element.identifier);
-                                registry
-                                    .modified_files
-                                    .insert(node.element.file_path.clone());
-                            }
-                        }
-                    }
-                }
-                for relation in original.element.relations.iter().filter(|relation| {
-                    relation.user_created && relation.target.link.as_str() == existing_id
-                }) {
-                    let mut relation = relation.clone();
-                    relation.target.link = LinkType::Identifier(element.identifier.clone());
-                    relation.target.element_id = Some(element.identifier.clone());
-                    node.element.relations.push(relation);
-                    registry
-                        .modified_files
-                        .insert(node.element.file_path.clone());
-                }
-            }
+    let mut candidate = registry_snapshot.clone();
+    let element = if let Some(existing_id) = &existing_id {
+        candidate.replace_element_from_string(
+            existing_id,
+            element_markdown,
+            &target_file_normalized,
+            excluded_patterns,
+        )?
+    } else {
+        candidate.create_element_from_string(
+            element_markdown,
+            &target_file_normalized,
+            excluded_patterns,
+        )?
+    };
+    apply_ontology_aware_rewrites(&mut candidate, &ontology_before)?;
+    // An override can change every authored declaration, so validate its complete
+    // graph, not a temporary deletion or only the supplied element's relations.
+    if let Some(existing_id) = &existing_id {
+        let (errors, _) = candidate.build_relations(excluded_patterns)?;
+        if !errors.is_empty() {
+            // Keep the removed-declaration context used by semantic diagnostics.
+            let semantic_errors =
+                candidate.validate_semantic_contracts_after_removal(existing_id)?;
+            return Err(ReqvireError::validation_diagnostics(
+                if semantic_errors.is_empty() {
+                    errors
+                } else {
+                    semantic_errors
+                },
+            ));
         }
-        model_manager
-            .graph_registry
-            .refresh_relation_context(excluded_patterns);
     }
+    model_manager.graph_registry = candidate;
 
     let diffs = match finalize_crud_operation(
         model_manager,
         &modified_before,
         git_root,
         dry_run,
-        removed_declaration_source.as_deref(),
-        Some(&ontology_before),
+        existing_id.as_deref(),
+        None,
     ) {
         Ok(diffs) => diffs,
         Err(err) => {
@@ -1090,7 +1051,7 @@ pub fn add_element(
     };
 
     // Create result structure
-    let operation = if override_existing {
+    let operation = if existing_id.is_some() {
         CrudOperation::Update
     } else {
         CrudOperation::Add

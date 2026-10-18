@@ -78,7 +78,8 @@ Acceptance review for the typed MCP `reqvire.add_element` adapter.
 
 #### Details
 - Submit typed `file` and `content` fields containing valid Markdown; require exactly one created element and insertion using core file-local hierarchy ordering.
-- Exercise `override_existing: true`, preserving incoming references and validating retained ownership/type dependencies. Reject malformed content, duplicate names without override and invalid complete candidates atomically.
+- Exercise the current childless `override_existing: true` fixtures and retained contract-reference/ownership checks. Reject malformed content, duplicate names without override and invalid complete candidates atomically.
+- The override fixture matrix exercises valid capability and requirement parent overrides, full-definition scope, incoming hierarchy and consumer retention, matching preview/application diffs, and rejection without source or accepted-state changes through production stdio MCP. Mutation-session tests additionally preserve pending accepted changes and captured reads, and restore state after injected Git publication failure.
 - Create and override one representative list-fenced payload; literal headings and declarations remain content, while real metadata and relations following the closing fence retain their meaning and code bytes are preserved.
 - Use existing-file and new-file fixtures, plus a single-element destination that rejects a second sibling. Read back the accepted element and its canonical identifier.
 - Require mutation enablement for the tool, including `dry_run: true`. Preview returns the validated candidate diff without writes; `dry_run: false` persists only accepted changes and subsequent reads expose the new model/revision.
@@ -93,6 +94,8 @@ Acceptance review for the typed MCP `reqvire.add_element` adapter.
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
   * satisfiedBy: [element_selection_checks.py](../../../../tests/element_selection_checks.py)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
@@ -1459,4 +1462,28 @@ The linked MCP server suite covers workspace and tool-contract metadata. The mod
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-model-revision-hashing/test.sh)
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
+---
+
+### MCP Update Element Tool Verification
+
+Verify focused-editing discovery, typed routing, permissions and observable effects through the real MCP server.
+
+#### Details
+- tools/list and tool_contract advertise reqvire.update_element with string target, five operation values, existing-element selector, revision and operation-specific content fields, and mutation annotations. Read-only startup omits it and rejects both preview and apply without side effects.
+- Reuse shared registry and MCP server/context acceptance evidence for generic invalid types, required/unknown fields, operation enums and invalid worktree selectors. The focused-editing suite checks its specific advertised schema and permissions once, and exercises exact names, canonical identifiers, default context and explicit worktree_id during real editing lifecycles. Return selected context and ordinary update evidence.
+- The acceptance matrix observes effective source/read/revision changes, so a registered facade returning empty successful results fails. The first pre-implementation run recorded discovery success and behavior failures with protocol transcripts; implemented behavior must pass the same observable assertions.
+- Existing transport and context suites remain regression evidence for common ownership, worker routing and transaction guarantees. Focused-editing-specific Git publication failure injection verifies restored source/index/HEAD/revision/pending state, safe retry, stale-retry rejection and retained captured reads.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Focused Element Editing Verification Objective](../../Operations/ModelOperations/ElementManipulationVerifications.md#focused-element-editing-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [definitions.rs](../../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-worktrees/test.sh)
+  * verify: [MCP Update Element Tool](../../../Interfaces/MCP/Tools.md#mcp-update-element-tool)
 ---

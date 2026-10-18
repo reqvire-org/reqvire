@@ -6,7 +6,7 @@ const integrationPages = [
   {
     name: "MCP Server",
     href: "/mcp-server",
-    desc: "Streamable HTTP MCP server, planned per-project stdio startup, tool discovery, mutation mode, and semantic evidence.",
+    desc: "Streamable HTTP and per-project stdio startup, tool discovery, mutation mode, and semantic evidence.",
   },
   {
     name: "Coding Assistants",
@@ -54,7 +54,7 @@ export default function Integrations() {
             },
             {
               name: "MCP",
-              desc: "Run reqvire mcp for Streamable HTTP tools; planned --transport stdio support will let clients launch a process per project. npx is available as a no-install convenience.",
+              desc: "Run reqvire mcp for Streamable HTTP tools, or add --transport stdio for a client-managed process per project. npx is available as a no-install convenience.",
             },
             {
               name: "Assistant packages",

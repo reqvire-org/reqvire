@@ -1,5 +1,22 @@
 use super::*;
 
+pub fn update_element_tool(args: &Value, exclusions: &GlobSet) -> Result<Value, ReqvireError> {
+    let edit: crud::FocusedEdit = serde_json::from_value(args.clone())?;
+    let mut model = super::arg_helpers::load_mutation_model(exclusions)?;
+    let result = crud::update_element(&mut model, &edit, exclusions, &current_dir_path())?;
+    let mut evidence = parse_json_string(render_crud_json(&result.result))?;
+    evidence["target"] = json!(edit.target);
+    evidence["edit_operation"] = args["operation"].clone();
+    evidence["base_model_revision"] = json!(result.base_model_revision);
+    evidence["changed_files"] = json!(result
+        .result
+        .diffs
+        .iter()
+        .map(|diff| &diff.file_path)
+        .collect::<Vec<_>>());
+    Ok(evidence)
+}
+
 pub fn add_element_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,

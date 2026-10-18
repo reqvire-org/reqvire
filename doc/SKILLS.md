@@ -68,8 +68,7 @@ Author model changes through typed MCP tools with mutations enabled. Formatting
 and lint repair use MCP; validation and migration remain CLI commands. Run
 migration before MCP startup when the source is incompatible.
 
-Stdio transport is planned and covered by acceptance tests; it is not available
-in the current implementation. Its command will be:
+For a client-managed local project process, use stdio transport:
 
 ```bash
 npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/project mcp --transport stdio --enable-mutations
@@ -79,4 +78,21 @@ Configure this command and its arguments in the MCP client so it starts Reqvire
 for that project. HTTP remains the default transport. Both transports retain
 normal startup validation and mutation ownership checks, including the clean
 worktree requirement. Installing skills does not opt into mutations or commits.
-See the repository README for the planned stdio client configuration.
+See the repository README for the stdio client configuration.
+
+For small content changes, use `reqvire.update_element` with an existing name or
+canonical identifier and an exact target: `Element Text` for opening prose or a
+subsection name. Append/replace take `content`; replace_text takes `old_text`
+(exactly one literal match within the target) and `new_text`. Optional prose
+subsections support explicit create/delete. Preview with `dry_run: true`, then
+apply in the same worktree context with `expected_model_revision` set to the
+preview's `base_model_revision`. Native Ontology/Shapes/Query payloads support
+only replace/replace_text with complete fenced Markdown; declaration sections
+are protected. Focused edits retain identity and declarations.
+
+For a full definition change, read the current definition and preview a complete
+replacement through `reqvire.add_element` with `override_existing: true` and
+`dry_run: true`. The payload replaces authored metadata and outgoing declarations;
+include those still intended. Incoming children and contract/concept consumers
+are retained when the complete candidate is valid. Apply the reviewed definition
+with `dry_run: false`. Deleting an element still enforces orphan protection.

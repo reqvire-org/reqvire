@@ -17,7 +17,7 @@ use std::{
     process::{Child, ChildStdin, Command, Stdio},
     sync::{
         atomic::{AtomicBool, AtomicU64, Ordering},
-        mpsc, Arc, LazyLock, Mutex, RwLock,
+        mpsc, Arc, LazyLock, Mutex, RwLock, Weak,
     },
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
@@ -452,6 +452,9 @@ pub struct Worktrees {
     read_only: bool,
     pub original: String,
     contexts: RwLock<BTreeMap<String, Arc<Context>>>,
+    // Independent of context gates, which in-flight mutations may still hold.
+    workers: Mutex<Vec<Weak<Worker>>>,
+    shutting_down: AtomicBool,
     browser_branches: Mutex<BTreeMap<String, String>>,
     admin: Mutex<()>,
     github: GithubAccess,
@@ -464,6 +467,14 @@ struct WorktreePolicy {
     read_only: bool,
 }
 impl Worktrees {
+    pub fn shutdown(&self) {
+        self.shutting_down.store(true, Ordering::Release);
+        let workers = std::mem::take(&mut *self.workers.lock().expect("worker registry poisoned"));
+        for worker in workers.into_iter().filter_map(|worker| worker.upgrade()) {
+            worker.stop();
+        }
+    }
+
     pub fn start(
         root: &Path,
         executable: &Path,
@@ -546,6 +557,8 @@ impl Worktrees {
             read_only,
             original: original.clone(),
             contexts: RwLock::new(BTreeMap::new()),
+            workers: Mutex::new(Vec::new()),
+            shutting_down: AtomicBool::new(false),
             browser_branches: Mutex::new(BTreeMap::new()),
             admin: Mutex::new(()),
             tool_catalog: SessionToolCatalog::new(github.available()),
@@ -574,6 +587,9 @@ impl Worktrees {
         original: bool,
         managed: bool,
     ) -> Result<Arc<Context>, ReqvireError> {
+        if self.shutting_down.load(Ordering::Acquire) {
+            return Err(error("MCP session is shutting down"));
+        }
         let root = root.canonicalize()?;
         if PathBuf::from(git(
             &root,
@@ -607,6 +623,16 @@ impl Worktrees {
                 read_parallelism: crate::mcp_worker::available_parallelism(),
             },
         )?;
+        let worker = Arc::new(worker);
+        {
+            let mut workers = self.workers.lock().expect("worker registry poisoned");
+            if self.shutting_down.load(Ordering::Acquire) {
+                worker.stop();
+                return Err(error("MCP session is shutting down"));
+            }
+            workers.retain(|worker| worker.strong_count() > 0);
+            workers.push(Arc::downgrade(&worker));
+        }
         let branch = text(&ready["status"], "branch")?.to_string();
         let context = Arc::new(Context {
             id: id.clone(),
@@ -616,7 +642,7 @@ impl Worktrees {
             managed,
             read_only: self.read_only,
             alive: Arc::clone(&worker.alive),
-            worker: Mutex::new(Some(Arc::new(worker))),
+            worker: Mutex::new(Some(worker)),
             published: RwLock::new(Published {
                 status: ready["status"].clone(),
                 sequence: 0,
@@ -2087,6 +2113,29 @@ mod tests {
     #[test]
     fn explicit_commit_reconciliation_through_real_worker() {
         reconcile_real_worker(false);
+    }
+
+    #[test]
+    fn shutdown_releases_workers_without_waiting_for_context_gates_or_arc_drops() {
+        let repo = fixture();
+        let session = manager(repo.path(), false);
+        let context = session.resolve(Some(&session.original)).unwrap();
+        let gate = context.test_control_gate();
+        let (send, receive) = mpsc::sync_channel(1);
+        let closing = Arc::clone(&session);
+        let shutdown = std::thread::spawn(move || {
+            closing.shutdown();
+            send.send(()).unwrap();
+        });
+        let completed = receive.recv_timeout(Duration::from_secs(2));
+        drop(gate);
+        shutdown.join().unwrap();
+        completed.expect("shutdown waited for a busy context gate");
+        assert!(!context.alive.load(Ordering::Acquire));
+        // Retain both the old manager and context while reacquiring ownership.
+        let reopened = manager(repo.path(), false);
+        assert!(reopened.resolve(None).unwrap().metadata()["owned"] == true);
+        session.shutdown();
     }
 
     #[test]

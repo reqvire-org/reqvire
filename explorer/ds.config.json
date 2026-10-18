@@ -233,6 +233,15 @@
     "showcaseTitle": "Reqvire Design System",
     "capture": {
       "channel": "chrome"
+    },
+    "behaviorProfiles": {
+      "widget": {
+        "runner": "playwright",
+        "command": "npm",
+        "args": ["run", "test:behavior", "--"],
+        "mode": "browser",
+        "timeoutMs": 240000
+      }
     }
   }
 }

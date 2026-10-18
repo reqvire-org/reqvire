@@ -18,6 +18,7 @@ import tarfile
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from contextlib import ExitStack
 
@@ -259,6 +260,23 @@ def catalogs(server):
             ("tools/list", "resources/list", "resources/templates/list", "prompts/list")}
 
 
+def mutation_catalogs(server):
+    discovery = catalogs(server)
+    original = call(server, "reqvire.worktree.list")["original_worktree_id"]
+    scoped = 0
+    for resource in discovery["resources/list"]["resources"]:
+        uri = urllib.parse.urlsplit(resource["uri"])
+        if uri.scheme == "reqvire" and uri.netloc == "workspace" and uri.path in (
+                "/status", "/model-revision"):
+            require(urllib.parse.parse_qs(uri.query) == {"worktree_id": [original]},
+                    "workspace resource does not select the current process's original context")
+            # Context IDs belong to a server process, not to its transport.
+            resource["uri"] = uri._replace(query="worktree_id=SESSION").geturl()
+            scoped += 1
+    require(scoped == 2, "missing context-scoped workspace resources")
+    return discovery
+
+
 def compare(expected, actual, label):
     if expected != actual:
         delta = "\n".join(difflib.unified_diff(
@@ -364,9 +382,9 @@ def mutation(binary, folder):
     root = project(folder / "project")
     head, index = git(root, "rev-parse", "HEAD"), git(root, "write-tree")
     with Http(binary, root, folder / "http", "--enable-mutations") as server:
-        expected = catalogs(server)
+        expected = mutation_catalogs(server)
     with Stdio(binary, root, folder / "stdio", "--enable-mutations") as server:
-        compare(expected, catalogs(server), "mutation catalog parity")
+        compare(expected, mutation_catalogs(server), "mutation catalog parity")
         before = (root / "Model.md").read_bytes()
         preview = call(server, "reqvire.add_element", file="Added.md", content=ADD_CONTENT, dry_run=True)
         require(preview["dry_run"] and preview["diffs"], "preview lacks diff")

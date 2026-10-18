@@ -182,6 +182,7 @@ WHEN a model operation produces a changed candidate, the system SHALL invoke sha
   * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
   * definedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * definedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
+  * derive: [Atomic Element Override](../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
   * derive: [Contract Bindings Identifier Updates](#contract-bindings-identifier-updates)
   * derive: [Create Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * derive: [Delete Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)

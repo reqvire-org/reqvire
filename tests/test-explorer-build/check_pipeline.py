@@ -14,7 +14,7 @@ npm = shutil.which("npm")
 assert npm, "Node/npm must be on PATH"
 guards = ["lint:ds", "lint:style"]
 checked = [*guards, "typecheck"]
-built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "icons", "app"]
+built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "unit", "toast", "icons", "app", "ads"]
 checks = []
 
 
@@ -38,6 +38,8 @@ def fixture(name):
     for guard in [*guards, "assets:ds"]:
         package["scripts"][guard] = f"node stage.cjs {guard}"
     package["scripts"]["generate:icons"] = "node stage.cjs icons"
+    package["scripts"]["test:toast"] = "node stage.cjs toast"
+    package["scripts"]["test:ads"] = "node stage.cjs ads"
     (app / "package.json").write_text(json.dumps(package))
     (app / "package-lock.json").write_text('{}')
     shutil.copy(root / "Makefile", repo / "Makefile")
@@ -47,14 +49,14 @@ def fixture(name):
 const path = require('node:path');
 const tool = path.basename(process.argv[1]);
 const args = process.argv.slice(2);
-const name = tool === 'tsc' ? 'typecheck' : tool === 'vite'
+const name = tool === 'vitest' ? 'unit' : tool === 'tsc' ? 'typecheck' : tool === 'vite'
   ? (args.includes('--config') ? 'kit' : 'app') : args[0];
 fs.appendFileSync(process.env.TRACE, JSON.stringify(name) + '\\n');
 if (name === 'ci') {
   fs.mkdirSync('node_modules/.bin', {recursive: true});
   // npm can leave partial output on failure; it must not be a success receipt.
   fs.writeFileSync('node_modules/.package-lock.json', '{}');
-  for (const binary of ['tsc', 'vite']) {
+  for (const binary of ['tsc', 'vite', 'vitest']) {
     fs.writeFileSync('node_modules/.bin/' + binary,
       '#!/usr/bin/env node\\nrequire(process.cwd() + "/stage.cjs");\\n', {mode: 0o755});
   }
@@ -152,12 +154,16 @@ def workflow_stages():
                 name = part.split()[2]
                 if "pre" + name in scripts:
                     stages.extend(expand(scripts["pre" + name]))
-                if name in [*guards, "assets:ds", "typecheck", "generate:icons", "build:ds-bundle"]:
+                if name in [*guards, "assets:ds", "typecheck", "generate:icons", "build:ds-bundle", "test:toast", "test:ads"]:
                     stages.append(name)
                 else:
                     stages.extend(expand(scripts[name]))
             elif part == "tsc --noEmit":
                 stages.append("typecheck")
+            elif part == "npm test":
+                stages.extend(expand(scripts["test"]))
+            elif part == "vitest run":
+                stages.append("unit")
             elif part == "vite build":
                 stages.append("app")
         return stages
@@ -168,15 +174,20 @@ def workflow_stages():
             block = re.split(r"^  " + job + r":\s*$", text, flags=re.M)[1]
             block = re.split(r"^  [a-zA-Z_][\w-]*:\s*$", block, maxsplit=1, flags=re.M)[0]
             assert "REQVIRE_BUILD_EXPLORER" not in block, f"{filename}/{job} rebuilds inside Cargo"
+            job_env = re.search(r"^    env:\n((?:^      .*\n)+)", block, re.M)
+            assert not job_env or not re.search(r"\$\{\{\s*runner\.", job_env[1]), f"{filename}/{job} uses runner context before a runner is available"
             stages = []
             for match in re.finditer(r"^        run: (cd explorer && .+)$", block, re.M):
                 stages.extend(expand(match[1]))
-            assert all(stages.count(stage) == 1 for stage in [*guards, "typecheck", "app"]), (filename, job, stages)
-            assert stages.index("app") > max(stages.index(stage) for stage in [*guards, "typecheck"])
+            assert all(stages.count(stage) == 1 for stage in [*guards, "typecheck", "unit", "test:toast", "app", "test:ads"]), (filename, job, stages)
+            assert stages.index("app") > max(stages.index(stage) for stage in [*guards, "typecheck", "unit", "test:toast"])
+            assert stages.index("test:ads") > stages.index("app")
             assert stages.count("build:ds-bundle") == (1 if filename == "pr.yml" else 0), (filename, job, stages)
+            bundle = block.find("run: cd explorer && npm run build")
+            browser = re.search(r"^        run: cd explorer && .*playwright install[^\n]*chromium", block, re.M)
+            assert browser and browser.start() < bundle, f"{filename}/{job} must provision Chromium before the checked browser build"
             cargo = block.find("run: cargo build")
             if cargo >= 0:
-                bundle = block.find("run: cd explorer && npm run build")
                 assert 0 <= bundle < cargo
 
 

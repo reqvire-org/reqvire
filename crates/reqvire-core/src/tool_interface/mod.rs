@@ -47,7 +47,7 @@ mod mutation_tools;
 use mutation_tools::{
     add_element_tool, link_tool, merge_elements_tool, move_asset_tool, move_element_tool,
     move_file_tool, move_folder_tool, relink_tool, remove_asset_tool, remove_element_tool,
-    rename_element_tool, unlink_tool,
+    rename_element_tool, unlink_tool, update_element_tool,
 };
 
 mod dispatch;
@@ -125,7 +125,7 @@ impl<'a> ReqvireToolRegistry<'a> {
         let preview = crate::mutation_io::active()
             && is_mutation_tool_name(name)
             && args.get("dry_run").and_then(Value::as_bool) == Some(true);
-        if preview {
+        if preview && name != "reqvire.update_element" {
             staged_args["dry_run"] = Value::Bool(false);
         }
         let result = dispatch_tool(

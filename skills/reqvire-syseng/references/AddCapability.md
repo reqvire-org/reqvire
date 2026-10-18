@@ -149,21 +149,23 @@ When splitting existing prose, do not lose meaning:
 
 ### Adding Requirements
 
-Create requirements using the `--content` flag or by piping element content to the add command:
+Create requirements through typed `reqvire.add_element` calls with complete Markdown definitions:
 
 ```text
-# Add capability using --content flag (preferred)
+# Add capability
 {"name": "reqvire.add_element", "arguments": {"file": "system-model/Product/CapabilityName/CapabilityFeature.md", "content": "### Capability Name\n\nCapability scope and purpose. Describe what the system is able to accomplish, not how it is implemented.\n\n#### Metadata\n  * type: capability\n"}}
 
 # Add ontology reused by a capability
 {"name": "reqvire.add_element", "arguments": {"file": "system-model/Ontologies/CapabilityName.md", "content": "### Capability Ontology\n\nDefines shared domain meaning for the capability.\n\n#### Metadata\n  * type: ontology\n  * ontology_base: https://example.org/ontology/capability-name\n  * ontology_prefix: ex\n\n#### Ontology\n\n```turtle\n@prefix ex: <https://example.org/ontology/capability-name#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n\nex:DomainConcept a owl:Class .\n```"}}
 
-# Add requirement using heredoc (stdin)
+# Add requirement with its capability parent
 {"name": "reqvire.add_element", "arguments": {"file": "system-model/Product/CapabilityName/Requirements.md", "content": "### System Capability Implementation\n\nThe system shall implement the capability using defined algorithms.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * specify: [Capability Name](CapabilityFeature.md#capability-name)"}}
 
-# Override existing element (replace by name) - useful for cleanup after merge
-{"name": "reqvire.add_element", "arguments": {"file": "system-model/File.md", "content": "### Existing Element Name\n\nUpdated content with corrections.\n\n#### Metadata\n  * type: requirement\n---", "override_existing": true}}
+# Preview a complete replacement of the requirement created above
+{"name": "reqvire.add_element", "arguments": {"file": "system-model/Product/CapabilityName/Requirements.md", "content": "### System Capability Implementation\n\nThe system shall implement the corrected capability behavior.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * specify: [Capability Name](CapabilityFeature.md#capability-name)\n", "override_existing": true, "dry_run": true}}
 ```
+
+Read the current element before preparing an override. The supplied definition replaces its authored prose, metadata, relations and dependency sections, so preserve the outgoing declarations still intended. Externally authored children and contract/concept references remain attached when the complete candidate is valid; do not unlink children to edit their parent's definition. Review the preview and apply the same complete content with `dry_run: false`. Moving the definition to another file rewrites incoming destinations. A missing name follows ordinary creation; actual deletion still protects children from becoming orphaned.
 
 Once requirements are created, establish traceability using the link command:
 

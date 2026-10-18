@@ -23,6 +23,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure browser cache
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/reqvire-browser" >> "$GITHUB_ENV"
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -37,16 +40,19 @@ jobs:
       - name: Install Explorer dependencies
         run: cd explorer && npm ci
 
+      - name: Install headless Chromium for Explorer checks
+        run: cd explorer && npx --no-install playwright install --with-deps chromium --only-shell
+
       - name: Build checked Explorer SPA bundle
         # All Cargo profiles/targets below embed this job's checked bundle.
         run: cd explorer && npm run build
 
       - name: Build host CLI for Rust worker tests
-        run: cargo build --locked --bin reqvire
+        run: cargo build --release --locked --bin reqvire
 
       - name: Test
         env:
-          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/debug/reqvire
+          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/release/reqvire
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             # on macOS skip our two tmpdir‐symlink tests
@@ -120,17 +126,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
+      - name: Configure browser cache
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/reqvire-browser" >> "$GITHUB_ENV"
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Install Explorer dependencies
+        run: cd explorer && npm ci
+
+      - name: Install headless Chromium for Explorer checks
+        run: cd explorer && npx --no-install playwright install --with-deps chromium --only-shell
+
       - name: Build Explorer SPA bundle for npm package
         # The Rust binaries already embed this bundle. The npm package also
         # ships the built dist so package contents make the Explorer payload
         # explicit and npm publish fails if the bundle is missing.
-        run: cd explorer && npm ci && npm run build
+        run: cd explorer && npm run build
 
       - name: Download All Archives
         uses: actions/download-artifact@v6

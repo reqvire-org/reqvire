@@ -2588,6 +2588,91 @@ impl GraphRegistry {
     // CRUD Operations (Add, Delete, Move)
     // ================================
 
+    /// Prepare a full-definition replacement in a private mutation candidate.
+    /// Incoming authored declarations survive; generated inverses are rebuilt
+    /// from the remaining authored definitions, never used as replacement input.
+    pub(crate) fn replace_element_from_string(
+        &mut self,
+        existing_id: &str,
+        markdown: &str,
+        target_file: &str,
+        excluded_patterns: &GlobSet,
+    ) -> Result<Element, ReqvireError> {
+        let previous = self
+            .nodes
+            .remove(existing_id)
+            .ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!("Element '{}' not found", existing_id))
+            })?
+            .element;
+        let mut replacement =
+            self.create_element_from_string(markdown, target_file, excluded_patterns)?;
+        // A concrete definition now tracks a newly created destination. The
+        // writer's virtual location marker is not part of the model candidate.
+        self.nodes.remove(&format!("__virtual__{target_file}"));
+        if previous.file_path == target_file {
+            replacement.file_order_index = previous.file_order_index;
+            if let Some(format) = previous.metadata.get("_single_element_format") {
+                replacement
+                    .metadata
+                    .insert("_single_element_format".into(), format.clone());
+            }
+            self.nodes
+                .get_mut(&replacement.identifier)
+                .expect("replacement inserted")
+                .element = replacement.clone();
+        }
+        self.modified_files.insert(previous.file_path);
+
+        if replacement.identifier != existing_id {
+            let identifiers =
+                FxHashMap::from_iter([(existing_id.to_string(), replacement.identifier.clone())]);
+            let moved = FxHashSet::from_iter([existing_id.to_string()]);
+            for (id, node) in &mut self.nodes {
+                if id == &replacement.identifier {
+                    continue;
+                }
+                let mut changed = false;
+                for relation in &mut node.element.relations {
+                    if relation.target.link.as_str() == existing_id {
+                        relation.target.link = LinkType::Identifier(replacement.identifier.clone());
+                        relation.target.element_id = Some(replacement.id.clone());
+                        changed |= relation.user_created;
+                    }
+                }
+                for entry in node
+                    .element
+                    .contract_bindings
+                    .iter_mut()
+                    .chain(&mut node.element.contract_references)
+                {
+                    if entry.target.as_str() == existing_id {
+                        entry.target = crate::element::ContractBindingTarget::ElementIdentifier(
+                            replacement.identifier.clone(),
+                        );
+                        changed = true;
+                    }
+                }
+                changed |= rewrite_moved_concept_reference_targets(
+                    &mut node.element,
+                    &identifiers,
+                    &moved,
+                );
+                if changed {
+                    self.modified_files.insert(node.element.file_path.clone());
+                }
+            }
+        }
+        for node in self.nodes.values_mut() {
+            node.element
+                .relations
+                .retain(|relation| relation.user_created);
+            node.relations.clear();
+        }
+        self.refresh_relation_context(excluded_patterns);
+        Ok(replacement)
+    }
+
     /// Creates an element from markdown string and adds it to the graph
     /// Used by CLI add command
     pub fn create_element_from_string(

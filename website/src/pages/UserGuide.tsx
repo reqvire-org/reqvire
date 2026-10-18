@@ -41,8 +41,7 @@ reqvire --workspace /path/to/workspace mcp`}</CodeBlock>
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace search --filter-type requirement
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          Per-project stdio startup is planned and has acceptance tests, but is
-          not implemented yet. Its command will add <code>--transport stdio</code>
+          For a client-managed project process, add <code>--transport stdio</code>
           to MCP startup. Use an absolute workspace path in a client&apos;s command
           and arguments. HTTP remains the default transport; mutation startup
           retains validation and clean-worktree ownership checks.
@@ -117,6 +116,8 @@ reqvire semantic export --layer queries --output queries.ttl`}</CodeBlock>
 
 // MCP tool calls
 reqvire.add_element({file: "system-model/Auth.md", content: "<complete element Markdown>", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", expected_model_revision: "<base_model_revision from preview>"})
 reqvire.add_element({file: "system-model/Auth.md", content: "<replacement Markdown>", override_existing: true})
 reqvire.remove_element({element_name: "Obsolete Requirement", dry_run: true})
 reqvire.move_element({element_name: "Token Expiry Requirement", file: "system-model/Identity/Auth.md"})
@@ -130,6 +131,29 @@ reqvire.remove_asset({file_path: "docs/obsolete-auth-flow.pdf", dry_run: true})`
           Each accepted mutation validates the complete candidate and persists
           canonical formatting in affected model documents. CLI authoring
           commands and their previews have been removed.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          For small edits, target <code>Element Text</code> or an exact subsection
+          name with <code>reqvire.update_element</code>. Append/replace take
+          <code> content</code>; replace_text takes exactly one literal
+          <code> old_text</code> match and <code>new_text</code>. Optional prose
+          subsections support explicit create/delete. Preview, review the diff,
+          then apply with the preview's <code>base_model_revision</code> as
+          <code> expected_model_revision</code> in the same worktree context.
+          Protected declarations stay attached; Ontology/Shapes/Query support
+          only replace and replace_text with complete fenced Markdown payloads.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          For a full definition change, read the current definition and submit
+          complete replacement Markdown with <code>override_existing: true</code>.
+          Its authored prose, metadata, relations, and dependency sections are
+          replaced; include every outgoing declaration still intended. Children
+          and incoming contract or concept references authored on other elements
+          remain attached when the complete candidate is valid. Preview with
+          <code> dry_run: true</code>, then apply the reviewed definition with
+          <code> dry_run: false</code>. A cross-file replacement rewrites incoming
+          destinations. Actual deletion still protects children from becoming
+          orphaned.
         </p>
       </Section>
 

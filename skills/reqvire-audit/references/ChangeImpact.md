@@ -45,6 +45,8 @@ Analyze how changes to requirements propagate through the model.
    - `impact_scope[]` - Per-branch scope roots (common parent requirements covering all impacted elements)
    - `invalidated_verifications[]` - Verifications that need re-review
 
+   The top-level `added` and `changed` arrays are smart-filtered report roots, not a complete change inventory: changes already reached through another root remain inside its `change_impact_tree`. Traverse those trees and compare the Git diff and current element inventory before concluding that no elements were added or changed. Native ontology and concept changes can produce a broad review set. An invalidated verification needs evidence review; it is not an assertion that its test has failed.
+
 5. **For each modified requirement:**
 
    ```bash

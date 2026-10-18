@@ -116,7 +116,7 @@ impl CodeFence {
 }
 
 /// Real subsection headings, excluding fenced examples and details content.
-fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
+pub(crate) fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
     let mut headers = Vec::new();
     let mut fence = CodeFence::default();
     let mut details = false;
@@ -445,7 +445,9 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
     let mut found_header = false;
 
     let mut content_fence = CodeFence::default();
-    for (line_num, line) in content.split_terminator('\n').enumerate() {
+    for (line_num, raw_line) in content.split_terminator('\n').enumerate() {
+        // Normalize document line endings; fenced payload bytes remain data.
+        let line = raw_line.strip_suffix('\r').unwrap_or(raw_line);
         let trimmed = line.trim();
         let was_open = content_fence.is_open();
         if !in_details_block && content_fence.consume(trimmed) {
@@ -455,7 +457,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 }
             }
             if let Some(element) = &mut current_element {
-                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
+                element.add_content_at_line(&format!("{}\n", raw_line), line_num + 1);
             }
             continue;
         }
@@ -1213,7 +1215,9 @@ pub fn parse_elements(
     let mut file_element_counter: usize = 0;
 
     let mut content_fence = CodeFence::default();
-    for (line_num, line) in content.split_terminator('\n').enumerate() {
+    for (line_num, raw_line) in content.split_terminator('\n').enumerate() {
+        // Normalize document line endings; fenced payload bytes remain data.
+        let line = raw_line.strip_suffix('\r').unwrap_or(raw_line);
         let trimmed = line.trim();
         let was_open = content_fence.is_open();
         if !in_details_block && content_fence.consume(trimmed) {
@@ -1223,7 +1227,7 @@ pub fn parse_elements(
                 }
             }
             if let Some(element) = &mut current_element {
-                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
+                element.add_content_at_line(&format!("{}\n", raw_line), line_num + 1);
             }
             continue;
         }

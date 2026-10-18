@@ -32,6 +32,12 @@ details, and keeps Close visible when lengthy details scroll.
 
 ## Components and patterns
 
+Shared foundation tokens are the only design-value catalogue. Components and
+patterns map those values into their `--ds-*` and `--ux-*` variables; they do not
+define independent token namespaces or value sheets. Reuse the project's font,
+text and spacing roles when adapting upstream UI. Measured rendering geometry
+comes from those styles rather than a second set of JavaScript design constants.
+
 Components provide one cohesive UI capability, including the branch/worktree
 selector and renderer notices. Patterns arrange components and content slots into
 reusable structures and workflows: the Explorer workspace, search, report screens,
@@ -59,7 +65,7 @@ showcase mount the same project-owned implementation.
 ## Source and tooling
 
 Use ADS skills for implementation workflows: `ads-designer` for UI changes,
-`ads-migrate` for a library reference, `ads-import` for another project's DS,
+`ads-port` for a library reference, `ads-import` for another project's DS,
 `ads-motion` for animation, and `ads-break-ui` for difficult content and states.
 They can be installed or read through the configured ADS MCP server. This guide
 records Reqvire-specific conventions; shared architecture belongs to the

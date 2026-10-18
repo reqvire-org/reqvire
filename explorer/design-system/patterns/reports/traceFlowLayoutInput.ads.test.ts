@@ -1,7 +1,8 @@
 import type { ElkNode } from "elkjs/lib/elk-api";
 import { describe, expect, it, vi } from "vitest";
-import { buildTraceFlowGraph, TRACE_NODE_HEIGHT, TRACE_NODE_WIDTH, type TraceFlowDirection, type TraceFlowTopology } from "./traceFlowLayout";
+import { buildTraceFlowGraph, type TraceFlowDirection, type TraceFlowTopology } from "./traceFlowLayout";
 
+const nodeSize = { width: 240, height: 150 };
 const layout = vi.fn<(input: ElkNode) => Promise<ElkNode>>();
 
 // Stop at the real engine boundary so preparation work is measured separately
@@ -9,7 +10,7 @@ const layout = vi.fn<(input: ElkNode) => Promise<ElkNode>>();
 async function prepare(topology: TraceFlowTopology, direction: TraceFlowDirection) {
   const stop = new Error("captured layout input");
   layout.mockClear().mockRejectedValueOnce(stop);
-  await expect(buildTraceFlowGraph(topology, direction, layout)).rejects.toBe(stop);
+  await expect(buildTraceFlowGraph(topology, direction, layout, nodeSize)).rejects.toBe(stop);
   expect(layout).toHaveBeenCalledTimes(1);
   return layout.mock.calls[0][0];
 }
@@ -33,7 +34,7 @@ function scanInput(topology: TraceFlowTopology, direction: TraceFlowDirection): 
       "elk.layered.spacing.edgeEdgeBetweenLayers": "16", "elk.randomSeed": "1",
     },
     children: sorted(topology.nodes).map(node => ({
-      id: node.id, width: TRACE_NODE_WIDTH, height: TRACE_NODE_HEIGHT,
+      id: node.id, ...nodeSize,
       layoutOptions: { "elk.portConstraints": "FIXED_SIDE", ...(node.root ? { "elk.layered.layering.layerConstraint": "FIRST" } : {}) },
       ports: edges.flatMap(edge => [
         ...(edge.source === node.id ? [{ id: portId(edge.id, "source"), width: 0, height: 0,
@@ -63,6 +64,12 @@ const topology: TraceFlowTopology = {
 };
 
 describe("Flow layout input preparation", () => {
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])("rejects unusable measured dimensions (%s) before starting the engine", async width => {
+    const engine = vi.fn();
+    await expect(buildTraceFlowGraph(topology, "RIGHT", engine, { width, height: 150 })).rejects.toThrow("Invalid trace node measurements");
+    expect(engine).not.toHaveBeenCalled();
+  });
+
   it.each(["RIGHT", "DOWN"] as const)("preserves every ordered port and layout option (%s)", async direction => {
     const input = await prepare(topology, direction);
     expect(input).toEqual(scanInput(topology, direction));
