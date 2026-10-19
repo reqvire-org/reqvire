@@ -108,6 +108,9 @@ def policy():
     assert "uses: actions/download-artifact@" in validation, "current compiled CLI is not consumed"
     assert pr.count("name: reqvire-pr-cli") == 2, "built and downloaded artifact names differ"
     upload = pr.split("      - name: Share current CLI with model validation", 1)[1].split("      - name:", 1)[0]
+    assert "id: share_cli" in upload, "CLI upload does not expose its result"
+    assert "cli_artifact_id: ${{ steps.share_cli.outputs.artifact-id }}" in pr, "actual uploaded artifact is not exposed to dependents"
+    assert "if: ${{ !cancelled() && needs.test.outputs.cli_artifact_id != '' }}" in validation, "validation can run without an uploaded CLI or is suppressed by unrelated later test failures"
     assert "path: target/release/reqvire" in upload, "optimized CLI is not uploaded"
     assert "path: target/release" in validation, "optimized CLI is not downloaded to its expected path"
     shell = next(block for name, _, block in steps(pr) if name == "Run shell end-to-end tests")

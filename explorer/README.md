@@ -118,9 +118,13 @@ npm run build:mcp-previews -- --watch  # advanced: compiler without the managed 
 
 `playwright.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
 The owners' `.ads.contract.ts` files register the checks with the `widget`
-profile in `ds.config.json`. `npm run test:ads` calls `ads verify .`, which starts
+profile in `ds.config.json`. `npm run test:ads` first validates and compiles the
+preview graph, then calls `ads verify .`, which starts
 and closes an isolated MCP preview host and supplies the selected cases to the
 project's `test:behavior` runner. No running MCP session or fixed port is needed.
+The managed preview watcher reuses the matching validated graph, keeping cold
+compilation outside its bounded App startup wait. Preparation failures stop
+verification; browser timeouts and interaction assertions remain unchanged.
 Use `npm run test:ads -- --unit components/controls/WorktreeSelector` to select
 one owner. Run the lower-level `test:behavior` command through ADS so it receives
 the verification request and scenario URLs.

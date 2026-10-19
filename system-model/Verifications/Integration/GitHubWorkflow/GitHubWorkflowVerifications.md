@@ -60,6 +60,7 @@ Verify that CI tests and validates the checked-out revision and propagates failu
 - Execute the workflows' host build and Rust test commands with an empty target and a deliberately stale worker executable. Assert an optimized build precedes tests and `REQVIRE_TEST_BIN` points to the resulting release executable in both PR and release jobs. Assert shell E2E checks select that executable and the model-validation artifact is uploaded and downloaded at its release path.
 - Make the build or worker test fail and assert the workflow command sequence fails without proceeding as a success.
 - Confirm PR validation consumes the current run's compiled binary, targets development-branch PRs as well as main, and preserves the required check name.
+- Confirm the validation condition is gated by the actual CLI upload's artifact ID and cancellation state, so an earlier build failure cannot cause a missing-artifact download error and a later test failure does not suppress available model validation.
 - Execute the model validation report command with a valid and an invalid model. The invalid model must fail despite report capture, and the workflow must retain the diagnostic report rather than tolerate the failure.
 
 #### Metadata

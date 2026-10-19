@@ -8,6 +8,8 @@ jobs:
     # Keep this name: the main branch ruleset requires this exact check.
     name: Run Rust Tests
     runs-on: ubuntu-24.04
+    outputs:
+      cli_artifact_id: ${{ steps.share_cli.outputs.artifact-id }}
 
     steps:
       - name: Checkout Repository
@@ -47,6 +49,7 @@ jobs:
         run: cargo build --release --locked --bin reqvire
 
       - name: Share current CLI with model validation
+        id: share_cli
         uses: actions/upload-artifact@v6
         with:
           name: reqvire-pr-cli
@@ -86,7 +89,7 @@ jobs:
   validate:
     name: Validate Requirements
     needs: test
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.test.outputs.cli_artifact_id != '' }}
     runs-on: ubuntu-24.04
 
     steps:

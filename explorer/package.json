@@ -25,7 +25,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run && npm run test:toast",
-    "test:ads": "ads verify .",
+    "test:ads": "npm run build:mcp-previews && ads verify .",
     "test:behavior": "playwright test",
     "test:toast": "node scripts/test-toast.mjs && node scripts/test-toast-usage.mjs",
     "lint:ds": "ads lint-config . && ads check . && oxlint --deny-warnings --config .ds/oxlintrc.json 'src' 'design-system'",

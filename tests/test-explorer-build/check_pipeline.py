@@ -14,7 +14,7 @@ npm = shutil.which("npm")
 assert npm, "Node/npm must be on PATH"
 guards = ["lint:ds", "lint:style"]
 checked = [*guards, "typecheck"]
-built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "unit", "toast", "icons", "app", "ads"]
+built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "unit", "toast", "icons", "app", "previews", "ads"]
 checks = []
 
 
@@ -39,7 +39,7 @@ def fixture(name):
         package["scripts"][guard] = f"node stage.cjs {guard}"
     package["scripts"]["generate:icons"] = "node stage.cjs icons"
     package["scripts"]["test:toast"] = "node stage.cjs toast"
-    package["scripts"]["test:ads"] = "node stage.cjs ads"
+    package["scripts"]["build:mcp-previews"] = "node stage.cjs previews"
     (app / "package.json").write_text(json.dumps(package))
     (app / "package-lock.json").write_text('{}')
     shutil.copy(root / "Makefile", repo / "Makefile")
@@ -49,14 +49,14 @@ def fixture(name):
 const path = require('node:path');
 const tool = path.basename(process.argv[1]);
 const args = process.argv.slice(2);
-const name = tool === 'vitest' ? 'unit' : tool === 'tsc' ? 'typecheck' : tool === 'vite'
+const name = tool === 'ads' ? 'ads' : tool === 'vitest' ? 'unit' : tool === 'tsc' ? 'typecheck' : tool === 'vite'
   ? (args.includes('--config') ? 'kit' : 'app') : args[0];
 fs.appendFileSync(process.env.TRACE, JSON.stringify(name) + '\\n');
 if (name === 'ci') {
   fs.mkdirSync('node_modules/.bin', {recursive: true});
   // npm can leave partial output on failure; it must not be a success receipt.
   fs.writeFileSync('node_modules/.package-lock.json', '{}');
-  for (const binary of ['tsc', 'vite', 'vitest']) {
+  for (const binary of ['tsc', 'vite', 'vitest', 'ads']) {
     fs.writeFileSync('node_modules/.bin/' + binary,
       '#!/usr/bin/env node\\nrequire(process.cwd() + "/stage.cjs");\\n', {mode: 0o755});
   }

@@ -65,6 +65,7 @@ Pull request validation workflow behavior:
 - Builds the checked-out revision's optimized host CLI before Rust tests that spawn CLI workers. Pass that exact executable through `REQVIRE_TEST_BIN`; a clean or stale target directory must not change which implementation is tested. Release validation follows the same build-before-worker-test rule. Shell E2E checks and model validation use the same optimized executable, with its artifact path preserved across jobs.
 - Runs `reqvire validate` and `reqvire lint` using the CLI built from the same checked-out revision, without installing a released validator. Preserve the required `Run Rust Tests` check name.
 - A build, Rust test, or model-validation failure fails its check. Capturing reports through pipelines must preserve failure exit status; model validation must not use `continue-on-error`.
+- Schedule the dependent model-validation job only when the current run uploaded its CLI artifact and the workflow is not cancelled. Preserve the original build failure when no artifact exists; a later test failure MUST NOT suppress model validation when the CLI artifact is available.
 - Reports pull-request validation results as workflow evidence.
 
 #### Metadata
