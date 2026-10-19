@@ -37,7 +37,7 @@ Verify interchangeable existing-element selection across the shared resolver and
 
 ##### Remaining Verification Work
 - Broaden accepted mutation and stale-identifier checks from representative rename to move, remove, merge and every endpoint operation. Add held reads during publication and recovery-required identifier selection to the existing concurrency/recovery suites.
-- Complete the excluded-input matrix for authored add/override headings, every path/URL branch, CURIEs, namespace filters, query text, Git refs and worktree IDs. The owning existing tests still cover those domains; the selector helper currently adds explicit literal-name, regex and IRI controls.
+- Complete the excluded-input matrix for authored add/override headings, every path/URL branch, CURIEs, namespace filters, query text, Git refs and branch selectors. The owning existing tests still cover those domains; the selector helper currently adds explicit literal-name, regex and IRI controls.
 
 These additional verification cases do not exempt the existing executable assertions from passing.
 

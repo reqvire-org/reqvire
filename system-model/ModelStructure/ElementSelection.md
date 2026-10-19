@@ -72,7 +72,7 @@ Shared implementation obligation for arguments that select existing Reqvire mode
 **Excluded input roles and mixed domains**
 - New element names, Markdown heading text, rename `new_name`, relation names, and other authored literals MUST remain literal values. Creating or overriding an element from authored Markdown does not reinterpret its heading as a selector.
 - Name regexes, globs and other search filters, including `filter_name` and `filter_id`, MUST retain their declared filtering semantics. A filter does not become a single-element selector merely because it contains a model name or identifier.
-- File/folder paths, asset paths, URLs, semantic IRIs, CURIEs, namespace selectors, Git refs, worktree IDs and query text MUST retain their existing domains and resolution rules.
+- File/folder paths, asset paths, URLs, semantic IRIs, CURIEs, namespace selectors, Git refs, branch selectors and query text MUST retain their existing domains and resolution rules.
 - Mixed-domain relation or contract arguments MUST preserve their operation's existing domain detection and path/URL normalization. Apply this contract within the existing-element branch without intercepting a supported file, evidence URL or semantic IRI. Generic element selection adds no new filesystem target or fragment-only syntax.
 
 **Compatibility, diagnostics and side effects**

@@ -117,10 +117,11 @@ export function Modal({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onOpenChange, open]);
 
-  return (
+  return createPortal(
     <ModalContext.Provider value={{ open, onOpenChange }}>
       {children}
-    </ModalContext.Provider>
+    </ModalContext.Provider>,
+    document.body,
   );
 }
 
@@ -143,7 +144,7 @@ export function ModalContent({
   const context = useContext(ModalContext);
   if (!context?.open) return null;
 
-  return createPortal(
+  return (
     <ModalContentContext.Provider value={context}>
       <div
         data-size={size}
@@ -166,8 +167,7 @@ export function ModalContent({
           {children}
         </div>
       </div>
-    </ModalContentContext.Provider>,
-    document.body,
+    </ModalContentContext.Provider>
   );
 }
 

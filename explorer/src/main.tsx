@@ -51,8 +51,8 @@ function loadProjectStoreSeed() {
 function projectStoreSeedCandidates() {
   if (window.reqvireWorktreeRouting) {
     const seed = new URL("/assets/project-store.js", window.location.href);
-    const id = new URL(window.location.href).searchParams.get("worktree_id");
-    if (id !== null) seed.searchParams.set("worktree_id", id);
+    const branch = new URL(window.location.href).searchParams.get("branch");
+    if (branch !== null) seed.searchParams.set("branch", branch);
     return [seed.toString()];
   }
   const candidates = new Set<string>();

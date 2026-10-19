@@ -12,7 +12,7 @@ function harness() {
     },
   };
   vm.runInNewContext(`(${instrument.toString()})();`, {
-    window, location: new URL('http://example.test/?worktree_id=branch-a'),
+    window, location: new URL('http://example.test/?branch=branch-a'),
     URL, Request, Response,
   });
   return { window, calls };
@@ -20,8 +20,8 @@ function harness() {
 
 for (const endpoint of [
   '/api/project-store/chunks',
-  '/api/project-store/chunks?worktree_id=branch-a',
-  'http://example.test/api/project-store/chunks?worktree_id=branch-a',
+  '/api/project-store/chunks?branch=branch-a',
+  'http://example.test/api/project-store/chunks?branch=branch-a',
 ]) {
   test(`records requested chunk hashes: ${endpoint}`, async () => {
     const { window } = harness();
@@ -38,7 +38,7 @@ for (const fault of ['missing', 'corrupt']) {
   test(`injects ${fault} chunks for selected worktrees`, async () => {
     const { window } = harness();
     window.reqvireChunkFault = fault;
-    const response = await window.fetch('/api/project-store/chunks?worktree_id=branch-a', {
+    const response = await window.fetch('/api/project-store/chunks?branch=branch-a', {
       method: 'POST', body: JSON.stringify({ revision: 'r', hashes: ['hash'] }),
     });
     const chunks = (await response.json()).chunks;
@@ -51,7 +51,7 @@ for (const fault of ['missing', 'corrupt']) {
 test('selected worktree chunks can be held and released', async () => {
   const { window, calls } = harness();
   window.reqvireHoldNextChunks = true;
-  const request = window.fetch('/api/project-store/chunks?worktree_id=branch-a', {
+  const request = window.fetch('/api/project-store/chunks?branch=branch-a', {
     method: 'POST', body: JSON.stringify({ hashes: ['hash'] }),
   });
   assert.equal(window.reqvireHeldChunks, true);

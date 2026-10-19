@@ -62,39 +62,42 @@ for mode in ('mcp', 'serve'):
                                 extra_args=['--enable-github'], environment=env) as server:
                 tools = server.rpc('tools/list', {})['tools']
                 publication = [tool for tool in tools if tool['name'] in ('reqvire.git.push', 'reqvire.github.pr.create', 'reqvire.github.pr.comment')]
-                check(f'{mode}/discovery', len(publication) == 3 and all(t['annotations']['openWorldHint'] for t in publication))
+                check(f'{mode}/discovery', len(publication) == 3
+                      and all(t['annotations']['openWorldHint']
+                              and 'branch' in t['inputSchema']['properties']
+                              and 'worktree_id' not in t['inputSchema']['properties'] for t in publication))
                 initial = git(root, 'rev-parse', 'HEAD')
                 pushed = server.tool('reqvire.git.push')
                 check(f'{mode}/push-exact-head', pushed['commit'] == git(remote, 'rev-parse', 'refs/heads/main') == initial)
                 check(f'{mode}/push-noop', server.tool('reqvire.git.push')['outcome'] == 'no_op')
                 created = server.tool('reqvire.worktree.create', branch='feature', base_ref='main')
-                context = created['worktree_id']
+                context = created['branch']
                 content = (fixture / 'fixtures/other.md.txt').read_text().split('# Elements\n\n', 1)[1]
-                server.tool('reqvire.add_element', worktree_id=context, file='Model.md', content=content)
-                check(f'{mode}/pending-push-rejected', server.raw_tool('reqvire.git.push', worktree_id=context).get('isError') is True)
-                committed = server.tool('reqvire.git.commit', worktree_id=context, message='Accepted feature')
-                check(f'{mode}/unpushed-pr-rejected', server.raw_tool('reqvire.github.pr.create', worktree_id=context,
+                server.tool('reqvire.add_element', branch=context, file='Model.md', content=content)
+                check(f'{mode}/pending-push-rejected', server.raw_tool('reqvire.git.push', branch=context).get('isError') is True)
+                committed = server.tool('reqvire.git.commit', branch=context, message='Accepted feature')
+                check(f'{mode}/unpushed-pr-rejected', server.raw_tool('reqvire.github.pr.create', branch=context,
                       base='main', title='Feature', body='Review').get('isError') is True)
-                server.tool('reqvire.git.push', worktree_id=context)
+                server.tool('reqvire.git.push', branch=context)
                 body = '--flag\n\nQuotes " and `code` $(literal)\n'
                 (state / 'scenario.json').write_text(json.dumps({'lost_create': True}))
-                pr = server.tool('reqvire.github.pr.create', worktree_id=context, base='main', title='Feature', body=body, draft=True)
-                again = server.tool('reqvire.github.pr.create', worktree_id=context, base='main', title='Changed ignored', body='ignored')
+                pr = server.tool('reqvire.github.pr.create', branch=context, base='main', title='Feature', body=body, draft=True)
+                again = server.tool('reqvire.github.pr.create', branch=context, base='main', title='Changed ignored', body='ignored')
                 calls = [json.loads(line) for line in (state / 'calls.jsonl').read_text().splitlines()]
                 creates = [call for call in calls if call['args'][:2] == ['pr', 'create']]
                 check(f'{mode}/pr-reconcile-no-duplicate', pr['pr_number'] == 7 and again['outcome'] == 'no_op'
                       and len(creates) == 1 and creates[0]['body'] == body)
                 (state / 'scenario.json').write_text('{}')
-                comment = server.tool('reqvire.github.pr.comment', worktree_id=context, pr_number=22, body=body)
+                comment = server.tool('reqvire.github.pr.comment', branch=context, pr_number=22, body=body)
                 check(f'{mode}/comment-exact-body', comment['comment_id'] == 123
                       and json.loads((state / 'comments.jsonl').read_text())['body'] == body)
                 (state / 'scenario.json').write_text(json.dumps({'lost_comment': True}))
-                unknown = server.raw_tool('reqvire.github.pr.comment', worktree_id=context, pr_number=22, body=body)
+                unknown = server.raw_tool('reqvire.github.pr.comment', branch=context, pr_number=22, body=body)
                 check(f'{mode}/ambiguous-comment-no-retry', unknown.get('isError') is True
                       and unknown['structuredContent']['outcome'] == 'unknown'
                       and len((state / 'comments.jsonl').read_text().splitlines()) == 2)
                 (state / 'scenario.json').write_text(json.dumps({'fail': 'pr comment'}))
-                denied = server.raw_tool('reqvire.github.pr.comment', worktree_id=context, pr_number=22, body='Denied')
+                denied = server.raw_tool('reqvire.github.pr.comment', branch=context, pr_number=22, body='Denied')
                 check(f'{mode}/denial-preserves-state', denied.get('isError') is True
                       and 'secret-token' not in json.dumps(denied)
                       and git(Path(created['workspace_root']), 'rev-parse', 'HEAD') == committed['commit'])

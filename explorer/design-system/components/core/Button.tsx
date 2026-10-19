@@ -14,6 +14,10 @@ export interface ButtonProps extends Omit<(ButtonHTMLAttributes<HTMLButtonElemen
 
 const baseUX = css`
   display: inline-flex;
+  &[data-block] {
+    display: flex;
+    width: 100%;
+  }
   height: var(--control-md);
   align-items: center;
   justify-content: center;
@@ -149,11 +153,6 @@ const lgUX = css`
   font-size: var(--text-base);
 `;
 
-const blockUX = css`
-  display: flex;
-  width: 100%;
-`;
-
 const iconUX = css`
   display: inline-flex;
 `;
@@ -201,6 +200,7 @@ export function Button({
   return (
     <button
       type={type}
+      data-block={block || undefined}
       className={cx(
         "ds-btn",
         baseUX,
@@ -208,7 +208,6 @@ export function Button({
         BUTTON_TONE_CLASSES[tone],
         sizeUX[size],
         BUTTON_SIZE_CLASSES[size],
-        block ? blockUX : "",
         block ? "ds-btn--block" : "",
         className,
       )}

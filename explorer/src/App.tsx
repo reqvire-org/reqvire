@@ -57,10 +57,10 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   const blocked = selectingWorktree || showRefreshError;
   const worktreeSelector: WorktreeSelectorProps | undefined = live.worktreeRouting ? {
     value: live.selectedWorktree,
-    displayedValue: result.ok ? result.store.project.worktree_id : undefined,
-    choices: live.worktrees.map(item => ({ id: item.worktree_id, branch: item.branch,
+    displayedValue: result.ok ? result.store.project.branch ?? undefined : undefined,
+    choices: live.worktrees.map(item => ({ id: item.branch, branch: item.branch,
       root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) })),
-    branch: result.ok ? result.store.project.branch : undefined,
+    branch: result.ok ? result.store.project.branch ?? undefined : undefined,
     pending: live.switching && !refreshError,
     onChange: live.selectWorktree,
     onOpen: () => { void live.refreshWorktrees(); },
@@ -72,12 +72,12 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   }
 
   return (
-    <WorktreeUrlContext.Provider value={result.store.project.worktree_id}>
+    <WorktreeUrlContext.Provider value={live.worktreeRouting ? result.store.project.branch ?? undefined : undefined}>
     <StoreProvider store={result.store} schemaMismatch={result.schemaMismatch}>
       <SearchIndexProvider>
         <ExplorerUiStateProvider worktreeRouting={live.worktreeRouting}>
           {(live.switching || live.worktreeSelectionError) && <WorktreeLoadDialog
-            branch={live.worktrees.find(item => item.worktree_id === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
+            branch={live.worktrees.find(item => item.branch === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
             error={live.worktreeSelectionError} onDismiss={live.dismissWorktreeError} /> }
           {showRefreshError && <WorktreeLoadDialog operation="refresh"
             branch={result.store.project.branch ?? "Displayed model"} error={refreshError}

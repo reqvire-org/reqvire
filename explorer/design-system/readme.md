@@ -38,6 +38,12 @@ define independent token namespaces or value sheets. Reuse the project's font,
 text and spacing roles when adapting upstream UI. Measured rendering geometry
 comes from those styles rather than a second set of JavaScript design constants.
 
+Role tokens retain their public names and remain independently overridable. Their
+initial values explicitly map to the shared dimension, type, color and motion
+scales. Large layout dimensions live in the same numeric dimension scale rather
+than coupling one screen's width to another screen's role. Status and RDF shape
+colors share a primitive red paint; SHACL uses the semantic-contract paint.
+
 Components provide one cohesive UI capability, including the branch/worktree
 selector and renderer notices. Patterns arrange components and content slots into
 reusable structures and workflows: the Explorer workspace, search, report screens,
@@ -104,6 +110,12 @@ DOM tests load the real `styles.css?inline` through Vite; the
 [test setup](../src/test/setupCssTokens.ts) unwraps its base cascade layer for
 jsdom without synthesizing token values. Browser/build checks inspect the real
 CSS and Linaria output.
+
+`Modal` owns its body portal and close lifecycle; `ModalContent` owns the dialog's
+DOM and class composition. `Button` expresses full-width layout through its owned
+`data-block` state, keeping size/tone composition small enough for complete source
+inspection. These structures keep modal style forwarding and button variants
+traceable without disabling ADS diagnostics.
 
 Atomic styles use matching property names across composed bases and variants.
 Separate border width/style/color, use paired logical padding sides for tree

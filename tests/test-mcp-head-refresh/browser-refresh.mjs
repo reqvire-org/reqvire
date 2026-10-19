@@ -13,8 +13,8 @@ function commit(folder) {
 }
 
 await withBrowser(profile, async browser => {
-  await browser.navigate(`${base}/?worktree_id=${original}#/model`);
-  await waitFor(() => browser.evaluate(id => window.reqvireProjectStore?.project.worktree_id === id
+  await browser.navigate(`${base}/?branch=${encodeURIComponent(original)}#/model`);
+  await waitFor(() => browser.evaluate(id => window.reqvireProjectStore?.project.branch === id
     && Boolean(document.querySelector('[data-product-pattern="app-shell"]')), original));
   const hasRefresh = await browser.evaluate(() => Boolean(document.querySelector('button[aria-label="Refresh HEAD"]')));
   assert.ok(hasRefresh, 'Served Explorer is missing the Refresh HEAD control');
@@ -35,7 +35,7 @@ await withBrowser(profile, async browser => {
   const head = commit(root);
   await browser.evaluate(() => document.querySelector('button[aria-label="Refresh HEAD"]').click());
   await waitFor(() => browser.evaluate(head => window.reqvireProjectStore?.project.eligible_git_worktrees?.some(w => w.head === head), head));
-  assert.ok(await browser.evaluate(id => window.refreshCalls.some(c => c.worktree_id === id), original), 'Refresh button bypassed the shared MCP command');
+  assert.ok(await browser.evaluate(() => window.refreshCalls.some(c => c.branch === window.reqvireProjectStore.project.branch && !('worktree_id' in c))), 'Refresh button bypassed the shared MCP command');
   assert.ok(await browser.evaluate(() => window.reqvireProjectStore.resources.some(r => r.source_text?.includes('refreshed implementation for browser'))), 'Refresh retained stale evidence source bytes');
 
   // Existing secondary context must adopt its branch tip on selection, without
@@ -45,9 +45,9 @@ await withBrowser(profile, async browser => {
   await browser.evaluate(() => document.querySelector('[role="combobox"][aria-label="Branch"]').click());
   await waitFor(() => browser.evaluate(id => Boolean(document.querySelector(`[data-worktree-id="${id}"]`)), secondary));
   await browser.evaluate(id => document.querySelector(`[data-worktree-id="${id}"]`).click(), secondary);
-  await waitFor(() => browser.evaluate((id, head) => window.reqvireProjectStore?.project.worktree_id === id
+  await waitFor(() => browser.evaluate((id, head) => window.reqvireProjectStore?.project.branch === id
     && window.reqvireProjectStore.project.eligible_git_worktrees?.some(w => w.head === head), secondary, secondaryHead));
-  assert.ok(await browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id, secondary), 'HEAD selection replaced context identity');
+  assert.ok(await browser.evaluate(id => new URLSearchParams(location.search).get('branch') === id, secondary), 'HEAD selection replaced context identity');
   const retained = await browser.evaluate(() => JSON.stringify(window.reqvireProjectStore));
   const model = join(secondRoot, 'Model.md');
   writeFileSync(model, readFileSync(model, 'utf8') + '\n');
@@ -56,5 +56,5 @@ await withBrowser(profile, async browser => {
   await waitFor(() => browser.evaluate(() => document.body.textContent.includes('Model.md')
     && /blocked|protected/i.test(document.body.textContent)));
   assert.equal(await browser.evaluate(() => JSON.stringify(window.reqvireProjectStore)), retained, 'Blocked refresh replaced the accepted view');
-  assert.ok(await browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id, secondary), 'Blocked refresh changed selection');
+  assert.ok(await browser.evaluate(id => new URLSearchParams(location.search).get('branch') === id, secondary), 'Blocked refresh changed selection');
 });

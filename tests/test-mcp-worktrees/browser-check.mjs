@@ -8,10 +8,10 @@ async function wait(check, description) {
   await waitFor(check);
 }
 try {
-  await browser.navigate(`${base}/?worktree_id=${original}#/model`);
-  await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.worktree_id === id, original), 'original model');
+  await browser.navigate(`${base}/?branch=${encodeURIComponent(original)}#/model`);
+  await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.branch === id, original), 'original model');
   // A second tab in the same browser shares storage, but not its model selection.
-  const { targetId } = await browser.rpc('Target.createTarget', { url: `${base}/?worktree_id=${secondary}#/model` });
+  const { targetId } = await browser.rpc('Target.createTarget', { url: `${base}/?branch=${encodeURIComponent(secondary)}#/model` });
   const { sessionId } = await browser.rpc('Target.attachToTarget', { targetId, flatten: true });
   const other = async (fn, ...args) => {
     const response = await browser.rpc('Runtime.evaluate', {
@@ -20,7 +20,7 @@ try {
     if (response.exceptionDetails) throw new Error(response.exceptionDetails.text);
     return response.result.value;
   };
-  await wait(() => other(id => window.reqvireProjectStore?.project.worktree_id === id, secondary), 'second-tab model');
+  await wait(() => other(id => window.reqvireProjectStore?.project.branch === id, secondary), 'second-tab model');
   // A real user activates the tab before switching its branch. Background tabs
   // deliberately defer model loads until visible.
   await browser.rpc('Page.bringToFront');
@@ -31,10 +31,10 @@ try {
     await wait(() => browser.evaluate(id => Boolean(document.querySelector(`[data-worktree-id="${id}"]`)), dirty), 'dirty branch choice');
     await browser.evaluate(id => document.querySelector(`[data-worktree-id="${id}"]`).click(), dirty);
     await wait(() => browser.evaluate(() => document.body.textContent.includes('clean')), 'dirty branch rejection');
-    assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id, original), 'Dirty admission replaced the displayed branch');
+    assert(await browser.evaluate(id => window.reqvireProjectStore.project.branch === id, original), 'Dirty admission replaced the displayed branch');
     assert(await browser.evaluate(() => document.querySelector('[role="combobox"][aria-label="Branch"]').getAttribute('aria-busy') !== 'true'), 'Failed admission is still shown as loading');
     await browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog').parentElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })));
-    await wait(() => browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id && !document.querySelector('.ux-worktree-load-dialog'), original), 'dismiss dirty-branch rejection');
+    await wait(() => browser.evaluate(id => new URLSearchParams(location.search).get('branch') === id && !document.querySelector('.ux-worktree-load-dialog'), original), 'dismiss dirty-branch rejection');
   }
   assert(await browser.evaluate(() => {
     const navigation = document.querySelector('nav[aria-label="Explorer views"]');
@@ -54,15 +54,15 @@ try {
     await other(view => { location.hash = '#/' + view; }, view);
     await wait(() => other(view => location.hash.startsWith(view === 'coverage' ? '#/coverage?scope=' : '#/' + view)
       && Boolean(document.querySelector('main')), view), `second-tab ${view} view`);
-    assert(await other(id => window.reqvireProjectStore.project.worktree_id === id, secondary), `${view} lost context`);
-    assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id, original), `${view} changed the other tab`);
+    assert(await other(id => window.reqvireProjectStore.project.branch === id, secondary), `${view} lost context`);
+    assert(await browser.evaluate(id => window.reqvireProjectStore.project.branch === id, original), `${view} changed the other tab`);
   }
   // Exercise failures over real accepted data, without replacing the server store.
   const retainedUrl = await browser.evaluate(() => location.href);
   await browser.evaluate(id => {
     const originalFetch = window.fetch;
     window.fetch = async (url, init) => {
-      if (String(url) === '/api/worktrees/load' && JSON.parse(init.body).worktree_id === id) {
+      if (String(url) === '/api/worktrees/load' && JSON.parse(init.body).branch === id) {
         if (window.simulateWorktreeError) return Response.json({ error: 'Injected worktree load failure' }, { status: 503 });
         if (window.holdWorktreeLoad) await new Promise(resolve => { window.releaseWorktreeLoad = resolve; });
       }
@@ -74,7 +74,7 @@ try {
     await wait(() => browser.evaluate(id => Boolean(document.querySelector(`[data-worktree-id="${id}"]`)), secondary), 'failure target choice');
     await browser.evaluate(id => document.querySelector(`[data-worktree-id="${id}"]`).click(), secondary);
     await wait(() => browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog [role="alert"]')?.textContent === 'Injected worktree load failure'), `worktree error dialog (${action})`);
-    assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Failure must retain and block the accepted model');
+    assert(await browser.evaluate(id => window.reqvireProjectStore.project.branch === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Failure must retain and block the accepted model');
     stage = `dismiss failed switch (${action})`;
     if (action === 'escape') {
       await browser.rpc('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
@@ -98,7 +98,7 @@ try {
   await browser.evaluate(id => [...document.querySelectorAll('[role="option"]')].find(option => option.dataset.worktreeId === id).click(), secondary);
   await wait(() => browser.evaluate(() => typeof window.releaseWorktreeLoad === 'function'
     && Boolean(document.querySelector('.ux-worktree-load-dialog [role="status"]'))), 'held worktree load and spinner');
-  assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Pending switch must retain and block the accepted model');
+  assert(await browser.evaluate(id => window.reqvireProjectStore.project.branch === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Pending switch must retain and block the accepted model');
   assert(await browser.evaluate(() => {
     const overlay = getComputedStyle(document.querySelector('.ux-worktree-load-dialog').parentElement);
     return overlay.alignItems === 'center' && overlay.backdropFilter.includes('blur') && overlay.backgroundColor !== 'rgba(0, 0, 0, 0)';
@@ -109,22 +109,22 @@ try {
   assert(await browser.evaluate(() => Boolean(document.querySelector('.ux-worktree-load-dialog [role="status"]'))), 'Pending loading dialog was dismissed');
   assert(await browser.evaluate(url => location.href === url, pendingUrl), 'Pending dismissal changed the underlying detail route');
   await browser.evaluate(() => { window.holdWorktreeLoad = false; window.releaseWorktreeLoad(); });
-  await wait(() => browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && !document.querySelector('[role="dialog"]'), secondary), 'secondary branch adoption');
-  assert(await browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id, secondary), 'Selection absent from URL');
+  await wait(() => browser.evaluate(id => window.reqvireProjectStore.project.branch === id && !document.querySelector('[role="dialog"]'), secondary), 'secondary branch adoption');
+  assert(await browser.evaluate(id => new URLSearchParams(location.search).get('branch') === id, secondary), 'Selection absent from URL');
   const previousDocument = await browser.evaluate(() => performance.timeOrigin);
   await browser.reloadPage();
   await wait(() => browser.evaluate((id, previous) => performance.timeOrigin !== previous
-    && window.reqvireProjectStore?.project.worktree_id === id
+    && window.reqvireProjectStore?.project.branch === id
     && Boolean(document.querySelector('[data-product-pattern="app-shell"]')), secondary, previousDocument), 'reloaded selection');
   await browser.evaluate(() => history.back());
-  await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.worktree_id === id, original), 'back to original branch');
-  assert(await other(id => window.reqvireProjectStore.project.worktree_id === id, secondary), 'History affected the second tab');
+  await wait(() => browser.evaluate(id => window.reqvireProjectStore?.project.branch === id, original), 'back to original branch');
+  assert(await other(id => window.reqvireProjectStore.project.branch === id, secondary), 'History affected the second tab');
 } catch (error) {
   const failure = new Error(`Worktree browser check failed during ${stage}`, { cause: error });
   try {
     console.error('Browser state:', await browser?.evaluate(() => ({
       url: location.href,
-      context: window.reqvireProjectStore?.project.worktree_id,
+      context: window.reqvireProjectStore?.project.branch,
       text: document.body.innerText.slice(0, 4000),
     })));
   } catch { /* Keep the original failure when the debugging connection is gone. */ }

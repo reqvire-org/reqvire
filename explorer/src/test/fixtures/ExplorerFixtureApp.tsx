@@ -94,16 +94,16 @@ const coverageStore = withTraceElements(scopedCoverage as ExplorerProjectStore);
 
 const fixtureStores = new Map(SHOWCASE_WORKTREES.filter(choice => choice.available).map(choice => {
   const base = choice.id === "showcase-coverage" ? coverageStore : modelStore;
-  return [choice.id, { ...base, project: { ...base.project, branch: choice.branch, worktree_id: choice.id } }];
+  return [choice.branch, { ...base, project: { ...base.project, branch: choice.branch, worktree_id: choice.id } }];
 }));
 
 function requestedFixture(fallback: string) {
-  const id = new URLSearchParams(window.location.search).get("worktree_id");
+  const id = new URLSearchParams(window.location.search).get("branch");
   return id && fixtureStores.has(id) ? id : fallback;
 }
 
 export function ExplorerFixtureApp({ example = "model" }: { example?: "model" | "coverage" }) {
-  const initialId = example === "coverage" ? "showcase-coverage" : "showcase-main";
+  const initialId = example === "coverage" ? "coverage-review" : "main";
   const [worktreeId, setWorktreeId] = useState(() => requestedFixture(initialId));
   useEffect(() => {
     const onPopState = () => setWorktreeId(requestedFixture(initialId));
@@ -119,7 +119,7 @@ export function ExplorerFixtureApp({ example = "model" }: { example?: "model" | 
     result: { ok: true, schemaMismatch: null, store: fixtureStores.get(worktreeId)! },
     refreshError: null,
     worktreeRouting: true,
-    worktrees: SHOWCASE_WORKTREES.map(choice => ({ worktree_id: choice.id, branch: choice.branch,
+    worktrees: SHOWCASE_WORKTREES.map(choice => ({ branch: choice.branch,
       workspace_root: choice.root, available: choice.available, explorer_available: choice.available })),
     selectedWorktree: worktreeId,
     selectWorktree,

@@ -189,20 +189,20 @@ describe("worktree selection", () => {
   });
   function contexts() {
     const store = smallStore();
-    const a = wireSnapshot({ ...store, project: { ...store.project, worktree_id: "a", branch: "main" } });
-    const b = wireSnapshot({ ...store, project: { ...store.project, worktree_id: "b", branch: "feature" }, elements: [{ ...store.elements[0], content: "Branch B" }] });
+    const a = wireSnapshot({ ...store, project: { ...store.project, worktree_id: "private-a", branch: "a" } });
+    const b = wireSnapshot({ ...store, project: { ...store.project, worktree_id: "private-b", branch: "b" }, elements: [{ ...store.elements[0], content: "Branch B" }] });
     window.reqvireWorktreeRouting = true;
     window.reqvireProjectStore = a.store;
     window.reqvireLiveRefresh = a.seed;
-    window.history.replaceState(null, "", "/?worktree_id=a#/model");
+    window.history.replaceState(null, "", "/?branch=a#/model");
     const transport = async (url: string, init: RequestInit = {}) => {
       const parsed = new URL(url, window.location.origin);
       if (parsed.pathname === "/api/worktrees/load") return Response.json({});
-      if (parsed.pathname === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: [
-        { worktree_id: "a", branch: "main", workspace_root: "/a", available: true, explorer_available: true },
-        { worktree_id: "b", branch: "feature", workspace_root: "/b", available: true, explorer_available: true },
+      if (parsed.pathname === "/api/worktrees") return Response.json({ original_branch: "a", worktrees: [
+        { branch: "a", workspace_root: "/a", available: true, explorer_available: true },
+        { branch: "b", workspace_root: "/b", available: true, explorer_available: true },
       ] });
-      const id = parsed.searchParams.get("worktree_id");
+      const id = parsed.searchParams.get("branch");
       if (id !== "a" && id !== "b") return Response.json({ error: "Unknown worktree" }, { status: 503 });
       const snapshot = id === "a" ? a : b;
       return parsed.pathname.endsWith("/manifest")
@@ -222,7 +222,7 @@ describe("worktree selection", () => {
       if (url !== "/mcp") return transport(url, init);
       const request = JSON.parse(String(init?.body));
       if (request.method === "initialize") return Response.json({ result: {} });
-      if (request.params.arguments.worktree_id === "a") {
+      if (request.params.arguments.branch === "a") {
         pendingSignal = init!.signal!;
         return new Promise(resolve => { release = resolve; });
       }
@@ -233,11 +233,17 @@ describe("worktree selection", () => {
     });
     const hook = renderHook(() => useLiveStore()); await tick();
     act(() => hook.result.current.refreshHead?.()); await tick();
+    const commands = () => fetchMock.mock.calls
+      .filter(([url]) => url === "/mcp")
+      .map(([, init]) => JSON.parse(String(init?.body)))
+      .filter(request => request.method === "tools/call");
+    expect(commands()[0].params.arguments).toEqual({ branch: "a", dry_run: false });
     expect(hook.result.current.refreshingHead).toBe(true);
     act(() => hook.result.current.selectWorktree("b")); await tick();
     expect(pendingSignal.aborted).toBe(true);
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
     act(() => hook.result.current.refreshHead?.()); await tick();
+    expect(commands().at(-1).params.arguments).toEqual({ branch: "b", dry_run: false });
     const diagnostic = hook.result.current.refreshError;
     expect(diagnostic).toContain("Model.md");
     expect(diagnostic).toContain("b-accepted");
@@ -245,15 +251,15 @@ describe("worktree selection", () => {
     await tick();
     expect(hook.result.current.refreshError).toBe(diagnostic);
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
-    expect(location.search).toBe("?worktree_id=b");
+    expect(location.search).toBe("?branch=b");
     expect(hook.result.current.refreshingHead).toBe(false);
   });
   it("retains selection URLs after error dismissal and requires explicit retry", async () => {
     const { a, b, fetchMock, transport } = contexts();
-    const retained = `/?worktree_id=a#/model?selected=${encodeURIComponent(smallStore().elements[0].id)}&mode=flow`;
+    const retained = `/?branch=a#/model?selected=${encodeURIComponent(smallStore().elements[0].id)}&mode=flow`;
     history.replaceState(null, "", retained);
     const hook = renderHook(() => useLiveStore()); await tick();
-    fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees/load" && JSON.parse(String(init?.body)).worktree_id === "b"
+    fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees/load" && JSON.parse(String(init?.body )).branch === "b"
       ? Response.json({ error: "Invalid target model" }, { status: 503 }) : transport(url, init));
     act(() => hook.result.current.selectWorktree("b"));
     expect(hook.result.current.switching).toBe(true);
@@ -285,7 +291,7 @@ describe("worktree selection", () => {
     });
     await tick(5000);
     act(() => {
-      window.history.replaceState(null, "", "/?worktree_id=a#/coverage?scope=");
+      window.history.replaceState(null, "", "/?branch=a#/coverage?scope=");
       window.dispatchEvent(new PopStateEvent("popstate"));
     });
     expect(pendingSignal.aborted).toBe(false);
@@ -298,13 +304,13 @@ describe("worktree selection", () => {
     const { a, b, fetchMock, transport } = contexts();
     fetchMock.mockImplementation(async (url, init) => {
       const response = await transport(url, init);
-      if (url.includes('/manifest') && url.includes('worktree_id=a')) response.headers.set('X-Reqvire-Recovery-Required', 'true');
+      if (url.includes('/manifest') && url.includes('branch=a')) response.headers.set('X-Reqvire-Recovery-Required', 'true');
       return response;
     });
     const hook = renderHook(() => useLiveStore());
     await tick();
     expect(hook.result.current.recoveryWarning).toMatch(/recovery/i);
-    fetchMock.mockImplementation(async (url, init) => url.includes('worktree_id=b')
+    fetchMock.mockImplementation(async (url, init) => url.includes('branch=b')
       ? Response.json({ error: 'unavailable' }, { status: 503 }) : transport(url, init));
     act(() => hook.result.current.selectWorktree('b'));
     await tick();
@@ -349,7 +355,7 @@ describe("worktree selection", () => {
     await tick(30000);
     expect(fetchMock).not.toHaveBeenCalled();
     act(() => {
-      window.history.replaceState(null, "", "/?worktree_id=a#/model");
+      window.history.replaceState(null, "", "/?branch=a#/model");
       window.dispatchEvent(new PopStateEvent("popstate"));
     });
     await tick();
@@ -360,7 +366,7 @@ describe("worktree selection", () => {
     delete window.reqvireLiveRefresh;
     const hook = renderHook(() => useLiveStore());
     await tick();
-    fetchMock.mockImplementation(async (url, init) => url.includes("worktree_id=b")
+    fetchMock.mockImplementation(async (url, init) => url.includes("branch=b")
       ? Response.json({ error: "Temporarily unavailable" }, { status: 503 }) : transport(url, init));
     act(() => hook.result.current.selectWorktree("b"));
     await tick();
@@ -386,7 +392,7 @@ describe("worktree selection", () => {
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
     expect(hook.result.current.refreshError).toContain("clean worktree");
     expect(fetchMock.mock.calls.filter(([url]) => url === "/api/worktrees/load")).toHaveLength(1);
-    expect(fetchMock.mock.calls.some(([url]) => url.includes("worktree_id=b"))).toBe(false);
+    expect(fetchMock.mock.calls.some(([url]) => url.includes("branch=b"))).toBe(false);
     fetchMock.mockImplementation(transport);
     act(() => hook.result.current.selectWorktree("b")); await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
@@ -399,20 +405,20 @@ describe("worktree selection", () => {
     fetchMock.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
     await tick(5000);
     act(() => hook.result.current.selectWorktree("b"));
-    expect(hook.result.current.result.ok && hook.result.current.result.store.project.branch).toBe("main");
+    expect(hook.result.current.result.ok && hook.result.current.result.store.project.branch).toBe("a");
     fetchMock.mockImplementation(transport);
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
-    expect(window.location.search).toBe("?worktree_id=b");
+    expect(window.location.search).toBe("?branch=b");
     const late = manifestResponse(a);
     late.headers.set('X-Reqvire-Recovery-Required', 'true');
     await act(async () => { release(late); });
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
     expect(hook.result.current.recoveryWarning).toBeNull();
-    expect(fetchMock.mock.calls.filter(([url]) => url.includes("/chunks")).every(([url]) => url.includes("worktree_id="))).toBe(true);
+    expect(fetchMock.mock.calls.filter(([url]) => url.includes("/chunks")).every(([url]) => url.includes("branch="))).toBe(true);
   });
-  it("retains the labelled valid branch when a selected ID disappears, and recovers explicitly", async () => {
+  it("retains the labelled valid branch when a selected branch disappears, and recovers explicitly", async () => {
     const { a, b } = contexts();
     const hook = renderHook(() => useLiveStore()); await tick();
     act(() => hook.result.current.selectWorktree("removed")); await tick();
@@ -427,7 +433,7 @@ describe("worktree selection", () => {
     const hook = renderHook(() => useLiveStore()); await tick();
     act(() => hook.result.current.selectWorktree("b")); await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
-    act(() => { window.history.replaceState(null, "", "/?worktree_id=a#/model"); window.dispatchEvent(new PopStateEvent("popstate")); });
+    act(() => { window.history.replaceState(null, "", "/?branch=a#/model"); window.dispatchEvent(new PopStateEvent("popstate")); });
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
     expect(storage).not.toHaveBeenCalled();
@@ -437,7 +443,7 @@ describe("worktree selection", () => {
     const { a, b } = contexts();
     window.reqvireProjectStore = b.store;
     window.reqvireLiveRefresh = b.seed;
-    window.history.replaceState(null, "", "/?worktree_id=b#/model");
+    window.history.replaceState(null, "", "/?branch=b#/model");
     let current: ReturnType<typeof useLiveStore> | undefined;
     const Probe = () => { current = useLiveStore(); return null; };
     const container = document.createElement("div");
@@ -445,7 +451,7 @@ describe("worktree selection", () => {
       // Render directly: renderHook's act would flush the deferred effects and
       // conceal the interval in which a real browser can deliver Back/Forward.
       render(h(Probe, {}), container);
-      window.history.replaceState(null, "", "/?worktree_id=a#/model");
+      window.history.replaceState(null, "", "/?branch=a#/model");
       window.dispatchEvent(new PopStateEvent("popstate"));
       await tick();
       expect(current?.selectedWorktree).toBe("a");
@@ -462,7 +468,7 @@ describe("worktree selection", () => {
     const prepare = vi.spyOn(ManifestStoreClient.prototype, "prepare");
     let listed = ["a", "b"];
     fetchMock.mockImplementation(async (url, init) => url === "/api/worktrees"
-      ? Response.json({ original_worktree_id: "a", worktrees: listed.map(worktree_id => ({ worktree_id, branch: worktree_id })) })
+      ? Response.json({ original_branch: "a", worktrees: listed.map(branch => ({ branch })) })
       : transport(url, init));
     const hook = renderHook(() => useLiveStore()); await tick();
     const initialClient = prepare.mock.contexts.at(-1);
@@ -490,7 +496,7 @@ describe("worktree selection", () => {
     const initialClient = prepare.mock.contexts.at(-1);
     let rejectLoad = true;
     fetchMock.mockImplementation(async (url, init) => {
-      if (url === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: [{ worktree_id: "b", branch: "feature" }] });
+      if (url === "/api/worktrees") return Response.json({ original_branch: "a", worktrees: [{ branch: "b" }] });
       if (url === "/api/worktrees/load" && rejectLoad) return Response.json({ error: "Unavailable" }, { status: 503 });
       return transport(url, init);
     });
@@ -518,10 +524,10 @@ describe("worktree selection", () => {
       if (failure === "http error") return Response.json({ error: "Git failed", worktrees: [] }, { status: 503 });
       if (failure === "error payload") return Response.json({ error: "Git failed", worktrees: [] });
       if (failure === "missing identity") return Response.json({ worktrees: [] });
-      if (failure === "duplicate identity") return Response.json({ original_worktree_id: "a", worktrees: [
-        { worktree_id: "b", branch: "first" }, { worktree_id: "b", branch: "second" },
+      if (failure === "duplicate identity") return Response.json({ original_branch: "a", worktrees: [
+        { branch: "b" }, { branch: "b" },
       ] });
-      return Response.json({ original_worktree_id: "a", worktrees: [{ branch: "broken" }] });
+      return Response.json({ original_branch: "a", worktrees: [{ branch: null }] });
     });
     await act(async () => { await hook.result.current.refreshWorktrees(); });
     expect(hook.result.current.refreshError).toBeTruthy();
@@ -541,7 +547,7 @@ describe("worktree selection", () => {
     act(() => hook.result.current.selectWorktree("b")); await tick();
     const cachedB = prepare.mock.contexts.at(-1);
     act(() => hook.result.current.selectWorktree("a")); await tick();
-    const onlyA = () => Response.json({ original_worktree_id: "a", worktrees: [{ worktree_id: "a", branch: "main" }] });
+    const onlyA = () => Response.json({ original_branch: "a", worktrees: [{ branch: "a" }] });
     await act(async () => { release(onlyA()); await pending; });
     act(() => hook.result.current.selectWorktree("b")); await tick();
     expect(prepare.mock.contexts.at(-1)).toBe(cachedB);
@@ -569,7 +575,7 @@ describe("worktree selection", () => {
     else timeout.abort(new DOMException("Inventory timed out", "TimeoutError"));
     const choices = hook.result.current.worktrees;
     await act(async () => {
-      release(Response.json({ original_worktree_id: "a", worktrees: [] }));
+      release(Response.json({ original_branch: "a", worktrees: [] }));
       await pending;
     });
     expect(hook.result.current.worktrees).toBe(choices);
@@ -588,10 +594,10 @@ describe("worktree selection", () => {
     let hold = true;
     let listed = ["a"];
     fetchMock.mockImplementation(async (url, init) => {
-      if (url === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: listed.map(worktree_id => ({
-        worktree_id, branch: worktree_id, available: worktree_id !== "b", explorer_available: worktree_id !== "b",
+      if (url === "/api/worktrees") return Response.json({ original_branch: "a", worktrees: listed.map(branch => ({
+        branch, available: branch !== "b", explorer_available: branch !== "b",
       })) });
-      if (hold && url.includes("/manifest") && url.includes("worktree_id=b")) {
+      if (hold && url.includes("/manifest") && url.includes("branch=b")) {
         hold = false;
         return new Promise(resolve => { release = resolve; });
       }
@@ -617,9 +623,9 @@ describe("worktree selection", () => {
     fetchMock.mockImplementation(async (url, init = {}) => {
       const parsed = new URL(url, window.location.origin);
       if (parsed.pathname === "/api/worktrees/load") return Response.json({});
-      if (parsed.pathname === "/api/worktrees") return Response.json({ original_worktree_id: "a", worktrees: [...snapshots.keys()]
-        .map(worktree_id => ({ worktree_id, branch: "shared-branch-label" })) });
-      const snapshot = snapshots.get(parsed.searchParams.get("worktree_id")!)!;
+      if (parsed.pathname === "/api/worktrees") return Response.json({ original_branch: "a", worktrees: [...snapshots.keys()]
+        .map(branch => ({ branch })) });
+      const snapshot = snapshots.get(parsed.searchParams.get("branch")!)!;
       return parsed.pathname.endsWith("/manifest") ? manifestResponse(snapshot) : chunkResponse(snapshot, init);
     });
     const hook = renderHook(() => useLiveStore()); await tick();
@@ -630,7 +636,7 @@ describe("worktree selection", () => {
       const id = `context-${index}`;
       for (const recreated of [false, true]) {
         const store = smallStore();
-        const snapshot = wireSnapshot({ ...store, project: { ...store.project, worktree_id: id },
+        const snapshot = wireSnapshot({ ...store, project: { ...store.project, worktree_id: `private-${id}-${recreated}`, branch: id },
           elements: [{ ...store.elements[0], content: recreated ? "Recreated" : "Original" }] });
         snapshots.set(id, snapshot);
         act(() => hook.result.current.selectWorktree(id)); await tick();

@@ -1,3 +1,4 @@
+import { readCssToken } from "../test/cssTokens";
 import type { ComponentType } from "preact";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@/test/render";
 import { useEffect } from "preact/hooks";
@@ -84,11 +85,11 @@ beforeEach(() => {
   // jsdom does not measure the CSS-token sizing probe used before layout starts.
   vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
     return this.classList.contains("ux-trace-flow-node-size")
-      ? Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-width")) : 0;
+      ? Number.parseFloat(readCssToken("--space-flow-node-width")) : 0;
   });
   vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
     return this.classList.contains("ux-trace-flow-node-size")
-      ? Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-flow-node-height")) : 0;
+      ? Number.parseFloat(readCssToken("--space-flow-node-height")) : 0;
   });
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
 });

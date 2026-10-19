@@ -483,20 +483,27 @@ reqvire serve --enable-mcp --enable-mutations
           operation as the Refresh HEAD button and MCP tool. Eligible implementation
           commits and same-branch amendments update accepted Git provenance and
           resource bytes through normal validated model loading, retaining the semantic
-          revision for unchanged model inputs and the same context ID. Polling reports staleness without adopting a new commit.
+          revision for unchanged model inputs and the same branch context. Polling reports staleness without adopting a new commit.
         </p>
         <p className="text-zinc-600 mb-4">
           Each browser tab keeps its own branch selection in the URL across reload
           and back/forward navigation. Switching retains cached context data and
           does not redirect MCP calls or preload other branches. Use
-          <code> reqvire.worktree.list</code> to obtain admitted context IDs for MCP
+          <code> reqvire.worktree.list</code> to find open branches for MCP
           requests. Prepared worktrees and their changes survive server shutdown.
         </p>
+        <p className="text-zinc-600 mb-4">
+          The branch-selector workflow below uses tool contract version 3.
+          Check discovery and contract compatibility when upgrading an older
+          client or build. Opening a branch registers
+          its model session; subsequent requests select it explicitly without
+          switching the original checkout or a global active branch.
+        </p>
         <DetailGrid items={[
-          { name: "reqvire.worktree.create", desc: "Requires branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_worktree_id for relative bases such as HEAD. The selected source must be clean." },
+          { name: "reqvire.worktree.create", desc: "Requires destination branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_branch for relative bases such as HEAD. The selected source branch must already be open and clean." },
           { name: "reqvire.worktree.open", desc: "Requires an existing local branch. Reuses a healthy context or admits its clean worktree, creating a managed worktree when necessary. It never forces a second checkout." },
           { name: "reqvire.worktree.refresh_head", desc: "Checks and adopts the selected owned branch's local HEAD. dry_run defaults to false; true checks only. After the guard passes, uses normal validated loading. Requires a clean tree, no accepted pending changes, the same branch and no unresolved Git/recovery operation. Creates no commit and works without --enable-commits." },
-          { name: "reqvire.worktree.remove", desc: "Requires worktree_id. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected." },
+          { name: "reqvire.worktree.remove", desc: "Requires branch. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected. Reopen the retained branch explicitly before using it again." },
           { name: "reqvire.git.commit", desc: "Requires a message and commits only accepted pending changes. Unrelated staged files and intervening external versions are excluded. No pending changes means no new commit. This tool works without GitHub enablement." },
           { name: "reqvire.git.reconcile", desc: "Verifies a live recorded unknown-outcome commit using exact attempted_commit and context routing. Preview is the default; dry_run: false completes only its affected index entries and accepted state after all checks pass. It preserves unrelated recorded staging and never updates a ref or retries a commit." },
         ]} />
@@ -507,12 +514,12 @@ reqvire serve --enable-mcp --enable-mutations
 
 {
   "name": "reqvire.coverage",
-  "arguments": { "worktree_id": "<returned worktree_id>" }
+  "arguments": { "branch": "model/review" }
 }
 
 {
   "name": "reqvire.worktree.refresh_head",
-  "arguments": { "worktree_id": "<returned worktree_id>", "dry_run": true }
+  "arguments": { "branch": "model/review", "dry_run": true }
 }`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Refresh permits ordinary implementation, evidence, documentation and
@@ -539,10 +546,16 @@ reqvire serve --enable-mcp --enable-mutations
           <code> reqvire.git.reconcile</code>.
         </p>
         <p className="text-zinc-600 mt-4">
-          Pass the returned <code>worktree_id</code> to workspace-bound tools
-          and prompts. Resources use <code>?worktree_id=...</code>. Omission
-          works with one admitted context; with multiple contexts it is an error.
-          IDs belong to the current server session. Each result identifies its
+          Pass the exact local <code>branch</code> to workspace-bound tools
+          and prompts. MCP resources use <code>?branch=model%2Freview</code>.
+          Optional selection may be omitted with one open context; multiple
+          contexts require a branch. Unknown or unopened branches fail without
+          fallback or automatic opening. Version 3 rejects the removed
+          <code> worktree_id</code> and <code>from_worktree_id</code> inputs.
+          Branch names are the public interface for selectors, response context, inventory, the Explorer picker, browser URLs and HTTP routes. Opaque IDs stay private to worker sessions, runtime publication and caches.
+          Clients targeting the same branch share its serialization and revision
+          checks; a branch selector does not grant exclusive client ownership.
+          Each result identifies its
           context and accepted model revision. Discovery and worktree inventory
           are server-wide. Restart preserves worktree files and branches but
           requires clean admission again.

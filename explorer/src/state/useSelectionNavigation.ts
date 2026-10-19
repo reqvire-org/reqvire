@@ -36,8 +36,8 @@ export function useSelectionNavigation(worktreeRouting: boolean) {
   const url = new URL(location);
   const route = parseHash(url.hash, DEFAULT_VIEW);
   const view = ["model", "traces", "thesaurus", "ontologies"].includes(route.view) && !route.elementId ? route.view as SelectionView : null;
-  const requested = url.searchParams.get("worktree_id");
-  const displayed = !worktreeRouting || !requested || requested === store.project.worktree_id;
+  const requested = url.searchParams.get("branch");
+  const displayed = !worktreeRouting || !requested || requested === store.project.branch;
   const key = `reqvire:selection:${JSON.stringify([store.project.workspace_root, store.project.repository, store.project.name, store.project.worktree_id])}`;
   const urlContext = useRef({ key, location });
   const sameContext = urlContext.current.key === key || urlContext.current.location !== location;
@@ -109,11 +109,11 @@ export function useSelectionNavigation(worktreeRouting: boolean) {
     update(view, active, missing ? missingNotice : unchanged ? preferences.notice ?? null : null);
     const next = new URL(location);
     next.hash = canonical(view, active);
-    if (worktreeRouting && store.project.worktree_id) next.searchParams.set("worktree_id", store.project.worktree_id);
+    if (worktreeRouting && store.project.branch) next.searchParams.set("branch", store.project.branch);
     writeExplorerUrl(next, true);
     if (view === "model") setLastMode(modelMode);
   // Serialized domain selection avoids rerunning on equivalent immutable snapshots.
-  }, [view, displayed, activeSerialized, location, update, missing, preferences.notice, worktreeRouting, store.project.worktree_id, canonical]);
+  }, [view, displayed, activeSerialized, location, update, missing, preferences.notice, worktreeRouting, store.project.branch, canonical]);
   const navigationRef = useRef({ displayed, view, canonical });
   navigationRef.current = { displayed, view, canonical };
   const select = useCallback((owner: SelectionView, value: Selection | ((previous: Selection) => Selection)) => {

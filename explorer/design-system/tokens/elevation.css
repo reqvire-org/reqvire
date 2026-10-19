@@ -42,10 +42,10 @@
 
     /* Toast stacking and status motion, adapted from Sonner. */
     --dur-toast-stack: 400ms; /* @kind other */
-    --dur-toast-exit: 200ms; /* @kind other */
+    --dur-toast-exit: var(--dur-base); /* @kind other */
     --dur-toast-rear-exit: 500ms; /* @kind other */
     --dur-toast-icon: 300ms; /* @kind other */
-    --dur-toast-loader: 200ms; /* @kind other */
+    --dur-toast-loader: var(--dur-base); /* @kind other */
     --ease-toast-stack: cubic-bezier(0.25, 0.1, 0.25, 1); /* @kind other */
     --ease-toast-exit: cubic-bezier(0, 0, 0.58, 1); /* @kind other */
     --toast-stack-scale-step: 0.05; /* @kind other */

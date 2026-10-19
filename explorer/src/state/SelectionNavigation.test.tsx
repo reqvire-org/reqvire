@@ -11,9 +11,9 @@ import { useHashRoute } from "../router/useHashRoute";
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 beforeEach(() => { localStorage.clear(); window.history.replaceState(null, "", "/#/model"); });
 function setup(hash: string, routing = false) {
-  window.history.replaceState(null, "", `/${routing ? '?worktree_id=a' : ''}${hash}`);
+  window.history.replaceState(null, "", `/${routing ? '?branch=a' : ''}${hash}`);
   const verification = devFixture.elements.find(node => node.element_type === "test-verification")!;
-  let store = { ...devFixture, traces: { files: { [verification.file_path]: { verifications: [{ identifier: verification.id, name: verification.name, file: verification.file_path }] } } }, project: { ...devFixture.project, worktree_id: "a" } };
+  let store = { ...devFixture, traces: { files: { [verification.file_path]: { verifications: [{ identifier: verification.id, name: verification.name, file: verification.file_path }] } } }, project: { ...devFixture.project, worktree_id: "private-a", branch: "a" } };
   const wrapper = ({ children }: { children: ComponentChildren }) => <StoreProvider store={store} schemaMismatch={null}>
     <ExplorerUiStateProvider worktreeRouting={routing}>{children}</ExplorerUiStateProvider>
   </StoreProvider>;
@@ -90,12 +90,12 @@ describe("shareable view selections", () => {
     const id = devFixture.elements[0].id;
     const hook = setup(routeForSelection("model", id, { mode: "flow" }), true);
     act(() => writeExplorerHash(routeForSelection("model", null, { mode: "list" }), true));
-    act(() => { history.replaceState(null, "", `/?worktree_id=b${routeForSelection("model", id, { mode: "grid" })}`); window.dispatchEvent(new PopStateEvent("popstate")); });
+    act(() => { history.replaceState(null, "", `/?branch=b${routeForSelection("model", id, { mode: "grid" })}`); window.dispatchEvent(new PopStateEvent("popstate")); });
     expect(window.location.hash).toBe(routeForSelection("model", id, { mode: "grid" }));
-    hook.change({ ...hook.store, project: { ...hook.store.project, worktree_id: "b" } });
+    hook.change({ ...hook.store, project: { ...hook.store.project, worktree_id: "private-b", branch: "b" } });
     expect(hook.result.current.ui.modelSelectionId).toBe(id);
     expect(hook.result.current.ui.modelMode).toBe("grid");
-    act(() => { history.replaceState(null, "", "/?worktree_id=a#/model"); window.dispatchEvent(new PopStateEvent("popstate")); });
+    act(() => { history.replaceState(null, "", "/?branch=a#/model"); window.dispatchEvent(new PopStateEvent("popstate")); });
     hook.change(hook.store);
     expect(hook.result.current.ui.modelSelectionId).toBe("__root__");
     expect(hook.result.current.ui.modelMode).toBe("list");

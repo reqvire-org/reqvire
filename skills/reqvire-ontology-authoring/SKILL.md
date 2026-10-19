@@ -21,6 +21,8 @@ Use `reqvire.format` with `fix: false` for a read-only preview, or `fix: true` t
 
 CLI retains validation, lint inspection, coverage, discovery/reports, artifact exports, managed-query inspection, server startup, and `migrate` preview/`--fix`. Incompatible source must be migrated through CLI before validated MCP startup. There is no MCP `validate` or `migrate` tool and no validation-bypass recovery server.
 
+For mutation-enabled branch sessions, tool contract version 3 uses exact local `branch` on context-bound MCP tools and prompts, and percent-encoded `?branch=...` on MCP resources. Open/create branches explicitly; use `from_branch` for an admitted source of a relative creation base. Keep the same branch across reads, previews and applies. Opaque worktree IDs remain private runtime/cache identity; public responses and Explorer URLs/routes use branches. Inspect discovery/version before using this contract with an older build.
+
 ## DO NOT DO
 
 - Do not put inline or reference-style hyperlinks to any model element in authored element prose, including the body, Details, or other prose subsections. This includes native concepts, self-links, and file-only links to single-element `# Element` documents. Changing the label or adding a structural declaration does not make the prose hyperlink valid.

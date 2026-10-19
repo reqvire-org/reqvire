@@ -24,6 +24,8 @@ Use `reqvire.format` with `fix: false` for a read-only preview, or `fix: true` t
 
 CLI retains validation, lint inspection, coverage, discovery/reports, artifact exports, managed-query inspection, server startup, and `migrate` preview/`--fix`. Incompatible source must be migrated through CLI before validated MCP startup. There is no MCP `validate` or `migrate` tool and no validation-bypass recovery server.
 
+For mutation-enabled branch sessions, tool contract version 3 uses exact local `branch` on context-bound MCP tools and prompts, and percent-encoded `?branch=...` on MCP resources. Open/create branches explicitly; use `from_branch` for an admitted source of a relative creation base. Keep the same branch across reads, previews and applies. Opaque worktree IDs remain private runtime/cache identity; public responses and Explorer URLs/routes use branches. Inspect discovery/version before using this contract with an older build.
+
 ## Reqvire Operations for Concept Authoring
 
 Use Reqvire as the source-of-truth runtime when authoring or changing native

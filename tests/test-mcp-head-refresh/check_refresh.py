@@ -144,16 +144,16 @@ def server(root, name, mode="mcp", commits=False):
 
 
 def original(client):
-    return next(row["worktree_id"] for row in client.tool("reqvire.worktree.list")["worktrees"]
+    return next(row["branch"] for row in client.tool("reqvire.worktree.list")["worktrees"]
                 if row.get("original"))
 
 
-def refresh(client, ident, **arguments):
-    result = client.raw_tool(TOOL, worktree_id=ident, **arguments)
+def refresh(client, ident, branch, **arguments):
+    result = client.raw_tool(TOOL, branch=branch, **arguments)
     data = result.get("structuredContent", {})
     require(data.get("outcome") in {"refreshed", "unchanged", "checked", "blocked"},
             "Missing refresh contract, not an eligible refresh/rejection: " + json.dumps(result))
-    require(data.get("worktree_id") == ident, "Refresh lost selected context")
+    require(data.get("branch") == branch and "worktree_id" not in data, "Refresh lost selected context")
     return data
 
 
@@ -162,11 +162,11 @@ class LoadedContext:
         self.client, self.root, self.ident = client, root, ident
         self.branch = git(root, "branch", "--show-current")
         self.head = git(root, "rev-parse", "HEAD")
-        self.revision = client.tool("reqvire.model_revision", worktree_id=ident)["model_fingerprint"]
+        self.revision = client.tool("reqvire.model_revision", branch=self.branch)["model_fingerprint"]
         self.external = {path: path.read_bytes() for path in external_paths}
 
     def refresh(self, **arguments):
-        data = refresh(self.client, self.ident, **arguments)
+        data = refresh(self.client, self.ident, self.branch, **arguments)
         if data["outcome"] == "refreshed":
             # Subsequent variations restore to the most recently accepted tip,
             # including when an assertion after successful adoption fails.
@@ -175,13 +175,13 @@ class LoadedContext:
 
     def blocked(self, reason, path=None):
         before = physical(self.root)
-        data = refresh(self.client, self.ident)
+        data = refresh(self.client, self.ident, self.branch)
         require(data["outcome"] == "blocked" and data.get("can_refresh") is False, str(data))
         require(data.get("accepted_head") == self.head, "Rejected refresh adopted HEAD")
         require(any(b.get("reason") == reason and (path is None or b.get("path") == path)
                     for b in data.get("blockers", [])), "Wrong/missing blocker: " + str(data))
         require(physical(self.root) == before, "Rejected refresh changed files, index or refs")
-        revision = self.client.tool("reqvire.model_revision", worktree_id=self.ident)["model_fingerprint"]
+        revision = self.client.tool("reqvire.model_revision", branch=self.branch)["model_fingerprint"]
         require(revision == self.revision, "Rejected refresh replaced the model or blocked accepted reads")
 
     def restore(self, branch_changed=False):
@@ -195,7 +195,7 @@ class LoadedContext:
         git(self.root, "clean", "-fd")
         for path, content in self.external.items():
             path.write_bytes(content)
-        revision = self.client.tool("reqvire.model_revision", worktree_id=self.ident)["model_fingerprint"]
+        revision = self.client.tool("reqvire.model_revision", branch=self.branch)["model_fingerprint"]
         require(revision == self.revision, "Fixture restoration lost the accepted model")
         require(git(self.root, "rev-parse", "HEAD") == self.head, "Fixture restoration lost accepted HEAD")
 
@@ -233,7 +233,7 @@ def catalog(client):
     require(TOOL in definitions, "Real HTTP MCP discovery is missing " + TOOL)
     definition = definitions[TOOL]
     fields = definition["inputSchema"]["properties"]
-    require(fields["dry_run"].get("default") is False and "worktree_id" in fields,
+    require(fields["dry_run"].get("default") is False and "branch" in fields and "worktree_id" not in fields,
             "Incorrect refresh argument contract")
     require(definition["annotations"].get("readOnlyHint") is False, "Refresh is classified as a read")
 
@@ -356,10 +356,10 @@ def lifecycle(check, context):
         require(physical(root) == before, "Policy refresh changed Git/files")
         context.revision = context.client.revision()
         context.external[ignored] = ignored.read_bytes()
-        model = str(context.client.tool("reqvire.search", worktree_id=context.ident))
+        model = str(context.client.tool("reqvire.search", branch=context.branch))
         require("Scope Policy Capability" not in model and "Refresh Ignored Ontology" not in model,
                 "Reload used stale ignore rules/owners")
-        excluded = context.client.raw_tool("reqvire.add_element", worktree_id=context.ident,
+        excluded = context.client.raw_tool("reqvire.add_element", branch=context.branch,
             file="ordinary/New.md", dry_run=True,
             content="### Excluded Capability\n\nExcluded.\n\n#### Metadata\n  * type: capability\n")
         require(excluded.get("isError") is True, "Subsequent MCP operation used stale ignore rules")
@@ -371,7 +371,7 @@ def lifecycle(check, context):
         data = context.refresh()
         require(data["outcome"] == "refreshed" and data["accepted_head"] == head, str(data))
         context.revision = context.client.revision()
-        model = str(context.client.tool("reqvire.search", worktree_id=context.ident))
+        model = str(context.client.tool("reqvire.search", branch=context.branch))
         require("Scope Policy Capability" in model and "Refresh Ignored Ontology" in model,
                 "Policy-only re-inclusion did not reload current membership")
         scope.write_text(scope.read_text() + "\n")
@@ -383,7 +383,7 @@ def lifecycle(check, context):
         # Last main-session check: this is a real accepted model mutation and
         # needs candidate validation. Its pending state is intentionally retained.
         head = context.head
-        context.client.tool("reqvire.add_element", worktree_id=context.ident, file="Model.md", content="""### Post Refresh Capability
+        context.client.tool("reqvire.add_element", branch=context.branch, file="Model.md", content="""### Post Refresh Capability
 
 The refreshed context remains writable.
 
@@ -394,7 +394,7 @@ The refreshed context remains writable.
         require(revision != context.revision and git(root, "rev-parse", "HEAD") == head,
                 "Commit-disabled mutation lost accepted model/HEAD")
         context.revision = revision
-        require("Post Refresh Capability" in str(context.client.tool("reqvire.search", worktree_id=context.ident)),
+        require("Post Refresh Capability" in str(context.client.tool("reqvire.search", branch=context.branch)),
                 "Mutation did not publish accepted content")
         context.blocked("pending_changes")
     check("mutation-resumes-and-pending-blocks", mutation_and_pending)
@@ -433,13 +433,13 @@ def stdio(check):
     metrics["server_starts"] += 1
     with transports.Stdio(BINARY, root, OUTPUT / "stdio", "--enable-mutations") as client:
         initial = client.rpc("tools/call", {"name": "reqvire.worktree.list", "arguments": {}})
-        ident = next(r["worktree_id"] for r in initial["structuredContent"]["worktrees"] if r.get("original"))
+        ident = next(r["branch"] for r in initial["structuredContent"]["worktrees"] if r.get("original"))
 
         def adopt():
             (root / "impl.rs").write_text("// updated over stdio\n")
             head = commit(root)
             before = physical(root)
-            result = client.rpc("tools/call", {"name": TOOL, "arguments": {"worktree_id": ident}})
+            result = client.rpc("tools/call", {"name": TOOL, "arguments": {"branch": "main"}})
             data = result.get("structuredContent", {})
             require(data.get("outcome") == "refreshed" and data.get("accepted_head") == head, str(result))
             require(physical(root) == before, "stdio refresh changed Git/files")
@@ -459,7 +459,7 @@ def automatic(check):
             require(data["outcome"] == "refreshed" and data["accepted_head"] == head, str(data))
             require(physical(root) == before and client.revision() == context.revision,
                     "Refresh created a commit or changed the model")
-            data = client.tool("reqvire.add_element", worktree_id=context.ident, file="Model.md", content="""### Automatic Refresh Capability
+            data = client.tool("reqvire.add_element", branch=context.branch, file="Model.md", content="""### Automatic Refresh Capability
 
 Automatic model commits follow the refreshed branch tip.
 
@@ -479,7 +479,7 @@ def explorer(check):
         child_root = Path(child["workspace_root"])
         # Reuse the two contexts required by browser selection for backend
         # isolation as well; do not start a separate isolation server/worktree.
-        context = LoadedContext(client, child_root, child["worktree_id"])
+        context = LoadedContext(client, child_root, child["branch"])
 
         def isolation():
             (child_root / "impl.rs").write_text("// secondary only\n")
@@ -489,13 +489,13 @@ def explorer(check):
             before = physical(root)
             data = context.refresh()
             require(data["accepted_head"] == head and physical(root) == before, "Refresh crossed contexts")
-            require(client.tool("reqvire.workspace_status", worktree_id=ident)["context"]["writes_available"] is True,
+            require(client.tool("reqvire.workspace_status", branch="main")["context"]["writes_available"] is True,
                     "Another context became unavailable")
         check("selected-context-isolation", lambda: context.variation(isolation))
 
         def browser():
             result = subprocess.run(["node", str(SUITE / "browser-refresh.mjs"), client.base, ident,
-                                     child["worktree_id"], str(root), str(child_root),
+                                     child["branch"], str(root), str(child_root),
                                      str(OUTPUT / "explorer/browser-profile")],
                                     capture_output=True, text=True, timeout=90)
             (OUTPUT / "explorer/browser.txt").write_text(result.stdout + result.stderr)

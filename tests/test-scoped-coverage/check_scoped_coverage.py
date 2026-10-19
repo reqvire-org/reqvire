@@ -404,8 +404,8 @@ def main():
                             original = next(row for row in inventory["worktrees"] if row.get("original"))
                             other = served.tool("reqvire.worktree.create", branch="coverage-links", base_ref="HEAD")
                             (output / "browser-contexts.json").write_text(json.dumps({
-                                "original": original["worktree_id"], "other": other["worktree_id"],
-                                "roots": {original["worktree_id"]: original["workspace_root"], other["worktree_id"]: other["workspace_root"]},
+                                "original": original["branch"], "other": other["branch"],
+                                "roots": {original["branch"]: original["workspace_root"], other["branch"]: other["workspace_root"]},
                             }))
                         driver_output = output / Path(driver).stem
                         driver_output.mkdir(exist_ok=True)
@@ -430,7 +430,7 @@ def main():
                     for path, content in originals.items():
                         path.write_bytes(content)
                     if other is not None:
-                        served.tool("reqvire.worktree.remove", worktree_id=other["worktree_id"])
+                        served.tool("reqvire.worktree.remove", branch=other["branch"])
             check("browser-served-exported-and-live-coverage", browser_checks)
 
         with McpServer(args.binary, root, output) as server:

@@ -386,11 +386,22 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           selecting an admitted context checks and adopts an eligible external
           branch tip without replacing its worker. Use Refresh HEAD to do the same
           for the displayed context, or call <code>reqvire.worktree.refresh_head</code>
-          with its <code>worktree_id</code>. Apply is the default; use
+          with its exact local <code>branch</code>. Apply is the default; use
           <code> dry_run: true</code> for a check-only preview. Clean implementation
           commits and same-branch amendments retain model semantics while updating
           Git provenance and resource text. The tool makes no commit and works
           with automatic commits disabled.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Branch-selected MCP calls use tool contract version 3. Open or create the branch
+          first, then use <code>branch</code> on model reads, edits, commits,
+          refresh and publication. Use <code>from_branch</code> to resolve a
+          relative creation base. With multiple open contexts, explicitly select
+          the branch on each request; there is no client-global branch switch.
+          Prompts use the same selector and MCP resource URIs encode it as
+          <code> ?branch=model%2Freview</code>. Branch names are the public interface in MCP results and inventory as well as Explorer’s picker, browser URLs and HTTP routes;
+          opaque IDs remain private to runtime and cache handling. Clients on the same branch share the existing
+          mutation serialization and revision checks.
         </p>
         <p className="text-zinc-600 mb-4">
           Changes to currently eligible model documents, consumed ontology sources

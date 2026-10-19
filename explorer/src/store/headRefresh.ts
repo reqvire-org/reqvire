@@ -18,14 +18,14 @@ async function rpc(method: string, params: unknown, signal: AbortSignal) {
   return value.result;
 }
 
-export async function refreshWorktreeHead(worktree: string, signal: AbortSignal) {
+export async function refreshWorktreeHead(branch: string, signal: AbortSignal) {
   initialized ??= rpc("initialize", { protocolVersion: PROTOCOL, capabilities: {},
     clientInfo: { name: "reqvire-explorer", version: "1" } }, signal).then(() => undefined)
     .catch(error => { initialized = undefined; session = null; throw error; });
   await initialized;
   signal.throwIfAborted();
   const result = await rpc("tools/call", { name: "reqvire.worktree.refresh_head",
-    arguments: { worktree_id: worktree, dry_run: false } }, signal);
+    arguments: { branch, dry_run: false } }, signal);
   const data = result?.structuredContent;
   if (data?.outcome === "blocked") {
     const paths = data.blockers?.map((b: { path?: string; reason: string; next_action?: string }) =>

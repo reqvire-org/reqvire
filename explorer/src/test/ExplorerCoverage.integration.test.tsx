@@ -159,7 +159,7 @@ describe("showcase application coverage", () => {
       expect(screen.getByRole("article", { name: "Alpha Root" })).toBeTruthy();
       expect(screen.queryByRole("article", { name: "Example Capability" })).toBeNull();
       expect(window.location.hash).toBe("#/coverage?scope=specifications%2FCapabilities.md%23alpha-root");
-      expect(new URLSearchParams(window.location.search).get("worktree_id")).toBe("showcase-coverage");
+      expect(new URLSearchParams(window.location.search).get("branch")).toBe("coverage-review");
       expect(screen.getByRole("tab", { name: "Coverage" }).getAttribute("aria-selected")).toBe("true");
       view.unmount();
       view = render(<MockShell />);

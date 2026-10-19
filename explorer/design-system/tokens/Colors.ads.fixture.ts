@@ -5,6 +5,7 @@ export const fixture = {
   "compactText": "Aa",
   "multilineText": "The quick brown fox\njumps over the lazy dog",
   "samples": [
+    {"token":"--color-red-600","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--color-capability","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--color-concept-reference","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--color-contract","property":"background-color","probe":"rgb(31, 97, 163)"},

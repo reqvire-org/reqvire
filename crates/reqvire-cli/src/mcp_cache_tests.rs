@@ -1345,8 +1345,8 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
     )
     .await;
     assert_eq!(
-        single["result"]["_meta"]["reqvire/context"]["worktree_id"],
-        original["worktree_id"]
+        single["result"]["_meta"]["reqvire/context"]["branch"],
+        original["branch"]
     );
     let created = http_rpc(app.clone(), 2, "tools/call", json!({"name":"reqvire.worktree.create","arguments":{"branch":"selector-child","base_ref":"HEAD"}})).await;
     assert!(created.get("error").is_none(), "{created}");
@@ -1408,15 +1408,15 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
             json!({"name":name,"arguments":args}),
         )
         .await;
-        assert_tool_error(&omitted, name, "worktree_id is required");
-        for id in [&original["worktree_id"], &child["worktree_id"]] {
+        assert_tool_error(&omitted, name, "branch is required");
+        for id in [&original["branch"], &child["branch"]] {
             assert!(omitted["result"]["structuredContent"]["error"]["message"]
                 .as_str()
                 .expect("expected a string in the test response")
                 .contains(id.as_str().expect("expected a string in the test response")));
         }
         let mut unknown_args = args.clone();
-        unknown_args["worktree_id"] = json!("unknown-context");
+        unknown_args["branch"] = json!("unknown-context");
         let unknown = http_rpc(
             app.clone(),
             4,
@@ -1427,7 +1427,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         assert_tool_error(
             &unknown,
             name,
-            "Unknown or removed worktree_id: unknown-context",
+            "Unknown or unopened branch: unknown-context",
         );
     }
     for selector in [json!(42), json!(""), Value::Null] {
@@ -1435,7 +1435,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
             app.clone(),
             5,
             "tools/call",
-            json!({"name":"reqvire.search","arguments":{"worktree_id":selector}}),
+            json!({"name":"reqvire.search","arguments":{"branch":selector}}),
         )
         .await;
         assert_eq!(invalid["error"]["code"], -32602, "{invalid}");
@@ -1448,7 +1448,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         ),
         (
             "resources/read",
-            json!({"uri":"reqvire://workspace/status?worktree_id=unknown-context"}),
+            json!({"uri":"reqvire://workspace/status?branch=unknown-context"}),
         ),
         (
             "prompts/get",
@@ -1456,7 +1456,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         ),
         (
             "prompts/get",
-            json!({"name":"reqvire.workflow.explore_model","arguments":{"worktree_id":"unknown-context"}}),
+            json!({"name":"reqvire.workflow.explore_model","arguments":{"branch":"unknown-context"}}),
         ),
     ] {
         let rejected = http_rpc(app.clone(), 6, method, params).await;
@@ -1468,11 +1468,11 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
             app.clone(),
             7,
             "tools/call",
-            json!({"name":"reqvire.search","arguments":{"worktree_id":context["worktree_id"]}}),
+            json!({"name":"reqvire.search","arguments":{"branch":context["branch"]}}),
         )
         .await;
         assert_ne!(read["result"]["isError"], true, "{read}");
-        for field in ["worktree_id", "head", "model_revision"] {
+        for field in ["branch", "head", "model_revision"] {
             assert_eq!(
                 read["result"]["_meta"]["reqvire/context"][field], context[field],
                 "{read}"
@@ -1492,7 +1492,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         app.clone(),
         8,
         "tools/call",
-        json!({"name":"reqvire.worktree.remove","arguments":{"worktree_id":child["worktree_id"]}}),
+        json!({"name":"reqvire.worktree.remove","arguments":{"branch":child["branch"]}}),
     )
     .await;
     assert_ne!(removed["result"]["isError"], true, "{removed}");
@@ -1500,13 +1500,13 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         app.clone(),
         9,
         "tools/call",
-        json!({"name":"reqvire.search","arguments":{"worktree_id":child["worktree_id"]}}),
+        json!({"name":"reqvire.search","arguments":{"branch":child["branch"]}}),
     )
     .await;
     assert_tool_error(
         &stale,
         "reqvire.search",
-        child["worktree_id"]
+        child["branch"]
             .as_str()
             .expect("expected a string in the test response"),
     );
@@ -1518,8 +1518,8 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
     )
     .await;
     assert_eq!(
-        remaining["result"]["_meta"]["reqvire/context"]["worktree_id"],
-        original["worktree_id"]
+        remaining["result"]["_meta"]["reqvire/context"]["branch"],
+        original["branch"]
     );
 }
 
@@ -1745,7 +1745,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     .await;
     assert_ne!(commit["result"]["isError"], true, "{commit}");
     let branch = http_rpc(app.clone(), 6, "tools/call", json!({"name":"reqvire.worktree.create","arguments":{"branch":"secondary","base_ref":"HEAD"}})).await;
-    let id = branch["result"]["structuredContent"]["worktree_id"]
+    let id = branch["result"]["structuredContent"]["branch"]
         .as_str()
         .expect("branch created");
     let secondary = worktrees
@@ -1756,7 +1756,7 @@ os.execv({git},[{git},*sys.argv[1:]])
         app.clone(),
         7,
         "tools/call",
-        json!({"name":"reqvire.workspace_status","arguments":{"worktree_id":id}}),
+        json!({"name":"reqvire.workspace_status","arguments":{"branch":id}}),
     ));
     entered(barrier.path(), "removal").await;
     let removed = response(
@@ -1765,7 +1765,7 @@ os.execv({git},[{git},*sys.argv[1:]])
             app.clone(),
             8,
             "tools/call",
-            json!({"name":"reqvire.worktree.remove","arguments":{"worktree_id":id}}),
+            json!({"name":"reqvire.worktree.remove","arguments":{"branch":id}}),
         )),
     )
     .await;
@@ -1776,10 +1776,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     let pending = response("removed worker read", pending).await;
     release();
     assert_eq!(pending["result"]["isError"], true, "{pending}");
-    assert_eq!(
-        pending["result"]["_meta"]["reqvire/context"]["worktree_id"],
-        id
-    );
+    assert_eq!(pending["result"]["_meta"]["reqvire/context"]["branch"], id);
     assert!(!secondary.root.exists());
     assert!(secondary.runtime().is_err());
     assert_eq!(original.metadata()["available"], true);
@@ -1813,14 +1810,15 @@ os.execv({git},[{git},*sys.argv[1:]])
         "{reopened}"
     );
     let reopened = &reopened["result"]["structuredContent"];
-    assert_ne!(reopened["worktree_id"], before["worktree_id"]);
+    assert_eq!(reopened["branch"], before["branch"]);
+    assert!(reopened.get("worktree_id").is_none());
     assert_ne!(reopened["head"], accepted["head"]);
     assert_eq!(reopened["available"], true);
     let pending = response("replaced worker read", pending).await;
     assert_eq!(pending["result"]["isError"], true, "{pending}");
     assert_eq!(
-        pending["result"]["_meta"]["reqvire/context"]["worktree_id"],
-        before["worktree_id"]
+        pending["result"]["_meta"]["reqvire/context"]["branch"],
+        before["branch"]
     );
     assert!(original.runtime().is_err());
 }

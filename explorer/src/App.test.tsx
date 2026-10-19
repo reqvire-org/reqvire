@@ -80,12 +80,12 @@ describe("Explorer worktree navigation", () => {
 
   it("blocks the retained shell during loading, shows dismissible errors, and adopts success", () => {
     localStorage.setItem("reqvire-explorer-theme", "light");
-    history.replaceState(null, "", "/?worktree_id=target#/model");
+    history.replaceState(null, "", "/?branch=feature%2Fmodel#/model");
     const dismissWorktreeError = vi.fn();
     const live = { result: { ok: true as const, schemaMismatch: null, store: { ...devFixture, project: { ...devFixture.project, worktree_id: "original", branch: "main" } } },
-      refreshError: null as string | null, automaticRefresh: false, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "target", switching: true,
+      refreshError: null as string | null, automaticRefresh: false, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "feature/model", switching: true,
       worktreeSelectionError: null as string | null, dismissWorktreeError, recoveryWarning: null,
-      worktrees: [{ worktree_id: "target", branch: "feature/model", workspace_root: "/target", available: true, explorer_available: true }],
+      worktrees: [{ branch: "feature/model", workspace_root: "/target", available: true, explorer_available: true }],
       selectWorktree: vi.fn(), refreshWorktrees: vi.fn().mockResolvedValue(undefined) };
     vi.spyOn(liveStore, "useLiveStore").mockImplementation(() => live);
     const view = render(<App />);
@@ -107,7 +107,7 @@ describe("Explorer worktree navigation", () => {
   });
 
   it("keeps the compact branch picker last in the shared header across navigation and pane collapse", () => {
-    window.history.replaceState(null, "", "/?worktree_id=original#/model");
+    window.history.replaceState(null, "", "/?branch=main#/model");
     localStorage.setItem("reqvire-explorer-theme", "light");
     const selectWorktree = vi.fn();
     vi.spyOn(liveStore, "useLiveStore").mockReturnValue({
@@ -115,13 +115,13 @@ describe("Explorer worktree navigation", () => {
         project: { ...devFixture.project, worktree_id: "original", branch: "main" },
       } },
       recoveryWarning: "MCP recovery required: showing the last accepted model; writes are disabled.",
-      refreshError: null, automaticRefresh: true, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "original", switching: false,
+      refreshError: null, automaticRefresh: true, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "main", switching: false,
     worktreeSelectionError: null, dismissWorktreeError: vi.fn(),
       worktrees: [
-        { worktree_id: "original", branch: "main", workspace_root: "/repo", available: true, explorer_available: true },
-        { worktree_id: "feature", branch: "feature", workspace_root: "/feature", available: true, explorer_available: true },
-        { worktree_id: "repair", branch: "repair", workspace_root: "/repair", available: true, explorer_available: false, owned: false },
-        { worktree_id: "stopped", branch: "stopped", workspace_root: "/stopped", available: false, explorer_available: false, owned: false },
+        { branch: "main", workspace_root: "/repo", available: true, explorer_available: true },
+        { branch: "feature", workspace_root: "/feature", available: true, explorer_available: true },
+        { branch: "repair", workspace_root: "/repair", available: true, explorer_available: false, owned: false },
+        { branch: "stopped", workspace_root: "/stopped", available: false, explorer_available: false, owned: false },
       ],
       selectWorktree, refreshWorktrees: vi.fn().mockResolvedValue(undefined),
     });

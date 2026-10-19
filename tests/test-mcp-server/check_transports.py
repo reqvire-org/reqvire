@@ -262,16 +262,16 @@ def catalogs(server):
 
 def mutation_catalogs(server):
     discovery = catalogs(server)
-    original = call(server, "reqvire.worktree.list")["original_worktree_id"]
+    original = next(row["branch"] for row in call(server, "reqvire.worktree.list")["worktrees"] if row.get("original"))
     scoped = 0
     for resource in discovery["resources/list"]["resources"]:
         uri = urllib.parse.urlsplit(resource["uri"])
         if uri.scheme == "reqvire" and uri.netloc == "workspace" and uri.path in (
                 "/status", "/model-revision"):
-            require(urllib.parse.parse_qs(uri.query) == {"worktree_id": [original]},
+            require(urllib.parse.parse_qs(uri.query) == {"branch": [original]},
                     "workspace resource does not select the current process's original context")
-            # Context IDs belong to a server process, not to its transport.
-            resource["uri"] = uri._replace(query="worktree_id=SESSION").geturl()
+            # Exact branch names have the same identity across HTTP and stdio.
+            resource["uri"] = uri._replace(query=urllib.parse.urlencode({"branch": original})).geturl()
             scoped += 1
     require(scoped == 2, "missing context-scoped workspace resources")
     return discovery
@@ -435,7 +435,7 @@ def preserved_worktree(binary, folder):
         created = call(server, "reqvire.worktree.create", branch="stdio-pending", base_ref="main")
         child = pathlib.Path(created["workspace_root"])
         head, index = git(child, "rev-parse", "HEAD"), git(child, "write-tree")
-        call(server, "reqvire.add_element", worktree_id=created["worktree_id"], file="Added.md", content=ADD_CONTENT)
+        call(server, "reqvire.add_element", branch=created["branch"], file="Added.md", content=ADD_CONTENT)
         expected_document(child)
         server.finish()
         require(child.is_dir() and git(child, "branch", "--show-current") == "stdio-pending", "shutdown removed managed worktree")

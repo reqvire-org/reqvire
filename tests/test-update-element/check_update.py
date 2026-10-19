@@ -106,9 +106,9 @@ def read(server, name):
 
 def state(server):
     status = transport.call(server, 'reqvire.workspace_status')
-    context = status.get('context', {'worktree_id': None, 'model_revision': status['model']['fingerprint'],
+    context = status.get('context', {'branch': None, 'model_revision': status['model']['fingerprint'],
                                      'pending_changes': [], 'head': status['git']['head']})
-    return {key: context[key] for key in ('worktree_id', 'model_revision', 'pending_changes', 'head')}
+    return {key: context[key] for key in ('branch', 'model_revision', 'pending_changes', 'head')}
 
 
 def declaration(value):
@@ -189,7 +189,7 @@ def discovery(server, root):
     require(props['target']['type'] == 'string', 'Target is not a string')
     require(set(props['operation']['enum']) == {'append', 'replace', 'replace_text', 'create', 'delete'}, 'Wrong operations')
     require({'element_name', 'target', 'operation'} <= set(tool['inputSchema']['required']), 'Missing required selectors')
-    require({'content', 'old_text', 'new_text', 'expected_model_revision', 'dry_run', 'worktree_id'} <= props.keys(), 'Missing edit/context arguments')
+    require({'content', 'old_text', 'new_text', 'expected_model_revision', 'dry_run', 'branch'} <= props.keys() and 'worktree_id' not in props, 'Missing edit/context arguments')
     require(tool['annotations']['readOnlyHint'] is False, 'Update advertised as read-only')
     contract = transport.call(server, 'reqvire.tool_contract')
     require(next(t for t in contract['tools'] if t['name'] == TOOL) == tool, 'Contract/discovery schema mismatch')
@@ -205,7 +205,7 @@ def permission(server, root):
 @case('text-and-subsection-lifecycle', crlf=True)
 def prose(server, root):
     content = edit(server, root, PARENT_TEXT + '\n\nRésumé — κείμενο.',
-                   element_name='Requirements.md#parent', worktree_id=state(server)['worktree_id'], content='Résumé — κείμενο.')
+                   element_name='Requirements.md#parent', branch=transport.call(server, 'reqvire.workspace_status')['context']['branch'], content='Résumé — κείμενο.')
     original_details = DETAILS.replace(DETAILS_FENCE, DETAILS_FENCE.replace('\n', '\r\n'))
     require(original_details in content and 'Existing decision.' in content,
             'Append damaged neighbouring subsections or literal fenced bytes')

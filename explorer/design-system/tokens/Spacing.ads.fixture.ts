@@ -5,6 +5,12 @@ export const fixture = {
   "compactText": "Aa",
   "multilineText": "The quick brown fox\njumps over the lazy dog",
   "samples": [
+    {"token":"--space-15","property":"width","probe":"13.375px"},
+    {"token":"--space-26","property":"width","probe":"13.375px"},
+    {"token":"--space-56","property":"width","probe":"13.375px"},
+    {"token":"--space-140","property":"width","probe":"13.375px"},
+    {"token":"--space-260","property":"width","probe":"13.375px"},
+    {"token":"--space-380","property":"width","probe":"13.375px"},
     {"token":"--control-lg","property":"width","probe":"13.375px"},
     {"token":"--control-md","property":"width","probe":"13.375px"},
     {"token":"--control-sm","property":"width","probe":"13.375px"},

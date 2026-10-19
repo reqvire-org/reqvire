@@ -201,7 +201,7 @@ reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ```
 
 After committing implementation or evidence changes outside MCP, call
-`reqvire.worktree.refresh_head` with the selected `worktree_id`. It checks and
+`reqvire.worktree.refresh_head` with the selected `branch`. It checks and
 guards the captured branch commit and reloads through normal validated loading
 without creating a commit; `dry_run: true` checks only. Changes to currently eligible
 model documents and their consumed semantic inputs require full validated admission
@@ -210,6 +210,15 @@ the model loaded after refresh. Mutation-enabled
 Explorer uses HEAD mode on branch selection and provides **Refresh HEAD** for
 the selected context. Blocked refreshes retain the accepted view and identify
 the inputs or Git state that need attention.
+
+Tool contract version 3 uses exact local branch names for context-bound MCP
+tools and prompts, and percent-encoded `?branch=...` for MCP resources. Open an
+existing branch with `reqvire.worktree.open`, or create one with
+`reqvire.worktree.create`; use `from_branch` to select the source for a relative
+base. An optional branch may be omitted with one loaded context; multiple
+contexts require it. Branch names are the public interface. Opaque worktree IDs are private runtime/cache identity; public responses, picker, browser URLs and HTTP routes use branch names.
+Version 3 rejects the removed MCP ID selectors; inspect discovery and tool
+contract compatibility when upgrading an older client or build.
 
 ---
 

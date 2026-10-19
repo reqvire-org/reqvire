@@ -196,12 +196,12 @@ describe("scoped coverage views", () => {
 
   it("waits for the requested worktree snapshot before interpreting or rewriting its scope", () => {
     const a = generatedFixture();
-    a.project = { ...a.project, worktree_id: "a" };
+    a.project = { ...a.project, worktree_id: "private-a", branch: "a" };
     const b = structuredClone(a);
-    b.project = { ...b.project, worktree_id: "b" };
-    window.history.replaceState(null, "", `/?worktree_id=a${routeForCoverage(cap("Alpha Root"))}`);
+    b.project = { ...b.project, worktree_id: "private-b", branch: "b" };
+    window.history.replaceState(null, "", `/?branch=a${routeForCoverage(cap("Alpha Root"))}`);
     const view = render(shell(a, vi.fn(), true));
-    const target = new URL(`/?worktree_id=b${routeForCoverage(cap("Shared Branch"))}`, window.location.origin);
+    const target = new URL(`/?branch=b${routeForCoverage(cap("Shared Branch"))}`, window.location.origin);
     act(() => writeExplorerUrl(target));
     expect(selectedScope()).toBe(cap("Alpha Root"));
     expect(window.location.href).toBe(target.href);
