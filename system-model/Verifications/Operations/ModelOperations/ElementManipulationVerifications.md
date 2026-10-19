@@ -113,6 +113,8 @@ Executable verification for canonical writes within model mutation transactions.
 Test verifies that the core create operation provides contextual error messages with examples when format parsing fails.
 
 #### Details
+Run these cases without global/system Git configuration or inherited author/committer overrides. Temporary MCP repositories provide their own local identity so startup reaches the intended model-validation diagnostics on clean hosts.
+
 **Test Cases:**
 
 1. **Missing ### header**: Provide markdown without element header

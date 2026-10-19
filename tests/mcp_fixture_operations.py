@@ -100,9 +100,11 @@ def main():
         output.mkdir()
         shutil.copytree(root, snapshot, ignore=shutil.ignore_patterns(".git", "output", "node_modules"))
         subprocess.run(["git", "init", "-q", str(snapshot)], check=True)
+        subprocess.run(["git", "-C", str(snapshot), "config", "user.name", "Fixture"], check=True)
+        subprocess.run(["git", "-C", str(snapshot), "config", "user.email", "fixture@example.org"], check=True)
         subprocess.run(["git", "-C", str(snapshot), "add", "."], check=True)
-        subprocess.run(["git", "-C", str(snapshot), "-c", "user.name=Fixture", "-c", "user.email=fixture@example.org",
-                        "-c", "commit.gpgSign=false", "commit", "--allow-empty", "-qm", "fixture"], check=True)
+        subprocess.run(["git", "-C", str(snapshot), "-c", "commit.gpgSign=false",
+                        "commit", "--allow-empty", "-qm", "fixture"], check=True)
         before = {p.relative_to(snapshot): p.read_bytes() for p in snapshot.rglob("*")
                   if p.is_file() and ".git" not in p.relative_to(snapshot).parts}
         mutations = args.operation not in ("format", "lint") or args.fix

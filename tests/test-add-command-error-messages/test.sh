@@ -14,6 +14,10 @@ set -uo pipefail  # NOTE: Do NOT use -e, it causes silent failures with diff
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Temporary MCP repositories must provide their own Git identity on clean hosts.
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
+unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+
 # Test 1: Missing ### header
 echo "Test 1: Missing ### header..."
 OUTPUT=$(cd "$TEST_DIR" && echo "This is invalid markdown without a header" | "$MCP_OPERATION_BIN" add system-model/test.md 2>&1)
