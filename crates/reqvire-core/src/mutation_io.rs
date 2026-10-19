@@ -179,6 +179,16 @@ pub fn read(path: impl AsRef<Path>) -> io::Result<Vec<u8>> {
 pub fn read_to_string(path: impl AsRef<Path>) -> io::Result<String> {
     String::from_utf8(read(path)?).map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))
 }
+pub fn file_size(path: impl AsRef<Path>) -> Option<u64> {
+    let path = absolute(path.as_ref());
+    CONTEXT.with(|slot| match slot.borrow().as_ref() {
+        Some(context) => context.file(&path).map(|bytes| bytes.len() as u64),
+        None => std::fs::metadata(path)
+            .ok()
+            .filter(|m| m.is_file())
+            .map(|m| m.len()),
+    })
+}
 pub fn is_file(path: impl AsRef<Path>) -> bool {
     let path = absolute(path.as_ref());
     CONTEXT.with(|slot| {

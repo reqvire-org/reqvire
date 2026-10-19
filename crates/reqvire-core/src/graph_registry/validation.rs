@@ -312,7 +312,10 @@ impl GraphRegistry {
                                 )));
                                 continue;
                             }
-                            if !crate::model_inputs::exists(&absolute_path) {
+                            if !crate::model_inputs::reference_target_exists(
+                                &absolute_path,
+                                std::path::Path::new(&source_node.element.file_path),
+                            ) {
                                 errors.push(ReqvireError::MissingRelationTarget(format!(
                                     "Element '{}' references missing target '{}'",
                                     source_node.element.identifier,

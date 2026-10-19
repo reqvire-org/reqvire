@@ -1,4 +1,6 @@
 //! Git ownership and publication boundary for mutation-enabled MCP.
+#[path = "mcp_head_refresh.rs"]
+mod head_refresh;
 #[cfg(test)]
 #[path = "mcp_session_tests.rs"]
 mod tests;
@@ -27,6 +29,7 @@ pub struct MutationSession {
     pending_paths: BTreeSet<PathBuf>,
     model: Arc<ModelManager>,
     model_revision: String,
+    inputs: reqvire::model_inputs::Inputs,
     exclusions: ExclusionSet,
     options: ModelBuildOptions,
     recovery_error: Option<String>,
@@ -144,6 +147,11 @@ pub fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
         .map_err(|e| error(e.to_string()))?
         .trim()
         .to_string())
+}
+
+fn git_operation_in_progress(root: &Path) -> Result<bool, ReqvireError> {
+    reqvire::git_commands::GitReader::new(root, |args, input| git(root, args, input, None))
+        .operation_in_progress()
 }
 
 /// One checkout observation, never retained across requests or state transitions.
@@ -388,6 +396,68 @@ fn lock_file_with(
     })
 }
 
+struct LoadedSnapshot {
+    files: SnapshotFiles,
+    model: Arc<ModelManager>,
+    model_revision: String,
+    inputs: reqvire::model_inputs::Inputs,
+}
+
+/// The normal validated loading path, shared by admission and guarded refresh.
+fn load_snapshot(
+    root: &Path,
+    branch: &str,
+    head: &str,
+    exclusions: &ExclusionSet,
+    options: ModelBuildOptions,
+) -> Result<LoadedSnapshot, ReqvireError> {
+    let mut files = SnapshotFiles {
+        root: root.to_path_buf(),
+        files: Arc::new(BTreeMap::new()),
+        executable: Arc::new(BTreeSet::new()),
+    };
+    // Git's executable bit is authoritative even when the filesystem cannot
+    // represent it (core.filemode=false, e.g. a Windows-backed bind mount).
+    for entry in git(root, &["ls-files", "--stage", "-z"], None, None)?
+        .split(|b| *b == 0)
+        .filter(|p| !p.is_empty())
+    {
+        let entry = std::str::from_utf8(entry).map_err(|e| error(e.to_string()))?;
+        let (metadata, path) = entry
+            .split_once('\t')
+            .ok_or_else(|| error("Invalid Git index entry"))?;
+        let path = root.join(path);
+        if metadata.starts_with("100755 ") {
+            Arc::make_mut(&mut files.executable).insert(path.clone());
+        }
+        if path.is_file() {
+            Arc::make_mut(&mut files.files).insert(path.clone(), Arc::new(fs::read(path)?));
+        }
+    }
+    let capture = files.enter(None);
+    capture.capture_dependencies();
+    let observed = reqvire::model_inputs::InputObservationGuard::start();
+    head_refresh::observe_policy(root);
+    let mut model = ModelManager::new();
+    model.parse_and_validate_with_options(None, exclusions, options)?;
+    let inputs = observed.finish();
+    if let Some((captured, _)) = capture.prepared() {
+        files = captured;
+    }
+    require_clean(root)?;
+    let model_revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
+    let checkout = GitCheckout::read(root)?;
+    if checkout.branch.as_deref() != Some(branch) || checkout.head.as_deref() != Some(head) {
+        return Err(error("Branch or HEAD changed during normal model loading"));
+    }
+    Ok(LoadedSnapshot {
+        files,
+        model: Arc::new(model),
+        model_revision,
+        inputs,
+    })
+}
+
 impl MutationSession {
     pub fn start(
         exclusions: &ExclusionSet,
@@ -423,56 +493,16 @@ impl MutationSession {
             .map_err(|_| error("Mutation-enabled MCP requires an existing commit"))?;
         git_text(&root, &["var", "GIT_AUTHOR_IDENT"])?;
         git_text(&root, &["var", "GIT_COMMITTER_IDENT"])?;
-        for marker in [
-            "MERGE_HEAD",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-        ] {
-            let path = git_text(&root, &["rev-parse", "--git-path", marker])?;
-            if root.join(path).exists() {
-                return Err(error(
-                    "Finish the in-progress Git operation before starting mutation-enabled MCP",
-                ));
-            }
-        }
-        let mut files = SnapshotFiles {
-            root: root.clone(),
-            files: Arc::new(BTreeMap::new()),
-            executable: Arc::new(BTreeSet::new()),
-        };
-        // Git's executable bit is authoritative even when the filesystem cannot
-        // represent it (core.filemode=false, e.g. a Windows-backed bind mount).
-        for entry in git(&root, &["ls-files", "--stage", "-z"], None, None)?
-            .split(|b| *b == 0)
-            .filter(|p| !p.is_empty())
-        {
-            let entry = std::str::from_utf8(entry).map_err(|e| error(e.to_string()))?;
-            let (metadata, path) = entry
-                .split_once('\t')
-                .ok_or_else(|| error("Invalid Git index entry"))?;
-            let path = root.join(path);
-            if metadata.starts_with("100755 ") {
-                Arc::make_mut(&mut files.executable).insert(path.clone());
-            }
-            if path.is_file() {
-                Arc::make_mut(&mut files.files).insert(path.clone(), Arc::new(fs::read(path)?));
-            }
+        if git_operation_in_progress(&root)? {
+            return Err(error(
+                "Finish the in-progress Git operation before starting mutation-enabled MCP",
+            ));
         }
         let options = ModelBuildOptions {
             lenient: false,
             with_size_estimates,
         };
-        let capture = files.enter(None);
-        capture.capture_dependencies();
-        let mut model = ModelManager::new();
-        model.parse_and_validate_with_options(None, exclusions, options)?;
-        if let Some((captured, _)) = capture.prepared() {
-            files = captured;
-        }
-        require_clean(&root)?;
-        let model_revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
+        let loaded = load_snapshot(&root, &branch, &head, exclusions, options)?;
         #[cfg(unix)]
         let track_file_mode = git_text(
             &root,
@@ -491,11 +521,12 @@ impl MutationSession {
             head,
             _ownership: ownership,
             _worktree_ownership: worktree_ownership,
-            committed_files: files.clone(),
+            committed_files: loaded.files.clone(),
             pending_paths: BTreeSet::new(),
-            files,
-            model: Arc::new(model),
-            model_revision,
+            files: loaded.files,
+            model: loaded.model,
+            model_revision: loaded.model_revision,
+            inputs: loaded.inputs,
             exclusions: exclusions.clone(),
             options,
             recovery_error: None,
@@ -504,8 +535,10 @@ impl MutationSession {
             #[cfg(unix)]
             track_file_mode,
         };
-        session.check_head()?;
         Ok(session)
+    }
+    pub(crate) fn exclusions(&self) -> &ExclusionSet {
+        &self.exclusions
     }
     pub fn model(&self) -> Arc<ModelManager> {
         Arc::clone(&self.model)
@@ -532,7 +565,7 @@ impl MutationSession {
         if observed.branch.as_deref() != Some(self.branch.as_str())
             || observed.head.as_deref() != Some(self.head.as_str())
         {
-            return Err(error("MCP owned branch or HEAD changed externally; restart the server before further mutations"));
+            return Err(error("MCP owned branch or HEAD changed externally; check reqvire.worktree.refresh_head for eligible same-branch artifact commits, or use explicit full validated worktree admission before further mutations"));
         }
         Ok(())
     }
@@ -540,9 +573,8 @@ impl MutationSession {
         if !snapshot_read(tool) {
             return Err(error("Operation is not an audited snapshot read"));
         }
-        if self.recovery_error.is_none() {
-            self.check_head()?;
-        }
+        // Audited reads retain accepted provenance even after an external HEAD
+        // mismatch; writes still require check_head or the dedicated refresh.
         Ok(ReadSnapshot {
             files: self.files.clone(),
             model: self.model(),
@@ -552,7 +584,7 @@ impl MutationSession {
     fn accepted_metadata(&self) -> Value {
         serde_json::json!({
             "workspace_root": self.root, "branch": self.branch_name(),
-            "head": self.head, "enable_commits": self.enable_commits,
+            "head": self.head, "accepted_head": self.head, "enable_commits": self.enable_commits,
             "model_revision": self.model_revision,
             "pending_changes": self.pending_paths().iter().filter_map(|p| p.strip_prefix(&self.root).ok()).collect::<Vec<_>>(),
         })
@@ -617,8 +649,11 @@ impl MutationSession {
             return Ok((Ok(result), false));
         }
         let scope = candidate_files.enter(None);
+        let observed = reqvire::model_inputs::InputObservationGuard::start();
+        head_refresh::observe_policy(&self.root);
         let mut candidate = ModelManager::new();
         candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+        let mut inputs = observed.finish();
         // Use the shared canonical writer for every authored-model operation,
         // including previews. Only changed model documents are normalized.
         if tool != "reqvire.format" {
@@ -632,8 +667,11 @@ impl MutationSession {
         if let Some((normalized, _)) = scope.prepared() {
             candidate_files = normalized;
             let scope = candidate_files.enter(None);
+            let observed = reqvire::model_inputs::InputObservationGuard::start();
+            head_refresh::observe_policy(&self.root);
             candidate = ModelManager::new();
             candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+            inputs = observed.finish();
             drop(scope);
         }
         let changed: BTreeSet<_> = changed
@@ -731,6 +769,7 @@ impl MutationSession {
         }
         self.model = Arc::new(candidate);
         self.model_revision = revision;
+        self.inputs = inputs;
         reqvire::model_cache::invalidate();
         if let (Some(commit), Some(content)) = (
             commit,
@@ -747,18 +786,24 @@ impl MutationSession {
         Ok((Ok(result), true))
     }
     pub fn status(&self) -> Value {
-        let observed = GitObservation::read(&self.root);
-        let (writable, dirty) = match observed {
-            Ok(observed) => (
-                self.check_checkout(&observed.checkout),
-                Some(observed.dirty),
-            ),
+        let (observed, dirty) = match GitObservation::read(&self.root) {
+            Ok(observed) => (Ok(observed.checkout), Some(observed.dirty)),
             // Dirty-state failure alone does not invalidate a valid checkout.
-            Err(_) => (self.check_head(), None),
+            Err(_) => (GitCheckout::read(&self.root), None),
+        };
+        let (writable, observed_head, head_stale) = match observed {
+            Ok(observed) => (
+                self.check_checkout(&observed),
+                observed.head.clone(),
+                observed.branch.as_deref() != Some(&self.branch)
+                    || observed.head.as_deref() != Some(&self.head),
+            ),
+            Err(failure) => (Err(failure), None, true),
         };
         let mut status = self.accepted_metadata();
         let live = serde_json::json!({
-            "dirty": dirty, "available": writable.is_ok() || self.recovery_error.is_some(),
+            "dirty": dirty, "available": true,
+            "observed_head": observed_head, "head_stale": head_stale,
             "writes_available": writable.is_ok(), "recovery_required": self.recovery_error.is_some(),
             "diagnostic": self.recovery_error.clone().or_else(|| writable.err().map(|e| e.to_string())),
             "recovery_attempt": self.recovery_attempt.as_ref().map(|attempt| serde_json::json!({
@@ -897,8 +942,11 @@ impl MutationSession {
             ));
         }
         let scope = attempt.files.enter(None);
+        let observed = reqvire::model_inputs::InputObservationGuard::start();
+        head_refresh::observe_policy(&self.root);
         let mut model = ModelManager::new();
         model.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
+        let inputs = observed.finish();
         drop(scope);
         let revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
         self.verify_attempt_files(attempt)?;
@@ -1010,6 +1058,7 @@ impl MutationSession {
             self.model = Arc::new(model);
         }
         self.model_revision = revision;
+        self.inputs = inputs;
         self.recovery_attempt = None;
         self.recovery_error = None;
         reqvire::model_cache::invalidate();
@@ -1046,19 +1095,10 @@ impl MutationSession {
                 "Reconciliation requires the owned branch at the exact recorded attempted commit",
             ));
         }
-        for marker in [
-            "MERGE_HEAD",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-        ] {
-            let path = git_text(&self.root, &["rev-parse", "--git-path", marker])?;
-            if self.root.join(path).exists() {
-                return Err(error(
-                    "Finish the in-progress Git operation before reconciliation",
-                ));
-            }
+        if git_operation_in_progress(&self.root)? {
+            return Err(error(
+                "Finish the in-progress Git operation before reconciliation",
+            ));
         }
         Ok(())
     }

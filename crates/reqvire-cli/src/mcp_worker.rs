@@ -189,7 +189,7 @@ pub fn run() -> Result<(), ReqvireError> {
             .next()
             .ok_or_else(|| error("Missing worker initialization"))??,
     )?;
-    let exclusions = crate::config::get_excluded_filename_patterns_glob_set();
+    let mut exclusions = crate::config::get_excluded_filename_patterns_glob_set();
     if options.read_only {
         let root = std::env::current_dir()?;
         let branch = GitCheckout::read(&root)?.branch_name().to_owned();
@@ -342,6 +342,22 @@ pub fn run() -> Result<(), ReqvireError> {
         let mut session = session.blocking_write();
         let mut response = match operation {
             "status" => json!({}),
+            "refresh_head" => {
+                match session.refresh_head(request["dry_run"].as_bool().unwrap_or(false)) {
+                    Ok(value) => {
+                        let refreshed = value["outcome"] == "refreshed";
+                        if refreshed {
+                            exclusions = session.exclusions().clone();
+                        }
+                        let mut response = json!({"result":value});
+                        if refreshed {
+                            runtime_result(&session, &options, &mut response);
+                        }
+                        response
+                    }
+                    Err(failure) => json!({"error":failure.to_string()}),
+                }
+            }
             "check_writable" => match session.check_head() {
                 Ok(()) => json!({}),
                 Err(failure) => json!({"error":failure.to_string()}),

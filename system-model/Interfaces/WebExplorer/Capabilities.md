@@ -39,7 +39,7 @@ When a user resizes the expanded left pane, the system SHALL align the header's 
 
 While preparing a newly selected worktree, the system SHALL show a blocking loading dialog over the retained model. If preparation fails, the system SHALL show the error and allow dismissal to the retained model; successful preparation SHALL close the dialog and render the new model.
 
-Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; reselecting an active context reuses its accepted model under the existing session rules.
+Selection SHALL resolve the branch to an existing or newly created isolated worktree and atomically adopt its context's model, reports, source content, and assets. Mutation-enabled serving SHALL reject a dirty target before loading a newly admitted context. The same admission, validation, existing cache/invalidation, navigation, and refresh rules SHALL apply regardless of whether the worktree already existed. Branch identity remains visible; selection defaults to HEAD mode and an active context retains its accepted model while any eligible branch-tip adoption passes through the shared HEAD-refresh operation.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
@@ -54,6 +54,7 @@ Selection SHALL resolve the branch to an existing or newly created isolated work
   * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
+  * [Explorer Worktree HEAD Refresh Specification](HeadRefresh.md#explorer-worktree-head-refresh-specification)
 
 #### Relations
   * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
@@ -114,7 +115,7 @@ Implementation details shall follow the associated contract specifications.
 
 ### Served Explorer Runtime Freshness
 
-When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients viewing that worktree context without restarting the server or interrupting MCP access.
+When an embedded MCP mutation succeeds during serving with mutations enabled, the system shall publish the updated valid model to Explorer clients viewing that worktree context without restarting the server or interrupting MCP access. A dedicated eligible HEAD refresh shall use normal validated loading and the existing runtime-publication path, preserving context identity. Artifact-only changes retain the semantic model revision; allowed current-exclusion changes may alter model membership and revision. Runtime failures follow the existing diagnostic and retained-view behavior.
 
 While the mutation's runtime snapshot is being rebuilt, the system shall serve the last valid published snapshot without waiting for model validation or generation.
 

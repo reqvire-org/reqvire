@@ -10,6 +10,73 @@ Curated conceptual vocabulary for Reqvire system-model authoring, search, explan
   * concept_prefix: concept
 ---
 
+### Accepted HEAD
+
+The Git commit recorded as the baseline of an admitted worktree context's accepted state. It remains distinct from the branch tip observed on disk until a controlled transition adopts that tip.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Observed HEAD](#observed-head)
+  * related: [MCP Worktree Context](#mcp-worktree-context)
+---
+
+### HEAD Mode
+
+A branch-viewing policy that resolves the current local branch tip through the context's acceptance rules instead of selecting a historical commit as a separate model identity.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [HEAD Refresh](#head-refresh)
+  * related: [Git Worktree](#git-worktree)
+---
+
+### HEAD Refresh
+
+A triggered operation that checks protected inputs between accepted and observed commits and, when eligible, reloads the committed snapshot through normal validated model loading.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Observed HEAD](#observed-head)
+  * related: [Protected Model Input](#protected-model-input)
+---
+
+### Observed HEAD
+
+The current commit reached through a worktree's local branch reference when Git state is inspected. Observing this commit does not establish that its files or model have been accepted by the running context.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Git Worktree](#git-worktree)
+---
+
+### Protected Model Input
+
+A currently eligible model source, or a semantic source or source-resolution dependency declared by a currently eligible model owner, whose change requires full validated admission rather than guarded HEAD refresh. Current exclusion rules determine owner eligibility; changing those rules is not itself a protected-input change. A referenced implementation or evidence artifact can instead have only an existence dependency; a file can serve both roles.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Model Eligibility Boundary](#model-eligibility-boundary)
+  * related: [External Ontology Source](#external-ontology-source)
+  * related: [HEAD Refresh](#head-refresh)
+---
+
 ### Atomic Model Mutation
 
 A model change whose complete candidate becomes accepted as one indivisible transition, with no partially accepted intermediate model.

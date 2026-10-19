@@ -83,7 +83,7 @@ describe("Explorer worktree navigation", () => {
     history.replaceState(null, "", "/?worktree_id=target#/model");
     const dismissWorktreeError = vi.fn();
     const live = { result: { ok: true as const, schemaMismatch: null, store: { ...devFixture, project: { ...devFixture.project, worktree_id: "original", branch: "main" } } },
-      refreshError: null as string | null, automaticRefresh: false, worktreeRouting: true, selectedWorktree: "target", switching: true,
+      refreshError: null as string | null, automaticRefresh: false, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "target", switching: true,
       worktreeSelectionError: null as string | null, dismissWorktreeError, recoveryWarning: null,
       worktrees: [{ worktree_id: "target", branch: "feature/model", workspace_root: "/target", available: true, explorer_available: true }],
       selectWorktree: vi.fn(), refreshWorktrees: vi.fn().mockResolvedValue(undefined) };
@@ -115,7 +115,7 @@ describe("Explorer worktree navigation", () => {
         project: { ...devFixture.project, worktree_id: "original", branch: "main" },
       } },
       recoveryWarning: "MCP recovery required: showing the last accepted model; writes are disabled.",
-      refreshError: null, automaticRefresh: true, worktreeRouting: true, selectedWorktree: "original", switching: false,
+      refreshError: null, automaticRefresh: true, refreshHead: undefined, refreshingHead: false, worktreeRouting: true, selectedWorktree: "original", switching: false,
     worktreeSelectionError: null, dismissWorktreeError: vi.fn(),
       worktrees: [
         { worktree_id: "original", branch: "main", workspace_root: "/repo", available: true, explorer_available: true },

@@ -471,7 +471,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 - The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned worktrees.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
-- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL reject unexpected branch or HEAD changes.
+- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Only the dedicated checked HEAD-refresh operation may adopt an eligible external HEAD on the same branch; it cannot bypass ownership or transaction recovery.
 - The MCP server shall make observed model revision visible to clients for read responses.
 - The MCP server shall keep post-mutation model state synchronized before serving dependent reads.
 
@@ -958,7 +958,7 @@ The system shall serve MCP model state from Reqvire core parsing, refreshing sou
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
 - Read-only MCP shall refresh stale model state before returning authoritative model evidence, including changes to active exclusions and model construction dependencies without requiring a restart.
 - Read-only MCP SHALL allow independent requests to execute concurrently within bounded admission and execution limits, without blocking the asynchronous transport or bypassing controlled workspace writes and core cache freshness checks.
-- Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external edits or rebuilding the filesystem cache on each request.
+- Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external model edits or rebuilding the filesystem cache on each request. An eligible dedicated HEAD refresh shall use normal validated loading to replace its captured files, model and semantic store while retaining context identity. Artifact-only changes retain the public model revision; allowed current-exclusion changes may alter model membership and revision.
 - Mutation-enabled MCP SHALL allow bounded concurrent audited snapshot reads, preserve each read's captured model identity through its response, and keep mutation preparation and publication serialized within the selected context.
 - Mutation-enabled MCP shall publish complete graph, page, and semantic state only after candidate validation, successful persistence, and a successful commit when enabled under the ownership contract.
 

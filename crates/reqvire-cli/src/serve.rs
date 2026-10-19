@@ -329,26 +329,24 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         return static_response(method, content_type_for_path(&request_path), content);
     }
 
-    let root =
-        if state.has_worktrees() {
-            let selected =
-                selected_context(&state, &uri, false).await.and_then(|c| {
-                    let status = c.metadata();
-                    if status["recovery_required"] == true {
-                        return Err(ReqvireError::ProcessError(format!(
-                        "Worktree {} requires recovery; local file downloads are unavailable: {}",
-                        c.id, status["diagnostic"].as_str().unwrap_or("incomplete restoration")
-                    )));
-                    }
-                    Ok(c.root.clone())
-                });
-            match selected {
-                Ok(root) => Some(root),
-                Err(e) => return context_error(&uri, e),
-            }
-        } else {
-            None
+    let root = if state.has_worktrees() {
+        let selected = match selected_context(&state, &uri, false).await {
+            Ok(context) => tokio::task::spawn_blocking(move || {
+                context.check_file_download()?;
+                Ok(context.root.clone())
+            })
+            .await
+            .map_err(|e| ReqvireError::ProcessError(e.to_string()))
+            .and_then(|result| result),
+            Err(error) => Err(error),
         };
+        match selected {
+            Ok(root) => Some(root),
+            Err(e) => return context_error(&uri, e),
+        }
+    } else {
+        None
+    };
     if let Some(response) =
         workspace_file_response_at(method.clone(), &request_path, root.as_deref())
     {

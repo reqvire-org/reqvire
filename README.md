@@ -200,6 +200,17 @@ Enable mutation tools:
 reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ```
 
+After committing implementation or evidence changes outside MCP, call
+`reqvire.worktree.refresh_head` with the selected `worktree_id`. It checks and
+guards the captured branch commit and reloads through normal validated loading
+without creating a commit; `dry_run: true` checks only. Changes to currently eligible
+model documents and their consumed semantic inputs require full validated admission
+instead. Ignore-file changes are allowed; current rules determine eligibility and
+the model loaded after refresh. Mutation-enabled
+Explorer uses HEAD mode on branch selection and provides **Refresh HEAD** for
+the selected context. Blocked refreshes retain the accepted view and identify
+the inputs or Git state that need attention.
+
 ---
 
 ## Assistant Skills

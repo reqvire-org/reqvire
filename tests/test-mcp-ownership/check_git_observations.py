@@ -48,8 +48,12 @@ config = json.loads(hook.read_text()) if hook.exists() else {}
 match = all(token in args for token in config.get('match', [])) and bool(config)
 if match and config.get('fail'):
     sys.exit(1)
+if match and config.get('before'):
+    hook.unlink()
+    subprocess.run([os.environ['REAL_TEST_GIT'], *config['run']], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 result = subprocess.run([os.environ['REAL_TEST_GIT'], *args], capture_output=True)
-if match:
+if match and not config.get('before'):
     hook.unlink()
     subprocess.run([os.environ['REAL_TEST_GIT'], *config['run']], check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -105,7 +109,7 @@ def counted(log, budget, call):
 def accepted_reads():
     with worker() as (_, request, log, _, ready):
         for _ in range(2):
-            result = counted(log, 2, lambda: tool(request, "reqvire.search", short=True))
+            result = counted(log, 1, lambda: tool(request, "reqvire.search", short=True))
             assert not result["result"].get("isError"), result
             assert result["status"]["model_revision"] == ready["status"]["model_revision"]
 
@@ -146,6 +150,7 @@ def live_dirty_state():
             status = response["status"]
             assert "Source marker alpha" in json.dumps(response["result"]), response
             assert status["head"] == ready["status"]["head"] and status["writes_available"], status
+            assert not status["head_stale"], status
             assert status["dirty"] == (None if action == "status-failure" else action in
                                        ("unstaged", "staged", "untracked")), (action, status)
 
@@ -157,8 +162,9 @@ def checkout_changes(commits):
                         ("checkout", "--detach", "-q", head)):
             git(root, *command)
             response = tool(request, "reqvire.search", short=True)
-            assert response["result"].get("isError"), response
+            assert not response["result"].get("isError"), response
             assert response["status"]["head"] == head, response
+            assert response["status"]["available"] and response["status"]["head_stale"], response
             assert not response["status"]["writes_available"], response
             git(root, "switch", "-q", "main")
             git(root, "reset", "--hard", head)
@@ -201,9 +207,9 @@ def commit_preparation_race():
 
 def accepted_read_final_status():
     with worker() as (_, request, _, hook, ready):
-        # Return the entry observation, then switch branches before dispatch.
-        # The accepted read can finish; its final physical status must be fresh.
-        hook.write_text(json.dumps(dict(match=["rev-parse", "HEAD"], run=["switch", "-q", "alternate"])))
+        # Snapshot reads need no entry HEAD guard. Switch immediately before
+        # the final status scan and require that observation, not cached status.
+        hook.write_text(json.dumps(dict(match=["status"], before=True, run=["switch", "-q", "alternate"])))
         response = tool(request, "reqvire.search", short=True)
         assert not response["result"].get("isError"), response
         assert response["status"]["branch"] == "main", response

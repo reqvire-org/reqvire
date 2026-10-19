@@ -127,6 +127,7 @@ export function ExplorerFixtureApp({ example = "model" }: { example?: "model" | 
     switching: false,
     worktreeSelectionError: null, dismissWorktreeError: () => {},
     automaticRefresh: false,
+    refreshHead: undefined, refreshingHead: false,
     recoveryWarning: null,
   }} />;
 }

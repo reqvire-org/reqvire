@@ -2062,7 +2062,8 @@ pub(super) fn resolve_external_source_path(
         .map_err(|error| error.to_string())?;
 
     let root_relative = git_root.join(source_path);
-    if crate::model_inputs::exists(&root_relative) {
+    if crate::model_inputs::semantic_candidate_exists(&root_relative, Path::new(&element.file_path))
+    {
         return Ok(root_relative);
     }
 
@@ -2112,23 +2113,24 @@ pub(super) fn build_external_ontology_block(
         }
     };
 
-    let content = match crate::model_inputs::read_to_string(&path) {
-        Ok(content) => content,
-        Err(error) => {
-            diagnostics.push(SemanticDiagnostic {
-                source: element.identifier.clone(),
-                file_path: element.file_path.clone(),
-                line_number: source.line_number,
-                message: format!(
-                    "External Ontology '{}' source '{}' cannot be read: {}.",
-                    source.prefix,
-                    path.display(),
-                    error
-                ),
-            });
-            return None;
-        }
-    };
+    let content =
+        match crate::model_inputs::read_semantic_source(&path, Path::new(&element.file_path)) {
+            Ok(content) => content,
+            Err(error) => {
+                diagnostics.push(SemanticDiagnostic {
+                    source: element.identifier.clone(),
+                    file_path: element.file_path.clone(),
+                    line_number: source.line_number,
+                    message: format!(
+                        "External Ontology '{}' source '{}' cannot be read: {}.",
+                        source.prefix,
+                        path.display(),
+                        error
+                    ),
+                });
+                return None;
+            }
+        };
 
     if matches!(format, ExternalOntologyFormat::Turtle)
         && turtle_prefix_binding(&content, &source.prefix) != Some(source.namespace.clone())

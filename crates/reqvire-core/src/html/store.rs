@@ -10,7 +10,6 @@ use crate::semantic_store::SemanticModelStore;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
 use std::path::{Path, PathBuf};
 
 const SCHEMA_VERSION: &str = "2026-10-06.project-store.v5";
@@ -1418,13 +1417,13 @@ fn enrich_resource_sources(resources: &mut BTreeMap<String, ProjectStoreResource
             continue;
         }
         let absolute_path = project_root.join(source_path);
-        let Ok(metadata) = fs::metadata(&absolute_path) else {
-            continue;
-        };
-        if !metadata.is_file() || metadata.len() > 512 * 1024 {
+        if !crate::mutation_io::file_size(&absolute_path).is_some_and(|size| size <= 512 * 1024) {
             continue;
         }
-        if let Ok(source_text) = fs::read_to_string(&absolute_path) {
+        if let Ok(source_text) = crate::mutation_io::read_to_string(&absolute_path) {
+            if source_text.len() > 512 * 1024 {
+                continue;
+            }
             resource.source_text = Some(source_text);
         }
     }

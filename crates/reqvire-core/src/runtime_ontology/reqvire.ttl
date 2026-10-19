@@ -12,11 +12,12 @@
 
 <https://www.reqvire.org/ontology> a owl:Ontology ;
 	rdfs:label "reqvire" ;
-	reqvire:ontologyElement <urn:reqvire:element:reqvire-behavior-rule-ontology> , <urn:reqvire:element:reqvire-linting-ontology> , <urn:reqvire:element:reqvire-model-mutation-ontology> , <urn:reqvire:element:reqvire-validation-ontology> , <urn:reqvire:element:reqvire-requirement-ontology> , <urn:reqvire:element:reqvire-semantic-contract-ontology> , <urn:reqvire:element:reqvire-core-element-ontology> , <urn:reqvire:element:reqvire-governance-ontology> , <urn:reqvire:element:reqvire-implementation-rollup-ontology> , <urn:reqvire:element:reqvire-code-traceability-ontology> , <urn:reqvire:element:reqvire-change-impact-ontology> , <urn:reqvire:element:reqvire-relation-ontology> , <urn:reqvire:element:reqvire-semantic-export-ontology> , <urn:reqvire:element:reqvire-verification-ontology> , <urn:reqvire:element:reqvire-verification-rollup-ontology> ;
+	reqvire:ontologyElement <urn:reqvire:element:reqvire-behavior-rule-ontology> , <urn:reqvire:element:reqvire-linting-ontology> , <urn:reqvire:element:reqvire-model-mutation-ontology> , <urn:reqvire:element:reqvire-validation-ontology> , <urn:reqvire:element:reqvire-requirement-ontology> , <urn:reqvire:element:reqvire-semantic-contract-ontology> , <urn:reqvire:element:reqvire-core-element-ontology> , <urn:reqvire:element:reqvire-governance-ontology> , <urn:reqvire:element:reqvire-implementation-rollup-ontology> , <urn:reqvire:element:reqvire-code-traceability-ontology> , <urn:reqvire:element:reqvire-change-impact-ontology> , <urn:reqvire:element:reqvire-relation-ontology> , <urn:reqvire:element:reqvire-semantic-export-ontology> , <urn:reqvire:element:reqvire-verification-ontology> , <urn:reqvire:element:reqvire-verification-rollup-ontology> , <urn:reqvire:element:reqvire-worktree-session-ontology> ;
 	reqvire:ontologyBase "https://www.reqvire.org/ontology" ;
 	reqvire:ontologyPrefix "reqvire" ;
 	reqvire:termNamespace "https://www.reqvire.org/ontology#" .
 
+reqvire:AcceptedModelSnapshot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:AnalysisVerification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Artifact rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:AtomicModelMutation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -74,12 +75,14 @@ reqvire:File rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:FocusedElementEdit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:FormalProofVerification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:FullSemanticModelExport rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:GitCommit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GitWorktree rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GovernanceMetadata rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GovernanceRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GovernanceValue rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GovernedElement rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:GraphRegistry rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:HeadRefresh rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:HierarchyRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ImpactClassification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ImpactReview rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -93,6 +96,7 @@ reqvire:LintFinding rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:LintIssue rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:LintingRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ModelContextProjection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:ModelInputDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ModelMutation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ModelRelation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:MutationSafetyGate rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -117,9 +121,11 @@ reqvire:OwlReservedVocabularyTerm rdfs:isDefinedBy <https://www.reqvire.org/onto
 reqvire:OwnershipRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:PrefixedTurtleExport rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:PriorityValue rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:ProtectedModelInput rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RawExternalOntologyGraph rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RdfProjection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RdfTriple rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:ReferenceTargetDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ReferenceTargetKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationConstraint rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationFamily rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -148,6 +154,7 @@ reqvire:SemanticQuery rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ShapeBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ShapeContract rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Source rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:SourceResolutionDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Specification rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:State rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:StateTransition rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -172,6 +179,9 @@ reqvire:VerificationRollup rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:VerificationRollupRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:VerificationType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:WorkspaceRoot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:WorktreeContext rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:acceptedHeadCommit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:acceptedModelSnapshot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:additionChangeKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:allowedContractRelation rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:allowedSourceType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -222,6 +232,7 @@ reqvire:childVerificationElement rdfs:isDefinedBy <https://www.reqvire.org/ontol
 reqvire:classExpressionKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:combinedImplementationRollupRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:commentStyleName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:commitObjectId rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptLabel rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReference rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReferenceDependencyRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -247,6 +258,7 @@ reqvire:constructSourceBlock rdfs:isDefinedBy <https://www.reqvire.org/ontology>
 reqvire:constructSubject rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:content rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:contentChangeKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:contextWorktree rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:contractBindingPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:contractBindingRelationCategory rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:contractBindingRelationFamily rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -290,6 +302,7 @@ reqvire:defineRelationRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:definedBy rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:definedByRelationRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:demonstrationVerificationType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:dependencyPath rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:dependencyRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:dependencyResolution rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:derive rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -401,6 +414,7 @@ reqvire:mediumPriority rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:mediumRisk rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:memberTerm rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:metadataSubsection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:modelInputDependency rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:multiBranchConvergenceLintRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:mutationSubject rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:name rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -411,6 +425,7 @@ reqvire:normalizedConceptRelationInverseProperty rdfs:isDefinedBy <https://www.r
 reqvire:normalizedForwardProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:normalizedInverseProperty rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:normalizedRelationLayer rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:observedHeadCommit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ontologyBase rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ontologyConstructProjection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:ontologyElement rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -462,6 +477,7 @@ reqvire:referenceKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:referenceTargetKindName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:referencesContract rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:referencesTerm rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:refreshContext rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:registryElement rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationConstraint rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:relationDirection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -3527,3 +3543,59 @@ reqvire:nonEvidenceBackedVerificationRule a reqvire:VerificationRollupRule ;
 	reqvire:rollupCondition "A verification element is analysis-verification, inspection-verification, or demonstration-verification." ;
 	reqvire:rollupOutcome "The verification does not require satisfiedBy evidence for coverage satisfaction." ;
 	reqvire:evidenceBacked false .
+
+# -----------------------------------------------------------------------------
+# Source: system-model/Ontologies/WorktreeSessions.md#reqvire-worktree-session-ontology
+# Name: Reqvire Worktree Session Ontology
+# Kind: ontology
+# File: system-model/Ontologies/WorktreeSessions.md
+# Line: 16
+
+reqvire:WorktreeContext a owl:Class ;
+	reqvire:mapsToConcept concept:MCPWorktreeContext ;
+	rdfs:comment "An independently addressed accepted-model session rooted in one Git worktree." .
+reqvire:GitCommit a owl:Class ;
+	rdfs:comment "A Git commit that can be accepted or observed by a worktree context." .
+reqvire:AcceptedModelSnapshot a owl:Class ;
+	rdfs:comment "A complete validated model retained as authoritative by a context." .
+reqvire:ModelInputDependency a owl:Class ;
+	rdfs:comment "A content, existence or source-selection observation on which an accepted model depends." .
+reqvire:ProtectedModelInput a owl:Class ;
+	rdfs:subClassOf reqvire:ModelInputDependency ;
+	reqvire:mapsToConcept concept:ProtectedModelInput ;
+	rdfs:comment "A currently eligible model source, or a semantic source or resolution observation with a currently eligible declaring owner, whose change requires full validated admission." .
+reqvire:ReferenceTargetDependency a owl:Class ;
+	rdfs:subClassOf reqvire:ModelInputDependency ;
+	rdfs:comment "A declared local reference's dependency on target existence and eligibility, independent of the target's content role." .
+reqvire:SourceResolutionDependency a owl:Class ;
+	rdfs:subClassOf reqvire:ProtectedModelInput ;
+	rdfs:comment "An observation of a candidate path, including absence, that determines which local semantic source is selected." .
+reqvire:HeadRefresh a owl:Class ;
+	reqvire:mapsToConcept concept:HEADRefresh ;
+	rdfs:comment "A guarded reload of an observed committed branch tip through normal model loading." .
+reqvire:contextWorktree a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorktreeContext ;
+	rdfs:range reqvire:GitWorktree .
+reqvire:acceptedHeadCommit a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorktreeContext ;
+	rdfs:range reqvire:GitCommit ;
+	reqvire:mapsToConcept concept:AcceptedHEAD .
+reqvire:observedHeadCommit a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorktreeContext ;
+	rdfs:range reqvire:GitCommit ;
+	reqvire:mapsToConcept concept:ObservedHEAD .
+reqvire:acceptedModelSnapshot a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorktreeContext ;
+	rdfs:range reqvire:AcceptedModelSnapshot .
+reqvire:modelInputDependency a owl:ObjectProperty ;
+	rdfs:domain reqvire:AcceptedModelSnapshot ;
+	rdfs:range reqvire:ModelInputDependency .
+reqvire:refreshContext a owl:ObjectProperty ;
+	rdfs:domain reqvire:HeadRefresh ;
+	rdfs:range reqvire:WorktreeContext .
+reqvire:dependencyPath a owl:DatatypeProperty ;
+	rdfs:domain reqvire:ModelInputDependency ;
+	rdfs:range xsd:string .
+reqvire:commitObjectId a owl:DatatypeProperty ;
+	rdfs:domain reqvire:GitCommit ;
+	rdfs:range xsd:string .

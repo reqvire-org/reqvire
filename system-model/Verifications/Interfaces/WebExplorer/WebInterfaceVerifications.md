@@ -512,6 +512,29 @@ Acceptance checks:
   * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
 ---
 
+### Explorer Worktree HEAD Refresh Verification
+
+Verify HEAD-default selection and explicit refresh against the real served Explorer and the shared MCP operation.
+
+#### Details
+- Reuse one embedded server and its two loaded browser-selection contexts for backend context isolation and browser refresh checks. Preserve the same context IDs between checks; do not create another server/model solely for the isolation variation.
+- Serve a mutation-enabled context and discover an accessible `Refresh HEAD` control. Commit an implementation edit outside MCP, invoke the button and assert the browser calls `reqvire.worktree.refresh_head` with the selected ID. Adopt the complete matching Git/artifact publication with unchanged model semantics, context ID and URL.
+- Advance an already admitted secondary branch before selecting it. Selection in default HEAD mode adopts its eligible tip through the same operation without silently replacing the worker or requiring a preliminary button click. First admission still uses the current clean branch tip and full model validation.
+- Commit a protected model edit while selected and invoke Refresh. Require the affected path and blocked/stale explanation, retain the exact accepted model/publication and selection, identify accepted versus observed commits, and keep ordinary writes disabled without disconnecting MCP.
+- Hold a HEAD-refresh response, switch to another context and produce a newer blocked diagnostic. Late completion cannot replace that view or clear its diagnostic. Existing runtime publication tests cover the normal loading/publication failure behavior. Plain/read-only selection retains its existing source-refresh rules; static exports retain a fixed snapshot.
+- The executable browser case and MCP cases must fail against an implementation without the command/control. Missing controls, unavailable tools and protocol errors are failures, not successful protection checks. Fault-injection and read-only/static compatibility retain their existing owning coverage and require focused extensions where the implementation changes those paths.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [browser-refresh.mjs](../../../../tests/test-mcp-head-refresh/browser-refresh.mjs)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
+  * verify: [Explorer Worktree HEAD Refresh](../../../Interfaces/WebExplorer/HeadRefresh.md#explorer-worktree-head-refresh)
+---
+
 ### Explorer Worktree Selection Verification
 
 Verify one branch-browsing experience backed by independent worktree contexts with plain serving, read-only MCP, and writable MCP.
@@ -535,7 +558,7 @@ Acceptance checks:
 - Confirm preparing a missing worktree leaves existing checkouts, indexes, files, branch refs, and other clients' routing unchanged while registering only the required worktree. Read-only selection takes no ownership; mutation-enabled selection takes ownership only through normal admission. Race preparation with another checkout and require reuse or an explicit conflict without forcing duplicate checkouts. Failed preparation releases only ownership acquired by that attempt and cleans up only newly created unchanged assets, preserving pre-existing work and reporting residual paths. Normal shutdown preserves successful worktrees and their changes.
 - In plain and read-only embedded serving, exercise the same loading and cache checks against reused and newly created worktrees. Include valid dirty content, repeat unchanged selections, then edit selected-context sources, root exclusions, and used external ontology inputs. The next demand load/read must follow existing invalidation and rebuild rules without restart; equal-length preserved-timestamp edits remain detectable. Invalid changed inputs return diagnostics rather than stale success, and repaired inputs recover. Other branches are not scanned or loaded, mutation tools remain unavailable, and no new periodic model polling is introduced. Static exports retain one snapshot.
 - In mutation-enabled serving, attempt first selection of targets with staged, unstaged, and non-ignored untracked changes. Each fails before model parsing/runtime construction, retains the displayed branch and all files/index/refs, and offers no read-only fallback. After changes are resolved, normal admission validates and loads the branch; author-identity and ownership conflicts retain their existing failure behavior. Exercise both reused and newly created worktrees.
-- With either automatic-commit policy, reselect a healthy active context and reuse its accepted model without source freshness scans or rebuilds. With commits disabled, accepted uncommitted writes must not cause a new clean-start failure on reselection. External edits must not be imported into that accepted model. Accepted mutations update only their context's runtime and derived cache state. Stop and restart with pending changes to confirm the existing clean-start rule still rejects admission.
+- With either automatic-commit policy, reselect an active context with unchanged HEAD and reuse its accepted model without source freshness scans or rebuilds. With commits disabled, accepted uncommitted writes must not cause a new clean-start failure on reselection. When HEAD differs, default HEAD selection follows the dedicated checked adoption contract; protected external model edits remain excluded. Accepted mutations and eligible HEAD refresh update only their context's runtime and derived cache state. Stop and restart with pending changes to confirm the existing clean-start rule still rejects admission.
 
 ##### Evidence scope
 The Rust worktree and HTTP router regressions exercise on-demand admission, dirty-target rejection, accepted-snapshot reuse, read-only source/exclusion/preview invalidation, and repair recovery. Explorer hook and application tests cover explicit loading, cached periodic reads, failed-switch retention, and retry selection. The HTTP/browser cases in `tests/test-mcp-worktrees` execute the compiled Explorer in plain, read-only embedded and writable serving, including held target loading, scrim/background behavior, error dismissal and independent-tab navigation.
@@ -831,6 +854,7 @@ Browser traffic assertions and missing/corrupt chunk injection must recognize wo
 - Generated seed data, the full JSON store, and the manifest revision agree after mutations, and generated ontology data remains available.
 - Verify context labels exist before worker serialization, the pipe carries a structured store rather than nested JSON text, and parent publication consumes the owned runtime payload. Count store serialization work for seed/full JSON and preserve the exact existing manifest/chunk goldens. Exercise script-sensitive characters, Unicode, numeric values, deep nesting, context identity, and failed-runtime retention through the publication boundary.
 - Failed parent runtime publication returns `503` for manifest and seed endpoints while retaining the last valid captured snapshot and accepted MCP model reads. Regenerating the runtime from accepted worker inputs clears the diagnostic and permits a matching conditional `304` without advancing identical runtime content's revision.
+- Dedicated HEAD refresh uses normal validated loading and the existing runtime-publication path. Rejected guards or failed loading retain accepted HEAD and model; a later runtime-generation/publication failure follows the same diagnostic and retained-view behavior as other accepted updates. Reuse the existing runtime fault-injection coverage. The dedicated HEAD-refresh verification owns the black-box adoption/control cases.
 - Plain serving and read-only embedded MCP expose snapshot APIs for branch selection but do not advertise periodic live refresh.
 - The same server processes remain alive and one initialized MCP client can issue successful reads after each runtime refresh without reinitialization.
 

@@ -119,8 +119,8 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 - In a real mutation-enabled worker under each commit policy, hold concurrent accepted reads behind controlled barriers, complete an independent read and mutation while they remain held, then confirm the delayed responses retain their original revision/HEAD/pending paths and later reads use the new snapshot. Verify final physical/recovery diagnostics without misclassifying the internal commit as an external checkout change.
 - Verify out-of-order pipe replies keep request IDs and payloads paired; older responses cannot roll back published status or runtime. Confirm bounded read admission does not starve control operations, external source edits stay excluded, and dry-run/rejected mutations do not publish. Stop/remove a worker with reads in flight and confirm all callers fail without hanging, retaining ownership or substituting another context.
 - Through the production in-process HTTP router and real workers, hold an accepted read across a completed mutation in both commit modes. Assert its captured revision/HEAD/pending paths, newer published runtime, JSON-RPC response IDs, overload code and retryable data. Cancelling a dispatched caller retains its read slot until completion; the separate control budget permits previews and worktree removal while reads are held.
-- Move HEAD externally while an accepted read is held, then explicitly reopen the unavailable context. Confirm old callers fail with their original context identity, retained browser/read handles cannot retain ownership, and new admission uses the clean current HEAD without replacing the old caller's result with a new-context response.
-- After external checkout changes, resource and prompt admission errors retain context diagnostics in protocol errors rather than returning malformed successful resource/prompt payloads.
+- Move HEAD externally while an accepted read is held, then explicitly readmit the stale context. Confirm old callers fail with their original context identity after replacement, retained browser/read handles cannot retain ownership, and new admission uses the clean current HEAD without replacing the old caller's result with a new-context response.
+- After external checkout changes, audited resources and prompts retain the accepted snapshot with live staleness and disabled-write diagnostics. Unavailable or replaced workers retain context diagnostics in protocol errors rather than returning malformed successful resource/prompt payloads.
 - A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
 - Construct mutation adapter regressions through the production worktree manager and actual workers under both commit policies. Successful persisted mutations rebuild and publish the selected runtime once. Preview requests, no-op executions, JSON-RPC errors, and tool results with `isError: true` perform no runtime build, change no published assets/revision, and do not clear a previous runtime diagnostic.
 - A runtime-generation or parent payload-publication failure after a successful persisted mutation preserves the last valid Explorer snapshot internally and reports runtime unavailability, while accepted model reads and their revision/HEAD/pending paths remain available. Context diagnostics survive HTTP resource/tool metadata serialization. A subsequent valid worker runtime publication clears the diagnostic without changing identical runtime content's revision.
@@ -559,7 +559,7 @@ Expected checks:
 - Without `--enable-commits`, verify successful mutations change the expected files, leave HEAD and index contents unchanged, omit the `commit` result field, and permit successive writes and reads from the accepted snapshot even though the worktree is now dirty.
 - With `--enable-commits`, verify successful mutations create exactly one commit with only their prepared paths and return its identifier. In both modes, rejected, dry-run and no-op requests leave files, HEAD, index, and published runtime state unchanged and omit `commit`.
 - Verify commit-disabled shutdown leaves changes uncommitted; mutation-enabled restart rejects that dirty worktree until the user commits or otherwise resolves it, then resumes the same branch without creating an extra commit.
-- Verify external model edits do not enter session reads or commits, unrelated staged changes are preserved, and unexpected HEAD/branch changes reject writes.
+- Verify external model edits do not enter session reads or commits, unrelated staged changes are preserved, and unexpected HEAD/branch changes reject ordinary writes until a dedicated eligible same-branch HEAD refresh succeeds. Refresh must not bypass mutation/commit recovery.
 - Verify complete candidate validation covers asset operations and formatting before persistence, and commit/persistence failures preserve accepted files and model state.
 - Verify file/folder moves update subsequent reads, asset moves preserve executable modes, and newly occupied external destination files are not overwritten.
 - In both commit modes, inject permission-setting denial while content writes remain possible. Existing content edits with matching executable state must retain their native permissions without a permission call, including non-default modes. Exercise new files and executable/non-executable asset moves; a required denied or ineffectual permission change must reject publication with its path and operation, preserve the accepted revision, and leave the session usable when rollback fully succeeds.
@@ -804,6 +804,34 @@ These are planned executable acceptance checks. Add test evidence only after imp
 
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
+---
+
+### MCP Worktree HEAD Refresh Verification
+
+Verify the shared HEAD-refresh operation through real MCP transports and owned workers before claiming support for external branch-tip adoption.
+
+#### Details
+- Reuse one loaded HTTP context for reversible input-protection, Git-state and refresh-lifecycle checks. Restore only disposable physical inputs to the accepted baseline between variations, without reopening the context or rebuilding its model. Assert unchanged server/context identity and model-build count through read/rejection checks. Separate servers only for stdio, embedded serving and the automatic-commit startup policy; reuse the Explorer selection contexts for backend isolation checks.
+- Discover `reqvire.worktree.refresh_head` with `worktree_id`, `dry_run: false` default and state-mutation classification. Exercise actual HTTP and stdio calls without a fake tool, permissive stub or unknown-tool-as-protection shortcut. Embedded execution is covered by the Explorer verification of the same operation.
+- Commit ordinary implementation/evidence content, non-model documentation, an excluded model-looking example and unreferenced RDF. Refresh and amend the same branch, retaining context identity, model/semantic revision and ownership while advancing accepted HEAD and displayed artifact provenance. Require one normal validated model load per eligible apply and no model load for a rejected guard, preview or unchanged HEAD. Repeat for an idempotent no-op and successfully execute a later MCP mutation with automatic commits disabled.
+- Check-only preview must leave accepted state and Git unchanged. Change a protected model input between preview and apply and require apply to recheck and block.
+- Reject changed/removed/renamed model sources, new and empty recognised documents, new single-element headers and ordinary Markdown converted into model content. Check old/new classification independently of the accepted element registry. A real policy rejection must carry the expected blocker and path; an unavailable-tool response fails verification.
+- Reject loaded External Ontology changes, changes to a dual implementation/semantic source and a new repository-root source shadowing a recorded document-relative fallback. Detect already consumed ignored/out-of-tree source drift independently of endpoint diff. Reject missing renamed evidence targets while allowing edited evidence content.
+- In the same loaded HTTP workflow, allow added/changed/removed root ignore files. Combine a policy update with changes to a now-excluded model file and a semantic source whose declaring owner is now excluded; require successful normal loading and the updated membership/revision. Preview must not adopt the policy. Verify subsequent MCP operations use the adopted exclusions, policy-only re-inclusion loads unchanged documents, and later edits to re-included model files block. Separately unexclude and modify a model file in the same commit and require a model-path blocker under current rules. Reuse the existing server/context rather than adding an exclusion-policy process matrix.
+- Reject pending accepted changes, staged/unstaged/nonignored untracked edits, branch changes, detached state, in-progress Git operations and unresolved recovery. Preserve recorded commit-outcome reconciliation as the only recovery exception. Verify both automatic-commit policies without creating a commit during refresh.
+- Refresh one context with two admitted contexts and assert independent HEAD, snapshots, pending state and availability. Rejections preserve files, index, refs, accepted model, accepted HEAD and publication. Compare physical state before/after both accepted and rejected calls.
+- Verify that successful refresh uses the same loading function as startup and the ordinary worker runtime/publication path. A captured old read remains coherent across that normal reload. Reuse existing loading/runtime failure tests; do not add a refresh-specific prepare/adopt protocol, transfer-failure matrix or concurrent-Git race suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-head-refresh/test.sh)
+  * verify: [MCP Worktree HEAD Refresh](../../../Interfaces/MCP/HeadRefresh.md#mcp-worktree-head-refresh)
 ---
 
 ### MCP Accepted Change Commit Verification
@@ -1217,6 +1245,7 @@ Read-only expected checks:
 Mutation-enabled expected checks:
 - Verify accepted persisted mutations replace the graph, pages, and semantic snapshot together in both commit modes, while external edits do not replace it.
 - Verify repeated reads reuse the accepted snapshot without filesystem cache rebuilding.
+- After a dedicated eligible HEAD refresh, assert accepted/observed Git provenance and captured inputs update through normal validated loading while context identity remains stable. Artifact-only changes retain the public model revision; allowed current-exclusion changes may alter membership and revision. Blocked guards or failed loading retain the old model and snapshot reads; inventory observation alone cannot adopt HEAD. The dedicated HEAD-refresh verification owns executable adoption cases.
 
 ##### Evidence Scope
 The linked hashing suite proves the unchanged-public-revision page-content freshness case. Model Cache Input Freshness Verification owns actual cache reuse and complete dependency invalidation; MCP Cache and Runtime Coherence Verification owns live configuration/dependency visibility across MCP tools and the embedded runtime boundary. Their passing regression assertions establish those guarantees independently of equal model revisions.

@@ -222,6 +222,25 @@ pub struct Context {
     alive: Arc<AtomicBool>,
 }
 impl Context {
+    fn refresh_head_locked(
+        &self,
+        slot: &mut Option<Arc<Worker>>,
+        dry_run: bool,
+    ) -> Result<Value, ReqvireError> {
+        let mut response =
+            self.request_locked(slot, &json!({"operation":"refresh_head","dry_run":dry_run}))?;
+        let mut result = response["result"].take();
+        result["worktree_id"] = json!(self.id);
+        if let Some(runtime) = &self
+            .published
+            .read()
+            .expect("context registry poisoned")
+            .runtime
+        {
+            result["publication_revision"] = json!(runtime.live.revision);
+        }
+        Ok(result)
+    }
     fn update(&self, response: &mut Value) -> Result<(), ReqvireError> {
         let runtime = response
             .get_mut("runtime")
@@ -386,9 +405,29 @@ impl Context {
             .clone()
             .ok_or_else(|| error("Explorer runtime is unavailable for this worktree"))
     }
+    pub fn check_file_download(&self) -> Result<(), ReqvireError> {
+        if !self.read_only {
+            // Disk assets are not accepted-snapshot reads. Observe HEAD now,
+            // rather than relying on metadata from an earlier inventory call.
+            self.request(&json!({"operation":"check_writable"}))?;
+        }
+        Ok(())
+    }
     pub fn load_for_browser(&self) -> Result<(), ReqvireError> {
         if self.read_only {
             self.request(&json!({"operation":"load"}))?;
+        } else {
+            self.request(&json!({"operation":"status"}))?;
+            if self.metadata()["head_stale"] == true {
+                let mut worker = self.worker.lock().expect("worktree lock poisoned");
+                let result = self.refresh_head_locked(&mut worker, false)?;
+                if result["outcome"] == "blocked" {
+                    return Err(error(format!(
+                        "HEAD refresh blocked: {}",
+                        result["blockers"]
+                    )));
+                }
+            }
         }
         self.runtime().map(|_| ())
     }
@@ -750,7 +789,24 @@ impl Worktrees {
             present.insert(branch.to_string());
             if let Some(context) = contexts.values().find(|c| c.branch == branch) {
                 choices.insert(branch.into(), context.id.clone());
-                rows.push(context.metadata());
+                let mut status = context.metadata();
+                if !self.read_only {
+                    let checkout = worktrees.iter().find(|row| {
+                        row["workspace_root"]
+                            .as_str()
+                            .is_some_and(|root| Path::new(root) == context.root)
+                    });
+                    status["observed_head"] =
+                        checkout.map_or(Value::Null, |row| row["head"].clone());
+                    status["head_stale"] = json!(checkout.is_none_or(|row| {
+                        row["branch"].as_str() != Some(branch)
+                            || row["head"] != status["accepted_head"]
+                    }));
+                    if status["head_stale"] == true {
+                        status["writes_available"] = json!(false);
+                    }
+                }
+                rows.push(status);
             } else {
                 let id = choices.entry(branch.into()).or_insert_with(Self::new_id);
                 let root = worktrees
@@ -855,6 +911,7 @@ impl Worktrees {
             // Idempotence does not import disk changes. A failed context must be explicitly readmitted.
             if context.request(&json!({"operation":"status"})).is_ok()
                 && context.metadata()["available"] == true
+                && context.metadata()["head_stale"] != true
             {
                 if self.explorer && context.metadata()["explorer_available"] != true {
                     context.request(&json!({"operation":"runtime"}))?;
@@ -1420,7 +1477,20 @@ impl Worktrees {
             if name == "reqvire.worktree.remove" {
                 return self.remove(&context).map(success);
             }
-            let mut result = if name == "reqvire.git.reconcile" {
+            let mut result = if name == "reqvire.worktree.refresh_head" {
+                let value = context.refresh_head_locked(
+                    worker
+                        .as_mut()
+                        .expect("validated worktree context invariant"),
+                    args["dry_run"].as_bool().unwrap_or(false),
+                )?;
+                let blocked = value["outcome"] == "blocked";
+                let mut result = success(value);
+                if blocked {
+                    result["isError"] = json!(true);
+                }
+                result
+            } else if name == "reqvire.git.reconcile" {
                 let response = context.request_locked(
                     worker.as_mut().expect("validated worktree context invariant"),
                     &json!({"operation":"reconcile","attempted_commit":args["attempted_commit"],"dry_run":args["dry_run"].as_bool().unwrap_or(true)}),
@@ -1441,7 +1511,7 @@ impl Worktrees {
                 context.request_locked(worker.as_mut().expect("validated worktree context invariant"),&json!({"operation":if name.ends_with(".comment"){"check_writable"}else{"check_clean"}}))?;
                 let status = context.metadata();
                 if status["writes_available"] != true {
-                    return Err(error("Owned HEAD changed; restart before publication"));
+                    return Err(error("Owned HEAD changed; check reqvire.worktree.refresh_head before publication"));
                 }
                 if !name.ends_with(".comment")
                     && status["pending_changes"]
@@ -1536,6 +1606,12 @@ fn build_local_definitions() -> Vec<Value> {
             &[],
             true,
             false,
+        ),
+        definition(
+            "reqvire.worktree.refresh_head",
+            "Check the owned branch's committed HEAD, then reload through normal validated model loading. Protected model/semantic inputs block adoption; dry_run checks only. No commit or Git ref/index/file writes.",
+            json!({"worktree_id":selector(),"dry_run":{"type":"boolean","default":false}}),
+            &[], false, false,
         ),
         definition(
             "reqvire.worktree.create",
@@ -3110,6 +3186,10 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         );
         assert_eq!(
             rejected_commit["structuredContent"]["context"]["available"],
+            true
+        );
+        assert_eq!(
+            rejected_commit["structuredContent"]["context"]["writes_available"],
             false
         );
         for (method, params) in [
@@ -3122,11 +3202,12 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                 json!({"name":"reqvire.workflow.verify_coverage","arguments":{"worktree_id":manager.original}}),
             ),
         ] {
-            let failure = manager.handle(method, params).unwrap_err();
-            let metadata = &failure.data.as_ref().unwrap()["context"];
+            let retained = manager.handle(method, params).unwrap();
+            let metadata = &retained["_meta"]["reqvire/context"];
             assert_eq!(metadata["worktree_id"], manager.original);
-            assert_eq!(metadata["available"], false);
-            assert!(failure.message.contains("HEAD changed"), "{failure}");
+            assert_eq!(metadata["available"], true);
+            assert_eq!(metadata["writes_available"], false);
+            assert_eq!(metadata["head_stale"], true);
         }
     }
     #[test]

@@ -90,6 +90,8 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
             worktreeSelector={worktreeSelector}
             worktreeBlocked={blocked}
             worktreeId={result.store.project.worktree_id}
+            onRefreshHead={live.refreshHead}
+            refreshingHead={live.refreshingHead}
           />
         </ExplorerUiStateProvider>
       </SearchIndexProvider>
@@ -98,12 +100,14 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   );
 }
 
-function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked }: AppProps & {
+function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked, onRefreshHead, refreshingHead }: AppProps & {
   recoveryWarning?: string | null;
   schemaMismatch: string | null;
   worktreeSelector?: WorktreeSelectorProps;
   worktreeId?: string;
   worktreeBlocked?: boolean;
+  onRefreshHead?: () => void;
+  refreshingHead?: boolean;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
   const ui = useExplorerUiState();
@@ -178,6 +182,8 @@ function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktre
       ref={shellRef}
       activeNavigationValue={effectiveHeaderView}
       worktree={worktreeSelector}
+      onRefreshHead={onRefreshHead}
+      refreshingHead={refreshingHead}
       isDark={isDark} onToggleTheme={toggleTheme}
       onSearch={() => navigateView("search")} onHelp={() => setHelpOpen(true)}
       thesaurus={route.view === "thesaurus" && !viewOverride ? {

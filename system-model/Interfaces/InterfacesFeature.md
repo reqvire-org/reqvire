@@ -134,6 +134,9 @@ MCP semantic prefix registry interface is the capability for exposing ontology e
 
 As an **AI Tool Integrator**, I want to manage independent model branches through Git worktrees behind one MCP endpoint, so that concurrent model work stays isolated without switching the original checkout.
 
+#### Details
+Mixed model and implementation workflows can adopt eligible external commits on an owned branch through checked HEAD refresh and normal validated model loading while retaining context identity.
+
 #### Concept References
   * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
 
@@ -195,6 +198,9 @@ As a **System Engineer**, I want to share a selected model context and item acro
 ### Explorer Worktree Browsing
 
 As a **System Engineer**, I want to choose any local branch in Explorer and inspect its model independently in each browser tab, so that I can compare concurrent work without switching an existing Git checkout or another client's context. Worktrees provide the isolated model workspaces behind this single branch-browsing experience.
+
+#### Details
+Branch selection defaults to HEAD mode. Owned contexts follow eligible local branch-tip changes through the shared check-and-refresh operation, with an explicit Refresh control and clear retained-model provenance when adoption is blocked.
 
 #### Concept References
   * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)

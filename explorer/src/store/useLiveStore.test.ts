@@ -214,6 +214,40 @@ describe("worktree selection", () => {
     vi.stubGlobal("fetch", fetchMock);
     return { a, b, fetchMock, transport };
   }
+  it("ignores a held HEAD action after switching and preserves a newer blocked diagnostic", async () => {
+    const { b, fetchMock, transport } = contexts();
+    let release!: (response: Response) => void;
+    let pendingSignal!: AbortSignal;
+    fetchMock.mockImplementation(async (url, init) => {
+      if (url !== "/mcp") return transport(url, init);
+      const request = JSON.parse(String(init?.body));
+      if (request.method === "initialize") return Response.json({ result: {} });
+      if (request.params.arguments.worktree_id === "a") {
+        pendingSignal = init!.signal!;
+        return new Promise(resolve => { release = resolve; });
+      }
+      return Response.json({ result: { isError: true, structuredContent: {
+        outcome: "blocked", accepted_head: "b-accepted", observed_head: "b-observed",
+        blockers: [{ path: "Model.md", reason: "protected_model_source", next_action: "Full validation required." }],
+      } } });
+    });
+    const hook = renderHook(() => useLiveStore()); await tick();
+    act(() => hook.result.current.refreshHead?.()); await tick();
+    expect(hook.result.current.refreshingHead).toBe(true);
+    act(() => hook.result.current.selectWorktree("b")); await tick();
+    expect(pendingSignal.aborted).toBe(true);
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    act(() => hook.result.current.refreshHead?.()); await tick();
+    const diagnostic = hook.result.current.refreshError;
+    expect(diagnostic).toContain("Model.md");
+    expect(diagnostic).toContain("b-accepted");
+    await act(async () => { release(Response.json({ result: { structuredContent: { outcome: "refreshed" } } })); });
+    await tick();
+    expect(hook.result.current.refreshError).toBe(diagnostic);
+    expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(b.store);
+    expect(location.search).toBe("?worktree_id=b");
+    expect(hook.result.current.refreshingHead).toBe(false);
+  });
   it("retains selection URLs after error dismissal and requires explicit retry", async () => {
     const { a, b, fetchMock, transport } = contexts();
     const retained = `/?worktree_id=a#/model?selected=${encodeURIComponent(smallStore().elements[0].id)}&mode=flow`;

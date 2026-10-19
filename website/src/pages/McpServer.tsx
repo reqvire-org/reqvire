@@ -478,6 +478,14 @@ reqvire serve --enable-mcp --enable-mutations
           accepted uncommitted writes when automatic commits are disabled.
         </p>
         <p className="text-zinc-600 mb-4">
+          Mutation-enabled Explorer selects branches in HEAD mode. Selecting an
+          admitted context checks an external branch-tip change through the same
+          operation as the Refresh HEAD button and MCP tool. Eligible implementation
+          commits and same-branch amendments update accepted Git provenance and
+          resource bytes through normal validated model loading, retaining the semantic
+          revision for unchanged model inputs and the same context ID. Polling reports staleness without adopting a new commit.
+        </p>
+        <p className="text-zinc-600 mb-4">
           Each browser tab keeps its own branch selection in the URL across reload
           and back/forward navigation. Switching retains cached context data and
           does not redirect MCP calls or preload other branches. Use
@@ -487,6 +495,7 @@ reqvire serve --enable-mcp --enable-mutations
         <DetailGrid items={[
           { name: "reqvire.worktree.create", desc: "Requires branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_worktree_id for relative bases such as HEAD. The selected source must be clean." },
           { name: "reqvire.worktree.open", desc: "Requires an existing local branch. Reuses a healthy context or admits its clean worktree, creating a managed worktree when necessary. It never forces a second checkout." },
+          { name: "reqvire.worktree.refresh_head", desc: "Checks and adopts the selected owned branch's local HEAD. dry_run defaults to false; true checks only. After the guard passes, uses normal validated loading. Requires a clean tree, no accepted pending changes, the same branch and no unresolved Git/recovery operation. Creates no commit and works without --enable-commits." },
           { name: "reqvire.worktree.remove", desc: "Requires worktree_id. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected." },
           { name: "reqvire.git.commit", desc: "Requires a message and commits only accepted pending changes. Unrelated staged files and intervening external versions are excluded. No pending changes means no new commit. This tool works without GitHub enablement." },
           { name: "reqvire.git.reconcile", desc: "Verifies a live recorded unknown-outcome commit using exact attempted_commit and context routing. Preview is the default; dry_run: false completes only its affected index entries and accepted state after all checks pass. It preserves unrelated recorded staging and never updates a ref or retries a commit." },
@@ -499,7 +508,36 @@ reqvire serve --enable-mcp --enable-mutations
 {
   "name": "reqvire.coverage",
   "arguments": { "worktree_id": "<returned worktree_id>" }
+}
+
+{
+  "name": "reqvire.worktree.refresh_head",
+  "arguments": { "worktree_id": "<returned worktree_id>", "dry_run": true }
 }`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Refresh permits ordinary implementation, evidence, documentation and
+          configuration edits, including changed <code>satisfiedBy</code> content,
+          while referenced targets must remain valid. It blocks recognised model
+          Markdown under current exclusions, consumed semantic sources and
+          source-resolution changes whose declaring owners remain eligible.
+          This includes new or converted model documents,
+          ignored or outside-worktree semantic sources, and new files shadowing
+          an existing source fallback. A protected role wins over an evidence role;
+          unreferenced RDF and excluded examples have no automatic protected role.
+          Changes to root <code>.gitignore</code> and <code>.reqvireignore</code>
+          are allowed: current rules govern both versions of changed paths, normal
+          loading and subsequent tools. Policy-only changes can include or exclude
+          unchanged documents and change the model revision. Preview and rejection
+          keep the accepted exclusion rules; successful refresh adopts the current rules.
+          Results distinguish <code>accepted_head</code> from <code>observed_head</code>
+          and return <code>refreshed</code>, <code>unchanged</code>, <code>checked</code>
+          or <code>blocked</code>, with bounded path-specific blockers and next actions.
+          Every apply repeats the checks. A rejection keeps accepted reads and
+          the prior Explorer publication; external HEAD staleness disables writes.
+          Changed model inputs require explicit full validated admission through
+          <code> reqvire.worktree.open</code>. Unknown commit outcomes still use
+          <code> reqvire.git.reconcile</code>.
+        </p>
         <p className="text-zinc-600 mt-4">
           Pass the returned <code>worktree_id</code> to workspace-bound tools
           and prompts. Resources use <code>?worktree_id=...</code>. Omission

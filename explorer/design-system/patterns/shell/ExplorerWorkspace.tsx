@@ -31,6 +31,8 @@ export interface ExplorerWorkspaceProps extends Omit<AppShellProps,
   onToggleTheme?: () => void;
   onSearch?: () => void;
   onHelp?: () => void;
+  onRefreshHead?: () => void;
+  refreshingHead?: boolean;
   /** One controller supplies the matching production concept pane and graph. */
   thesaurus?: ThesaurusExplorerProps & Pick<ThesaurusPaneProps, "query" | "onQueryChange">;
   files?: FileBrowserScreenProps;
@@ -50,7 +52,7 @@ export interface ExplorerWorkspaceProps extends Omit<AppShellProps,
 
 /** The production workspace chrome and screen composition, also used by fixtures. */
 export const ExplorerWorkspace = forwardRef<HTMLDivElement, ExplorerWorkspaceProps>(
-  function ExplorerWorkspace({ worktree, isDark, onToggleTheme, onSearch, onHelp,
+  function ExplorerWorkspace({ worktree, isDark, onToggleTheme, onSearch, onHelp, onRefreshHead, refreshingHead,
     thesaurus, files, fileNavigation, modelFlow, modelGraph, modelGraphControls, traces, traceNavigation,
     coverage, coverageNavigation, ontology, ontologyControls, search, searchControls,
     leftPaneOpen = true, onToggleLeftPane = () => {}, sidePane, main, ...props }, ref) {
@@ -79,6 +81,7 @@ export const ExplorerWorkspace = forwardRef<HTMLDivElement, ExplorerWorkspacePro
     return <AppShell {...props} ref={ref} navigationItems={EXPLORER_NAVIGATION}
       headerContext={worktree && <WorktreeSelector {...worktree} density="compact" menuAlign="end" />}
       headerActions={[
+        ...(onRefreshHead ? [{ id: "refresh-head", label: "Refresh HEAD", icon: "rotate-ccw" as const, onClick: onRefreshHead, disabled: refreshingHead }] : []),
         ...(onSearch ? [{ id: "search", label: "Search", icon: "search" as const, onClick: onSearch }] : []),
         ...(onToggleTheme ? [{ id: "theme", label: isDark ? "Switch to light mode" : "Switch to dark mode", icon: isDark ? "sun" as const : "moon" as const, onClick: onToggleTheme }] : []),
         ...(onHelp ? [{ id: "help", label: "Help", icon: "help-circle" as const, onClick: onHelp }] : []),

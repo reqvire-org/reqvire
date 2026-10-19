@@ -345,7 +345,8 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           the model; successful MCP mutations rebuild the published snapshot.
           Updates preserve navigation without restarting the server or
           interrupting MCP access. Failed updates keep the last valid view and
-          retry automatically. External file edits require a server restart.
+          retry automatically. Committed external artifact edits can be adopted
+          through Refresh HEAD; changed model inputs require full validated admission.
         </p>
         <p className="text-zinc-600 mb-4">
           If a commit times out, MCP checks local Git automatically. A verified
@@ -379,6 +380,33 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           uncommitted changes. Unchanged data stays cached across switches, and
           prepared worktrees survive shutdown. Exported pages contain only their
           exported snapshot.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          In mutation-enabled serving, branch selection defaults to HEAD mode:
+          selecting an admitted context checks and adopts an eligible external
+          branch tip without replacing its worker. Use Refresh HEAD to do the same
+          for the displayed context, or call <code>reqvire.worktree.refresh_head</code>
+          with its <code>worktree_id</code>. Apply is the default; use
+          <code> dry_run: true</code> for a check-only preview. Clean implementation
+          commits and same-branch amendments retain model semantics while updating
+          Git provenance and resource text. The tool makes no commit and works
+          with automatic commits disabled.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Changes to currently eligible model documents, consumed ontology sources
+          and resolution dependencies block refresh; dependency protection follows
+          currently eligible declaring owners. Changes to root ignore files are
+          allowed, and their current rules govern classification and normal
+          loading. Successful refresh also adopts those rules for later tools;
+          preview and rejection keep the accepted rules. Policy-only changes may
+          change model membership and revision. Ordinary evidence content may
+          change while referenced targets must remain valid. Pending
+          model edits, a dirty checkout, branch changes and unresolved Git/recovery
+          operations also block it. Explorer keeps the accepted view and commit
+          label, shows the affected paths and observed commit, and disables writes
+          for an external HEAD mismatch. Resolve the diagnostic or explicitly
+          readmit changed model inputs through <code>reqvire.worktree.open</code>.
+          Polling observes staleness without automatically adopting external commits.
         </p>
       </Section>
 

@@ -17,7 +17,7 @@ impl ExclusionSet {
     }
 
     /// Reload workspace policy, preserving only explicitly supplied extra rules.
-    pub(crate) fn refreshed(&self) -> Self {
+    pub fn refreshed(&self) -> Self {
         if crate::mutation_io::active() {
             return self.clone();
         }
