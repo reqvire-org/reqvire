@@ -1,4 +1,5 @@
 import { act, cleanup, renderHook } from "@/test/render";
+import { h, render } from "preact";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useLiveStore } from "./useLiveStore";
 import { ManifestStoreClient } from "./manifestRefresh";
@@ -396,6 +397,29 @@ describe("worktree selection", () => {
     await tick();
     expect(hook.result.current.result.ok && hook.result.current.result.store).toEqual(a.store);
     expect(storage).not.toHaveBeenCalled();
+  });
+
+  it("handles history traversal after mount before deferred effects run", async () => {
+    const { a, b } = contexts();
+    window.reqvireProjectStore = b.store;
+    window.reqvireLiveRefresh = b.seed;
+    window.history.replaceState(null, "", "/?worktree_id=b#/model");
+    let current: ReturnType<typeof useLiveStore> | undefined;
+    const Probe = () => { current = useLiveStore(); return null; };
+    const container = document.createElement("div");
+    try {
+      // Render directly: renderHook's act would flush the deferred effects and
+      // conceal the interval in which a real browser can deliver Back/Forward.
+      render(h(Probe, {}), container);
+      window.history.replaceState(null, "", "/?worktree_id=a#/model");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      await tick();
+      expect(current?.selectedWorktree).toBe("a");
+      await tick();
+      expect(current?.result.ok && current.result.store).toEqual(a.store);
+    } finally {
+      act(() => render(null, container));
+    }
   });
 
   it.each([false, true])("releases removed contexts after switching away (live refresh: %s)", async live => {

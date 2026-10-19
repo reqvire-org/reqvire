@@ -79,9 +79,10 @@ before = (source / "fixtures/Repair.md.fixture").read_bytes()
 untouched = b"# Elements\n\n### Untouched Capability\n\nAn untouched document.\n\n#### Metadata\n  * type: capability\n---\n"
 (root / "Untouched.md").write_bytes(untouched)
 subprocess.run(["git", "init", "-q", str(root)], check=True)
+subprocess.run(["git", "-C", str(root), "config", "user.name", "Test"], check=True)
+subprocess.run(["git", "-C", str(root), "config", "user.email", "test@example.org"], check=True)
 subprocess.run(["git", "-C", str(root), "add", "Repair.md", "Untouched.md"], check=True)
-subprocess.run(["git", "-C", str(root), "-c", "user.name=Test", "-c", "user.email=test@example.org",
-                "commit", "-qm", "fixture"], check=True)
+subprocess.run(["git", "-C", str(root), "-c", "commit.gpgSign=false", "commit", "-qm", "fixture"], check=True)
 server = Server(root)
 try:
     tools = {t["name"]: t for t in server.rpc("tools/list", {})["result"]["tools"]}

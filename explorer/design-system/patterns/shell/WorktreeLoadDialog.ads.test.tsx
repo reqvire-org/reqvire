@@ -1,9 +1,28 @@
 import { cleanup, fireEvent, render, screen } from "@/test/render";
+import { render as renderImmediately } from "preact";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { WorktreeLoadDialog } from "./WorktreeLoadDialog";
+import { Modal, ModalContent } from "@ds";
 
 afterEach(cleanup);
 describe("WorktreeLoadDialog", () => {
+  it("does not deliver Escape to the hidden previous dialog during loading", () => {
+    const onPreviousChange = vi.fn();
+    const onDismiss = vi.fn();
+    function Dialogs({ loading }: { loading: boolean }) {
+      return <><Modal open={!loading} onOpenChange={onPreviousChange}>
+        <ModalContent>Previous detail</ModalContent>
+      </Modal>{loading && <WorktreeLoadDialog branch="feature" onDismiss={onDismiss} />}</>;
+    }
+    const view = render(<Dialogs loading={false} />);
+    // Keep deferred effects pending, matching a key press as soon as the
+    // loading dialog appears in a real browser.
+    renderImmediately(<Dialogs loading />, view.container);
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    expect(onPreviousChange).not.toHaveBeenCalled();
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
   it("shares dismissible error presentation for refresh failures and explains automatic retry", () => {
     const onDismiss = vi.fn();
     render(<WorktreeLoadDialog branch="main" operation="refresh" error="Connection lost"

@@ -1,5 +1,5 @@
 import { cloneElement, createContext, isValidElement, type ButtonHTMLAttributes, type ComponentProps, type HeadingHTMLAttributes, type TargetedMouseEvent, type HTMLAttributes, type VNode, type ComponentChildren, type Ref } from "preact";
-import { useContext, useEffect } from "preact/hooks";
+import { useContext, useLayoutEffect } from "preact/hooks";
 import { css, cx } from "@linaria/atomic";
 import { createPortal } from "preact";
 
@@ -108,7 +108,7 @@ export function Modal({
   onOpenChange?: (open: boolean) => void;
   children: ComponentChildren;
 }) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return undefined;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onOpenChange?.(false);

@@ -193,8 +193,10 @@ for name, run in cases:
             (root / file).write_text('# Elements\n\n' + '\n---\n\n'.join(elements) + '\n---\n')
         (root / 'evidence.txt').write_text('Stable unrelated evidence.\n')
         transport.git(root, 'init', '-qb', 'main')
+        transport.git(root, 'config', 'user.name', 'Override Test')
+        transport.git(root, 'config', 'user.email', 'override@example.invalid')
         transport.git(root, 'add', '.')
-        transport.git(root, '-c', 'user.name=Override Test', '-c', 'user.email=override@example.invalid', '-c', 'commit.gpgSign=false', 'commit', '-qm', 'fixture')
+        transport.git(root, '-c', 'commit.gpgSign=false', 'commit', '-qm', 'fixture')
         validate(root)
         head, index = transport.git(root, 'rev-parse', 'HEAD'), transport.git(root, 'write-tree')
         with transport.Stdio(binary, root, output / name, '--enable-mutations') as server:

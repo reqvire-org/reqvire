@@ -77,8 +77,6 @@ try {
     assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Failure must retain and block the accepted model');
     stage = `dismiss failed switch (${action})`;
     if (action === 'escape') {
-      // Preact updates the modal's document-level Escape listener after paint.
-      await browser.evaluate(() => new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0))));
       await browser.rpc('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
       await browser.rpc('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
     }
@@ -98,15 +96,18 @@ try {
   }, secondary);
   await wait(() => browser.evaluate(id => Boolean([...document.querySelectorAll('[role="option"]')].find(option => option.dataset.worktreeId === id)), secondary), 'secondary branch choice');
   await browser.evaluate(id => [...document.querySelectorAll('[role="option"]')].find(option => option.dataset.worktreeId === id).click(), secondary);
-  await wait(() => browser.evaluate(() => Boolean(document.querySelector('.ux-worktree-load-dialog [role="status"]'))), 'worktree loading spinner');
+  await wait(() => browser.evaluate(() => typeof window.releaseWorktreeLoad === 'function'
+    && Boolean(document.querySelector('.ux-worktree-load-dialog [role="status"]'))), 'held worktree load and spinner');
   assert(await browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && document.querySelector('[data-product-pattern="app-shell"]').inert, original), 'Pending switch must retain and block the accepted model');
   assert(await browser.evaluate(() => {
     const overlay = getComputedStyle(document.querySelector('.ux-worktree-load-dialog').parentElement);
     return overlay.alignItems === 'center' && overlay.backdropFilter.includes('blur') && overlay.backgroundColor !== 'rgba(0, 0, 0, 0)';
   }), 'Loading dialog must use the centered blurred/darkened scrim');
+  const pendingUrl = await browser.evaluate(() => location.href);
   await browser.evaluate(() => document.querySelector('.ux-worktree-load-dialog').parentElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })));
   await browser.rpc('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
   assert(await browser.evaluate(() => Boolean(document.querySelector('.ux-worktree-load-dialog [role="status"]'))), 'Pending loading dialog was dismissed');
+  assert(await browser.evaluate(url => location.href === url, pendingUrl), 'Pending dismissal changed the underlying detail route');
   await browser.evaluate(() => { window.holdWorktreeLoad = false; window.releaseWorktreeLoad(); });
   await wait(() => browser.evaluate(id => window.reqvireProjectStore.project.worktree_id === id && !document.querySelector('[role="dialog"]'), secondary), 'secondary branch adoption');
   assert(await browser.evaluate(id => new URLSearchParams(location.search).get('worktree_id') === id, secondary), 'Selection absent from URL');

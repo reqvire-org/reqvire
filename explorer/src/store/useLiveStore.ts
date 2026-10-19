@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import { loadStore } from "./loadStore";
 import { devFixture } from "./devFixture";
 import { ManifestStoreClient } from "./manifestRefresh";
@@ -173,6 +173,11 @@ export function useLiveStore() {
   useEffect(() => {
     if (!worktreeRouting) return;
     void refreshWorktrees();
+    return () => { inventoryRequestRef.current?.abort(); };
+  }, [worktreeRouting, refreshWorktrees]);
+
+  useLayoutEffect(() => {
+    if (!worktreeRouting) return;
     const onPopState = () => {
       if (requestedWorktree() === selectedWorktreeRef.current) return;
       requestRef.current?.abort(); requestRef.current = null;
@@ -181,8 +186,8 @@ export function useLiveStore() {
       setSelectedWorktree(requestedWorktree());
     };
     window.addEventListener("popstate", onPopState);
-    return () => { window.removeEventListener("popstate", onPopState); inventoryRequestRef.current?.abort(); };
-  }, [worktreeRouting, refreshWorktrees]);
+    return () => { window.removeEventListener("popstate", onPopState); };
+  }, [worktreeRouting]);
 
   useEffect(() => {
     const inventory = inventoryRef.current;
