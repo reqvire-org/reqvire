@@ -48,9 +48,10 @@ function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
       });
       if (!previous) folders.get(parent)!.children.push(file);
     }
-    const addRelation = (source: string, target: string, type: string) => relations.push({
+    const addRelation = (source: string, target: string, type: string, inverse: string) => relations.push({
       id: JSON.stringify([source, type, target]), source_id: source, target_id: target, target_kind: "element",
       relation_type: type, canonical_relation_type: type, source_relation_types: [type],
+      inverse_relation_type: inverse,
       authored: true, generated_opposite: false, resource_id: null,
     });
     for (const element of traceExampleElements(example)) {
@@ -66,9 +67,9 @@ function withTraceElements(base: ExplorerProjectStore): ExplorerProjectStore {
       });
     }
     for (const requirement of example.trace.requirements) {
-      if (requirement.directlyVerified) addRelation(example.trace.verification.id, requirement.id, "verify");
-      requirement.parentIds.forEach(parent => addRelation(requirement.id, parent, "derivedFrom"));
-      if (!requirement.parentIds.length) addRelation(requirement.id, capability.id, "specify");
+      if (requirement.directlyVerified) addRelation(requirement.id, example.trace.verification.id, "verifiedBy", "verify");
+      requirement.parentIds.forEach(parent => addRelation(parent, requirement.id, "derive", "derivedFrom"));
+      if (!requirement.parentIds.length) addRelation(capability.id, requirement.id, "specifiedBy", "specify");
     }
   }
   const traceFiles: ExplorerProjectStore["traces"]["files"] = {};

@@ -37,6 +37,13 @@ return <ShowcaseRegion regions={["page"]}>
         { value: "grid" as const, label: "Grid", icon: <Icon name="grid" size={14}/> },
     ]} value={view} onChange={setView} ariaLabel="Layout mode"/>
         </ShowcaseRegion>
+        <ShowcaseRegion regions={["col"]}>
+          <ShowcaseRegion regions={["label"]}>Icons with tooltips</ShowcaseRegion>
+          <SegmentedControl items={[
+        { value: "list" as const, icon: <Icon name="list" />, tooltip: "List" },
+        { value: "grid" as const, icon: <Icon name="grid" />, tooltip: "Grid" },
+    ]} value={view} onChange={setView} ariaLabel="Icon layout mode"/>
+        </ShowcaseRegion>
       </Section>
 </ShowcaseRegion>;
 }

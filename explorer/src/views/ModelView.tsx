@@ -1,9 +1,9 @@
-import { useMemo } from "preact/hooks";
+import { useMemo, useState } from "preact/hooks";
 import { useExplorerUiState } from "../state/ExplorerUiState";
-import { ModelFlowScreen, ModelGraphScreen } from "@ds";
+import { Icon, ModelFlowScreen, ModelGraphScreen, SegmentedControl } from "@ds";
 import { useStore } from "../store/StoreContext";
 import { flowLayoutEngine } from "../workers/flowLayoutEngine";
-import { selectModelFlow } from "../lib/modelFlow";
+import { selectModelFlow, type ModelFlowScope } from "../lib/modelFlow";
 import { routeForContent, routeForResource } from "../router/routes";
 import { FilesView } from "./FilesView";
 import { KnowledgeGraphView } from "./GraphLibraryViews";
@@ -28,9 +28,13 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
 function ModelFlowView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
   const ui = useExplorerUiState();
   const { store, elementById, getModelFlowIndex } = useStore();
-  const data = useMemo(() => selectModelFlow(getModelFlowIndex(), ui.modelSelectionId, store.project.root_label),
-    [getModelFlowIndex, store.project.root_label, ui.modelSelectionId]);
+  const [scope, setScope] = useState<ModelFlowScope>("downstream");
+  const data = useMemo(() => selectModelFlow(getModelFlowIndex(), ui.modelSelectionId, store.project.root_label, scope),
+    [getModelFlowIndex, store.project.root_label, ui.modelSelectionId, scope]);
   return <ModelFlowScreen data={data} layoutEngine={flowLayoutEngine} mode={ui.modelMode}
+    controls={ui.modelSelectionId !== "__root__" && <SegmentedControl<ModelFlowScope> ariaLabel="Flow scope" value={scope} onChange={setScope}
+      items={[{ value: "downstream", icon: <Icon name="chevron-down" />, tooltip: "Downstream" },
+        { value: "upstream", icon: <Icon name="chevron-up" />, tooltip: "Upstream" }]} />}
     onModeChange={ui.setModelMode} onRootClick={() => ui.setModelSelectionId("__root__")}
     onOpenElement={id => {
       if (elementById(id)) onOpenElement(id);

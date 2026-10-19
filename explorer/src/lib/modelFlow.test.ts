@@ -1,21 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore, ProjectStoreElement, ProjectStoreRelation } from "../store/types";
-import { buildModelFlow } from "./modelFlow";
+import { buildModelFlow, prepareModelFlow, selectModelFlow } from "./modelFlow";
 
 const element = (id: string, file = "model/A.md", type = "requirement"): ProjectStoreElement => ({
   id, name: id, file_path: file, element_type: type, type_family: type, line_number: 1,
   source_anchor: `#/content/${file}#${id}`, content: id, metadata: {}, governance: {},
 });
-const relation = (source: string, target: string, type = "derivedFrom"): ProjectStoreRelation => ({
+const relation = (source: string, target: string, type = "derive", inverse = type === "derive" ? "derivedFrom" : undefined): ProjectStoreRelation => ({
   id: `${source}-${type}-${target}`, source_id: source, target_id: target, target_kind: "element",
   relation_type: type, canonical_relation_type: type, source_relation_types: [type],
+  inverse_relation_type: inverse,
   authored: true, generated_opposite: false, resource_id: null,
 });
 const fixture: ExplorerProjectStore = { ...devFixture,
   elements: [element("a"), element("b"), element("merge", "other/B.md"), element("root", "other/B.md", "capability"), element("isolated", "separate/C.md")],
-  relations: [{ ...relation("a", "merge"), generated_opposite: true }, relation("b", "merge"), relation("merge", "root", "specify"),
-    { ...relation("a", "merge"), id: "same-canonical-edge", source_relation_types: ["derivedFrom", "derive"], generated_opposite: true }],
+  relations: [{ ...relation("merge", "a"), generated_opposite: true }, relation("merge", "b"), relation("root", "merge", "specifiedBy", "specify"),
+    { ...relation("merge", "a"), id: "same-canonical-edge", source_relation_types: ["derivedFrom", "derive"], generated_opposite: true }],
   contract_bindings: [], contract_references: [], concept_refs: [], resources: [],
 };
 
@@ -28,12 +29,18 @@ describe("Model Flow projection", () => {
     ]);
     expect(data.nodes.find(node => node.element.id === "root")?.type).toBe("capability");
     expect(data.nodes.find(node => node.element.id === "root")?.root).toBe(true);
+    const suppliedVocabulary = buildModelFlow({ ...fixture,
+      relations: [relation("root", "a", "customForward", "customInverse")],
+    }, "a", "upstream");
+    expect(suppliedVocabulary.edges).toEqual([
+      expect.objectContaining({ source: "root", target: "a", label: "customInverse", reversed: true }),
+    ]);
   });
   it("starts with capabilities and descends to requirements, verification, contracts, and evidence", () => {
     const store = { ...fixture, elements: [element("cap", "C.md", "capability"), element("child-cap", "C.md", "capability"),
       element("req"), element("child"), element("check", "V.md", "test-verification"), element("contract", "S.md", "specification")],
-      relations: [relation("child-cap", "cap"), relation("req", "child-cap", "specify"), relation("child", "req"),
-        relation("check", "child", "verify"), relation("contract", "req", "define")],
+      relations: [relation("cap", "child-cap"), relation("child-cap", "req", "specifiedBy", "specify"), relation("req", "child"),
+        relation("child", "check", "verifiedBy", "verify"), relation("req", "contract", "definedBy", "define")],
     };
     const snapshot = JSON.stringify(store);
     const data = buildModelFlow(store, "__root__");
@@ -44,14 +51,29 @@ describe("Model Flow projection", () => {
     expect(data.nodes.filter(node => node.root).map(node => node.element.id)).toEqual(["cap"]);
     expect(JSON.stringify(store)).toBe(snapshot);
   });
-  it("scopes containers to their elements and immediate endpoints, and elements to full directed paths", () => {
+  it("follows one horizon from element and page seeds, merging shared paths without adding siblings", () => {
+    const store = { ...fixture, elements: [...fixture.elements, element("shared", "other/C.md"), element("leaf", "other/D.md")],
+      relations: [...fixture.relations, relation("a", "shared"), relation("b", "shared"), relation("shared", "leaf")],
+    };
+    const snapshot = JSON.stringify(store);
+    const index = prepareModelFlow(store);
+    const ids = (selection: string, scope: "downstream" | "upstream" = "downstream") =>
+      selectModelFlow(index, selection, "Model", scope).nodes.map(node => node.element.id).sort();
     for (const selection of ["folder:model", "file:model/A.md"]) {
-      expect(buildModelFlow(fixture, selection).nodes.map(node => node.element.id).sort()).toEqual(["a", "b", "merge", "root"]);
+      expect(ids(selection)).toEqual(["a", "b", "leaf", "shared"]);
+      expect(ids(selection, "upstream")).toEqual(["a", "b", "merge", "root"]);
     }
-    expect(buildModelFlow(fixture, "a").nodes.map(node => node.element.id).sort()).toEqual(["a", "merge", "root"]);
-    expect(buildModelFlow(fixture, "merge").nodes.map(node => node.element.id).sort()).toEqual(["a", "b", "merge", "root"]);
-    expect(buildModelFlow(fixture, "isolated").nodes.map(node => node.element.id)).toEqual(["isolated"]);
-    expect(buildModelFlow(fixture, "folder:empty").nodes).toEqual([]);
+    expect(ids("a")).toEqual(["a", "leaf", "shared"]);
+    expect(ids("a", "upstream")).toEqual(["a", "merge", "root"]);
+    // Related seeds retain their edge rather than being forced into one rank.
+    expect(selectModelFlow(index, "file:other/B.md", "Model", "upstream").edges).toEqual([
+      expect.objectContaining({ source: "root", target: "merge", label: "specify", reversed: true }),
+    ]);
+    expect(ids("isolated")).toEqual(["isolated"]);
+    expect(ids("isolated", "upstream")).toEqual(["isolated"]);
+    expect(ids("folder:empty")).toEqual([]);
+    expect(ids("missing", "upstream")).toEqual([]);
+    expect(JSON.stringify(store)).toBe(snapshot);
   });
   it("preserves distinct contracts, concept references, and evidence targets", () => {
     const store: ExplorerProjectStore = { ...fixture,
@@ -60,7 +82,7 @@ describe("Model Flow projection", () => {
       contract_references: [{ id: "reference", source_id: "b", target: "contract", target_kind: "element", resource_id: null, content_hash: null }],
       concept_refs: [{ id: "concept-ref", source_id: "a", target_element_id: "concept", label: "Concept", iri: "https://example.org/concept", line_number: 1 }],
       resources: [{ id: "evidence", kind: "file", target: "code.rs", display: "code.rs", file_path: "code.rs", external_url: null, referring_element_ids: ["a"], relation_types: ["satisfiedBy"] }],
-      relations: [...fixture.relations, { ...relation("a", "code.rs", "satisfiedBy"), target_kind: "resource", resource_id: "evidence" }],
+      relations: [...fixture.relations, { ...relation("a", "code.rs", "satisfiedBy", "satisfy"), target_kind: "resource", resource_id: "evidence" }],
     };
     const data = buildModelFlow(store, "__root__");
     expect(data.edges).toEqual(expect.arrayContaining([
@@ -71,10 +93,18 @@ describe("Model Flow projection", () => {
     ]));
     expect(data.nodes.filter(node => node.element.id === "contract")).toHaveLength(1);
     expect(data.nodes.find(node => node.element.id === "evidence")?.element.href).toBe("#/resources/evidence");
+    expect(buildModelFlow(store, "evidence", "upstream").edges).toContainEqual(
+      expect.objectContaining({ source: "a", target: "evidence", label: "satisfy", reversed: true }));
+    expect(buildModelFlow(store, "contract", "upstream").edges).toContainEqual(
+      expect.objectContaining({ source: "a", target: "contract", label: "Contract binding" }));
   });
   it("traverses non-hierarchical cycles safely without changing edge direction", () => {
-    const data = buildModelFlow({ ...fixture, relations: [...fixture.relations, relation("a", "root", "trace")] }, "a");
+    const store = { ...fixture, relations: [...fixture.relations, relation("a", "root", "trace")] };
+    const data = buildModelFlow(store, "a");
     expect(data.nodes.map(node => node.element.id).sort()).toEqual(["a", "b", "merge", "root"]);
     expect(data.edges.some(edge => edge.source === "a" && edge.target === "root" && edge.label === "trace")).toBe(true);
+    const upstream = buildModelFlow(store, "a", "upstream");
+    expect(upstream.nodes.map(node => node.element.id).sort()).toEqual(["a", "merge", "root"]);
+    expect(upstream.edges).toContainEqual(expect.objectContaining({ source: "a", target: "root", label: "trace" }));
   });
 });

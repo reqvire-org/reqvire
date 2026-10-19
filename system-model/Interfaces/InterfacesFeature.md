@@ -184,6 +184,17 @@ Web requirements define concrete Explorer views, local server behavior, browser 
   * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
 ---
 
+### Explorer Directional Model Browsing
+
+As a **System Engineer**, I want to inspect either the downstream realization or upstream context of a selected model scope, so that I can understand its trace chains without mixing the two horizons.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
+---
+
 ### Explorer Selection Sharing
 
 As a **System Engineer**, I want to share a selected model context and item across Explorer views, so that collaborators can open the same selection and browser navigation can restore it.

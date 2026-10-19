@@ -338,7 +338,7 @@ describe("Explorer flow integration", () => {
     expect(viewport(region).zoom).toBe(1);
   }, 30000);
 
-  it("uses the left tree to scope Model Flow and reserves element details for canvas cards", async () => {
+  it("switches element and page horizons while preserving orientation and canvas navigation", async () => {
     window.history.replaceState(null, "", "/?tab=mocks#/model");
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("button", { name: "Flow" }));
@@ -352,7 +352,40 @@ describe("Explorer flow integration", () => {
     const flow = screen.getByRole("region", { name: "Model flow" });
     expect(within(flow).getByRole("heading", { name: "Ontology Construct Classification" })).toBeTruthy();
     await waitFor(() => expect(within(flow).queryByRole("article", { name: "Property Projection" })).toBeNull());
+    expect(within(flow).getByRole("button", { name: "Downstream" }).getAttribute("aria-pressed")).toBe("true");
+    for (const name of ["Downstream", "Upstream", "Left to right", "Top to bottom"]) {
+      const control = within(flow).getByRole("button", { name });
+      expect(control.textContent).toBe("");
+      expect(control.getAttribute("title")).toBe(name);
+      expect(control.querySelector("svg")).not.toBeNull();
+    }
+    expect(within(flow).queryByRole("article", { name: "Ontology Exploration" })).toBeNull();
+    expect(within(flow).getByRole("article", { name: "O-Kernel Ontology Classification Unit Test Verification" })).toBeTruthy();
+    fireEvent.click(within(flow).getByRole("button", { name: "Left to right" }));
+    fireEvent.click(within(flow).getByRole("button", { name: "Upstream" }));
+    await waitFor(() => expect(flow.getAttribute("aria-busy")).toBe("false"));
+    expect(within(flow).getByRole("button", { name: "Left to right" }).getAttribute("aria-pressed")).toBe("true");
     expect(within(flow).getByRole("article", { name: "Ontology Exploration" })).toBeTruthy();
+    expect(within(flow).queryByRole("article", { name: "O-Kernel Ontology Classification Unit Test Verification" })).toBeNull();
+    fireEvent.click(within(flow).getByRole("button", { name: "Top to bottom" }));
+    await waitFor(() => expect(flow.getAttribute("aria-busy")).toBe("false"));
+    const y = (name: string) => Number(/translate\([^,]+,\s*([\d.]+)px/.exec(within(flow).getByRole("article", { name }).parentElement!.getAttribute("style")!)?.[1]);
+    expect(y("Ontology Exploration")).toBeLessThan(y("SHACL and Ontology Algorithm Services"));
+    expect(y("SHACL and Ontology Algorithm Services")).toBeLessThan(y("Ontology Construct Classification"));
+    const upstreamEdge = within(flow).getByRole("group", { name: "Ontology Construct Classification derivedFrom SHACL and Ontology Algorithm Services" });
+    expect(upstreamEdge.querySelector(".react-flow__edge-path")?.getAttribute("marker-start")).toBeTruthy();
+    expect(upstreamEdge.querySelector(".react-flow__edge-path")?.getAttribute("marker-end")).toBeNull();
+    expect(within(flow).getByRole("group", { name: "SHACL and Ontology Algorithm Services specify Ontology Exploration" })).toBeTruthy();
+    fireEvent.input(filter, { target: { value: "OntologyKernelRequirements" } });
+    fireEvent.click(within(tree).getByText("OntologyKernelRequirements.md"));
+    await within(flow).findByRole("article", { name: "Property Projection" });
+    expect(within(flow).getAllByRole("article", { name: "Ontology Exploration" })).toHaveLength(1);
+    fireEvent.click(within(flow).getByRole("button", { name: "Expand flow" }));
+    const overlay = screen.getByRole("dialog", { name: "Expanded model flow" });
+    fireEvent.click(within(overlay).getByRole("button", { name: "Downstream" }));
+    await waitFor(() => expect(within(flow).queryByRole("article", { name: "Ontology Exploration" })).toBeNull());
+    expect(within(flow).getByRole("article", { name: "Ontology Projection Verification" })).toBeTruthy();
+    fireEvent.click(within(overlay).getByRole("button", { name: "Close expanded flow" }));
     fireEvent.input(filter, { target: { value: "API Exploration Capability" } });
     fireEvent.click(within(tree).getByText("API Exploration Capability"));
     expect(screen.queryByRole("dialog")).toBeNull();

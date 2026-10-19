@@ -38,6 +38,17 @@ keep application views free of compatibility wrappers for the same UI.
 - `thesaurus/` - shared concept hierarchy pane and concept map.
 - `files/`, `search/`, `resources/` - public browsing, search and resource patterns.
 
+## Model Flow
+
+Model Flow's directional browsing scope belongs to the application adapter. The
+shared `ElementFlow` pattern accepts evaluated nodes and connections plus an
+optional `controls` slot, which remains available in its expanded viewport.
+Reversed connections retain their layout topology and render an inverse label
+with an arrowhead at the path's start. The application supplies core-generated
+inverse names; patterns do not maintain a relation vocabulary. Horizon selection
+and horizontal/vertical layout are independent controls. Icon-only segments use
+`tooltip` for their native title and accessible name.
+
 ## Naming
 
 Names should be general inside their folder context. Do not repeat `Explorer`

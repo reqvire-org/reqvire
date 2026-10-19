@@ -80,6 +80,8 @@ export interface ProjectStoreRelation {
   target_kind: string;
   relation_type: string;
   canonical_relation_type: string;
+  /** Core relation vocabulary; absent in older snapshots. */
+  inverse_relation_type?: string | null;
   source_relation_types: string[];
   authored: boolean;
   generated_opposite: boolean;

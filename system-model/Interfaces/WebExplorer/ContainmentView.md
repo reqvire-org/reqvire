@@ -18,11 +18,11 @@ Four workspace modes are available:
 - **List**: Tabular folder/file/element browsing with sortable fields
 - **Grid**: Card-based folder/file/element browsing
 - **Graph**: Interactive project graph over elements, resources, relations, contract_bindings, contract_references, concept references, and trace facts
-- **Flow**: Capability-first, top-to-bottom element cards descending through requirements, verifications, and evidence, with shared element details and complete path highlighting through splits and merges
+- **Flow**: Interactive model relation cards with Downstream or Upstream browsing of a selected element, file, or folder, shared element details, and complete path highlighting through splits and merges
 
 In Flow, left-tree selection updates the relation scope displayed in the main workspace and keeps the Model route active. Activating an element card's name or body opens the shared element-detail modal. Pointer hover and keyboard focus on a card highlight its full directed paths through splits and merges.
 
-Users switch between Model modes using the shared workspace layout selector. Flow uses the same card-and-connection pattern as the native Traces flow, with horizontal/vertical layout, pan/zoom, and source navigation. The project-tree selection scopes Flow to folder/file elements and immediate relation endpoints while retaining their capability ancestry, or the complete directed paths of a selected element, as specified by the Model Browser and Graph Specification.
+Users switch between Model modes using the shared workspace layout selector. Flow uses the same card-and-connection pattern as native Traces, with horizontal/vertical layout, pan/zoom, and source navigation. Project-tree selection chooses the seed element or all elements in a selected file or folder; the active Downstream or Upstream horizon determines the displayed chains. Detailed scope and relation presentation belong to the directional model flow contract.
 
 ## Hierarchy Extraction
 
@@ -56,8 +56,7 @@ The containment hierarchy extraction must:
 - Elements preserve document order within files
 - Contract Bindings and Contract References preserve declaration order within elements
 
----
-
+***
 ## Workspace Modes
 
 ### List View
@@ -107,27 +106,25 @@ The Graph view renders the project knowledge graph inside the Model workspace.
 - Selected-node centering uses Sigma's display-coordinate mapping after focus layout updates so camera movement and focus animation converge without using raw Graphology coordinates as camera state
 - Graph labels, hover tooltips, and focused-neighborhood highlighting follow the shared Knowledge Graph behavior
 
----
-
+***
 ### Flow View
 
 **Structure:**
 - The project overview starts with root capabilities and follows child capabilities, requirements, verification, and evidence.
 - Cards place the element name beside its type glyph and show context below the name.
-- Shared endpoints appear once, with their incoming and outgoing relation labels and arrow directions preserved.
+- Shared endpoints appear once. Downstream uses canonical relation labels and arrows; Upstream uses the inverse labels supplied by core and arrows toward ancestors when a declared inverse exists. Connections without an inverse retain their original presentation.
 
 **Interactive Capabilities:**
 - Selecting a folder, file, or element in the left tree renders its relation scope in the right workspace; tree selection and element inspection are separate actions.
 - Clicking a card name or body opens the shared element-detail modal. Closing it returns to the same Flow context.
 - Hovering or keyboard-focusing a card accents the complete visible paths into and out of that element, including every split and merge, and fades unrelated paths. Related lines and arrowheads change together.
 - Moving the pointer away clears temporary highlighting. Focus path pins the highlight until cleared. These interactions preserve card positions and the viewport.
-- The direction control switches between Top to bottom and Left to right while retaining relation direction. Pan, zoom, Fit, and actual-size controls support navigation.
+- The independent layout control switches between Top to bottom and Left to right, while the horizon control chooses Downstream or Upstream chains. These icon-only controls expose text tooltips and accessible names. Pan, zoom, Fit, and actual-size controls support navigation.
 - Initial framing and Fit include the full layout of cards, connections, and labels. The minimum zoom adapts to layout and canvas size so large flows fit; users can zoom farther out or return to 100%. Scope, direction, and canvas resizing refresh framing.
 - Expand flow opens a full-page overlay with the same scope, direction, and path focus. Close or Escape returns to the embedded view and its expand control. Element details open above the expanded canvas and return to it when closed.
 - Source and focus controls perform their respective actions independently of opening element details.
 
----
-
+***
 ## Visual Semantics
 
 All Model route visualizations use the Explorer design-system semantic palette.
@@ -146,8 +143,7 @@ All Model route visualizations use the Explorer design-system semantic palette.
 
 The concrete color values are owned by the Explorer design-system tokens. This design document names roles and usage only.
 
----
-
+***
 ## Model Mode Controls
 
 The Model route includes compact mode controls in the shared workspace toolbar:
@@ -169,8 +165,7 @@ The Model route includes compact mode controls in the shared workspace toolbar:
 - Model mode changes are handled by React Explorer UI state inside the canonical `index.html#/model` route, with no separate containment route.
 - The route uses the shared headerless Explorer shell with vertical `Explorer` edge strip, left-pane project tree, workspace mode controls, selected-item modal detail, and right tool rail.
 
----
-
+***
 ## JSON Data Format
 
 The following illustrative hierarchy shows a requirement binding to a compatible specification owned by another requirement. It illustrates dependency display rather than the complete normalized Project Store schema; resource records and Contract References remain separate collections.
@@ -224,8 +219,7 @@ The following illustrative hierarchy shows a requirement binding to a compatible
 **Contract Bindings Node Types:**
 - `contract-bindings-element`: Compatible, independently owned contract element bound by a requirement (navigable to its definition)
 
----
-
+***
 ## Explorer Data Integration
 
 The Model workspace consumes Project Store records directly:
@@ -236,8 +230,7 @@ The Model workspace consumes Project Store records directly:
 3. The compiled Explorer bundle renders List, Grid, Graph, and Flow modes from the shared Project Store
 4. The served Explorer shall not depend on route-local Markdown code blocks or CDN-loaded visualization scripts for native Model modes
 
----
-
+***
 ## Explorer Integration
 
 Explorer integration must:

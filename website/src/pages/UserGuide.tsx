@@ -318,6 +318,16 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           explorer output.
         </p>
         <p className="text-zinc-600 mb-4">
+          Model Flow supports directional model browsing. Select an element,
+          file, or folder, then use Downstream to follow its realization chains
+          or Upstream to inspect its ancestors. Page selections merge the chains
+          of their elements and show shared nodes once. Upstream uses the
+          model's inverse relation names and arrows toward ancestors. The
+          separate layout control chooses horizontal or vertical placement;
+          hover either icon group for its text tooltips. Both horizons are
+          available in served and exported Explorer.
+        </p>
+        <p className="text-zinc-600 mb-4">
           In Traces, select a verification to open its interactive flow from
           directly verified requirements through their ancestors and owning
           capabilities. Switch between left-to-right and top-to-bottom layouts,

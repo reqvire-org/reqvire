@@ -1,3 +1,4 @@
+import type { ComponentChildren } from "preact";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import { css, cx } from "@linaria/atomic";
 import {
@@ -27,6 +28,7 @@ export interface TraceFlowProps {
 
 export interface ElementFlowProps {
   data: ElementFlowData;
+  controls?: ComponentChildren;
   layoutEngine: FlowLayoutEngine;
   onOpenElement: TraceFlowProps["onOpenElement"];
   onOpenSource: TraceFlowProps["onOpenSource"];
@@ -226,10 +228,10 @@ type FlowNodeData = Record<string, unknown> & {
 type FlowNode = Node<FlowNodeData>;
 type FlowEdge = Edge<{ path: string; labelPosition: { x: number; y: number } }>;
 
-function TraceEdge({ id, data, label, markerEnd }: EdgeProps<FlowEdge>) {
+function TraceEdge({ id, data, label, markerStart, markerEnd }: EdgeProps<FlowEdge>) {
   if (!data) return null;
   return <>
-    <BaseEdge id={id} path={data.path} markerEnd={markerEnd} />
+    <BaseEdge id={id} path={data.path} markerStart={markerStart} markerEnd={markerEnd} />
     {/* Anchor text directly in graph coordinates. Cached getBBox measurements at tiny
         overview scales can produce oversized background rectangles after zooming. */}
     <text className="react-flow__edge-text ux-trace-edge-label"
@@ -303,11 +305,12 @@ export function ElementFlow({ data, ...navigation }: ElementFlowProps) {
     summary={`${data.nodes.length} elements · ${data.edges.length} relations`} />;
 }
 
-function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, onToggle, onExpandAll, onOpenElement, onOpenSource }: {
+function FlowCanvas({ layoutEngine, topology, title, summary, kind, controls, collapsed, onToggle, onExpandAll, onOpenElement, onOpenSource }: {
   topology: TraceFlowTopology;
   title: string;
   summary: string;
   kind: "trace" | "model";
+  controls?: ComponentChildren;
   collapsed?: ReadonlySet<string>;
   onToggle?: (id: string) => void;
   onExpandAll?: () => void;
@@ -395,14 +398,21 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
       onToggle: () => onToggle?.(node.id),
     },
   })), [graph, direction, collapsed, onOpenElement, onOpenSource, focusedId, neighborhood, onToggle]);
-  const edges: FlowEdge[] = (graph?.edges ?? []).map(edge => ({ id: edge.id, source: edge.source, target: edge.target, label: edge.label, type: "trace",
-    // SVG attributes are case-sensitive; ReactFlow emits React's tabIndex prop.
-    domAttributes: { tabindex: 0 },
-    className: neighborhood ? neighborhood.edgeIds.has(edge.id) ? "ux-trace-edge-highlighted" : "ux-trace-edge-dimmed" : undefined,
-    data: { path: edge.path, labelPosition: edge.labelPosition },
-    markerEnd: { type: MarkerType.ArrowClosed, color: neighborhood?.edgeIds.has(edge.id) ? "var(--accent)" : "var(--color-role-edge-trace)" },
-    ariaLabel: `${nodeById.get(edge.source)?.element.name} ${edge.label} ${nodeById.get(edge.target)?.element.name}`,
-  }));
+  const edges: FlowEdge[] = (graph?.edges ?? []).map(edge => {
+    const marker = { type: MarkerType.ArrowClosed, color: neighborhood?.edgeIds.has(edge.id) ? "var(--accent)" : "var(--color-role-edge-trace)" };
+    const source = nodeById.get(edge.reversed ? edge.target : edge.source);
+    const target = nodeById.get(edge.reversed ? edge.source : edge.target);
+    return {
+      id: edge.id, source: edge.source, target: edge.target, label: edge.label, type: "trace",
+      // SVG attributes are case-sensitive; ReactFlow emits React's tabIndex prop.
+      domAttributes: { tabindex: 0 },
+      className: neighborhood ? neighborhood.edgeIds.has(edge.id) ? "ux-trace-edge-highlighted" : "ux-trace-edge-dimmed" : undefined,
+      data: { path: edge.path, labelPosition: edge.labelPosition },
+      markerStart: edge.reversed ? marker : undefined,
+      markerEnd: edge.reversed ? undefined : marker,
+      ariaLabel: `${source?.element.name} ${edge.label} ${target?.element.name}`,
+    };
+  });
   return <ExpandableViewport expanded={expanded} onExpandedChange={setExpanded}
     label={kind === "trace" ? "Expanded verification trace flow" : "Expanded model flow"}>
     <section className={cx(baseUX, skinX)} data-product-pattern="trace-flow" aria-label={kind === "trace" ? "Verification trace flow" : "Model flow"} aria-busy={busy}
@@ -418,8 +428,10 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, collapsed, o
         </div>}
       </div>
       <div className="ux-trace-flow-tools" role="group" aria-label={kind === "trace" ? "Trace navigation" : "Flow navigation"}>
+        {controls}
         <SegmentedControl ariaLabel="Flow direction" value={direction} onChange={setDirection} items={[
-          { value: "RIGHT", label: "Left to right" }, { value: "DOWN", label: "Top to bottom" },
+          { value: "RIGHT", icon: <Icon name="arrow-right" />, tooltip: "Left to right" },
+          { value: "DOWN", icon: <Icon name="arrow-down" />, tooltip: "Top to bottom" },
         ]} />
         {Boolean(collapsed?.size) && <Button tone="ghost" size="sm" onClick={onExpandAll}>Expand all</Button>}
         <IconButton aria-label="Zoom out" title="Zoom out" disabled={!flow} onClick={() => void flow?.zoomOut()}><Icon name="minus" /></IconButton>

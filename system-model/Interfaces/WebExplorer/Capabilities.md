@@ -51,10 +51,10 @@ Selection SHALL resolve the branch to an existing or newly created isolated work
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
   * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
   * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * [Explorer Worktree HEAD Refresh Specification](HeadRefresh.md#explorer-worktree-head-refresh-specification)
   * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)
   * [Explorer Worktree Runtime Isolation Specification](Specifications.md#explorer-worktree-runtime-isolation-specification)
-  * [Explorer Worktree HEAD Refresh Specification](HeadRefresh.md#explorer-worktree-head-refresh-specification)
 
 #### Relations
   * definedBy: [Explorer Worktree Selection Specification](Specifications.md#explorer-worktree-selection-specification)
@@ -300,7 +300,7 @@ The system SHALL restore valid selections through copied links, reload and brows
 The system shall render a model-centric Explorer visualization showing model roots with nested relations containing full element details.
 
 #### Details
-The Model workspace provides List, Grid, Graph, and Flow modes. Flow starts with root capabilities and descends through child capabilities, requirements, verification, and evidence as interactive element cards, with shared element details and complete path highlighting. Scope, navigation, and presentation follow the associated contract specifications.
+The Model workspace provides List, Grid, Graph, and Flow modes. Flow provides a capability-rooted overview and directional browsing of selected element, file, or folder scopes as interactive cards, with shared element details and complete path highlighting. Scope, navigation, and presentation follow the associated contract specifications.
 
 #### Metadata
   * type: requirement
@@ -312,6 +312,22 @@ The Model workspace provides List, Grid, Graph, and Flow modes. Flow starts with
   * satisfiedBy: [store.rs](../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
+---
+
+### Explorer Directional Model Flow
+
+When a user selects a modeled element, file, or folder in Model Flow, the system SHALL let the user inspect its downstream or upstream relation chains as a shared directed graph.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/patterns/reports/TraceFlow.tsx)
+  * satisfiedBy: [traceFlowLayout.ts](../../../explorer/design-system/patterns/reports/traceFlowLayout.ts)
+  * satisfiedBy: [modelFlow.ts](../../../explorer/src/lib/modelFlow.ts)
+  * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
+  * specify: [Explorer Directional Model Browsing](../InterfacesFeature.md#explorer-directional-model-browsing)
 ---
 
 ### Model Selection Sharing

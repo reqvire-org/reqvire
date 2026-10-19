@@ -110,6 +110,7 @@ pub struct ProjectStoreRelation {
     pub target_kind: String,
     pub relation_type: String,
     pub canonical_relation_type: String,
+    pub inverse_relation_type: Option<&'static str>,
     pub source_relation_types: Vec<String>,
     pub authored: bool,
     pub generated_opposite: bool,
@@ -1134,6 +1135,9 @@ fn build_relations(
             target_id: relation.target_id,
             target_kind: relation.target_kind,
             relation_type: relation.canonical_relation_type.clone(),
+            inverse_relation_type: relation::RELATION_TYPES
+                .get(relation.canonical_relation_type.as_str())
+                .and_then(|info| info.opposite),
             canonical_relation_type: relation.canonical_relation_type,
             source_relation_types: relation.source_relation_types.into_iter().collect(),
             authored: relation.authored,
@@ -1777,7 +1781,18 @@ ext:UnusedTerm a owl:Class ;
             .expect("element should register");
 
         let elements = build_elements(&registry);
-        let (_relations, mut resources) = build_relations(&registry);
+        let (relations, mut resources) = build_relations(&registry);
+        let evidence = relations
+            .iter()
+            .find(|relation| relation.canonical_relation_type == "satisfiedBy")
+            .expect("evidence relation should be exported");
+        assert_eq!(evidence.inverse_relation_type, Some("satisfy"));
+        let hierarchy = relations
+            .iter()
+            .find(|relation| relation.canonical_relation_type == "derive")
+            .expect("hierarchy should use the core traversal direction");
+        assert_eq!(hierarchy.inverse_relation_type, Some("derivedFrom"));
+        assert_eq!(hierarchy.target_id, "system-model/API.md#api-requirement");
         enrich_resource_sources(&mut resources);
         let (files, _folders) = build_files_and_folders(&registry, &resources);
         let search = build_search_documents(

@@ -609,29 +609,10 @@ export function relationFlowFromSelectedElement(
 
 function selectedTargetRelationLabel(relation: ProjectStoreRelation): string {
   return (
+    relation.inverse_relation_type ??
     relation.source_relation_types.find((type) => type !== relation.canonical_relation_type) ??
-    inverseRelationLabel(relation.relation_type || relation.canonical_relation_type)
+    (relation.relation_type || relation.canonical_relation_type)
   );
-}
-
-function inverseRelationLabel(relationType: string): string {
-  const inverse: Record<string, string> = {
-    constrain: "constrainedBy",
-    constrainedBy: "constrain",
-    define: "definedBy",
-    definedBy: "define",
-    derive: "derivedFrom",
-    derivedFrom: "derive",
-    satisfy: "satisfiedBy",
-    satisfiedBy: "satisfy",
-    specify: "specifiedBy",
-    specifiedBy: "specify",
-    use: "usedBy",
-    usedBy: "use",
-    verify: "verifiedBy",
-    verifiedBy: "verify",
-  };
-  return inverse[relationType] ?? relationType;
 }
 
 function relationSourceEndpoint(

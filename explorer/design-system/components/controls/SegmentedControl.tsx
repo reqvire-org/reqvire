@@ -65,6 +65,7 @@ export interface SegmentedControlItem<T extends string> {
   value: T;
   label?: ComponentChildren;
   icon?: ComponentChildren;
+  tooltip?: string;
 }
 
 export interface SegmentedControlProps<T extends string> {
@@ -91,6 +92,8 @@ export function SegmentedControl<T extends string>({
             key={item.value}
             type="button"
             aria-pressed={active}
+            aria-label={item.label ? undefined : item.tooltip}
+            title={item.tooltip}
             className={cx("ds-segmented__item", itemBaseUX, active && "is-active")}
             onClick={() => onChange(item.value)}
           >

@@ -226,10 +226,10 @@ Verify the Model Flow mode through the same application and design-system patter
 #### Details
 - Select Flow from the existing Model layout selector, switch between all four modes, and retain the selected folder, file, or element.
 - Select an element and a capability in the left project tree while Flow is active: the right workspace updates to that selection's relation scope and retains the Model route. The detail dialog opens only after activating a Flow card name or body, independently of tree selection.
-- At the project root, assert that Flow starts with root capabilities above their child capabilities and specifying requirements, then descends through requirement decomposition to verification and evidence. Switch to horizontal layout and retain that ordering. Assert corresponding inverse labels for the displayed direction and unchanged canonical store facts; Traces keep their verification-to-ancestor direction.
-- Compare Flow nodes and labelled directed connections with the Project Store, including different element types, evidence endpoints, contract bindings and references, and generated inverse relations. Shared endpoints appear once; different relations between the same endpoints remain distinct.
-- Select a file or folder and assert that its elements and their immediate relation endpoints remain reachable, together with requirement and capability ancestry back to the owning root capabilities. Select an element and assert its full incoming and outgoing paths across repeated splits and merges. Include an isolated element, an empty folder, and a cyclic non-hierarchical relation graph.
-- Switch between horizontal and vertical layout and exercise path focus and clearing. Hover or keyboard-focus a card and inspect full-path highlighting through splits and merges, accent lines and arrowheads, faded unrelated connections, and unchanged card positions.
+- At the project root, assert the capability-rooted downstream overview and the absence of a scoped horizon selector. Switch to horizontal layout and retain that ordering. Confirm core canonical endpoints remain unchanged and Traces retain their separate verification-to-ancestor direction.
+- Compare Flow nodes and directed connections with canonical Project Store facts, including element types, evidence, contract dependencies, concept references, and deduplicated generated opposites. Supply an unfamiliar forward/inverse name pair in the projection fixture and require the supplied inverse label rather than a frontend vocabulary lookup.
+- For element and file/folder selections, assert Downstream by default, then Upstream membership. Follow complete paths in one direction, exclude sibling-only branches, deduplicate shared ancestors and descendants, retain edges between related page seeds, and cover isolated elements, empty or missing scopes, and cyclic connections. Repeated horizon switches reuse the same prepared topology without rereading relation inputs.
+- Confirm icon-only horizon and layout controls have matching text tooltips and accessible names, visible active selection, and independent state. Upstream displays core-declared inverse names and arrowheads toward ancestors while leaving the selected element below them in vertical layout. Connections without an inverse retain their direction. Changing horizon does not change layout orientation; expanded Flow exposes the same horizon controls. Exercise focus and clearing, full-path highlighting, and unchanged positions during viewport interactions.
 - Click a card body and name to open the existing element-detail modal, inspect metadata and incoming/outgoing relations, navigate a related element, go back, and close to the same Flow workspace. Source and focus controls perform their own actions.
 - Confirm React Flow's rendered node wrapper and card accept pointer input while node dragging and selection are disabled. Check pointer eligibility before dispatching card and hover interactions so synthetic events cannot mask a browser hit-testing failure.
 - Render a large Model Flow requiring less than 20% zoom on desktop and narrow canvases. Assert that initial framing and Fit keep all cards inside the canvas in both directions, manual zoom-out remains available, and Fit restores the overview after 100%. Resize the canvas and select a small scope to check updated framing and the 100% fitting cap. Confirm complete layout bounds include connection routes and relation labels.
@@ -247,11 +247,12 @@ Verify the Model Flow mode through the same application and design-system patter
   * satisfiedBy: [TraceFlow.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.ads.test.ts)
   * satisfiedBy: [traceFlowLayoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.ads.test.ts)
   * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
+  * satisfiedBy: [StoreContext.test.tsx](../../../../explorer/src/store/StoreContext.test.tsx)
   * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
   * satisfiedBy: [flowLayoutEngine.test.ts](../../../../explorer/src/workers/flowLayoutEngine.test.ts)
   * satisfiedBy: [check-flow-worker.mjs](../../../../tests/test-export-command/check-flow-worker.mjs)
   * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
-  * verify: [Model-Centric View Generation](../../../Interfaces/WebExplorer/Capabilities.md#model-centric-view-generation)
+  * verify: [Explorer Directional Model Flow](../../../Interfaces/WebExplorer/Capabilities.md#explorer-directional-model-flow)
   * verify: [Model View Element Navigation](../../../Interfaces/WebExplorer/Capabilities.md#model-view-element-navigation)
 ---
 
@@ -484,6 +485,29 @@ Acceptance checks:
   * verify: [Trace Selection Sharing](../../../Interfaces/WebExplorer/Capabilities.md#trace-selection-sharing)
 ---
 
+### Explorer Worktree HEAD Refresh Verification
+
+Verify HEAD-default selection and explicit refresh against the real served Explorer and the shared MCP operation.
+
+#### Details
+- Reuse one embedded server and its two loaded browser-selection contexts for backend context isolation and browser refresh checks. Preserve the same context IDs between checks; do not create another server/model solely for the isolation variation.
+- Serve a mutation-enabled context and discover an accessible `Refresh HEAD` control. Commit an implementation edit outside MCP, invoke the button and assert the browser calls `reqvire.worktree.refresh_head` with the displayed model's exact branch and no ID argument. Adopt the complete matching Git/artifact publication with unchanged model semantics, private runtime identity and branch URL. Assert public load/manifest/chunk/source/asset routes use the exact branch, survive restart under normal admission, reject obsolete ID inputs, and preserve another tab's selection. Use slash/Unicode/plus/percent branch names in existing shared contexts.
+- Advance an already admitted secondary branch before selecting it. Selection in default HEAD mode adopts its eligible tip through the same operation without silently replacing the worker or requiring a preliminary button click. First admission still uses the current clean branch tip and full model validation.
+- Commit a protected model edit while selected and invoke Refresh. Require the affected path and blocked/stale explanation, retain the exact accepted model/publication and selection, identify accepted versus observed commits, and keep ordinary writes disabled without disconnecting MCP.
+- Hold a HEAD-refresh response, switch to another context and produce a newer blocked diagnostic. Late completion cannot replace that view or clear its diagnostic. Existing runtime publication tests cover the normal loading/publication failure behavior. Plain/read-only selection retains its existing source-refresh rules; static exports retain a fixed snapshot.
+- The executable browser case and MCP cases must fail against an implementation without the command/control. Missing controls, unavailable tools and protocol errors are failures, not successful protection checks. Fault-injection and read-only/static compatibility retain their existing owning coverage and require focused extensions where the implementation changes those paths.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
+  * satisfiedBy: [browser-refresh.mjs](../../../../tests/test-mcp-head-refresh/browser-refresh.mjs)
+  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
+  * verify: [Explorer Worktree HEAD Refresh](../../../Interfaces/WebExplorer/HeadRefresh.md#explorer-worktree-head-refresh)
+---
+
 ### Explorer Worktree Runtime Isolation Verification
 
 Verify that the served Explorer runtime fulfills its shared context-isolation and live-store implementation obligations.
@@ -510,29 +534,6 @@ Acceptance checks:
   * satisfiedBy: [App.test.tsx](../../../../explorer/src/App.test.tsx)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
   * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
----
-
-### Explorer Worktree HEAD Refresh Verification
-
-Verify HEAD-default selection and explicit refresh against the real served Explorer and the shared MCP operation.
-
-#### Details
-- Reuse one embedded server and its two loaded browser-selection contexts for backend context isolation and browser refresh checks. Preserve the same context IDs between checks; do not create another server/model solely for the isolation variation.
-- Serve a mutation-enabled context and discover an accessible `Refresh HEAD` control. Commit an implementation edit outside MCP, invoke the button and assert the browser calls `reqvire.worktree.refresh_head` with the displayed model's exact branch and no ID argument. Adopt the complete matching Git/artifact publication with unchanged model semantics, private runtime identity and branch URL. Assert public load/manifest/chunk/source/asset routes use the exact branch, survive restart under normal admission, reject obsolete ID inputs, and preserve another tab's selection. Use slash/Unicode/plus/percent branch names in existing shared contexts.
-- Advance an already admitted secondary branch before selecting it. Selection in default HEAD mode adopts its eligible tip through the same operation without silently replacing the worker or requiring a preliminary button click. First admission still uses the current clean branch tip and full model validation.
-- Commit a protected model edit while selected and invoke Refresh. Require the affected path and blocked/stale explanation, retain the exact accepted model/publication and selection, identify accepted versus observed commits, and keep ordinary writes disabled without disconnecting MCP.
-- Hold a HEAD-refresh response, switch to another context and produce a newer blocked diagnostic. Late completion cannot replace that view or clear its diagnostic. Existing runtime publication tests cover the normal loading/publication failure behavior. Plain/read-only selection retains its existing source-refresh rules; static exports retain a fixed snapshot.
-- The executable browser case and MCP cases must fail against an implementation without the command/control. Missing controls, unavailable tools and protocol errors are failures, not successful protection checks. Fault-injection and read-only/static compatibility retain their existing owning coverage and require focused extensions where the implementation changes those paths.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
-  * satisfiedBy: [browser-refresh.mjs](../../../../tests/test-mcp-head-refresh/browser-refresh.mjs)
-  * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
-  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
-  * verify: [Explorer Worktree HEAD Refresh](../../../Interfaces/WebExplorer/HeadRefresh.md#explorer-worktree-head-refresh)
 ---
 
 ### Explorer Worktree Selection Verification
@@ -744,6 +745,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 - Run the Explorer component/unit tests that cover element-detail modal back context rendering, inline native concept-reference modal routing, alternative-label concept-reference matching, hidden authored concept-reference subsection rendering, and exclusion of self-referential concept relation rows from the modal.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
+- Assert generated relation records expose canonical endpoints and core-supplied `inverse_relation_type`. In the served/exported seed, evidence relations expose `satisfy` as the inverse of `satisfiedBy`, including file targets without generated opposite provenance. The Rust store test also checks canonical hierarchy direction and its inverse vocabulary.
 - Assert the `project` section exposes effective workspace identity and available Git worktree metadata when running with source-control metadata, and that Explorer tree roots render top-level `Model` and `Resources` branches with Git worktree identity grouping folders.
 - Assert at least one Markdown source path appears in `files`.
 - Assert at least one implementation or evidence path referenced by `satisfiedBy` or contract_bindings appears in `resources`.
@@ -773,6 +775,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [store.rs](../../../../crates/reqvire-core/src/html/store.rs)
   * satisfiedBy: [forceAtlasLayout.test.ts](../../../../explorer/src/lib/forceAtlasLayout.test.ts)
   * satisfiedBy: [loadStore.test.ts](../../../../explorer/src/store/loadStore.test.ts)
   * satisfiedBy: [useLiveStore.test.ts](../../../../explorer/src/store/useLiveStore.test.ts)
@@ -781,6 +784,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * satisfiedBy: [forceAtlasLayoutEngine.test.ts](../../../../explorer/src/workers/forceAtlasLayoutEngine.test.ts)
   * satisfiedBy: [test.sh](../../../../tests/test-explorer-build/test.sh)
   * satisfiedBy: [check-forceatlas-worker.mjs](../../../../tests/test-export-command/check-forceatlas-worker.mjs)
+  * satisfiedBy: [check-store.py](../../../../tests/test-serve-command/scripts/check-store.py)
   * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---

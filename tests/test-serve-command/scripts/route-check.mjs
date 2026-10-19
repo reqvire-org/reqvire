@@ -103,7 +103,7 @@ await withBrowser(profile, async ({ evaluate, navigate: navigatePage, rpc }) => 
     await navigate("#/content/specifications/broken%ZZ.md");
     return evaluate(() => document.body.textContent.includes("File not found: specifications/broken%ZZ.md"));
   });
-  await run("Model Flow packaged worker", async () => {
+  await run("Model Flow horizons and packaged worker", async () => {
     await navigate("#/model");
     await evaluate(() => {
       const button = [...document.querySelectorAll('[aria-label="Model layout"] button')]
@@ -119,14 +119,59 @@ await withBrowser(profile, async ({ evaluate, navigate: navigatePage, rpc }) => 
     await waitFor(ready);
     const original = await evaluate(() => [...document.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort());
     await evaluate(() => [...document.querySelectorAll('[aria-label="Flow direction"] button')]
-      .find(button => button.textContent === "Left to right").click());
+      .find(button => button.getAttribute("aria-label") === "Left to right").click());
     await waitFor(ready);
-    return evaluate(original => {
+    if (!await evaluate(original => {
       const ids = [...document.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort();
       const workers = performance.getEntriesByType("resource").filter(entry => entry.name.includes("flowLayout.worker-"));
       return JSON.stringify(ids) === JSON.stringify(original) && workers.length > 0
         && workers.every(entry => new URL(entry.name).origin === location.origin);
-    }, original);
+    }, original)) return false;
+
+    const requirement = "specifications/Requirements.md#test-requirement-one";
+    const parent = "specifications/Requirements.md#parent-requirement";
+    const sibling = "specifications/Requirements.md#test-requirement-two";
+    const verification = "specifications/Verifications/Tests.md#test-verification-one";
+    const select = selection => evaluate(selection => {
+      location.hash = `#/model?selected=${encodeURIComponent(selection)}&mode=flow`;
+    }, selection);
+    const members = () => evaluate(() => [...document.querySelectorAll('.react-flow__node')].map(node => node.dataset.id));
+    const scope = label => evaluate(label => document.querySelector(`[aria-label="Flow scope"] button[aria-label="${label}"]`).click(), label);
+    await select(requirement);
+    await waitFor(async () => {
+      const ids = await members();
+      return await ready() && ids.includes(requirement) && ids.includes(verification) && !ids.includes(parent) && !ids.includes(sibling);
+    });
+    if (!await evaluate(() => [...document.querySelectorAll('[aria-label="Flow scope"] button, [aria-label="Flow direction"] button')]
+      .every(button => !button.textContent.trim() && button.title === button.getAttribute("aria-label")))) return false;
+    await scope("Upstream");
+    await waitFor(async () => {
+      const ids = await members();
+      return await ready() && ids.includes(parent) && !ids.includes(verification) && !ids.includes(sibling);
+    });
+    if (!await evaluate(() => [...document.querySelectorAll('.react-flow__edge')].every(edge => {
+      const [source, target, type] = JSON.parse(edge.dataset.id);
+      const fact = window.reqvireProjectStore.relations.find(relation => relation.source_id === source && relation.target_id === target && relation.canonical_relation_type === type);
+      const path = edge.querySelector('.react-flow__edge-path');
+      return fact?.inverse_relation_type && edge.querySelector('text')?.textContent === fact.inverse_relation_type
+        && path?.getAttribute('marker-start') && !path.getAttribute('marker-end');
+    }))) return false;
+    await select("file:specifications/Requirements.md");
+    await waitFor(async () => {
+      const ids = await members();
+      return await ready() && ids.includes(sibling) && ids.includes(parent) && !ids.includes(verification);
+    });
+    await scope("Downstream");
+    await waitFor(async () => {
+      const ids = await members();
+      return await ready() && ids.includes(sibling) && ids.includes(verification)
+        && !ids.includes("specifications/Capabilities.md#test-capability");
+    });
+    return evaluate(() => {
+      const ids = [...document.querySelectorAll('.react-flow__node')].map(node => node.dataset.id);
+      return new Set(ids).size === ids.length
+        && document.querySelector('[aria-label="Flow direction"] button[aria-label="Left to right"]')?.getAttribute('aria-pressed') === 'true';
+    });
   });
   for (const kind of ["Model Graph", "Ontologies"]) {
     await run(`${kind} packaged ForceAtlas worker`, async () => {

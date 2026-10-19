@@ -25,12 +25,13 @@ export interface ElementFlowData {
   id: string;
   title: string;
   nodes: readonly { element: TraceFlowElement; type: string; context: string; root?: boolean }[];
-  edges: readonly { id: string; source: string; target: string; label: string }[];
+  edges: readonly { id: string; source: string; target: string; label: string; reversed?: boolean }[];
 }
 
 export interface TraceFlowTopology {
   nodes: { id: string; element: TraceFlowElement; type: string; context: string; parentCount: number; root?: boolean }[];
-  edges: { id: string; source: string; target: string; label: string }[];
+  /** Reversed arrows follow the inverse relation while retaining the layout direction. */
+  edges: { id: string; source: string; target: string; label: string; reversed?: boolean }[];
   totalCount: number;
   directCount?: number;
 }

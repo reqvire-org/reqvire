@@ -216,6 +216,7 @@ describe("derived store inputs", () => {
         expect(selected.nodes.some(node => node.element.id === selection)).toBe(true);
       }
     }
+    modelFlow.selectModelFlow(index, initial.elements[0].id, initial.project.root_label, "upstream");
     expect(relationReads).toBe(preparedReads);
     expect(prepare).toHaveBeenCalledTimes(1);
     update({ ...initial, project: { ...initial.project, root_label: "Renamed workspace" },
