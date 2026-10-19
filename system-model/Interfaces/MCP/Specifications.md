@@ -978,6 +978,7 @@ Read-only cache rules (mutation mode instead follows the ownership and accepted-
 - Read-only mode reports dirty state without blocking compatible read operations. Mutation-enabled startup requires a clean worktree.
 
 Git observation reuse:
+- Observational Git commands preserve the index even when cached file stats are stale. Status reads disable optional index refreshes while retaining current HEAD and dirty-state detection.
 - A request may reuse a typed Git observation for checks and response metadata that describe the same observation point. Observations MUST NOT be cached across requests or reused across model loading, mutation preparation, persistence, commit, or remote publication boundaries that require a fresh check.
 - Checkout observations before and after read-only context loading remain distinct, with branch identity checked at both points. Current HEAD follows the existing read-only freshness rules. The final observation may also supply response metadata; runtime branch labels use the admitted context identity rather than triggering another status scan.
 - Mutation status distinguishes accepted branch/HEAD/model identity from live physical dirty state. Combining Git observations MUST preserve detached/unborn handling, staged/unstaged/untracked dirty detection, unavailable metadata, recovery diagnostics, and rejection of unexpected checkout changes. Existing core-cache freshness checks and expected-HEAD publication checks remain authoritative.

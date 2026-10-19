@@ -288,6 +288,7 @@ fn git_output_in_dir<const N: usize>(
     args: [&str; N],
 ) -> Option<String> {
     let output = Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
         .args(args)
         .current_dir(directory)
         .output()

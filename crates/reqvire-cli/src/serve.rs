@@ -1163,13 +1163,17 @@ mod tests {
         std::fs::write(root.join("evidence.txt"), "original evidence").unwrap();
         git(&["add", "."]);
         git(&["commit", "-qm", "baseline"]);
-        let executable = std::env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX));
+        let executable = std::env::var_os("REQVIRE_TEST_BIN")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|| {
+                std::env::current_exe()
+                    .expect("test executable")
+                    .parent()
+                    .expect("deps directory")
+                    .parent()
+                    .expect("target directory")
+                    .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
+            });
         let manager = crate::mcp_worktrees::Worktrees::start(
             root,
             &executable,

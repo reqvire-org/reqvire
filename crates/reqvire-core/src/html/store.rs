@@ -381,6 +381,7 @@ fn project_store_git_worktrees() -> Vec<ProjectStoreGitWorktree> {
 
 fn git_output_in_dir<const N: usize>(dir: &Path, args: [&str; N]) -> Option<String> {
     let output = std::process::Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
         .current_dir(dir)
         .args(args)
         .output()

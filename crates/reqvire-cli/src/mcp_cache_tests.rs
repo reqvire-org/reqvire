@@ -349,6 +349,11 @@ case!(read_only_aggregate_workspace_keeps_model_reads_available, {
     std::fs::create_dir("nested").expect("aggregate child directory");
     std::fs::rename(".git", "nested/.git").expect("move child repository");
     std::fs::rename("Model.md", "nested/Model.md").expect("move child model");
+    // Stale stat data must not turn a read-only status lookup into an index write.
+    std::fs::File::open("nested/Model.md")
+        .expect("child model")
+        .set_modified(std::time::UNIX_EPOCH + Duration::from_secs(1))
+        .expect("make cached index stat stale without changing content");
     let index = std::fs::read("nested/.git/index").expect("child index");
     let server = read_only_server();
     let search = server
