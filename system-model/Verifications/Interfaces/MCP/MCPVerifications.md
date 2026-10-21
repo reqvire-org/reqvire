@@ -957,10 +957,12 @@ Verify the successful and rejected paths of mcp pull request creation.
 Verify the owning-repository save and publication boundaries for one combined Repo model.
 
 #### Details
-- The explicit and automatic component-commit cases add a component model file, require its exact golden bytes in the component commit, preserve the selected component parent, and forbid tracking component files in Central. The final Central commit's manifest pins that component commit, pending state clears only after that checkpoint, and a repeated no-op creates no further commit. Default acceptance before explicit commit leaves all indexes and HEADs unchanged.
+- The existing explicit and automatic commit cases declare three component repositories. One shared-contract rename changes Central and references in two components in the same mutation. Require exact golden source bytes in all three changed Git histories, one commit per changed repository parented by its accepted base, and a final Central manifest pinning every component's exact resulting SHA. Preserve relative contract-reference paths even when the source documents have the same filename. Central cannot track component files.
+- Require the third component's files, index, refs and HEAD to remain identical throughout both save policies. Default acceptance before explicit commit leaves every owned index and HEAD unchanged. Pending paths clear only after the Central checkpoint; a fresh CLI read of that saved manifest returns the complete combined model.
+- Retain the new-component-file save check in the same session after the shared rename. Require its owning component and Central to receive the next commits, pin every component correctly, leave the other component HEADs unchanged and preserve the retained component's full state. Repeated no-op commit creates no further commit.
 - `mcp/failed-central-checkpoint-retains-component` rejects the final Central Git reference transaction. Require a tool error, unchanged Central HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
-- The push cases start from an independently prepared saved Central manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before Central and a reachable component ref. A denied component push must prevent every Central push attempt and preserve local saved commits and the previous Central remote tip.
-- Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution.
+- The push cases start from an independently prepared saved Central manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before Central and a reachable component ref. A denied component push must prevent every Central push attempt and preserve local saved commits and the previous Central remote tip; removing the denial then retries the same saved view successfully in that server.
+- Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution. Reuse compatible fixed-policy HTTP sessions across related cases and record actual server starts in the suite report. Different startup policies, dirty admission and destructive reference-failure checks remain isolated; shared sessions are closed through the existing lifecycle on completion or failure.
 
 #### Metadata
   * type: test-verification
@@ -969,6 +971,9 @@ Verify the owning-repository save and publication boundaries for one combined Re
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
   * satisfiedBy: [added.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/added.md.txt)
+  * satisfiedBy: [commit-central-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-central-renamed.md.txt)
+  * satisfiedBy: [commit-component-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-component-renamed.md.txt)
+  * satisfiedBy: [commit-secondary-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-secondary-renamed.md.txt)
   * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
   * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
 ---

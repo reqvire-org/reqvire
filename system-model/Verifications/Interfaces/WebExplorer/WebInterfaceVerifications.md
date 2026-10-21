@@ -311,9 +311,9 @@ This test verifies production served/exported trace rendering and the shared nat
 Verify combined Repo model publication through the existing Explorer runtime and Central branch picker.
 
 #### Details
-- `serve/combined-publication-and-branch-picker` starts the embedded mutation-enabled HTTP server. Require the full project store to contain Central and declared component elements. A component preview retains the published manifest; accepted component changes update the full store and manifest through existing publication.
+- `serve/combined-publication-and-branch-picker` uses the embedded mutation-enabled HTTP server. Require the full project store to contain Central and declared component elements. A component preview retains the published manifest; accepted component changes update the full store and manifest through existing publication.
 - Create a second Central context from a manifest selecting different component content. Use the shared real-browser lifecycle to open `?branch=main`, verify the canonical component identifier, then select `topic` with the existing Branch control. Require the new context's component content and URL selector.
-- Keep the server and browser fixture-owned and stop them on failure. Do not replace the browser's store or add a component picker to manufacture acceptance.
+- Reuse the embedded fixed-policy server from the complete-snapshot case. Keep the shared server and browser fixture-owned and close them through the existing lifecycle on completion or failure. Do not replace the browser's store or add a component picker to manufacture acceptance.
 
 #### Metadata
   * type: test-verification
