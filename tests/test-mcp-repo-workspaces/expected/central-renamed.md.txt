@@ -1,0 +1,23 @@
+# Elements
+
+### Central Capability
+
+Compose declared component models.
+
+#### Metadata
+  * type: capability
+---
+
+### Central Consumer
+
+The system SHALL consume the selected component contract.
+
+#### Contract References
+  * [Updated Component Specification](repositories/component/Model.md#updated-component-specification)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Central Capability](#central-capability)
+---

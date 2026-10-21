@@ -1,0 +1,9 @@
+# Elements
+
+### Added Capability
+
+An accepted component addition.
+
+#### Metadata
+  * type: capability
+---
