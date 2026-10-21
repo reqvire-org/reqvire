@@ -715,11 +715,15 @@ The effective Reqvire workspace root defines path normalization, identifier stor
 - Git root detection is used to classify eligible files and artifacts by Git worktree membership and to collect revision, branch, remote, and dirty-state metadata; it must not change path normalization.
 - All internal paths are normalized to workspace-root-relative format for storage.
 
+**Source Selection Modes:**
+- Ordinary Git mode discovers containing and descendant Git worktrees under the existing rules below.
+- Repo mode narrows the participating worktree inventory to Central and its declared projects through manifest-defined source selection. The common path and Git containment rules remain in force; an undeclared nested repository is not admitted by generic discovery.
+
 **Git Worktree Eligibility Rules:**
 - A file or artifact is eligible for SOI model processing only when it is inside the effective workspace root and inside a Git worktree.
 - A workspace-root descendant folder that is not inside any Git worktree is ignored, including Markdown files, local assets, implementation files, and evidence artifacts under that folder.
 - When the workspace root is a child of a Git worktree, files under the workspace root remain eligible because they are inside that parent Git worktree; files outside the workspace root remain out of scope.
-- When the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
+- In ordinary Git mode, when the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
 - Nested Git worktrees remain ordinary workspace subdirectories for addressing; their repository identity may be reported as metadata but does not alter the workspace-root-relative identifier.
 - Local InternalPath evidence, static assets, implementation files, and resource targets must also be inside an eligible Git worktree before they are included in resources reports, exports, semantic model facts, or other consumer-facing evidence/resource views.
 
@@ -752,7 +756,7 @@ The effective Reqvire workspace root defines path normalization, identifier stor
 - Semantic export, model JSON, coverage, resources, traces, search, diagnostics, and diff output must expose workspace-root-relative file paths and element identifiers.
 - Consumer records, static export manifests, source target metadata, and element target metadata must use workspace-root-relative paths for eligible Git-worktree content only.
 - Tooling workspace state may include Git metadata for eligible worktrees, but tool inputs, outputs, evidence references, mutation diffs, and resources must use workspace-root-relative paths.
-- Nested repositories may provide revision metadata in future integrations, but model relations and identifiers continue to use one workspace-root-relative path namespace.
+- Nested repositories retain their own source-control provenance, while model relations and identifiers continue to use one workspace-root-relative path namespace.
 
 #### Metadata
   * type: specification

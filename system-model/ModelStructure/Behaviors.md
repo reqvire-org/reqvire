@@ -76,6 +76,8 @@ Formatting and rewrite operations shall not insert inherited or default values i
 Describes how workspace scope detection and enforcement works when Reqvire starts from a directory that may be a Git root, a child of a Git root, or a parent of Git repositories.
 
 #### Details
+These detection steps describe ordinary Git source selection. Repo mode supplies its manifest-selected worktree inventory within the same workspace path and containment boundary.
+
 **Detection Steps:**
 
 1. **Establish effective workspace root**: Use the process working directory after startup workspace selection has been applied.

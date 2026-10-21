@@ -1124,7 +1124,7 @@ Detailed schema-source, semantic evidence, mutation/error result, versioning, an
 
 ### MCP Tool Exposure Scope
 
-The system SHALL expose only specified Reqvire model operations and typed worktree, commit, and same-repository publication operations as MCP tools.
+The system SHALL expose only specified Reqvire model operations and typed worktree, commit, and authorized owning-repository publication operations as MCP tools.
 
 #### Details
 Detailed supported-operation, exclusion, internal/server-management boundary, startup-validation, and MCP contract rules shall follow the associated specification.
