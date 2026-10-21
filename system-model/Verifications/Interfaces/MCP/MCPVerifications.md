@@ -799,7 +799,7 @@ This objective groups verification of isolated worktree model sessions, accepted
 #### Details
 Repo-mode acceptance covers unchanged Central branch-selected calls, private manifest-defined component checkouts, cross-project preview/apply, per-component commits before the Central checkpoint, dependency-first publication and retained-state failures.
 
-These are planned executable acceptance checks. Add test evidence only after implementing the fixtures and observing their results. Use disposable local Git repositories and controlled gh executables; do not publish to a live repository during regular tests.
+Repository workflow acceptance uses disposable local Git repositories and controlled gh executables. Concrete verifications define executable pass/fail criteria and link their fixture and outcome evidence. Regular tests publish only to local fixture remotes.
 
 #### Metadata
   * type: verification-objective
