@@ -19,62 +19,8 @@ The Git commit recorded as the baseline of an admitted worktree context's accept
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Observed HEAD](#observed-head)
   * related: [MCP Worktree Context](#mcp-worktree-context)
----
-
-### HEAD Mode
-
-A branch-viewing policy that resolves the current local branch tip through the context's acceptance rules instead of selecting a historical commit as a separate model identity.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [HEAD Refresh](#head-refresh)
-  * related: [Git Worktree](#git-worktree)
----
-
-### HEAD Refresh
-
-A triggered operation that checks protected inputs between accepted and observed commits and, when eligible, reloads the committed snapshot through normal validated model loading.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Accepted HEAD](#accepted-head)
   * related: [Observed HEAD](#observed-head)
-  * related: [Protected Model Input](#protected-model-input)
----
-
-### Observed HEAD
-
-The current commit reached through a worktree's local branch reference when Git state is inspected. Observing this commit does not establish that its files or model have been accepted by the running context.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Accepted HEAD](#accepted-head)
-  * related: [Git Worktree](#git-worktree)
----
-
-### Protected Model Input
-
-A currently eligible model source, or a semantic source or source-resolution dependency declared by a currently eligible model owner, whose change requires full validated admission rather than guarded HEAD refresh. Current exclusion rules determine owner eligibility; changing those rules is not itself a protected-input change. A referenced implementation or evidence artifact can instead have only an existence dependency; a file can serve both roles.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Model Eligibility Boundary](#model-eligibility-boundary)
-  * related: [External Ontology Source](#external-ontology-source)
-  * related: [HEAD Refresh](#head-refresh)
 ---
 
 ### Atomic Model Mutation
@@ -248,6 +194,18 @@ Documentation references an error-response specification so that schema changes 
   * related: [Contract Binding](#contract-binding)
 ---
 
+### Edit Target
+
+Selected element text or subsection that bounds a focused element edit.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Focused Element Edit](#focused-element-edit)
+---
+
 ### Element
 
 Addressable Reqvire model item with metadata, prose, sections, and optional relations.
@@ -310,6 +268,30 @@ An override replaces a complete authored definition. Text-only editing and appen
   * related: [Element Deletion](#element-deletion)
   * related: [Element Identity](#element-identity)
   * related: [Incoming Relation](#incoming-relation)
+---
+
+### Element Subsection
+
+Named region within one authored element definition whose content and applicability follow the document grammar and element type.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
+---
+
+### Element Text
+
+Opening human-readable content of an element before its first subsection boundary.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
 ---
 
 ### Explorer Interface
@@ -414,6 +396,18 @@ Construct-query pattern that selects and describes the used subset of an externa
   * related: [Ontology Projection](#ontology-projection)
 ---
 
+### Focused Element Edit
+
+Atomic change confined to selected text or a permitted subsection of one element, retaining its identity and authored declarations outside that selection.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Atomic Model Mutation](#atomic-model-mutation)
+---
+
 ### Git Worktree
 
 Local Git worktree whose files may participate in the SOI model when they are inside the effective workspace root.
@@ -436,6 +430,33 @@ Conceptual area covering ownership, status, priority, risk, review readiness, an
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+---
+
+### HEAD Mode
+
+A branch-viewing policy that resolves the current local branch tip through the context's acceptance rules instead of selecting a historical commit as a separate model identity.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [HEAD Refresh](#head-refresh)
+---
+
+### HEAD Refresh
+
+A triggered operation that checks protected inputs between accepted and observed commits and, when eligible, reloads the committed snapshot through normal validated model loading.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Observed HEAD](#observed-head)
+  * related: [Protected Model Input](#protected-model-input)
 ---
 
 ### Implementation Coverage
@@ -498,7 +519,7 @@ Human or machine surface that exposes Reqvire model semantics or operations.
 
 ### MCP Worktree Context
 
-An independently addressed MCP model session rooted in one Git worktree, with its own branch identity, accepted model state, and operation lifecycle.
+An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a Repo workspace the owning worktree is Central; its versioned manifest selects the component checkouts included in that same context.
 
 #### Metadata
   * type: concept
@@ -510,9 +531,21 @@ An independently addressed MCP model session rooted in one Git worktree, with it
   * related: [Workspace Root](#workspace-root)
 ---
 
+### Manifest Project
+
+A component repository declared by the effective Repo manifest, with a workspace-relative checkout path and a selected revision. Its files retain their repository ownership while participating in the combined model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Repo Manifest](#repo-manifest)
+---
+
 ### Model Change Publication
 
-The progression of accepted model changes into local Git history, a remote branch, and a pull request or review comment in the same repository.
+The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. In a Repo workspace, component commits are recorded by the Central manifest before the Central commit saves the combined view. Pull requests and review comments remain repository-specific.
 
 #### Metadata
   * type: concept
@@ -614,6 +647,19 @@ Generated relation-family predicate intended for semantic traversal, graph proje
   * related: [Relation Predicate Layer](#relation-predicate-layer)
 ---
 
+### Observed HEAD
+
+The current commit reached through a worktree's local branch reference when Git state is inspected. Observing this commit does not establish that its files or model have been accepted by the running context.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Git Worktree](#git-worktree)
+---
+
 ### Ontology Document
 
 Ontology document identity that groups contributed semantic terms under an ontology base IRI.
@@ -699,6 +745,20 @@ Reserved vocabulary IRI recognized by the semantic kernel in valid vocabulary po
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * related: [Owl Reserved Vocabulary Registry](#owl-reserved-vocabulary-registry)
   * related: [Semantic Model](#semantic-model)
+---
+
+### Protected Model Input
+
+A currently eligible model source, or a semantic source or source-resolution dependency declared by a currently eligible model owner, whose change requires full validated admission rather than guarded HEAD refresh. Current exclusion rules determine owner eligibility; changing those rules is not itself a protected-input change. A referenced implementation or evidence artifact can instead have only an existence dependency; a file can serve both roles.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [External Ontology Source](#external-ontology-source)
+  * related: [HEAD Refresh](#head-refresh)
+  * related: [Model Eligibility Boundary](#model-eligibility-boundary)
 ---
 
 ### Query
@@ -800,6 +860,30 @@ Semantic pattern describing relation behavior such as hierarchy, bridge, ownersh
   * related: [Relation Model](#relation-model)
 ---
 
+### Repo Manifest
+
+A version-controlled description of a Repo workspace's component repositories, their checkout paths and selected revisions. A Central worktree's manifest defines that branch's component view.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+---
+
+### Repo Workspace
+
+A model workspace rooted in a Central Git worktree whose versioned manifest selects component repository checkouts managed by the Repo tool. The Central branch identifies the context; project revisions identify its component content.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [MCP Worktree Context](#mcp-worktree-context)
+  * related: [Repo Manifest](#repo-manifest)
+---
+
 ### Report
 
 Generated view or output that presents selected model structure, semantic context, coverage, traceability, resources, or validation evidence.
@@ -839,6 +923,18 @@ Precise terms that define a requirement, including source basis, specifications,
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
   * related: [Model Structure](#model-structure)
   * related: [Semantic Contract](#semantic-contract)
+---
+
+### Revision-Locked Manifest
+
+A Repo manifest recording exact component commit identifiers so that its saved component view can be reconstructed independently of moving branch tips.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Repo Manifest](#repo-manifest)
 ---
 
 ### Runtime Ontology Artifact
@@ -1037,52 +1133,4 @@ Effective Reqvire process root used as the SOI model path, identifier, diagnosti
   * related: [Git Worktree](#git-worktree)
   * related: [Model Eligibility Boundary](#model-eligibility-boundary)
   * related: [Model Structure](#model-structure)
----
-
-### Element Text
-
-Opening human-readable content of an element before its first subsection boundary.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Authored Element Definition](#authored-element-definition)
----
-
-### Element Subsection
-
-Named region within one authored element definition whose content and applicability follow the document grammar and element type.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Authored Element Definition](#authored-element-definition)
----
-
-### Focused Element Edit
-
-Atomic change confined to selected text or a permitted subsection of one element, retaining its identity and authored declarations outside that selection.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Atomic Model Mutation](#atomic-model-mutation)
----
-
-### Edit Target
-
-Selected element text or subsection that bounds a focused element edit.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Focused Element Edit](#focused-element-edit)
 ---

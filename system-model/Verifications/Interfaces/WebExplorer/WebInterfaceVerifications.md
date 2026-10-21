@@ -4,6 +4,8 @@
 
 This objective groups verification that the served Web Explorer renders model data, assets, diagrams, navigation, responsive layouts, and export flows correctly.
 
+Repo-workspace acceptance includes complete combined data under the selected Central branch, coherent adoption of component mutations through the existing runtime publication and retained views after preview, rejection or another branch's operations.
+
 #### Metadata
   * type: verification-objective
 

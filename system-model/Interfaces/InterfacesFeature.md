@@ -58,7 +58,7 @@ MCP tool access covers validated evidence, semantic queries, authoring, maintena
 
 ### MCP Change Publication
 
-As a **System Engineer**, I want an MCP client to commit accepted model changes and publish them to a branch and pull request in the same repository, so that model work can be reviewed through the existing GitHub workflow.
+As a **System Engineer**, I want an MCP client to commit accepted model changes and publish their owning Git histories and the saved Central manifest through the existing branch workflow, so that model work can be reviewed through the existing GitHub workflow.
 
 #### Concept References
   * [Model Change Publication](../Thesaurus/Thesaurus.md#model-change-publication)

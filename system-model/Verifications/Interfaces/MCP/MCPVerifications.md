@@ -93,10 +93,10 @@ Acceptance review for the typed MCP `reqvire.add_element` adapter.
 
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
-  * satisfiedBy: [element_selection_checks.py](../../../../tests/element_selection_checks.py)
   * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
+  * satisfiedBy: [element_selection_checks.py](../../../../tests/element_selection_checks.py)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [fenced_code.py](../../../../tests/test-parsing-functionality/fenced_code.py)
@@ -794,9 +794,11 @@ Acceptance review for the typed MCP `reqvire.rename_element` adapter.
 
 ### MCP Repository Workflow Verification Objective
 
-This objective groups verification of isolated worktree model sessions, accepted-change commits, and optional same-repository GitHub publication.
+This objective groups verification of isolated worktree model sessions, accepted-change commits, and authorized repository publication, including Central manifest checkpoints for Repo workspaces.
 
 #### Details
+Repo-mode acceptance covers unchanged Central branch-selected calls, private manifest-defined component checkouts, cross-project preview/apply, per-component commits before the Central checkpoint, dependency-first publication and retained-state failures.
+
 These are planned executable acceptance checks. Add test evidence only after implementing the fixtures and observing their results. Use disposable local Git repositories and controlled gh executables; do not publish to a live repository during regular tests.
 
 #### Metadata
@@ -804,34 +806,6 @@ These are planned executable acceptance checks. Add test evidence only after imp
 
 #### Relations
   * derivedFrom: [MCP Protocol and Tool Verification Objective](#mcp-protocol-and-tool-verification-objective)
----
-
-### MCP Worktree HEAD Refresh Verification
-
-Verify the shared HEAD-refresh operation through real MCP transports and owned workers before claiming support for external branch-tip adoption.
-
-#### Details
-- Reuse one loaded HTTP context for reversible input-protection, Git-state and refresh-lifecycle checks. Restore only disposable physical inputs to the accepted baseline between variations, without reopening the context or rebuilding its model. Assert unchanged server/context identity and model-build count through read/rejection checks. Separate servers only for stdio, embedded serving and the automatic-commit startup policy; reuse the Explorer selection contexts for backend isolation checks.
-- Discover `reqvire.worktree.refresh_head` with `branch`, no `worktree_id`, `dry_run: false` default and state-mutation classification. Exercise actual branch-selected HTTP and stdio calls without a fake tool, permissive stub or unknown-tool-as-protection shortcut. Embedded execution is covered by the Explorer verification of the same operation; returned public context identity is the branch; opaque IDs remain private.
-- Commit ordinary implementation/evidence content, non-model documentation, an excluded model-looking example and unreferenced RDF. Refresh and amend the same branch, retaining context identity, model/semantic revision and ownership while advancing accepted HEAD and displayed artifact provenance. Require one normal validated model load per eligible apply and no model load for a rejected guard, preview or unchanged HEAD. Repeat for an idempotent no-op and successfully execute a later MCP mutation with automatic commits disabled.
-- Check-only preview must leave accepted state and Git unchanged. Change a protected model input between preview and apply and require apply to recheck and block.
-- Reject changed/removed/renamed model sources, new and empty recognised documents, new single-element headers and ordinary Markdown converted into model content. Check old/new classification independently of the accepted element registry. A real policy rejection must carry the expected blocker and path; an unavailable-tool response fails verification.
-- Reject loaded External Ontology changes, changes to a dual implementation/semantic source and a new repository-root source shadowing a recorded document-relative fallback. Detect already consumed ignored/out-of-tree source drift independently of endpoint diff. Reject missing renamed evidence targets while allowing edited evidence content.
-- In the same loaded HTTP workflow, allow added/changed/removed root ignore files. Combine a policy update with changes to a now-excluded model file and a semantic source whose declaring owner is now excluded; require successful normal loading and the updated membership/revision. Preview must not adopt the policy. Verify subsequent MCP operations use the adopted exclusions, policy-only re-inclusion loads unchanged documents, and later edits to re-included model files block. Separately unexclude and modify a model file in the same commit and require a model-path blocker under current rules. Reuse the existing server/context rather than adding an exclusion-policy process matrix.
-- Reject pending accepted changes, staged/unstaged/nonignored untracked edits, branch changes, detached state, in-progress Git operations and unresolved recovery. Preserve recorded commit-outcome reconciliation as the only recovery exception. Verify both automatic-commit policies without creating a commit during refresh.
-- Refresh one context with two admitted contexts and assert independent HEAD, snapshots, pending state and availability. Rejections preserve files, index, refs, accepted model, accepted HEAD and publication. Compare physical state before/after both accepted and rejected calls.
-- Verify that successful refresh uses the same loading function as startup and the ordinary worker runtime/publication path. A captured old read remains coherent across that normal reload. Reuse existing loading/runtime failure tests; do not add a refresh-specific prepare/adopt protocol, transfer-failure matrix or concurrent-Git race suite.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
-  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [test.sh](../../../../tests/test-mcp-head-refresh/test.sh)
-  * verify: [MCP Worktree HEAD Refresh](../../../Interfaces/MCP/HeadRefresh.md#mcp-worktree-head-refresh)
 ---
 
 ### MCP Accepted Change Commit Verification
@@ -1025,6 +999,34 @@ Verify the successful and rejected paths of mcp worktree creation.
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * verify: [MCP Worktree Creation](../../../Interfaces/MCP/Tools.md#mcp-worktree-creation)
+---
+
+### MCP Worktree HEAD Refresh Verification
+
+Verify the shared HEAD-refresh operation through real MCP transports and owned workers before claiming support for external branch-tip adoption.
+
+#### Details
+- Reuse one loaded HTTP context for reversible input-protection, Git-state and refresh-lifecycle checks. Restore only disposable physical inputs to the accepted baseline between variations, without reopening the context or rebuilding its model. Assert unchanged server/context identity and model-build count through read/rejection checks. Separate servers only for stdio, embedded serving and the automatic-commit startup policy; reuse the Explorer selection contexts for backend isolation checks.
+- Discover `reqvire.worktree.refresh_head` with `branch`, no `worktree_id`, `dry_run: false` default and state-mutation classification. Exercise actual branch-selected HTTP and stdio calls without a fake tool, permissive stub or unknown-tool-as-protection shortcut. Embedded execution is covered by the Explorer verification of the same operation; returned public context identity is the branch; opaque IDs remain private.
+- Commit ordinary implementation/evidence content, non-model documentation, an excluded model-looking example and unreferenced RDF. Refresh and amend the same branch, retaining context identity, model/semantic revision and ownership while advancing accepted HEAD and displayed artifact provenance. Require one normal validated model load per eligible apply and no model load for a rejected guard, preview or unchanged HEAD. Repeat for an idempotent no-op and successfully execute a later MCP mutation with automatic commits disabled.
+- Check-only preview must leave accepted state and Git unchanged. Change a protected model input between preview and apply and require apply to recheck and block.
+- Reject changed/removed/renamed model sources, new and empty recognised documents, new single-element headers and ordinary Markdown converted into model content. Check old/new classification independently of the accepted element registry. A real policy rejection must carry the expected blocker and path; an unavailable-tool response fails verification.
+- Reject loaded External Ontology changes, changes to a dual implementation/semantic source and a new repository-root source shadowing a recorded document-relative fallback. Detect already consumed ignored/out-of-tree source drift independently of endpoint diff. Reject missing renamed evidence targets while allowing edited evidence content.
+- In the same loaded HTTP workflow, allow added/changed/removed root ignore files. Combine a policy update with changes to a now-excluded model file and a semantic source whose declaring owner is now excluded; require successful normal loading and the updated membership/revision. Preview must not adopt the policy. Verify subsequent MCP operations use the adopted exclusions, policy-only re-inclusion loads unchanged documents, and later edits to re-included model files block. Separately unexclude and modify a model file in the same commit and require a model-path blocker under current rules. Reuse the existing server/context rather than adding an exclusion-policy process matrix.
+- Reject pending accepted changes, staged/unstaged/nonignored untracked edits, branch changes, detached state, in-progress Git operations and unresolved recovery. Preserve recorded commit-outcome reconciliation as the only recovery exception. Verify both automatic-commit policies without creating a commit during refresh.
+- Refresh one context with two admitted contexts and assert independent HEAD, snapshots, pending state and availability. Rejections preserve files, index, refs, accepted model, accepted HEAD and publication. Compare physical state before/after both accepted and rejected calls.
+- Verify that successful refresh uses the same loading function as startup and the ordinary worker runtime/publication path. A captured old read remains coherent across that normal reload. Reuse existing loading/runtime failure tests; do not add a refresh-specific prepare/adopt protocol, transfer-failure matrix or concurrent-Git race suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-head-refresh/test.sh)
+  * verify: [MCP Worktree HEAD Refresh](../../../Interfaces/MCP/HeadRefresh.md#mcp-worktree-head-refresh)
 ---
 
 ### MCP Worktree Opening and Inventory Verification
@@ -1511,9 +1513,9 @@ Verify focused-editing discovery, typed routing, permissions and observable effe
   * derivedFrom: [Focused Element Editing Verification Objective](../../Operations/ModelOperations/ElementManipulationVerifications.md#focused-element-editing-verification-objective)
   * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
   * satisfiedBy: [definitions.rs](../../../../crates/reqvire-core/src/tool_interface/definitions.rs)
-  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
-  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-worktrees/test.sh)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
   * verify: [MCP Update Element Tool](../../../Interfaces/MCP/Tools.md#mcp-update-element-tool)
 ---

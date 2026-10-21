@@ -4,6 +4,8 @@
 
 This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently, and reuses completed model builds with correct source freshness and publication.
 
+Manifest-defined workspace acceptance includes real Repo/local-Git fixtures proving complete declared-project discovery, workspace-relative ownership and source parity, plus precise rejection of unavailable or escaping selections.
+
 #### Metadata
   * type: verification-objective
 

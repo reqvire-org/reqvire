@@ -118,10 +118,10 @@ When mutation mode is disabled, the system SHALL retain lint inspection and reje
 
 ### MCP Model Change Publication
 
-WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to the same remote repository.
+WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to its authorized owning repository remotes.
 
 #### Details
-Automatic commits remain an independent, default-disabled option. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+Automatic commits remain an independent, default-disabled option. The context transaction owns component-first commit ordering and the Central manifest checkpoint in Repo mode. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -373,12 +373,12 @@ When guiding contract authoring, refactoring, exploration, implementation planni
   * type: requirement
 
 #### Contract References
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
   * [MCP Formatting Tool Specification](Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](Specifications.md#mcp-lint-fix-tool-specification)
   * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
   * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
 
 #### Relations
@@ -821,6 +821,26 @@ The system SHALL expose typed MCP tools to rename a selected element and update 
   * verifiedBy: [MCP Rename Element Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-rename-element-tool-verification)
 ---
 
+### MCP Update Element Tool
+
+WHEN a mutation-enabled MCP client requests a focused element edit, the system SHALL expose the shared selected-content editing operation through a typed context-bound tool with preview and revision-aware change evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [Focused Element Editing Specification](../../Operations/ModelOperations/Specifications.md#focused-element-editing-specification)
+
+#### Relations
+  * definedBy: [MCP Update Element Tool Specification](Specifications.md#mcp-update-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+---
+
 ### MCP Protocol Standard Conformance
 
 The system shall implement the Model Context Protocol using standard MCP lifecycle, capability, tool, and resource messages.
@@ -1166,10 +1186,10 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 ### MCP Worktree Model Sessions
 
-WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup Git repository through one MCP endpoint.
+WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository, including manifest-defined Repo workspaces through one MCP endpoint.
 
 #### Details
-Worktree administration is an explicit repository operation. It does not change the original checkout branch or broaden the workspace boundary of any model operation.
+Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
@@ -1216,6 +1236,7 @@ The child worker-session requirement implements the MCP side of this boundary. E
 #### Contract Bindings
   * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
 
 #### Relations
   * definedBy: [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
@@ -1278,24 +1299,4 @@ WHEN a client selects an existing branch, the system SHALL open an eligible work
   * definedBy: [MCP Worktree Opening and Inventory Specification](Specifications.md#mcp-worktree-opening-and-inventory-specification)
   * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
----
-
-### MCP Update Element Tool
-
-WHEN a mutation-enabled MCP client requests a focused element edit, the system SHALL expose the shared selected-content editing operation through a typed context-bound tool with preview and revision-aware change evidence.
-
-#### Metadata
-  * type: requirement
-
-#### Contract References
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [Focused Element Editing Specification](../../Operations/ModelOperations/Specifications.md#focused-element-editing-specification)
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * definedBy: [MCP Update Element Tool Specification](Specifications.md#mcp-update-element-tool-specification)
-  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
-  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
-  * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
 ---
