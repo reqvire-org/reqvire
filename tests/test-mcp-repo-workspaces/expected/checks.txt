@@ -11,5 +11,5 @@ PASS mcp/automatic-component-first-commit
 PASS mcp/dirty-component-admission
 PASS mcp/failed-central-checkpoint-retains-component
 PASS serve/combined-publication-and-branch-picker
-PASS mcp/dependency-first-push
 PASS mcp/failed-dependency-push-preserves-central
+PASS mcp/dependency-first-push

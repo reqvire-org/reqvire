@@ -5,6 +5,7 @@ support is neither skipped nor converted into an expected exception. Fixture
 repositories, responses, server logs and diffs stay under the runner's TEST_DIR.
 """
 import difflib
+from contextlib import ExitStack, nullcontext
 import importlib.util
 import json
 import os
@@ -13,7 +14,6 @@ import shutil
 import subprocess
 import sys
 import traceback
-import urllib.parse
 import xml.etree.ElementTree as ET
 
 
@@ -34,6 +34,7 @@ ENV = {**os.environ, 'GIT_ALLOW_PROTOCOL': 'file', 'GIT_TERMINAL_PROMPT': '0',
        'GIT_CONFIG_VALUE_1': 'repo-test@example.invalid'}
 EXPECTED_NAMES = ['Central Capability', 'Central Consumer', 'Component Capability',
                   'Component Requirement', 'Component Specification']
+SERVER_STARTS = []
 
 
 def command(root, *args, env=None, timeout=60, check=True):
@@ -69,7 +70,7 @@ def names(server, branch='main'):
 
 
 class Fixture:
-    def __init__(self, name, cross_reference=False):
+    def __init__(self, name, cross_reference=False, multiple_components=False):
         self.base = ROOT / name
         self.base.mkdir()
         self.output = OUTPUT / name
@@ -79,16 +80,30 @@ class Fixture:
         component_seed = self.base / 'component-seed'
         component_seed.mkdir()
         git(component_seed, 'init', '-qb', 'main')
-        source = (SUITE / 'fixtures/component.md.txt').read_text()
+        source = (SUITE / ('fixtures/commit-component.md.txt' if multiple_components
+                          else 'fixtures/component.md.txt')).read_text()
         (component_seed / 'Model.md').write_text(source)
         self.alpha = commit(component_seed, 'Component alpha')
         (component_seed / 'Model.md').write_text(source.replace('behavior is alpha.', 'behavior is omega.'))
         self.omega = commit(component_seed, 'Component omega')
         git(self.base, 'clone', '-q', '--bare', str(component_seed), str(self.remotes / 'component'))
+        self.extra_revisions = {}
+        if multiple_components:
+            for project, text in {
+                'secondary': source.replace('Component', 'Secondary').replace('component-', 'secondary-'),
+                'retained': (SUITE / 'fixtures/retained.md.txt').read_text(),
+            }.items():
+                seed = self.base / (project + '-seed')
+                seed.mkdir()
+                git(seed, 'init', '-qb', 'main')
+                (seed / 'Model.md').write_text(text)
+                self.extra_revisions[project] = commit(seed, 'Initial ' + project)
+                git(self.base, 'clone', '-q', '--bare', str(seed), str(self.remotes / project))
         self.central = self.base / 'central'
         self.central.mkdir()
         git(self.central, 'init', '-qb', 'main')
-        text = (SUITE / 'fixtures/central.md.txt').read_text()
+        text = (SUITE / ('fixtures/commit-central.md.txt' if multiple_components
+                        else 'fixtures/central.md.txt')).read_text()
         if not cross_reference:
             text = text.replace('#### Contract References\n  * [Component Specification](repositories/component/Model.md#component-specification)\n\n', '')
         (self.central / 'Model.md').write_text(text)
@@ -117,69 +132,96 @@ class Fixture:
                 log.write(result.stdout + result.stderr)
                 assert result.returncode == 0, f'Real Repo setup failed; see {log.name}'
         self.component = self.central / 'repositories/component'
+        self.projects = {'component': self.component,
+                         **{p: self.central / 'repositories' / p for p in self.extra_revisions}}
+        self.initial_projects = {'component': self.alpha, **self.extra_revisions}
         assert git(self.component, 'rev-parse', 'HEAD') == self.alpha, 'Repo did not honor the pinned revision'
         assert git(self.component, 'cat-file', '-t', self.omega) == 'commit', 'Review revision must be available offline'
         assert not git(self.central, 'status', '--porcelain'), 'Fixture Central is dirty'
         assert not git(self.component, 'status', '--porcelain'), 'Fixture component is dirty'
+        for project in self.extra_revisions:
+            assert git(self.projects[project], 'rev-parse', 'HEAD') == self.extra_revisions[project]
+            assert not git(self.projects[project], 'status', '--porcelain'), project + ' fixture is dirty'
         (self.output / 'provenance.json').write_text(json.dumps({
             'repo_runtime_commit': runtime_sha, 'central': self.initial_central,
-            'alpha': self.alpha, 'omega': self.omega, 'review': self.review}, indent=2))
+            'alpha': self.alpha, 'omega': self.omega, 'review': self.review,
+            'projects': self.initial_projects}, indent=2))
 
     def write_manifest(self, sha, fetch=None):
         fetch = fetch or self.remotes.as_uri() + '/'
+        projects = {'component': sha, **self.extra_revisions}
+        declarations = ''.join(
+            f'  <project name="{name}" path="repositories/{name}" revision="{revision}"/>\n'
+            for name, revision in projects.items())
         (self.central / 'default.xml').write_text(
             '<manifest>\n'
             f'  <remote name="local" fetch="{fetch}"/>\n'
             '  <default remote="local" revision="main"/>\n'
-            f'  <project name="component" path="repositories/component" revision="{sha}"/>\n'
-            '</manifest>\n')
+            + declarations + '</manifest>\n')
 
     def server(self, mode='mcp', commits=False, extra_args=(), environment=None):
+        SERVER_STARTS.append({'fixture': self.base.name, 'mode': mode, 'automatic_commits': commits})
         return helpers.Server(BINARY, self.central, self.output, mode, 'server',
                               mutations=True, commits=commits, extra_args=extra_args,
                               environment={**ENV, **(environment or {})})
 
     def git_state(self):
         return [(git(p, 'rev-parse', 'HEAD'), git(p, 'ls-files', '--stage'))
-                for p in (self.central, self.component)]
+                for p in (self.central, *self.projects.values())]
 
     def files(self):
         paths = [self.central / 'Model.md', self.central / 'default.xml',
-                 self.component / 'Model.md', self.component / 'Added.md']
+                 *[root / name for root in self.projects.values() for name in ('Model.md', 'Added.md')]]
         return {str(p): p.read_bytes() if p.exists() else None for p in paths}
 
     def add(self, server):
         return server.tool('reqvire.add_element', branch='main', file='repositories/component/Added.md',
                            content=(SUITE / 'fixtures/addition.md.txt').read_text())
 
-    def saved(self, server, result):
-        golden(self.component / 'Added.md', 'added.md.txt')
-        component = git(self.component, 'rev-parse', 'HEAD')
+    def saved_multiple(self, server, result, retained_state):
         central = git(self.central, 'rev-parse', 'HEAD')
-        assert component != self.alpha, 'The owning component received no commit'
-        assert git(self.component, 'show', 'HEAD:Added.md') + '\n' == (SUITE / 'expected/added.md.txt').read_text()
-        assert git(self.component, 'rev-parse', 'HEAD^') == self.alpha, 'Component commit has the wrong base'
+        heads = {name: git(root, 'rev-parse', 'HEAD') for name, root in self.projects.items()}
+        for name in ('component', 'secondary'):
+            root = self.projects[name]
+            assert heads[name] != self.initial_projects[name], name + ' received no commit'
+            assert git(root, 'rev-parse', 'HEAD^') == self.initial_projects[name], name + ' has the wrong parent'
+            expected = 'commit-' + name + '-renamed.md.txt'
+            golden(root / 'Model.md', expected)
+            assert git(root, 'show', 'HEAD:Model.md') + '\n' == (SUITE / 'expected' / expected).read_text()
+            assert not git(root, 'status', '--porcelain'), name + ' remains dirty'
+        assert self.retained_state() == retained_state, 'The unchanged component received a commit or was modified'
+        golden(self.central / 'Model.md', 'commit-central-renamed.md.txt')
+        assert git(self.central, 'show', 'HEAD:Model.md') + '\n' == (SUITE / 'expected/commit-central-renamed.md.txt').read_text()
         assert not git(self.central, 'ls-files', 'repositories'), 'Central tracked component files'
         manifest = ET.fromstring(git(self.central, 'show', 'HEAD:default.xml'))
-        assert manifest.find('project').get('revision') == component, 'Central did not pin the committed component'
+        pins = {p.get('name'): p.get('revision') for p in manifest.findall('project')}
+        assert pins == heads, 'Central did not pin every changed and unchanged component exactly'
         assert central != self.initial_central and result.get('commit', result.get('context', {}).get('head')) == central
-        assert not git(self.component, 'status', '--porcelain'), 'Committed component remains dirty'
+        assert git(self.central, 'rev-parse', 'HEAD^') == self.initial_central, 'Save created extra Central commits'
         assert server.tool('reqvire.workspace_status', branch='main')['context']['pending_changes'] == []
-        assert 'Added Capability' in names(server), 'Commit replaced the accepted model'
-        return component, central
+        expected_names = sorted(EXPECTED_NAMES + ['Updated Shared Specification', 'Secondary Capability',
+                                                 'Secondary Requirement', 'Secondary Specification', 'Retained Capability'])
+        assert names(server) == expected_names, 'Commit lost part of the accepted combined model'
+        cli = json.loads(command(self.central, BINARY, 'search', '--json').stdout)
+        assert sorted(e['name'] for data in cli['files'].values() for e in data['elements']) == expected_names
+
+    def retained_state(self):
+        root = self.projects['retained']
+        return (git(root, 'rev-parse', 'HEAD'), git(root, 'ls-files', '--stage'),
+                git(root, 'for-each-ref', '--format=%(refname) %(objectname)'),
+                (root / 'Model.md').read_bytes(), git(root, 'status', '--porcelain'))
 
 
-def complete_snapshot(mode):
-    f = Fixture(mode + '-snapshot', cross_reference=True)
+def complete_snapshot(mode, shared):
+    f, server = shared(mode + '-snapshot')
     cli = command(f.central, BINARY, 'search', '--json')
     cli_names = sorted(e['name'] for data in json.loads(cli.stdout)['files'].values() for e in data['elements'])
     assert cli_names == EXPECTED_NAMES, 'CLI did not see the complete Repo model'
-    with f.server(mode) as server:
-        assert names(server) == cli_names, 'MCP snapshot omitted declared component sources'
-        result = server.tool('reqvire.read_element', branch='main', name='Component Specification')
-        assert 'repositories/component/Model.md#component-specification' in json.dumps(result)
-        status = server.tool('reqvire.workspace_status', branch='main')
-        assert 'workspace_mode' in json.dumps(status) and 'repo' in json.dumps(status)
+    assert names(server) == cli_names, 'MCP snapshot omitted declared component sources'
+    result = server.tool('reqvire.read_element', branch='main', name='Component Specification')
+    assert 'repositories/component/Model.md#component-specification' in json.dumps(result)
+    status = server.tool('reqvire.workspace_status', branch='main')
+    assert 'workspace_mode' in json.dumps(status) and 'repo' in json.dumps(status)
 
 
 def explicit_manifest():
@@ -238,60 +280,89 @@ def declared_sources_only():
     assert found == EXPECTED_NAMES, f'Manifest-defined discovery scanned undeclared sources: {found}'
 
 
-def branch_revisions():
-    f = Fixture('branch-revisions')
+def branch_revisions(shared):
+    f, server = shared('explicit-commit')
     original = f.files(), f.git_state()
-    with f.server() as server:
-        child = server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
-        target = Path(child['workspace_root'])
-        assert child['base_commit'] == f.review, 'base_ref did not select Central'
-        project = target / 'repositories/component'
-        assert project.is_dir(), 'Central context did not prepare its declared project'
-        assert git(project, 'rev-parse', 'HEAD') == f.omega
-        assert (target / '.repo').resolve() != (f.central / '.repo').resolve(), 'Repo metadata was shared'
-        assert 'omega' in json.dumps(server.tool('reqvire.read_element', branch='topic', name='Component Specification'))
-        assert 'alpha' in json.dumps(server.tool('reqvire.read_element', branch='main', name='Component Specification'))
-        assert (f.files(), f.git_state()) == original, 'Branch creation altered the original project checkout'
-        assert 'topic' not in git(f.component, 'branch', '--format=%(refname:short)').splitlines(), 'Invented component branch'
-        server.tool('reqvire.worktree.remove', branch='topic')
-        reopened = server.tool('reqvire.worktree.open', branch='topic')
-        restored = Path(reopened['workspace_root']) / 'repositories/component'
-        assert git(restored, 'rev-parse', 'HEAD') == f.omega, 'Reopening lost the retained manifest selection'
-        assert 'omega' in json.dumps(server.tool('reqvire.read_element', branch='topic', name='Component Specification'))
+    child = server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
+    target = Path(child['workspace_root'])
+    assert child['base_commit'] == f.review, 'base_ref did not select Central'
+    project = target / 'repositories/component'
+    assert project.is_dir(), 'Central context did not prepare its declared project'
+    assert git(project, 'rev-parse', 'HEAD') == f.omega
+    assert (target / '.repo').resolve() != (f.central / '.repo').resolve(), 'Repo metadata was shared'
+    assert 'omega' in json.dumps(server.tool('reqvire.read_element', branch='topic', name='Component Specification'))
+    assert 'alpha' in json.dumps(server.tool('reqvire.read_element', branch='main', name='Component Specification'))
+    assert (f.files(), f.git_state()) == original, 'Branch creation altered the original project checkout'
+    assert 'topic' not in git(f.component, 'branch', '--format=%(refname:short)').splitlines(), 'Invented component branch'
+    server.tool('reqvire.worktree.remove', branch='topic')
+    reopened = server.tool('reqvire.worktree.open', branch='topic')
+    restored = Path(reopened['workspace_root']) / 'repositories/component'
+    assert git(restored, 'rev-parse', 'HEAD') == f.omega, 'Reopening lost the retained manifest selection'
+    assert 'omega' in json.dumps(server.tool('reqvire.read_element', branch='topic', name='Component Specification'))
 
 
-def cross_project_mutation():
-    f = Fixture('cross-project', cross_reference=True)
+def cross_project_mutation(shared):
+    f, server = shared('mcp-snapshot')
     before_files, before_git = f.files(), f.git_state()
-    with f.server() as server:
-        revision = server.revision()
-        preview = server.tool('reqvire.rename_element', branch='main', element_name='Component Specification',
-                              new_name='Updated Component Specification', dry_run=True)
-        assert 'Model.md' in json.dumps(preview) and 'repositories/component/Model.md' in json.dumps(preview)
-        assert f.files() == before_files and f.git_state() == before_git and server.revision() == revision
-        rejected = server.raw_tool('reqvire.rename_element', branch='main', element_name='Component Specification',
-                                   new_name='Central Capability')
-        assert rejected.get('isError') is True and f.files() == before_files
-        server.tool('reqvire.rename_element', branch='main', element_name='Component Specification',
-                    new_name='Updated Component Specification')
-        golden(f.central / 'Model.md', 'central-renamed.md.txt')
-        golden(f.component / 'Model.md', 'component-renamed.md.txt')
-        assert f.git_state() == before_git, 'Default mutation changed an index or HEAD'
-        assert 'Updated Component Specification' in names(server) and server.revision() != revision
-        assert set(server.tool('reqvire.workspace_status')['context']['pending_changes']) == {
-            'Model.md', 'repositories/component/Model.md'}
+    revision = server.revision()
+    preview = server.tool('reqvire.rename_element', branch='main', element_name='Component Specification',
+                          new_name='Updated Component Specification', dry_run=True)
+    assert 'Model.md' in json.dumps(preview) and 'repositories/component/Model.md' in json.dumps(preview)
+    assert f.files() == before_files and f.git_state() == before_git and server.revision() == revision
+    rejected = server.raw_tool('reqvire.rename_element', branch='main', element_name='Component Specification',
+                               new_name='Central Capability')
+    assert rejected.get('isError') is True and f.files() == before_files
+    server.tool('reqvire.rename_element', branch='main', element_name='Component Specification',
+                new_name='Updated Component Specification')
+    golden(f.central / 'Model.md', 'central-renamed.md.txt')
+    golden(f.component / 'Model.md', 'component-renamed.md.txt')
+    assert f.git_state() == before_git, 'Default mutation changed an index or HEAD'
+    assert 'Updated Component Specification' in names(server) and server.revision() != revision
+    assert set(server.tool('reqvire.workspace_status', branch='main')['context']['pending_changes']) == {
+        'Model.md', 'repositories/component/Model.md'}
 
 
-def component_commit(automatic):
-    f = Fixture('automatic-commit' if automatic else 'explicit-commit')
+def component_commit(automatic, shared):
+    if automatic:
+        f = Fixture('automatic-commit', multiple_components=True)
+        session = f.server(commits=True)
+    else:
+        f, server = shared('explicit-commit')
+        session = nullcontext(server)
     before = f.git_state()
-    with f.server(commits=automatic) as server:
-        result = f.add(server)
-        golden(f.component / 'Added.md', 'added.md.txt')
+    retained = f.retained_state()
+    with session as server:
+        # One rename updates Central and references in both changed projects.
+        # This is one transaction even when commits happen automatically.
+        result = server.tool('reqvire.rename_element', branch='main', element_name='Shared Specification',
+                             new_name='Updated Shared Specification')
         if not automatic:
             assert f.git_state() == before, 'Pending acceptance changed Git state'
-            result = server.tool('reqvire.git.commit', branch='main', message='Save combined component addition')
-        f.saved(server, result)
+            result = server.tool('reqvire.git.commit', branch='main', message='Save combined contract rename')
+        f.saved_multiple(server, result, retained)
+
+        # Preserve the original new-file save coverage in the same session.
+        # Only its owning component changes in this second transaction.
+        before_add = f.git_state()
+        old_heads = {name: git(root, 'rev-parse', 'HEAD') for name, root in f.projects.items()}
+        old_central = git(f.central, 'rev-parse', 'HEAD')
+        f.add(server)
+        if not automatic:
+            assert f.git_state() == before_add, 'Pending addition changed Git state'
+            server.tool('reqvire.git.commit', branch='main', message='Save new component file')
+        golden(f.component / 'Added.md', 'added.md.txt')
+        assert git(f.component, 'show', 'HEAD:Added.md') + '\n' == (SUITE / 'expected/added.md.txt').read_text()
+        assert git(f.component, 'rev-parse', 'HEAD^') == old_heads['component']
+        for name in ('secondary', 'retained'):
+            assert git(f.projects[name], 'rev-parse', 'HEAD') == old_heads[name], name + ' received an unrelated commit'
+        assert f.retained_state() == retained, 'Unchanged component was altered by the addition'
+        manifest = ET.fromstring(git(f.central, 'show', 'HEAD:default.xml'))
+        assert {p.get('name'): p.get('revision') for p in manifest.findall('project')} == {
+            name: git(root, 'rev-parse', 'HEAD') for name, root in f.projects.items()}
+        assert git(f.central, 'rev-parse', 'HEAD^') == old_central
+        assert not git(f.central, 'ls-files', 'repositories'), 'Central tracked the new component file'
+        assert server.tool('reqvire.workspace_status', branch='main')['context']['pending_changes'] == []
+        assert 'Added Capability' in names(server), 'New component source was lost after save'
         saved = f.git_state()
         server.tool('reqvire.git.commit', branch='main', message='No further changes')
         assert f.git_state() == saved, 'No-op created an extra commit'
@@ -334,30 +405,29 @@ def failed_central_commit():
         assert 'Added Capability' in names(server), 'Failure discarded the accepted model'
 
 
-def explorer():
-    f = Fixture('explorer')
-    with f.server('serve') as server:
-        status, body = server.http('/api/project-store?branch=main')
-        assert status == 200
-        store = json.loads(body)['store']
-        assert sorted(e['name'] for e in store['elements']) == EXPECTED_NAMES, 'Explorer published a Central-only snapshot'
-        status, baseline = server.http('/api/project-store/manifest?branch=main')
-        assert status == 200
-        server.tool('reqvire.add_element', branch='main', file='repositories/component/Added.md',
-                    content=(SUITE / 'fixtures/addition.md.txt').read_text(), dry_run=True)
-        assert server.http('/api/project-store/manifest?branch=main') == (status, baseline), 'Preview changed publication'
-        f.add(server)
-        _, body = server.http('/api/project-store?branch=main')
-        assert 'Added Capability' in [e['name'] for e in json.loads(body)['store']['elements']]
-        assert server.http('/api/project-store/manifest?branch=main')[1] != baseline, 'Accepted component mutation was not published'
-        server.tool('reqvire.git.commit', branch='main', message='Save browser fixture')
-        server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
-        # Use the shared real-browser lifecycle and the existing picker. No UI or
-        # store replacement hides a missing combined backend publication.
-        browser = command(f.central, 'bun', str(SUITE / 'browser-repo.mjs'), server.base,
-                          str(f.output / 'browser-profile'), timeout=90, check=False)
-        (f.output / 'browser.log').write_text(browser.stdout + browser.stderr)
-        assert browser.returncode == 0, f'Branch picker failed; see {f.output / "browser.log"}'
+def explorer(shared):
+    f, server = shared('serve-snapshot')
+    status, body = server.http('/api/project-store?branch=main')
+    assert status == 200
+    store = json.loads(body)['store']
+    assert sorted(e['name'] for e in store['elements']) == EXPECTED_NAMES, 'Explorer published a Central-only snapshot'
+    status, baseline = server.http('/api/project-store/manifest?branch=main')
+    assert status == 200
+    server.tool('reqvire.add_element', branch='main', file='repositories/component/Added.md',
+                content=(SUITE / 'fixtures/addition.md.txt').read_text(), dry_run=True)
+    assert server.http('/api/project-store/manifest?branch=main') == (status, baseline), 'Preview changed publication'
+    f.add(server)
+    _, body = server.http('/api/project-store?branch=main')
+    assert 'Added Capability' in [e['name'] for e in json.loads(body)['store']['elements']]
+    assert server.http('/api/project-store/manifest?branch=main')[1] != baseline, 'Accepted component mutation was not published'
+    server.tool('reqvire.git.commit', branch='main', message='Save browser fixture')
+    server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
+    # Use the shared real-browser lifecycle and the existing picker. No UI or
+    # store replacement hides a missing combined backend publication.
+    browser = command(f.central, 'bun', str(SUITE / 'browser-repo.mjs'), server.base,
+                      str(f.output / 'browser-profile'), timeout=90, check=False)
+    (f.output / 'browser.log').write_text(browser.stdout + browser.stderr)
+    assert browser.returncode == 0, f'Branch picker failed; see {f.output / "browser.log"}'
 
 
 def publication_environment(f):
@@ -411,70 +481,111 @@ os.execv(REAL_GIT, [REAL_GIT, *args])
             'REQVIRE_REPO_TEST_FAIL_COMPONENT': str(f.output / 'deny-component')}
 
 
-def push(fail_component):
-    f = Fixture('push-denied' if fail_component else 'push-success')
+def push_fixture():
+    f = Fixture('push')
     env = publication_environment(f)
-    remote_before = git(f.remotes / 'central', 'rev-parse', 'refs/heads/main')
+    f.remote_before_push = git(f.remotes / 'central', 'rev-parse', 'refs/heads/main')
     # Start from an already saved, valid combined view. Push ordering must fail
     # independently of a broken Reqvire multi-repository commit implementation.
     (f.component / 'Added.md').write_text((SUITE / 'expected/added.md.txt').read_text())
-    component = commit(f.component, 'Saved component dependency')
-    f.write_manifest(component, fetch='https://github.com/test/')
-    central = commit(f.central, 'Saved Central dependency selection')
-    with f.server(extra_args=['--enable-github'], environment=env) as server:
-        if fail_component:
-            (f.output / 'deny-component').touch()
-        outcome = server.raw_tool('reqvire.git.push', branch='main')
-        attempts = [json.loads(line) for line in (f.output / 'pushes.jsonl').read_text().splitlines()]
-        targets = [t for call in attempts for t in call['targets']]
-        assert targets and 'component' in targets[0], 'Central was attempted before its required component commit'
-        assert git(f.central, 'rev-parse', 'HEAD') == central and git(f.component, 'rev-parse', 'HEAD') == component
-        if fail_component:
-            assert outcome.get('isError') is True
-            assert git(f.remotes / 'central', 'rev-parse', 'refs/heads/main') == remote_before, 'Central published a missing dependency'
-            assert not any('project.git' in t for t in targets), 'Central push attempted after dependency failure'
-        else:
-            assert not outcome.get('isError'), outcome
-            assert targets[-1] == 'https://github.com/test/project.git'
-            assert git(f.remotes / 'central', 'rev-parse', 'refs/heads/main') == central
-            refs = git(f.remotes / 'component', 'for-each-ref', '--format=%(objectname)').splitlines()
-            assert component in refs, 'Manifest component commit has no published ref'
+    f.component_to_push = commit(f.component, 'Saved component dependency')
+    f.write_manifest(f.component_to_push, fetch='https://github.com/test/')
+    f.central_to_push = commit(f.central, 'Saved Central dependency selection')
+    return f, {'extra_args': ['--enable-github'], 'environment': env}
+
+
+def push(fail_component, shared):
+    f, server = shared('push')
+    gate = f.output / 'deny-component'
+    if fail_component:
+        gate.touch()
+    else:
+        gate.unlink(missing_ok=True)
+    log = f.output / 'pushes.jsonl'
+    before = len(log.read_text().splitlines()) if log.exists() else 0
+    outcome = server.raw_tool('reqvire.git.push', branch='main')
+    lines = log.read_text().splitlines() if log.exists() else []
+    attempts = [json.loads(line) for line in lines[before:]]
+    targets = [t for call in attempts for t in call['targets']]
+    assert targets and 'component' in targets[0], 'Central was attempted before its required component commit'
+    assert git(f.central, 'rev-parse', 'HEAD') == f.central_to_push
+    assert git(f.component, 'rev-parse', 'HEAD') == f.component_to_push
+    if fail_component:
+        assert outcome.get('isError') is True
+        assert git(f.remotes / 'central', 'rev-parse', 'refs/heads/main') == f.remote_before_push, 'Central published a missing dependency'
+        assert not any('project.git' in t for t in targets), 'Central push attempted after dependency failure'
+    else:
+        assert not outcome.get('isError'), outcome
+        assert targets[-1] == 'https://github.com/test/project.git'
+        assert git(f.remotes / 'central', 'rev-parse', 'refs/heads/main') == f.central_to_push
+        refs = git(f.remotes / 'component', 'for-each-ref', '--format=%(objectname)').splitlines()
+        assert f.component_to_push in refs, 'Manifest component commit has no published ref'
 
 
 def main():
     if not REPO or not (REPO_SOURCE / 'main.py').is_file() or not (REPO_SOURCE / '.git').exists():
         print('Fixture dependency missing: install repo and set REQVIRE_TEST_REPO_SOURCE to a local git-repo Git checkout.', file=sys.stderr)
         return 2
+    # Each group has one fixed startup policy and an intentional sequence:
+    # reads before edits; isolated branch checks before editing main; denied
+    # publication before its repaired retry. Failure injection/admission and
+    # automatic commits keep their own processes. No protocol helper is copied.
+    factories = {
+        'mcp-snapshot': lambda: (Fixture('mcp-snapshot', cross_reference=True), {}),
+        'serve-snapshot': lambda: (Fixture('serve-snapshot'), {'mode': 'serve'}),
+        'explicit-commit': lambda: (Fixture('explicit-commit', multiple_components=True), {}),
+        'push': push_fixture,
+    }
+    sessions = {}
+    stack = ExitStack()
+
+    def shared(key):
+        if key not in sessions:
+            try:
+                fixture, options = factories[key]()
+                sessions[key] = fixture, stack.enter_context(fixture.server(**options))
+            except Exception as error:
+                # Keep startup failure visible for every affected case without
+                # repeatedly constructing the same failed fixture/server.
+                sessions[key] = error
+        value = sessions[key]
+        if isinstance(value, Exception):
+            raise RuntimeError('Shared server unavailable: ' + key) from value
+        return value
+
     cases = [
-        ('mcp/complete-declared-snapshot', lambda: complete_snapshot('mcp')),
-        ('serve/complete-declared-snapshot', lambda: complete_snapshot('serve')),
+        ('mcp/complete-declared-snapshot', lambda: complete_snapshot('mcp', shared)),
+        ('serve/complete-declared-snapshot', lambda: complete_snapshot('serve', shared)),
         ('cli/explicit-manifest-selection', explicit_manifest),
         ('cli/invalid-selected-manifest-rejected', invalid_manifest),
         ('cli/invalid-project-boundaries-rejected', project_boundaries),
         ('cli/only-declared-project-sources', declared_sources_only),
-        ('mcp/central-branch-component-revisions', branch_revisions),
-        ('mcp/cross-project-preview-apply', cross_project_mutation),
-        ('mcp/explicit-component-first-commit', lambda: component_commit(False)),
-        ('mcp/automatic-component-first-commit', lambda: component_commit(True)),
+        ('mcp/central-branch-component-revisions', lambda: branch_revisions(shared)),
+        ('mcp/cross-project-preview-apply', lambda: cross_project_mutation(shared)),
+        ('mcp/explicit-component-first-commit', lambda: component_commit(False, shared)),
+        ('mcp/automatic-component-first-commit', lambda: component_commit(True, shared)),
         ('mcp/dirty-component-admission', dirty_component),
         ('mcp/failed-central-checkpoint-retains-component', failed_central_commit),
-        ('serve/combined-publication-and-branch-picker', explorer),
-        ('mcp/dependency-first-push', lambda: push(False)),
-        ('mcp/failed-dependency-push-preserves-central', lambda: push(True)),
+        ('serve/combined-publication-and-branch-picker', lambda: explorer(shared)),
+        ('mcp/failed-dependency-push-preserves-central', lambda: push(True, shared)),
+        ('mcp/dependency-first-push', lambda: push(False, shared)),
     ]
     failures = []
-    for name, test in cases:
-        try:
-            test()
-        except Exception:
-            failures.append(name)
-            detail = traceback.format_exc()
-            (OUTPUT / (name.replace('/', '-') + '.failure.txt')).write_text(detail)
-            print(detail, file=sys.stderr)
-            print('FAIL ' + name, flush=True)
-        else:
-            print('PASS ' + name, flush=True)
-    (OUTPUT / 'summary.json').write_text(json.dumps({'cases': len(cases), 'failures': failures}, indent=2))
+    with stack:
+        for name, test in cases:
+            try:
+                test()
+            except Exception:
+                failures.append(name)
+                detail = traceback.format_exc()
+                (OUTPUT / (name.replace('/', '-') + '.failure.txt')).write_text(detail)
+                print(detail, file=sys.stderr)
+                print('FAIL ' + name, flush=True)
+            else:
+                print('PASS ' + name, flush=True)
+    (OUTPUT / 'summary.json').write_text(json.dumps({
+        'cases': len(cases), 'failures': failures, 'server_starts': len(SERVER_STARTS),
+        'servers': SERVER_STARTS}, indent=2))
     return int(bool(failures))
 
 

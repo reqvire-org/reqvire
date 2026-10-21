@@ -1,0 +1,31 @@
+# Elements
+
+### Central Capability
+
+Compose declared component models.
+
+#### Metadata
+  * type: capability
+---
+
+### Central Consumer
+
+The system SHALL provide the shared component contract.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Central Capability](#central-capability)
+---
+
+### Shared Specification
+
+The shared contract is consumed by two components.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Central Consumer](#central-consumer)
+---

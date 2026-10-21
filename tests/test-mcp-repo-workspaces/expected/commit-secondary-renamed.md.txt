@@ -1,0 +1,34 @@
+# Elements
+
+### Secondary Capability
+
+Provide component behavior.
+
+#### Metadata
+  * type: capability
+---
+
+### Secondary Requirement
+
+The system SHALL expose the selected component behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Updated Shared Specification](../../Model.md#updated-shared-specification)
+
+#### Relations
+  * specify: [Secondary Capability](#secondary-capability)
+---
+
+### Secondary Specification
+
+The selected component behavior is alpha.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Secondary Requirement](#secondary-requirement)
+---
