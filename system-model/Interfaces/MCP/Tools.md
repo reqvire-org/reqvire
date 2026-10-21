@@ -1186,7 +1186,7 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 ### MCP Worktree Model Sessions
 
-WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository, including manifest-defined Repo workspaces through one MCP endpoint.
+WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository through one MCP endpoint, including manifest-defined Repo workspaces.
 
 #### Details
 Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.

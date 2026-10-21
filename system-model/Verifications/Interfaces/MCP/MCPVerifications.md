@@ -952,6 +952,52 @@ Verify the successful and rejected paths of mcp pull request creation.
   * verify: [MCP Pull Request Creation](../../../Interfaces/MCP/Tools.md#mcp-pull-request-creation)
 ---
 
+### MCP Repo Change Publication Verification
+
+Verify the owning-repository save and publication boundaries for one combined Repo model.
+
+#### Details
+- The explicit and automatic component-commit cases add a component model file, require its exact golden bytes in the component commit, preserve the selected component parent, and forbid tracking component files in Central. The final Central commit's manifest pins that component commit, pending state clears only after that checkpoint, and a repeated no-op creates no further commit. Default acceptance before explicit commit leaves all indexes and HEADs unchanged.
+- `mcp/failed-central-checkpoint-retains-component` rejects the final Central Git reference transaction. Require a tool error, unchanged Central HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
+- The push cases start from an independently prepared saved Central manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before Central and a reachable component ref. A denied component push must prevent every Central push attempt and preserve local saved commits and the previous Central remote tip.
+- Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [added.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/added.md.txt)
+  * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
+  * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
+---
+
+### MCP Repo Context Isolation Verification
+
+Verify that the existing Central branch context owns a complete isolated Repo view and applies model changes through its accepted snapshot.
+
+#### Details
+- `mcp/central-branch-component-revisions` creates a context from a different Central commit whose manifest pins a second locally available component commit. Require separate component directories and Repo metadata, unchanged original files/indexes/HEADs, different selected content under the same component identifier, and no invented matching component branch. Remove and reopen the managed context; require its recorded component content again.
+- `mcp/cross-project-preview-apply` previews a component contract rename referenced from Central. Require a complete diff, unchanged source/index/HEAD/revision after preview and rejected duplicate naming, then exact committed golden file contents in both repositories after acceptance. Default mutation leaves Git indexes and HEADs unchanged and reports both pending paths.
+- `mcp/dirty-component-admission` requires a dirty declared project to fail mutation admission with its path; rejecting admission cannot alter files or Git state.
+- Exercise existing typed branch-selected tools over the real HTTP server. Do not add a project selector or substitute a single-repository test adapter for Repo preparation.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [central-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/central-renamed.md.txt)
+  * satisfiedBy: [component-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/component-renamed.md.txt)
+  * verify: [MCP Managed Worktree Removal](../../../Interfaces/MCP/Tools.md#mcp-managed-worktree-removal)
+  * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
+  * verify: [MCP Worktree Context Isolation](../../../Interfaces/MCP/Tools.md#mcp-worktree-context-isolation)
+  * verify: [MCP Worktree Creation](../../../Interfaces/MCP/Tools.md#mcp-worktree-creation)
+  * verify: [MCP Worktree Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-worktree-opening-and-inventory)
+---
+
 ### MCP Worktree Context Isolation Verification
 
 Verify that MCP worker sessions implement the shared context boundary on successful and rejected paths.

@@ -416,6 +416,28 @@ The search fixture and expected output establish parsing and content placement. 
   * verify: [Reserved Subsections Support](../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
 ---
 
+### Repo Manifest Workspace Source Verification
+
+Verify the manifest-defined source boundary through real initialized Repo clients and local Git remotes.
+
+#### Details
+- Run `mcp/complete-declared-snapshot` and `serve/complete-declared-snapshot`: CLI and mutation-enabled MCP return the same Central and declared component elements, including a Central requirement's component contract reference and the workspace-relative component identifier.
+- Run the CLI manifest cases: explicit `--manifest default.xml` selects the same complete model; an invalid or missing selected manifest is rejected with its path. Initialized Repo discovery rejects duplicate or escaping project paths, unavailable commits and missing checkouts without changing inputs or Git state. A nested Git repository absent from the manifest does not contribute model elements.
+- The suite requires the real Repo launcher and a local git-repo source checkout through `REQVIRE_TEST_REPO_SOURCE`. Repo initialization/synchronization uses only local fixture remotes. Missing dependencies fail fixture preparation; they do not count as successful feature rejection.
+- Compare the committed expected outcome file with the accumulated case outcomes. Every expected outcome is PASS; a failed source admission or a missing selector remains a failing acceptance case.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [check_repo_workspaces.py](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
+  * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)
+  * verify: [CLI Repo Manifest Selection](../../Interfaces/CLI/RepoWorkspaces.md#cli-repo-manifest-selection)
+  * verify: [Manifest-Defined Workspace Scope](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope)
+---
+
 ### Requirement Governance Metadata Verification
 
 This verification shall prove that requirement governance metadata is parsed, validated against the governance metadata contract, and exposed as effective model evidence without losing whether each value is explicit, inherited, or default.

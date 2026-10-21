@@ -306,6 +306,26 @@ This test verifies production served/exported trace rendering and the shared nat
   * verify: [Traces View Generation](../../../Interfaces/WebExplorer/Capabilities.md#traces-view-generation)
 ---
 
+### Explorer Repo Context Publication Verification
+
+Verify combined Repo model publication through the existing Explorer runtime and Central branch picker.
+
+#### Details
+- `serve/combined-publication-and-branch-picker` starts the embedded mutation-enabled HTTP server. Require the full project store to contain Central and declared component elements. A component preview retains the published manifest; accepted component changes update the full store and manifest through existing publication.
+- Create a second Central context from a manifest selecting different component content. Use the shared real-browser lifecycle to open `?branch=main`, verify the canonical component identifier, then select `topic` with the existing Branch control. Require the new context's component content and URL selector.
+- Keep the server and browser fixture-owned and stop them on failure. Do not replace the browser's store or add a component picker to manufacture acceptance.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
+  * satisfiedBy: [browser-repo.mjs](../../../../tests/test-mcp-repo-workspaces/browser-repo.mjs)
+  * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
+  * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)
+---
+
 ### Explorer Route Identifier Resolution Verification
 
 Verify authored identifiers through the compiled Explorer served by the CLI in a real browser.
