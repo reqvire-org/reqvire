@@ -12,11 +12,11 @@ Compose declared component models.
 
 The system SHALL consume the selected component contract.
 
-#### Contract References
-  * [Updated Component Specification](repositories/component/Model.md#updated-component-specification)
-
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Updated Component Specification](repositories/component/Model.md#updated-component-specification)
 
 #### Relations
   * specify: [Central Capability](#central-capability)
