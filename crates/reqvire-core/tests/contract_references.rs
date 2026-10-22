@@ -280,6 +280,66 @@ fn contract_reference_tools_preserve_semantics_and_refresh_revisions() {
         read_reference(),
         "specifications/Other.md#error-response-specification"
     );
+
+    // Exercise same-filename path shadowing through the dispatcher, without an
+    // additional server or test process. The E2E case uses these same goldens.
+    let collision_files = ["Model.md", "nested/Model.md"];
+    for file in collision_files {
+        let target = workspace.path().join(file);
+        fs::create_dir_all(target.parent().expect("fixture parent"))
+            .expect("create collision fixture folder");
+        fs::copy(fixture.join("fixtures/same-basename").join(file), target)
+            .expect("copy collision fixture");
+    }
+    let before_collision: Vec<_> = collision_files
+        .iter()
+        .map(|file| fs::read_to_string(file).expect("source before rename"))
+        .collect();
+    tools
+        .call_tool(
+            "reqvire.read_element",
+            &json!({"name": "Collision Reference Consumer"}),
+        )
+        .expect("collision fixture must be valid before renaming");
+    let mut rename = json!({
+        "element_name": "Collision Specification",
+        "new_name": "Renamed Collision Specification",
+        "dry_run": true,
+    });
+    let preview = tools
+        .call_tool("reqvire.rename_element", &rename)
+        .expect("preview must preserve workspace-root contract identity");
+    assert!(preview
+        .to_string()
+        .contains("../Model.md#renamed-collision-specification"));
+    for (file, before) in collision_files.iter().zip(&before_collision) {
+        assert_eq!(
+            fs::read_to_string(file).expect("source after preview"),
+            *before
+        );
+    }
+    rename["dry_run"] = json!(false);
+    tools
+        .call_tool("reqvire.rename_element", &rename)
+        .expect("rename must not resolve a root contract in the consumer's folder");
+    for file in collision_files {
+        assert_eq!(
+            fs::read_to_string(file).expect("renamed source"),
+            fs::read_to_string(fixture.join("expected/same-basename").join(file))
+                .expect("expected renamed source"),
+            "unexpected rename output in {file}",
+        );
+    }
+    let renamed = tools
+        .call_tool(
+            "reqvire.read_element",
+            &json!({"name": "Collision Reference Consumer"}),
+        )
+        .expect("reload renamed contract reference");
+    assert_eq!(
+        renamed["contract_references"][0]["target"]["ElementIdentifier"],
+        "Model.md#renamed-collision-specification",
+    );
 }
 
 #[test]

@@ -93,8 +93,7 @@ fn rewrite_moved_concept_reference_targets(
             continue;
         };
 
-        let Ok(link) =
-            crate::utils::concept_reference_relative_link(&element.file_path, new_target)
+        let Ok(link) = crate::utils::model_reference_relative_link(&element.file_path, new_target)
         else {
             output.push(line.to_string());
             continue;
@@ -605,22 +604,21 @@ impl GraphRegistry {
                                 .unwrap_or_else(|| std::path::Path::new("."))
                                 .to_path_buf();
 
-                            // Use to_relative_identifier to make identifier relative to current file
-                            let relative_id = crate::utils::to_relative_identifier(
-                                identifier,
-                                &current_folder,
-                                true,
-                            )
-                            .unwrap_or_else(|_| identifier.clone());
-
                             let relative_id = if section == CONTRACT_REFERENCES_SECTION {
-                                crate::utils::concept_reference_relative_link(
+                                crate::utils::model_reference_relative_link(
                                     _current_file,
                                     identifier,
                                 )
-                                .unwrap_or(relative_id)
+                                .unwrap_or_else(|_| identifier.clone())
                             } else {
-                                relative_id
+                                // Registry identifiers are workspace-relative,
+                                // rather than relative to this document's folder.
+                                crate::utils::to_relative_identifier(
+                                    &format!("/{identifier}"),
+                                    &current_folder,
+                                    true,
+                                )
+                                .unwrap_or_else(|_| identifier.clone())
                             };
 
                             // Look up actual element name from registry for human-readable display
@@ -693,8 +691,7 @@ impl GraphRegistry {
                             .find('#')
                             .map_or(target_id.as_str(), |file_pos| &target_id[..file_pos]);
 
-                        // Get current file path for comparison
-                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        // Compare full workspace-relative file identities.
                         let current_file_str = _current_file;
 
                         // If target is in the same file, use just the fragment
@@ -704,16 +701,9 @@ impl GraphRegistry {
                         {
                             format!("[{}](#{})", display_name, fragment)
                         } else {
-                            // Make the link relative using just the folder of the current file
-                            let current_folder = current_file_path
-                                .parent()
-                                .unwrap_or_else(|| std::path::Path::new("."))
-                                .to_path_buf();
-
-                            let relative_link = crate::utils::to_relative_identifier(
-                                relation.target.link.as_str(),
-                                &current_folder,
-                                false,
+                            let relative_link = crate::utils::model_reference_relative_link(
+                                _current_file,
+                                target_id,
                             )
                             .unwrap_or_else(|_| relation.target.link.as_str().to_string());
 
@@ -819,7 +809,7 @@ impl GraphRegistry {
                 continue;
             }
             let Some(link) =
-                crate::utils::concept_reference_relative_link(current_file, &target_id).ok()
+                crate::utils::model_reference_relative_link(current_file, &target_id).ok()
             else {
                 output.push(line.to_string());
                 continue;
@@ -1042,9 +1032,12 @@ impl GraphRegistry {
                             .parent()
                             .unwrap_or_else(|| Path::new("."))
                             .to_path_buf();
-                        let relative_id =
-                            crate::utils::to_relative_identifier(target_id, &current_folder, true)
-                                .unwrap_or_else(|_| target_id.clone());
+                        let relative_id = crate::utils::to_relative_identifier(
+                            &format!("/{target_id}"),
+                            &current_folder,
+                            true,
+                        )
+                        .unwrap_or_else(|_| target_id.clone());
                         let display_name = self
                             .get_element(target_id)
                             .map(|e| e.name.clone())

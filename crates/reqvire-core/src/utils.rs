@@ -35,7 +35,9 @@ pub(crate) fn compile_glob_matcher(pattern: &str) -> Result<GlobMatcher, Reqvire
     Ok(Glob::new(pattern)?.compile_matcher())
 }
 
-pub(crate) fn concept_reference_relative_link(
+/// Render a normalized workspace-relative model identifier from a source file.
+/// Its path is rooted at the workspace, even when a same-named local file exists.
+pub(crate) fn model_reference_relative_link(
     source_file: &str,
     target_identifier: &str,
 ) -> Result<String, ReqvireError> {
@@ -47,7 +49,7 @@ pub(crate) fn concept_reference_relative_link(
         .parent()
         .map(PathBuf::from)
         .unwrap_or_default();
-    to_relative_identifier(target_identifier, &source_parent, false)
+    to_relative_identifier(&format!("/{target_identifier}"), &source_parent, false)
 }
 
 pub(crate) fn resolve_model_target_identifier(

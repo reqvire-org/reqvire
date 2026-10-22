@@ -2064,22 +2064,8 @@ pub fn reuse_contract_element_identifier(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
     let contract_binding_display_name = contract_bindings_element.name.clone();
-    let contract_binding_file_path = contract_bindings_element.file_path.clone();
-
-    let relative_identifier = if file_path == contract_binding_file_path {
-        let (_path, fragment_opt) =
-            crate::utils::extract_path_and_fragment(&contract_bindings_identifier);
-        let fragment = fragment_opt.unwrap_or(&contract_bindings_identifier);
-        format!("#{}", fragment)
-    } else {
-        let target_file_path_buf = std::path::PathBuf::from(&file_path);
-        let target_folder = target_file_path_buf
-            .parent()
-            .unwrap_or_else(|| std::path::Path::new("."))
-            .to_path_buf();
-        crate::utils::to_relative_identifier(&contract_bindings_identifier, &target_folder, true)
-            .unwrap_or_else(|_| contract_bindings_identifier.clone())
-    };
+    let relative_identifier =
+        crate::utils::model_reference_relative_link(&file_path, &contract_bindings_identifier)?;
 
     let new_content = add_element_contract_bindings_to_element(
         &content,
@@ -2161,25 +2147,8 @@ pub fn remove_reused_contract_element_identifier(
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    let target_file_path = std::path::PathBuf::from(&file_path);
-    let target_folder = target_file_path
-        .parent()
-        .unwrap_or_else(|| std::path::Path::new("."))
-        .to_path_buf();
-    let relative_identifier = {
-        let (identifier_path, fragment_opt) =
-            crate::utils::extract_path_and_fragment(&contract_bindings_identifier);
-        if identifier_path == file_path {
-            format!("#{}", fragment_opt.unwrap_or(&contract_bindings_identifier))
-        } else {
-            crate::utils::to_relative_identifier(
-                &contract_bindings_identifier,
-                &target_folder,
-                true,
-            )
-            .unwrap_or_else(|_| contract_bindings_identifier.clone())
-        }
-    };
+    let relative_identifier =
+        crate::utils::model_reference_relative_link(&file_path, &contract_bindings_identifier)?;
 
     let new_content = remove_element_contract_bindings_from_element(
         &content,
