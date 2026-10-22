@@ -265,6 +265,7 @@ Verify contract reference identifier updates across authored models and publishe
 - Invalid mutations leave every authored file unchanged; dry runs return a diff without writing.
 - Link, relink, create, override, ownership or hierarchy edits, and merge reject candidate reference cycles atomically. Shared core and MCP dispatch cover successful and rejected mutations.
 - Create and override retain references. Moves of contracts, referencing requirements, files, and folders, plus contract renames and requirement merges, preserve the target identity and correct relative links.
+- When a contract target and a consumer document have the same filename in different folders, rename preview preserves the workspace-root target and leaves authored files unchanged. Apply preserves relative Contract References, Contract Bindings, and ordinary hierarchy links; both files match expected output and reload resolves the renamed contract to its original file.
 - Overriding a referenced contract retains incoming references and externally authored ownership. Invalid source-type, target-type, or ownership changes fail atomically; a valid contract-content override retains its consumers.
 - Changing a referenced contract's owner from requirement to capability is rejected in both apply and dry-run modes, even when its hierarchy relation is valid for a capability. Every authored file remains unchanged and the original model still validates.
 - A cross-file contract override rewrites incoming references and externally authored ownership to the replacement identifier. Its dry-run diff includes those rewrites and leaves every authored file unchanged; applying it produces the expected files and a valid model.
@@ -281,6 +282,7 @@ Verify contract reference identifier updates across authored models and publishe
 #### Relations
   * derivedFrom: [Contract Bindings and Resource Operation Verification Objective](#contract-bindings-and-resource-operation-verification-objective)
   * satisfiedBy: [contract_references.rs](../../../../crates/reqvire-core/tests/contract_references.rs)
+  * satisfiedBy: [check_references.py](../../../../tests/test-contract-references/check_references.py)
   * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
   * verify: [MCP Relation Management Tools](../../../Interfaces/MCP/Tools.md#mcp-relation-management-tools)
