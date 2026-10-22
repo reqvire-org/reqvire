@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { build } from "vite";
 import { runScenarioCompiler } from "@reqvire-org/ads/scenarios/compiler";
-import { createPreviewResources, previewEntriesPlugin } from "@reqvire-org/ads/scenarios/vite";
+import { createVitePreviewBuilder, previewEntriesPlugin } from "@reqvire-org/ads/scenarios/vite";
 
 const root = path.resolve(import.meta.dirname, "..");
 const runScript = promisify(execFile);
@@ -15,16 +15,18 @@ await runScenarioCompiler(root, {
     try { await runScript("npm", ["run", "check"], { cwd: root }); }
     catch (error) { throw new Error([error.stdout, error.stderr].filter(Boolean).join("\n") || error.message); }
   },
-  async buildGraph(entries, options, track) {
-    const mount = path.join(options.dsRoot, "showcase/mcp/main.tsx");
-    // Reuse production extraction, framework aliases, assets and runtime guards.
-    const output = await build({ configFile: config, root, base: "./", publicDir: false,
-      plugins: [previewEntriesPlugin(entries.map(entry => ({ ...entry, root })), mount), track],
-      worker: { format: "iife" },
-      build: { write: false, cssCodeSplit: true, assetsInlineLimit: 0, modulePreload: false,
-        rollupOptions: { preserveEntrySignatures: "strict", input: Object.fromEntries(entries.map((_entry, index) => [`scenario-${index}`, `ads-preview-entry:${index}`])),
-          output: { entryFileNames: "assets/preview-[name]-[hash].js", chunkFileNames: "assets/[name]-[hash].js", assetFileNames: "assets/[name]-[hash][extname]" } } },
-    });
-    return createPreviewResources(output, options, entries);
-  },
+  buildGraph: createVitePreviewBuilder({
+    build,
+    configure(entries, options) {
+      const mount = path.join(options.dsRoot, "showcase/mcp/main.tsx");
+      // Reuse production extraction, framework aliases, assets and runtime guards.
+      return { configFile: config, root, base: "./", publicDir: false,
+        plugins: [previewEntriesPlugin(entries.map(entry => ({ ...entry, root })), mount)],
+        worker: { format: "iife" },
+        build: { write: false, cssCodeSplit: true, assetsInlineLimit: 0, modulePreload: false,
+          rollupOptions: { preserveEntrySignatures: "strict", input: Object.fromEntries(entries.map((_entry, index) => [`scenario-${index}`, `ads-preview-entry:${index}`])),
+            output: { entryFileNames: "assets/preview-[name]-[hash].js", chunkFileNames: "assets/[name]-[hash].js", assetFileNames: "assets/[name]-[hash][extname]" } } },
+      };
+    },
+  }),
 });

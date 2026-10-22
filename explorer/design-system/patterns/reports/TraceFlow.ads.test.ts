@@ -1,6 +1,6 @@
 import { testFlowLayoutEngine } from "../../test/flowLayoutEngine.ads.helpers";
 import { describe, expect, it } from "vitest";
-import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, type TraceFlowData, type TraceFlowDirection } from "./traceFlowLayout";
+import { buildTraceFlowGraph as buildGraph, buildTraceFlowTopology, traceFlowNeighborhood, type TraceFlowData, type TraceFlowDirection } from "./TraceFlow.layout";
 import { SPLIT_MERGE_TRACE } from "./fixtures/traces.ads.fixture";
 
 const nodeSize = { width: 280, height: 164 };

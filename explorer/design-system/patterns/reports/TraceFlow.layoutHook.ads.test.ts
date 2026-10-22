@@ -1,8 +1,8 @@
 import { act, renderHook, waitFor, cleanup } from "@/test/render";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ElkNode } from "elkjs/lib/elk-api";
-import { buildTraceFlowTopology, type TraceFlowDirection, type TraceFlowNodeSize } from "./traceFlowLayout";
-import { useTraceFlowLayout } from "./useTraceFlowLayout";
+import { buildTraceFlowTopology, type TraceFlowDirection, type TraceFlowNodeSize } from "./TraceFlow.layout";
+import { useTraceFlowLayout } from "./TraceFlow.useLayout";
 
 afterEach(cleanup);
 const nodeSize = { width: 260, height: 180 };

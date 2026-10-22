@@ -16,8 +16,8 @@ import { ExpandableViewport } from "../../components/core/ExpandableViewport";
 import {
   buildTraceFlowTopology, traceFlowNeighborhood,
   type TraceFlowData, type TraceFlowElement, type TraceFlowDirection, type TraceFlowTopology, type ElementFlowData, type FlowLayoutEngine, type TraceFlowNodeSize,
-} from "./traceFlowLayout";
-import { useTraceFlowLayout } from "./useTraceFlowLayout";
+} from "./TraceFlow.layout";
+import { useTraceFlowLayout } from "./TraceFlow.useLayout";
 
 export interface TraceFlowProps {
   trace: TraceFlowData;

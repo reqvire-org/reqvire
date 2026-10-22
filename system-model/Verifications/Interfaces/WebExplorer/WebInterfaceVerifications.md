@@ -247,7 +247,7 @@ Verify the Model Flow mode through the same application and design-system patter
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [TraceFlow.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.ads.test.ts)
-  * satisfiedBy: [traceFlowLayoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.ads.test.ts)
+  * satisfiedBy: [TraceFlow.layoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.layoutInput.ads.test.ts)
   * satisfiedBy: [modelFlow.test.ts](../../../../explorer/src/lib/modelFlow.test.ts)
   * satisfiedBy: [StoreContext.test.tsx](../../../../explorer/src/store/StoreContext.test.tsx)
   * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
@@ -293,9 +293,9 @@ This test verifies production served/exported trace rendering and the shared nat
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [TraceFlow.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.ads.test.ts)
-  * satisfiedBy: [TraceFlowViewport.ads.test.tsx](../../../../explorer/design-system/patterns/reports/TraceFlowViewport.ads.test.tsx)
-  * satisfiedBy: [traceFlowLayoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/traceFlowLayoutInput.ads.test.ts)
-  * satisfiedBy: [useTraceFlowLayout.ads.test.ts](../../../../explorer/design-system/patterns/reports/useTraceFlowLayout.ads.test.ts)
+  * satisfiedBy: [TraceFlow.layoutHook.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.layoutHook.ads.test.ts)
+  * satisfiedBy: [TraceFlow.layoutInput.ads.test.ts](../../../../explorer/design-system/patterns/reports/TraceFlow.layoutInput.ads.test.ts)
+  * satisfiedBy: [TraceFlow.viewport.ads.test.tsx](../../../../explorer/design-system/patterns/reports/TraceFlow.viewport.ads.test.tsx)
   * satisfiedBy: [traceFlow.test.ts](../../../../explorer/src/lib/traceFlow.test.ts)
   * satisfiedBy: [ExplorerFlow.integration.test.tsx](../../../../explorer/src/test/ExplorerFlow.integration.test.tsx)
   * satisfiedBy: [TracesView.test.tsx](../../../../explorer/src/views/TracesView.test.tsx)

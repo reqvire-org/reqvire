@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@/test/render";
 import { expect, it } from "vitest";
-import WorkspaceScenario from "../../design-system/composition/Workspace/Workspace.ads.scenario";
-import { TRACE_EXAMPLES } from "../../design-system/patterns/reports/fixtures/traces.ads.fixture";
+import WorkspaceScenario from "./Workspace.ads.scenario";
+import { TRACE_EXAMPLES } from "../../patterns/reports/fixtures/traces.ads.fixture";
 it("composes public mock patterns with fixture navigation and local detail callbacks", async () => {
   history.replaceState(null, "", "/?tab=mocks");
   const view = render(<WorkspaceScenario />);

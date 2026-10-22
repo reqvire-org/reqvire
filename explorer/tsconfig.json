@@ -52,7 +52,7 @@
     "types",
     "vite.config.ts",
     "vitest.config.ts",
-    "playwright.config.ts",
+    "playwright.ads.config.ts",
     "design-system/vite.bundle.config.ts",
     "preact.config.ts"
   ]

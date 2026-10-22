@@ -1,4 +1,4 @@
-import type { FlowLayoutEngine } from "./traceFlowLayout";
+import type { FlowLayoutEngine } from "./TraceFlow.layout";
 import type { ElkNode } from "elkjs/lib/elk-api";
 import ELK from "elkjs/lib/elk-api";
 

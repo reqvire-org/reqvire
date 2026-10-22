@@ -26,7 +26,7 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + test + build:app + test:ads
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.27` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.32` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
 Oxlint is pinned to `1.72.0` so guarded candidate linting also works inside the
 ignored `.ds/` workspace; `1.69.0` can incorrectly select no source files there.
@@ -116,7 +116,7 @@ npm run build:mcp-previews -- --watch  # advanced: compiler without the managed 
 
 ### Browser verification
 
-`playwright.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
+`playwright.ads.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
 The owners' `.ads.contract.ts` files register the checks with the `widget`
 profile in `ds.config.json`. `npm run test:ads` first validates and compiles the
 preview graph, then calls `ads verify .`, which starts
@@ -228,19 +228,23 @@ npm run ads-mcp -- --port 4191
 Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.27`; build checks and
+These launch commands use `npx --yes @reqvire-org/ads@0.3.32`; build checks and
 the preview compiler use the same published version installed by `npm ci`.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.27 mcp explorer --mutations
+npx --yes @reqvire-org/ads@0.3.32 mcp explorer --mutations
 ```
 
 MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
 `npm --silent run ads-read-mcp` to keep stdout exclusive to JSON-RPC. Restart the
 MCP connection after changing client configuration or upgrading ADS.
+
+The managed preview compiler keeps a persistent Vite graph and reuses unchanged
+module transforms after edits. Validation still gates publication. One-off
+`build:mcp-previews` commands remain checked, fresh builds.
 
 For visual review through MCP, discover a scenario with `ads_scenarios` and call
 `ads_capture` with its exact ID. Screenshot-enabled patch/transaction dry runs

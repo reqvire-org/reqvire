@@ -323,8 +323,8 @@ When a user selects a modeled element, file, or folder in Model Flow, the system
 
 #### Relations
   * derivedFrom: [Model-Centric View Generation](#model-centric-view-generation)
+  * satisfiedBy: [TraceFlow.layout.ts](../../../explorer/design-system/patterns/reports/TraceFlow.layout.ts)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/patterns/reports/TraceFlow.tsx)
-  * satisfiedBy: [traceFlowLayout.ts](../../../explorer/design-system/patterns/reports/traceFlowLayout.ts)
   * satisfiedBy: [modelFlow.ts](../../../explorer/src/lib/modelFlow.ts)
   * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
   * specify: [Explorer Directional Model Browsing](../InterfacesFeature.md#explorer-directional-model-browsing)

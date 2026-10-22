@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
-import { buildTraceFlowGraph, type TraceFlowGraph, type TraceFlowTopology, type TraceFlowDirection, type FlowLayoutEngine, type FlowLayoutTask, type TraceFlowNodeSize } from "./traceFlowLayout";
+import { buildTraceFlowGraph, type TraceFlowGraph, type TraceFlowTopology, type TraceFlowDirection, type FlowLayoutEngine, type FlowLayoutTask, type TraceFlowNodeSize } from "./TraceFlow.layout";
 
 /** Keep the map available during layout and apply only the latest request. */
 export function useTraceFlowLayout(topology: TraceFlowTopology, direction: TraceFlowDirection, layoutEngine: FlowLayoutEngine, nodeSize: TraceFlowNodeSize | null) {

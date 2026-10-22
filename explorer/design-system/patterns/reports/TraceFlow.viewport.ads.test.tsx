@@ -7,7 +7,7 @@ const graphs = vi.hoisted(() => Object.fromEntries(["DOWN", "RIGHT"].map(directi
   direction, nodeSize: { width: 300, height: 180 }, bounds: { x: 0, y: 0, width: 300, height: 180 }, edges: [],
   nodes: [{ id: "root", element: { id: "root", name: "Root", file: "Model.md" }, type: "capability", context: "Model", parentCount: 0, position: { x: 0, y: 0 } }],
 }])));
-vi.mock("./useTraceFlowLayout", () => ({
+vi.mock("./TraceFlow.useLayout", () => ({
   useTraceFlowLayout: (_topology: unknown, direction: string) => ({ graph: graphs[direction], pending: false, failed: false, retry: vi.fn() }),
 }));
 vi.mock("@xyflow/react", async importOriginal => ({

@@ -1,6 +1,6 @@
 import type { ElkNode } from "elkjs/lib/elk-api";
 import { describe, expect, it, vi } from "vitest";
-import { buildTraceFlowGraph, type TraceFlowDirection, type TraceFlowTopology } from "./traceFlowLayout";
+import { buildTraceFlowGraph, type TraceFlowDirection, type TraceFlowTopology } from "./TraceFlow.layout";
 
 const nodeSize = { width: 240, height: 150 };
 const layout = vi.fn<(input: ElkNode) => Promise<ElkNode>>();
