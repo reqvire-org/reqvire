@@ -229,6 +229,41 @@ def explicit_manifest():
     result = command(f.central, BINARY, '--manifest', 'default.xml', 'search', '--json')
     found = sorted(e['name'] for data in json.loads(result.stdout)['files'].values() for e in data['elements'])
     assert found == EXPECTED_NAMES, 'Explicit selection did not reach shared discovery'
+    # Count actual Repo resolver launches, rather than relying on a wall-clock
+    # threshold. File evidence must not reload the whole project inventory.
+    original = (f.central / 'Model.md').read_text()
+    evidence = f.central / 'evidence'
+    evidence.mkdir()
+    resolver_bin = f.output / 'resolver-bin'
+    resolver_bin.mkdir()
+    launches = f.output / 'resolver-launches.txt'
+    wrapper = resolver_bin / 'python3'
+    wrapper.write_text(f'#!{sys.executable}\n'
+                       'import os, sys\n'
+                       "if len(sys.argv) > 2 and sys.argv[1] == '-c' and "
+                       "'from manifest_xml import RepoClient' in sys.argv[2]:\n"
+                       f'    with open({str(launches)!r}, "a") as log:\n'
+                       '        log.write("resolve\\n")\n'
+                       f'os.execv({sys.executable!r}, [{sys.executable!r}, *sys.argv[1:]])\n')
+    wrapper.chmod(0o755)
+    counts = []
+    for count in (1, 64):
+        relations = ''.join(f'  * satisfiedBy: [Evidence {i}](evidence/{i}.txt)\n'
+                            for i in range(count))
+        for i in range(count):
+            (evidence / f'{i}.txt').write_text('Evidence\n')
+        (f.central / 'Model.md').write_text(original.replace(
+            '#### Relations\n', '#### Relations\n' + relations))
+        launches.write_text('')
+        command(f.central, BINARY, '--manifest', 'default.xml', 'validate',
+                env={**ENV, 'PATH': str(resolver_bin) + os.pathsep + ENV['PATH']})
+        counts.append(len(launches.read_text().splitlines()))
+    (f.output / 'resolver-counts.json').write_text(json.dumps(counts))
+    assert counts[0] > 0 and counts[0] == counts[1], (
+        f'File references repeated Repo scope resolution: 1 reference={counts[0]}, '
+        f'64 references={counts[1]}')
+    (f.central / 'Model.md').write_text(original)
+    shutil.rmtree(evidence)
     # Only Central has this include. Repo's separate remote-manifest checkout
     # must not supply an older input, and Repo still owns extend semantics.
     manifest = (f.central / 'default.xml').read_text()

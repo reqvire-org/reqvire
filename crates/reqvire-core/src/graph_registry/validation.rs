@@ -227,6 +227,10 @@ impl GraphRegistry {
         log::debug!("Running relation validation...");
         let mut errors = Vec::new();
         let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        // Discovery validates the whole manifest and every project checkout.
+        // Share its result (including failure) across this pass's file targets.
+        // Keep it local so the next validation observes its current scope.
+        let workspace_scope = std::cell::OnceCell::new();
 
         for source_id in &element_ids {
             if let Some(source_node) = self.nodes.get(source_id) {
@@ -290,7 +294,8 @@ impl GraphRegistry {
 
                             // Validate file existence and workspace eligibility for InternalPath targets.
                             // InternalPath contains normalized workspace-root-relative paths.
-                            let workspace_scope = match crate::workspace::WorkspaceScope::discover()
+                            let workspace_scope = match workspace_scope
+                                .get_or_init(crate::workspace::WorkspaceScope::discover)
                             {
                                 Ok(scope) => scope,
                                 Err(error) => {
