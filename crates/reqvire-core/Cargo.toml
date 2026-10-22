@@ -34,6 +34,8 @@ log = { workspace = true }
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }
+quick-xml = { workspace = true }
+tempfile = { workspace = true }
 
 # Performance
 rustc-hash = { workspace = true }

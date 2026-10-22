@@ -4,13 +4,21 @@ This is the static website for Reqvire. It is a Vite + React site built with
 `vite-react-ssg`, so production output is plain static HTML, CSS, and assets in
 `dist/`.
 
+## Development tools
+
+From the repository root, `source bin/activate-hermit` and `hermit install`
+provide pinned Bun and Node versions along with the other Reqvire development
+tools. Using your own compatible tools is also supported. `package-lock.json`
+remains the dependency receipt. Bun may create an untracked `bun.lock` while
+importing it; keep that generated file out of commits.
+
 ## Commands
 
 ```sh
-npm install
-npm run dev
-npm run build
-npm run preview
+bun install --no-save
+bun run dev
+bun run build
+bun run preview
 ```
 
 The Makefile wraps the same commands:

@@ -23,6 +23,21 @@ executable for the entire run and fails startup if it is missing.
 Install ripgrep (`rg`) before running the suites; ontology hygiene checks use it.
 The pull-request workflow installs it explicitly.
 
+The multi-repository suite requires Google Repo, Python 3, Bun and a **local
+Git checkout** of Google's `git-repo`. The optional repository Hermit environment
+provides them, including `REQVIRE_TEST_REPO_SOURCE`:
+
+```bash
+source bin/activate-hermit
+hermit install
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh test-mcp-repo-workspaces
+```
+
+With your own tools, export `REQVIRE_TEST_REPO_SOURCE=/path/to/git-repo` instead.
+The suite creates local Git remotes and real Repo clients; it neither downloads
+test repositories nor skips missing production support. Its 15 cases reuse
+seven MCP/Explorer server starts and retain failures under the normal runner.
+
 The runner copies each suite into a temporary Git workspace. Keep fixtures and
 expected output in the suite directory, and link its `test.sh` from the owning
 system-model verification using `satisfiedBy`.

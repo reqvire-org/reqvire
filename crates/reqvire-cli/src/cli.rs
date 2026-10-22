@@ -28,6 +28,10 @@ pub struct Args {
     #[clap(long, global = true, value_name = "DIR")]
     pub workspace: Option<PathBuf>,
 
+    /// Versioned Central Repo manifest (initialized Repo clients select it automatically)
+    #[clap(long, global = true, value_name = "FILE")]
+    pub manifest: Option<PathBuf>,
+
     #[clap(subcommand)]
     pub command: Option<Commands>,
 }
@@ -1816,6 +1820,7 @@ mod tests {
         // Mock CLI arguments
         let args = Args {
             workspace: None,
+            manifest: None,
             command: Some(Commands::Validate {
                 json: false,
                 output: None,

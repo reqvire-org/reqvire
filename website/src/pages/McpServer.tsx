@@ -442,7 +442,7 @@ reqvire.update_element({element_name: "Token Expiry Requirement", target: "Eleme
             "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
             "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
             "The running server owns its model snapshot. External edits are not imported and affected model files may be overwritten. Stop the server before editing its workspace externally.",
-            "After a commit timeout, MCP checks local Git automatically. A verified published commit is reconciled and returns success without repeating the ref side effect. Confirmed non-publication returns an error: automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits uncommitted. If verification or recovery cannot complete, the accepted snapshot remains readable with a diagnostic and further writes are blocked. Resolve conflicting evidence, then inspect reqvire.git.reconcile with the exact attempted_commit (dry_run defaults to true) and apply dry_run: false for verified live recovery. Missing live evidence and other recovery failures require preservation, manual repair, validation, and normal admission. Repair a stalled hook before committing again.",
+            "After a commit timeout, MCP checks local Git automatically. A verified published commit is reconciled and returns success without repeating the ref side effect. Confirmed non-publication returns an error: single-repository automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits uncommitted. Repo workspaces retain confirmed component commits and accepted pending changes until the final Central commit. If verification or recovery cannot complete, the accepted snapshot remains readable with a diagnostic and further writes are blocked. Resolve conflicting evidence, then inspect reqvire.git.reconcile with the exact attempted_commit (dry_run defaults to true) and apply dry_run: false for verified live recovery. Missing live evidence and other recovery failures require preservation, manual repair, validation, and normal admission. Repair a stalled hook before committing again.",
             "Restart requires the same clean-start checks. Use reqvire.git.commit for accepted pending changes before stopping, or resolve saved changes before restarting. Branch creation and remote publication require explicit tool calls.",
             "Leftover lock files are reused after their holders exit. A worker that survives its parent still owns its locks. If startup reports a lock error, check the named path and OS error: fix permissions for the server/container user or use a filesystem with locking support as indicated. Do not delete lock files to bypass an active owner.",
             "Most mutation tools support dry_run.",
@@ -562,6 +562,51 @@ reqvire serve --enable-mcp --enable-mutations
         </p>
       </Section>
 
+      <Section title="Repo Workspaces">
+        <p className="text-zinc-600 mb-4">
+          A versioned Repo manifest makes Central and its declared components one
+          model. Install Git, Python 3 and Google Repo, initialize and sync the
+          client, then start from Central. The User Guide covers preparation.
+          An initialized <code>.repo/</code> selects manifest mode; an explicit
+          <code> --manifest</code> selects a tracked Central manifest.
+        </p>
+        <CodeBlock>{`reqvire --manifest default.xml mcp --enable-mutations
+
+# Or expose Explorer and MCP together
+reqvire --manifest default.xml serve --enable-mcp --enable-mutations`}</CodeBlock>
+        <BulletList items={[
+          "The existing branch argument selects a Central worktree. Its manifest selects component revisions. New contexts have private component checkouts and Repo metadata; preparation uses locally available objects without a network sync.",
+          "The same typed mutation tools edit Central-relative paths. Each file is saved in its owning repository. By default the edits remain pending and create no commits.",
+          "reqvire.git.commit saves changed components first, pins exact project commits in Central's manifest, then commits Central last. Unchanged components create no commit. --enable-commits uses the same ordering automatically.",
+          "If a later commit fails, confirmed component commits remain retained. The accepted model stays readable and pending changes remain until the final Central checkpoint. Inspect per-project outcomes before retrying; an unknown ref outcome blocks writes until reconciled.",
+          "With GitHub publication enabled, required component commits are pushed before Central. A dependency failure stops Central publication. Pull-request operations address Central; callers cannot substitute arbitrary repositories.",
+          "Changing the selected manifest or project HEAD externally requires full validated admission. Refresh HEAD does not silently replace the composition of an accepted model.",
+        ]} />
+        <CodeBlock>{`{
+  "name": "reqvire.worktree.create",
+  "arguments": { "branch": "model/review", "base_ref": "main" }
+}
+{
+  "name": "reqvire.rename_element",
+  "arguments": {
+    "branch": "model/review",
+    "element_name": "Component Requirement",
+    "new_name": "Reviewed Component Requirement",
+    "dry_run": true
+  }
+}
+{
+  "name": "reqvire.git.commit",
+  "arguments": { "branch": "model/review", "message": "Review component requirement" }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Preview the mutation, apply it with <code>dry_run: false</code>, then
+          commit. Context metadata reports the selected manifest, project commits
+          and per-project pending paths. No project selector or separate model
+          namespace is needed.
+        </p>
+      </Section>
+
       <Section title="GitHub Publication">
         <CodeBlock>{`reqvire mcp --enable-mutations --enable-github
 reqvire serve --enable-mcp --enable-mutations --enable-github
@@ -581,7 +626,7 @@ reqvire mcp --enable-mutations --enable-github --github-remote upstream`}</CodeB
           { name: "reqvire.github.pr.comment", desc: "Requires a positive pr_number and non-empty body. Adds the exact comment to a PR in the pinned repository, including a PR on another branch. Pending local changes are allowed; commenting never commits or pushes them." },
         ]} />
         <p className="text-zinc-600 mt-4">
-          Only the startup repository and configured remote are supported; forks
+          Publication uses the startup repository and configured remote. In Repo mode, declared component repositories are also checked and pinned at admission; dependency commits are published first. Forks
           are not supported. Automatic commits remain a separate opt-in through
           <code> --enable-commits</code>. Repository access at startup does not
           guarantee permission for every operation: push rules and later permission

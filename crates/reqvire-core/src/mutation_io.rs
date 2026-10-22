@@ -10,6 +10,7 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct SnapshotFiles {
     pub root: PathBuf,
+    pub workspace: Option<Arc<crate::workspace::WorkspaceScope>>,
     pub files: Arc<BTreeMap<PathBuf, Arc<Vec<u8>>>>,
     pub executable: Arc<BTreeSet<PathBuf>>,
 }
@@ -95,6 +96,13 @@ impl Drop for SnapshotGuard {
 }
 pub fn active() -> bool {
     CONTEXT.with(|slot| slot.borrow().is_some())
+}
+pub fn workspace_scope() -> Option<crate::workspace::WorkspaceScope> {
+    CONTEXT.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .and_then(|c| c.files.workspace.as_deref().cloned())
+    })
 }
 pub fn model() -> Option<Arc<ModelManager>> {
     CONTEXT.with(|slot| {
@@ -332,6 +340,7 @@ mod tests {
         let root = directory.path().to_path_buf();
         let files = SnapshotFiles {
             root: root.clone(),
+            workspace: None,
             files: Arc::new(BTreeMap::from([(
                 root.join("a.txt"),
                 Arc::new(b"accepted".to_vec()),

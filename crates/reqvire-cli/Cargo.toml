@@ -24,6 +24,7 @@ workspace = true
 
 [dependencies]
 reqvire = { workspace = true }
+quick-xml = { workspace = true }
 
 # CLI
 clap = { workspace = true }

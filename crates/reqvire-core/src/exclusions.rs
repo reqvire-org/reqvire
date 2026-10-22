@@ -9,10 +9,23 @@ pub struct ExclusionSet {
     matcher: GlobSet,
     globs: Vec<Glob>,
     additional: Vec<Glob>,
+    owned: Vec<(std::path::PathBuf, GlobSet, Vec<Glob>)>,
 }
 
 impl ExclusionSet {
     pub fn is_match(&self, path: impl AsRef<Path>) -> bool {
+        let path = path.as_ref();
+        self.matcher.is_match(path)
+            || self
+                .owned
+                .iter()
+                .filter(|(root, _, _)| path.starts_with(root))
+                .max_by_key(|(root, _, _)| root.components().count())
+                .is_some_and(|(root, matcher, _)| {
+                    path.strip_prefix(root).is_ok_and(|p| matcher.is_match(p))
+                })
+    }
+    pub fn is_global_match(&self, path: impl AsRef<Path>) -> bool {
         self.matcher.is_match(path)
     }
 
@@ -33,6 +46,20 @@ impl ExclusionSet {
         self
     }
 
+    pub(crate) fn with_owners(mut self, owners: Vec<(std::path::PathBuf, Vec<Glob>)>) -> Self {
+        self.owned = owners
+            .into_iter()
+            .map(|(path, globs)| {
+                (
+                    path,
+                    compile(&globs).expect("validated owner exclusions"),
+                    globs,
+                )
+            })
+            .collect();
+        self
+    }
+
     /// Regex source encodes the effective matching options (case sensitivity,
     /// separator handling, escaping, etc.). Neither runtime state nor rule order
     /// participates in the identity of this any-match set.
@@ -42,6 +69,17 @@ impl ExclusionSet {
             .iter()
             .map(|glob| (glob.glob().to_owned(), glob.regex().to_owned()))
             .collect();
+        for (path, _, globs) in &self.owned {
+            identity.extend(globs.iter().map(|glob| {
+                (
+                    format!(
+                        "owner:{}",
+                        serde_json::to_string(&(path, glob.glob())).expect("owner policy identity")
+                    ),
+                    glob.regex().to_owned(),
+                )
+            }));
+        }
         identity.sort();
         identity.dedup();
         identity
@@ -68,6 +106,7 @@ impl ExclusionSetBuilder {
             matcher: compile(&self.globs)?,
             globs: self.globs.clone(),
             additional: self.globs.clone(),
+            owned: Vec::new(),
         })
     }
 }

@@ -145,7 +145,7 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
                 path.display()
             );
             if excluded_filename_patterns.is_match(path)
-                || excluded_filename_patterns.is_match(filename)
+                || excluded_filename_patterns.is_global_match(filename)
             {
                 debug!(
                     "File '{}' is excluded due to matching a glob pattern.",
@@ -158,7 +158,7 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
     };
 
     if excluded_filename_patterns.is_match(&relative_path)
-        || excluded_filename_patterns.is_match(filename)
+        || excluded_filename_patterns.is_global_match(filename)
     {
         debug!(
             "File '{}' is excluded due to matching a glob pattern.",
@@ -313,6 +313,15 @@ pub fn scan_markdown_files(
             }
             let mut files = Vec::new();
             let workspace_scope = workspace::WorkspaceScope::discover()?;
+
+            if workspace_scope.repo.is_some() {
+                return Ok(workspace_scope
+                    .owned_files()?
+                    .into_iter()
+                    .filter(|p| p.extension().is_some_and(|e| e == "md"))
+                    .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
+                    .collect());
+            }
 
             for scan_dir in workspace_scope.scan_roots() {
                 debug!("Scanning for markdown files in: {}", scan_dir.display());

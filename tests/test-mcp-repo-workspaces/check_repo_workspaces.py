@@ -229,6 +229,31 @@ def explicit_manifest():
     result = command(f.central, BINARY, '--manifest', 'default.xml', 'search', '--json')
     found = sorted(e['name'] for data in json.loads(result.stdout)['files'].values() for e in data['elements'])
     assert found == EXPECTED_NAMES, 'Explicit selection did not reach shared discovery'
+    # Only Central has this include. Repo's separate remote-manifest checkout
+    # must not supply an older input, and Repo still owns extend semantics.
+    manifest = (f.central / 'default.xml').read_text()
+    declaration = next(line for line in manifest.splitlines() if '<project ' in line)
+    (f.central / 'projects.xml').write_text('<manifest>\n' + declaration + '\n</manifest>\n')
+    (f.central / 'default.xml').write_text(manifest.replace(declaration,
+        '  <include name="projects.xml"/>\n'
+        f'  <extend-project name="component" revision="{f.alpha}"/>'))
+    commit(f.central, 'Select Central-owned manifest composition')
+    before = f.files(), f.git_state(), (f.central / 'projects.xml').read_bytes()
+    composed = json.loads(command(f.central, BINARY, '--manifest', 'default.xml', 'search', '--json').stdout)
+    assert sorted(e['name'] for data in composed['files'].values() for e in data['elements']) == EXPECTED_NAMES
+    assert (f.files(), f.git_state(), (f.central / 'projects.xml').read_bytes()) == before
+    # Existing manually managed checkouts can use origin for the same identity.
+    # Relative fetch roots and SSH/scp spelling are resolved without any fetch.
+    git(f.component, 'remote', 'rename', 'local', 'origin')
+    composed_text = (f.central / 'default.xml').read_text()
+    for fetch, checkout_url in [
+        ('.', str(f.remotes / 'component')),
+        ('ssh://git@github.com/test', 'git@github.com:test/component.git'),
+    ]:
+        (f.central / 'default.xml').write_text(composed_text.replace(f.remotes.as_uri() + '/', fetch))
+        git(f.component, 'remote', 'set-url', 'origin', checkout_url)
+        found = json.loads(command(f.central, BINARY, 'search', '--json').stdout)
+        assert sorted(e['name'] for data in found['files'].values() for e in data['elements']) == EXPECTED_NAMES
     missing = command(f.central, BINARY, '--manifest', 'missing.xml', 'validate', check=False)
     assert missing.returncode != 0 and 'missing.xml' in missing.stderr + missing.stdout
     assert 'unexpected argument' not in missing.stderr, 'The selector was not implemented'
@@ -248,12 +273,16 @@ def invalid_manifest():
 def project_boundaries():
     f = Fixture('project-boundaries')
     manifest = (f.central / 'default.xml').read_text()
+    (f.central / 'repositories/escape').symlink_to(f.base / 'component-seed', target_is_directory=True)
     invalid = {
         'duplicate-path': manifest.replace('</manifest>',
             f'  <project name="another" path="repositories/component" revision="{f.alpha}"/>\n</manifest>'),
         'escaping-path': manifest.replace('path="repositories/component"', 'path="../outside"'),
         'unavailable-commit': manifest.replace(f.alpha, '0' * 40),
         'missing-project': manifest.replace('path="repositories/component"', 'path="repositories/missing"'),
+        'symlink-escape': manifest.replace('path="repositories/component"', 'path="repositories/escape"'),
+        'overlapping-path': manifest.replace('</manifest>',
+            f'  <project name="nested" path="repositories/component/nested" revision="{f.alpha}"/>\n</manifest>'),
     }
     errors = []
     for label, text in invalid.items():
@@ -265,6 +294,18 @@ def project_boundaries():
         if result.returncode == 0 or 'default.xml' not in diagnostic:
             errors.append(label + ': invalid selected project was accepted or lacks its manifest diagnostic')
         assert (f.files(), f.git_state()) == before, 'Rejected selection changed files or Git state'
+    (f.central / 'default.xml').write_text(manifest)
+    remote = git(f.component, 'remote', 'get-url', 'local')
+    try:
+        git(f.component, 'remote', 'set-url', 'local', str(f.base / 'foreign'))
+        before = f.files(), f.git_state()
+        result = command(f.central, BINARY, 'validate', '--json', check=False)
+        diagnostic = result.stdout + result.stderr
+        if result.returncode == 0 or 'default.xml' not in diagnostic or 'repositories/component' not in diagnostic:
+            errors.append('foreign-checkout: mismatched project identity was accepted or lacks provenance')
+        assert (f.files(), f.git_state()) == before
+    finally:
+        git(f.component, 'remote', 'set-url', 'local', remote)
     assert not errors, '\n'.join(errors)
 
 

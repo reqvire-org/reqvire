@@ -486,6 +486,7 @@ impl SessionToolCatalog {
 pub struct Worktrees {
     root: PathBuf,
     common: PathBuf,
+    manifest: Option<PathBuf>,
     storage: PathBuf,
     executable: PathBuf,
     enable_commits: bool,
@@ -500,6 +501,7 @@ pub struct Worktrees {
     browser_branches: Mutex<BTreeMap<String, String>>,
     admin: Mutex<()>,
     github: GithubAccess,
+    github_components: BTreeMap<PathBuf, GithubAccess>,
     tool_catalog: SessionToolCatalog,
 }
 struct WorktreePolicy {
@@ -567,6 +569,7 @@ impl Worktrees {
             read_only,
         } = policy;
         let root = root.canonicalize()?;
+        let manifest = reqvire::repo_workspace::selected_manifest(&root)?;
         let common = PathBuf::from(git(
             &root,
             &["rev-parse", "--path-format=absolute", "--git-common-dir"],
@@ -583,7 +586,22 @@ impl Worktrees {
             ".reqvire-{}-worktrees",
             reqvire::utils::hash_content(&common.to_string_lossy())
         ));
-        let github = GithubAccess::check(&root, enable_github, remote);
+        let mut github = GithubAccess::check(&root, enable_github, remote);
+        let mut github_components = BTreeMap::new();
+        if github.available() && manifest.is_some() {
+            let scope = reqvire::workspace::WorkspaceScope::discover_from(root.clone())?;
+            for project in &scope.repo.as_ref().expect("Repo source scope").projects {
+                let access = GithubAccess::check(&root.join(&project.path), true, &project.remote);
+                if !access.available() {
+                    github.disable(format!(
+                        "Component {} publication is unavailable: {}",
+                        project.path.display(),
+                        access.status()
+                    ));
+                }
+                github_components.insert(project.path.clone(), access);
+            }
+        }
         if enable_github {
             eprintln!("MCP GitHub publication: {}", github.status());
         }
@@ -591,6 +609,7 @@ impl Worktrees {
         let manager = Arc::new(Self {
             root: root.clone(),
             common,
+            manifest,
             storage,
             executable: executable.into(),
             enable_commits,
@@ -605,6 +624,7 @@ impl Worktrees {
             admin: Mutex::new(()),
             tool_catalog: SessionToolCatalog::new(github.available()),
             github,
+            github_components,
         });
         manager.admit(root, original, true, false)?;
         Ok(manager)
@@ -658,6 +678,7 @@ impl Worktrees {
             &root,
             &WorkerOptions {
                 worktree_id: id.clone(),
+                manifest: self.manifest.clone(),
                 enable_commits: self.enable_commits,
                 with_size_estimates: self.with_size_estimates,
                 explorer: self.explorer,
@@ -1053,6 +1074,22 @@ impl Worktrees {
                     create,
                 ));
             }
+            if let Some(manifest) = &self.manifest {
+                if let Err(failure) = crate::mcp_repo_worktrees::prepare(
+                    resolution_root,
+                    &root,
+                    &self.common,
+                    manifest,
+                ) {
+                    return Err(self.creation_failure(
+                        failure,
+                        &root,
+                        branch,
+                        &base_commit,
+                        create,
+                    ));
+                }
+            }
         }
         let managed = self.is_managed(&root, branch);
         let id = self
@@ -1191,6 +1228,11 @@ impl Worktrees {
                 || git(&context.root, &["symbolic-ref", "--short", "HEAD"])? != context.branch
             {
                 return Err(error("Branch or HEAD changed during removal"));
+            }
+            if let Some(manifest) = &self.manifest {
+                let view =
+                    crate::mcp_repo_worktrees::retain(&context.root, &self.common, manifest)?;
+                crate::mcp_repo_worktrees::remove_checkouts(&context.root, &view)?;
             }
             git(
                 &self.root,
@@ -1546,6 +1588,14 @@ impl Worktrees {
                         .is_some_and(|a| !a.is_empty())
                 {
                     return Err(error("Commit pending accepted changes before publication"));
+                }
+                if name == "reqvire.git.push" {
+                    for project in status["projects"].as_array().into_iter().flatten() {
+                        let path = PathBuf::from(text(project, "path")?);
+                        let access = self.github_components.get(&path).ok_or_else(|| error("Saved manifest project is outside the startup publication inventory"))?;
+                        access
+                            .push_dependency(&context.root.join(&path), text(project, "commit")?)?;
+                    }
                 }
                 success(self.github.execute(&context.root, name, &args, &status)?)
             } else {

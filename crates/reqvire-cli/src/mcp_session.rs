@@ -1,6 +1,8 @@
 //! Git ownership and publication boundary for mutation-enabled MCP.
 #[path = "mcp_head_refresh.rs"]
 mod head_refresh;
+#[path = "mcp_repo.rs"]
+mod repo;
 #[cfg(test)]
 #[path = "mcp_session_tests.rs"]
 mod tests;
@@ -35,6 +37,7 @@ pub struct MutationSession {
     recovery_error: Option<String>,
     recovery_attempt: Option<RecoveryAttempt>,
     enable_commits: bool,
+    repo: Option<repo::RepoSession>,
     #[cfg(unix)]
     track_file_mode: bool,
 }
@@ -413,25 +416,43 @@ fn load_snapshot(
 ) -> Result<LoadedSnapshot, ReqvireError> {
     let mut files = SnapshotFiles {
         root: root.to_path_buf(),
+        workspace: Some(Arc::new(reqvire::workspace::WorkspaceScope::discover()?)),
         files: Arc::new(BTreeMap::new()),
         executable: Arc::new(BTreeSet::new()),
     };
     // Git's executable bit is authoritative even when the filesystem cannot
     // represent it (core.filemode=false, e.g. a Windows-backed bind mount).
-    for entry in git(root, &["ls-files", "--stage", "-z"], None, None)?
-        .split(|b| *b == 0)
-        .filter(|p| !p.is_empty())
+    for owner in files
+        .workspace
+        .as_ref()
+        .expect("workspace snapshot")
+        .git_worktrees
+        .clone()
     {
-        let entry = std::str::from_utf8(entry).map_err(|e| error(e.to_string()))?;
-        let (metadata, path) = entry
-            .split_once('\t')
-            .ok_or_else(|| error("Invalid Git index entry"))?;
-        let path = root.join(path);
-        if metadata.starts_with("100755 ") {
-            Arc::make_mut(&mut files.executable).insert(path.clone());
-        }
-        if path.is_file() {
-            Arc::make_mut(&mut files.files).insert(path.clone(), Arc::new(fs::read(path)?));
+        for entry in git(&owner, &["ls-files", "--stage", "-z"], None, None)?
+            .split(|b| *b == 0)
+            .filter(|p| !p.is_empty())
+        {
+            let entry = std::str::from_utf8(entry).map_err(|e| error(e.to_string()))?;
+            let (metadata, path) = entry
+                .split_once('\t')
+                .ok_or_else(|| error("Invalid Git index entry"))?;
+            let path = owner.join(path);
+            if files
+                .workspace
+                .as_ref()
+                .expect("workspace snapshot")
+                .git_worktree_for_path(&path)
+                != Some(&owner)
+            {
+                continue;
+            }
+            if metadata.starts_with("100755 ") {
+                Arc::make_mut(&mut files.executable).insert(path.clone());
+            }
+            if path.is_file() {
+                Arc::make_mut(&mut files.files).insert(path.clone(), Arc::new(fs::read(path)?));
+            }
         }
     }
     let capture = files.enter(None);
@@ -444,7 +465,14 @@ fn load_snapshot(
     if let Some((captured, _)) = capture.prepared() {
         files = captured;
     }
-    require_clean(root)?;
+    for owner in &files
+        .workspace
+        .as_ref()
+        .expect("workspace snapshot")
+        .git_worktrees
+    {
+        require_clean(owner)?;
+    }
     let model_revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
     let checkout = GitCheckout::read(root)?;
     if checkout.branch.as_deref() != Some(branch) || checkout.head.as_deref() != Some(head) {
@@ -465,12 +493,19 @@ impl MutationSession {
         enable_commits: bool,
     ) -> Result<Self, ReqvireError> {
         let scope = reqvire::workspace::WorkspaceScope::discover()?;
-        if scope.git_worktrees.len() != 1 || scope.git_worktrees[0] != scope.root {
+        if (scope.git_worktrees.len() != 1 && scope.repo.is_none())
+            || scope.git_worktrees[0] != scope.root
+        {
             return Err(error(
                 "Mutation-enabled MCP requires one Git worktree at the workspace root",
             ));
         }
-        let root = scope.root;
+        let root = scope.root.clone();
+        let repo = scope
+            .repo
+            .as_ref()
+            .map(|r| repo::RepoSession::start(&root, r))
+            .transpose()?;
         let branch = git_text(&root, &["symbolic-ref", "--quiet", "HEAD"]).map_err(|_| {
             error("Mutation-enabled MCP requires a named branch (detached HEAD is not supported)")
         })?;
@@ -532,6 +567,7 @@ impl MutationSession {
             recovery_error: None,
             recovery_attempt: None,
             enable_commits,
+            repo,
             #[cfg(unix)]
             track_file_mode,
         };
@@ -550,7 +586,21 @@ impl MutationSession {
     }
     pub fn check_head(&self) -> Result<(), ReqvireError> {
         self.check_recovery()?;
-        self.check_checkout(&GitCheckout::read(&self.root)?)
+        self.check_checkout(&GitCheckout::read(&self.root)?)?;
+        if let Some(repo) = &self.repo {
+            repo.check(&self.root)?;
+        }
+        Ok(())
+    }
+    pub fn check_clean(&self) -> Result<(), ReqvireError> {
+        self.check_head()?;
+        require_clean(&self.root)?;
+        if let Some(repo) = &self.repo {
+            for project in &repo.workspace.projects {
+                require_clean(&self.root.join(&project.path))?;
+            }
+        }
+        Ok(())
     }
     fn check_recovery(&self) -> Result<(), ReqvireError> {
         if let Some(reason) = &self.recovery_error {
@@ -582,12 +632,34 @@ impl MutationSession {
         })
     }
     fn accepted_metadata(&self) -> Value {
-        serde_json::json!({
+        let mut value = serde_json::json!({
             "workspace_root": self.root, "branch": self.branch_name(),
             "head": self.head, "accepted_head": self.head, "enable_commits": self.enable_commits,
             "model_revision": self.model_revision,
             "pending_changes": self.pending_paths().iter().filter_map(|p| p.strip_prefix(&self.root).ok()).collect::<Vec<_>>(),
-        })
+        });
+        if let Some(repo) = &self.repo {
+            value["workspace_mode"] = serde_json::json!("repo");
+            value["manifest"] = serde_json::json!(repo.workspace.manifest);
+            value["projects"] = serde_json::json!(repo
+                .workspace
+                .projects
+                .iter()
+                .map(|project| {
+                    let mut metadata = serde_json::to_value(project).expect("project provenance");
+                    let owner = self.root.join(&project.path);
+                    metadata["pending_changes"] = serde_json::json!(self
+                        .pending_paths
+                        .iter()
+                        .filter(|p| p.starts_with(&owner))
+                        .filter_map(|p| p.strip_prefix(&self.root).ok())
+                        .collect::<Vec<_>>());
+                    metadata
+                })
+                .collect::<Vec<_>>());
+            value["project_outcomes"] = serde_json::json!(repo.outcomes);
+        }
+        value
     }
     pub fn execute(
         &mut self,
@@ -647,6 +719,16 @@ impl MutationSession {
             .collect();
         if changed.is_empty() {
             return Ok((Ok(result), false));
+        }
+        if let Some(repo) = &self.repo {
+            if changed.iter().any(|path| {
+                repo.workspace
+                    .inputs
+                    .keys()
+                    .any(|input| self.root.join(input) == *path)
+            }) {
+                return Err(error("Manifest inputs cannot be mutated as model artifacts; change the versioned selection and use full validated admission"));
+            }
         }
         let scope = candidate_files.enter(None);
         let observed = reqvire::model_inputs::InputObservationGuard::start();
@@ -752,7 +834,7 @@ impl MutationSession {
             self.head = commit.clone();
         }
         self.files = candidate_files;
-        if self.enable_commits {
+        if self.enable_commits && self.repo.is_none() {
             self.committed_files = self.files.clone();
             self.pending_paths.clear();
         } else {
@@ -771,6 +853,14 @@ impl MutationSession {
         self.model_revision = revision;
         self.inputs = inputs;
         reqvire::model_cache::invalidate();
+        let commit = if self.enable_commits && self.repo.is_some() {
+            match self.explicit_commit(&format!("reqvire: {tool}")) {
+                Ok(saved) => saved["commit"].as_str().map(str::to_owned),
+                Err(failure) => return Ok((Ok(crate::mcp::tool_error(tool, failure)), true)),
+            }
+        } else {
+            commit
+        };
         if let (Some(commit), Some(content)) = (
             commit,
             result
@@ -793,7 +883,11 @@ impl MutationSession {
         };
         let (writable, observed_head, head_stale) = match observed {
             Ok(observed) => (
-                self.check_checkout(&observed),
+                self.check_checkout(&observed).and_then(|_| {
+                    self.repo
+                        .as_ref()
+                        .map_or(Ok(()), |repo| repo.check(&self.root))
+                }),
                 observed.head.clone(),
                 observed.branch.as_deref() != Some(&self.branch)
                     || observed.head.as_deref() != Some(&self.head),
@@ -840,7 +934,18 @@ impl MutationSession {
         let mut candidate = ModelManager::new();
         candidate.parse_and_validate_with_options(None, &self.exclusions, self.options)?;
         drop(scope);
-        let mut publication = self.prepare_commit(&files, &changed, message)?;
+        if self.repo.is_some() {
+            return self.commit_repo(message);
+        }
+        self.commit_central(&files, &changed, message)
+    }
+    fn commit_central(
+        &mut self,
+        files: &SnapshotFiles,
+        changed: &BTreeSet<PathBuf>,
+        message: &str,
+    ) -> Result<Value, ReqvireError> {
+        let mut publication = self.prepare_commit(files, changed, message)?;
         self.check_head()?;
         if let Err(failure) = git_result(
             &self.root,
@@ -869,7 +974,7 @@ impl MutationSession {
                     self.branch, self.head, publication.commit, failure.error
                 );
                 self.recovery_error = Some(reason);
-                self.record_attempt(&publication, &files, &changed);
+                self.record_attempt(&publication, files, changed);
                 let commit = publication.commit.clone();
                 drop(publication);
                 return self.resolve_recorded_commit(&commit);
@@ -894,7 +999,7 @@ impl MutationSession {
         }
         publication.index_lock.published = true;
         let old_head = std::mem::replace(&mut self.head, publication.commit);
-        self.committed_files = files;
+        self.committed_files = files.clone();
         self.pending_paths.clear();
         Ok(
             serde_json::json!({"outcome":"completed", "old_head":old_head, "head":self.head,
@@ -1153,90 +1258,91 @@ impl MutationSession {
         changed: &BTreeSet<PathBuf>,
         message: &str,
     ) -> Result<PreparedCommit, ReqvireError> {
-        let candidate_index = tempfile::NamedTempFile::new()?.into_temp_path();
-        fs::remove_file(&candidate_index)?;
-        git(
-            &self.root,
-            &["read-tree", &self.head],
-            None,
-            Some(&candidate_index),
-        )?;
-        let mut entries = Vec::new();
-        for path in changed {
-            let relative = path
-                .strip_prefix(&self.root)
-                .map_err(|e| error(e.to_string()))?
-                .to_str()
-                .ok_or_else(|| error("Non-UTF8 mutation path"))?;
-            let (mode, oid) = if let Some(bytes) = files.files.get(path) {
-                let oid = String::from_utf8(git(
-                    &self.root,
-                    &["hash-object", "-w", "--stdin"],
-                    Some(bytes),
-                    None,
-                )?)
-                .map_err(|e| error(e.to_string()))?;
-                let mode = if files.executable.contains(path) {
-                    "100755"
-                } else {
-                    "100644"
-                };
-                (mode, oid.trim().to_string())
-            } else {
-                ("0", "0".repeat(self.head.len()))
-            };
-            entries.extend_from_slice(format!("{mode} {oid}\t{relative}\0").as_bytes());
-        }
-        git(
-            &self.root,
-            &["update-index", "-z", "--index-info"],
-            Some(&entries),
-            Some(&candidate_index),
-        )?;
-        let tree = String::from_utf8(git(
-            &self.root,
-            &["write-tree"],
-            None,
-            Some(&candidate_index),
-        )?)
-        .map_err(|e| error(e.to_string()))?;
-        let commit = git_text(
-            &self.root,
-            &["commit-tree", tree.trim(), "-p", &self.head, "-m", message],
-        )?;
-        // Hold Git's real index lock across persistence and reference publication.
-        // A separate index preserves unrelated staged changes without including
-        // any of them in the commit tree above.
-        let index_path = self
-            .root
-            .join(git_text(&self.root, &["rev-parse", "--git-path", "index"])?);
-        let index_lock_path = index_path.with_file_name("index.lock");
-        let mut index_lock = IndexLock {
-            file: OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(&index_lock_path)?,
-            path: index_lock_path,
-            published: false,
-        };
-        let old_index = fs::read(&index_path)?;
-        let merged_index = tempfile::NamedTempFile::new()?;
-        fs::write(merged_index.path(), &old_index)?;
-        git(
-            &self.root,
-            &["update-index", "-z", "--index-info"],
-            Some(&entries),
-            Some(merged_index.path()),
-        )?;
-        index_lock.file.write_all(&fs::read(merged_index.path())?)?;
-        index_lock.file.sync_all()?;
-        Ok(PreparedCommit {
-            commit,
-            index_path,
-            index_lock,
-            original_index: old_index,
-        })
+        prepare_commit_for(&self.root, &self.head, files, changed, message)
     }
+}
+
+fn prepare_commit_for(
+    root: &Path,
+    head: &str,
+    files: &SnapshotFiles,
+    changed: &BTreeSet<PathBuf>,
+    message: &str,
+) -> Result<PreparedCommit, ReqvireError> {
+    let candidate_index = tempfile::NamedTempFile::new()?.into_temp_path();
+    fs::remove_file(&candidate_index)?;
+    git(root, &["read-tree", head], None, Some(&candidate_index))?;
+    let mut entries = Vec::new();
+    for path in changed {
+        let relative = path
+            .strip_prefix(root)
+            .map_err(|e| error(e.to_string()))?
+            .to_str()
+            .ok_or_else(|| error("Non-UTF8 mutation path"))?;
+        let (mode, oid) = if let Some(bytes) = files.files.get(path) {
+            let oid = String::from_utf8(git(
+                root,
+                &["hash-object", "-w", "--stdin"],
+                Some(bytes),
+                None,
+            )?)
+            .map_err(|e| error(e.to_string()))?;
+            let mode = if files.executable.contains(path) {
+                "100755"
+            } else {
+                "100644"
+            };
+            (mode, oid.trim().to_string())
+        } else {
+            ("0", "0".repeat(head.len()))
+        };
+        entries.extend_from_slice(format!("{mode} {oid}\t{relative}\0").as_bytes());
+    }
+    git(
+        root,
+        &["update-index", "-z", "--index-info"],
+        Some(&entries),
+        Some(&candidate_index),
+    )?;
+    let tree = String::from_utf8(git(root, &["write-tree"], None, Some(&candidate_index))?)
+        .map_err(|e| error(e.to_string()))?;
+    let commit = git_text(
+        root,
+        &["commit-tree", tree.trim(), "-p", head, "-m", message],
+    )?;
+    // Hold Git's real index lock across persistence and reference publication.
+    // A separate index preserves unrelated staged changes without including
+    // any of them in the commit tree above.
+    let index_path = root.join(git_text(root, &["rev-parse", "--git-path", "index"])?);
+    let index_lock_path = index_path.with_file_name("index.lock");
+    let mut index_lock = IndexLock {
+        file: OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&index_lock_path)?,
+        path: index_lock_path,
+        published: false,
+    };
+    let old_index = fs::read(&index_path)?;
+    let merged_index = tempfile::NamedTempFile::new()?;
+    fs::write(merged_index.path(), &old_index)?;
+    git(
+        root,
+        &["update-index", "-z", "--index-info"],
+        Some(&entries),
+        Some(merged_index.path()),
+    )?;
+    index_lock.file.write_all(&fs::read(merged_index.path())?)?;
+    index_lock.file.sync_all()?;
+    Ok(PreparedCommit {
+        commit,
+        index_path,
+        index_lock,
+        original_index: old_index,
+    })
+}
+
+impl MutationSession {
     fn record_attempt(
         &mut self,
         publication: &PreparedCommit,
@@ -1268,7 +1374,7 @@ impl MutationSession {
         }
         // No index or Git object writes in the default mode. Both modes use the
         // same validated candidate, persistence, and rollback boundary.
-        let mut publication = if self.enable_commits {
+        let mut publication = if self.enable_commits && self.repo.is_none() {
             Some(self.prepare_commit(files, changed, &format!("reqvire: {tool}"))?)
         } else {
             None
@@ -1298,7 +1404,13 @@ impl MutationSession {
                 attempted.push(path);
                 persist(path, files.files.get(path).map(|b| b.as_slice()))?;
                 #[cfg(unix)]
-                if self.track_file_mode && files.files.contains_key(path) {
+                if self
+                    .repo
+                    .as_ref()
+                    .and_then(|repo| repo.track_file_mode(&self.root, path))
+                    .unwrap_or(self.track_file_mode)
+                    && files.files.contains_key(path)
+                {
                     reconcile_executable(path, files.executable.contains(path))?;
                 }
             }

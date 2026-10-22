@@ -78,6 +78,15 @@ impl MutationSession {
                 ),
             ));
         }
+        if let Some(repo) = &self.repo {
+            if repo.check(&self.root).is_err()
+                || repo.workspace.inputs.iter().any(|(path, bytes)| {
+                    std::fs::read(self.root.join(path)).ok().as_deref() != Some(bytes.as_slice())
+                })
+            {
+                return Ok(Self::rejected(result, state_block("manifest_or_project_changed", "Restore the accepted Repo selection or use full validated worktree admission.")));
+            }
+        }
         if !self.pending_paths.is_empty() {
             return Ok(Self::rejected(
                 result,

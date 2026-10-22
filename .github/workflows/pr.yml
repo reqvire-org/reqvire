@@ -66,6 +66,9 @@ jobs:
         env:
           REQVIRE_BIN: ${{ github.workspace }}/target/release/reqvire
         run: |
+          # Repo/Bun/Python test tools are pinned with the local dev environment.
+          source bin/activate-hermit
+          repo version
           browser=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \( -name chrome-headless-shell -o -name headless_shell \) -print -quit)
           test -n "$browser"
           REQVIRE_TEST_BROWSER="$browser" ./tests/run_all.sh

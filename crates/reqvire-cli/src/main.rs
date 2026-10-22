@@ -5,6 +5,7 @@ mod mcp;
 mod mcp_github;
 mod mcp_http;
 mod mcp_process;
+mod mcp_repo_worktrees;
 mod mcp_session;
 mod mcp_worker;
 mod mcp_worktrees;
@@ -33,6 +34,11 @@ async fn main() {
     let args = Args::parse_args();
 
     if let Err(err) = apply_workspace(args.workspace.as_ref()) {
+        error!("{}", err);
+        std::process::exit(1);
+    }
+
+    if let Err(err) = reqvire::repo_workspace::set_manifest_selection(args.manifest.clone()) {
         error!("{}", err);
         std::process::exit(1);
     }

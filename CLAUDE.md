@@ -27,6 +27,13 @@ This guide is split into domain-specific guides for better organization:
 
 ## Building and Running Reqvire
 
+The optional Hermit environment pins the development tools. From the repository
+root, run `source bin/activate-hermit` then `hermit install`; see
+[Contributor setup](doc/README.md#development-quick-start) for full prerequisites.
+Commit only bootstrap/version selectors and package definitions. Downloaded
+packages stay in Hermit's user cache; `.hermit/`, build outputs and dependencies
+are Git-ignored.
+
 ### Basic cargo Commands
 - Build: `cargo build`
 - Run inspection commands: `cargo run -- validate` or `./target/debug/reqvire lint`

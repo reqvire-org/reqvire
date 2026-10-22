@@ -101,6 +101,8 @@ fn read_status(observed: Result<GitCheckout, ReqvireError>) -> Value {
 #[derive(Serialize, Deserialize)]
 pub struct WorkerOptions {
     pub worktree_id: String,
+    #[serde(default)]
+    pub manifest: Option<PathBuf>,
     pub enable_commits: bool,
     pub with_size_estimates: bool,
     pub explorer: bool,
@@ -189,6 +191,7 @@ pub fn run() -> Result<(), ReqvireError> {
             .next()
             .ok_or_else(|| error("Missing worker initialization"))??,
     )?;
+    reqvire::repo_workspace::set_manifest_selection(options.manifest.clone())?;
     let mut exclusions = crate::config::get_excluded_filename_patterns_glob_set();
     if options.read_only {
         let root = std::env::current_dir()?;
@@ -362,10 +365,7 @@ pub fn run() -> Result<(), ReqvireError> {
                 Ok(()) => json!({}),
                 Err(failure) => json!({"error":failure.to_string()}),
             },
-            "check_clean" => match session
-                .check_head()
-                .and_then(|_| crate::mcp_session::require_clean(&std::env::current_dir()?))
-            {
+            "check_clean" => match session.check_clean() {
                 Ok(()) => json!({}),
                 Err(failure) => json!({"error":failure.to_string()}),
             },

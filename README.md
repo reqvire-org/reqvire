@@ -102,8 +102,49 @@ The effective workspace root is the path used for Reqvire identifiers and
 relative paths. It must contain at least one eligible Git worktree; files under
 the workspace but outside Git worktrees are ignored by model processing.
 
+### Multi-repository models
+
+Use a Central Git worktree with a **versioned Google Repo manifest** to combine
+its own model with declared component repositories. Runtime prerequisites are
+Git, Python 3 and an initialized Google Repo client. Install the `repo` launcher
+and explicitly run `repo init` and `repo sync` before using Reqvire. Track the
+selected manifest and includes in Central; keep `.repo/` and component checkout
+directories ignored by Central Git. All declared projects must be local, inside
+Central, at the selected revisions, and match their declared repository identity.
+Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
+
+```bash
+# From an already initialized and synced Central checkout
+reqvire validate                         # auto-select .repo/manifest.xml
+reqvire --manifest default.xml validate  # explicit Central manifest
+reqvire --manifest default.xml serve --enable-mcp --enable-mutations
+```
+
+CLI, MCP and Explorer share the combined model and Central-relative identifiers.
+Workspace `.reqvireignore` rules remain global; each repository's Git ignores
+apply to its own files. A selected manifest failure is an error, and Reqvire
+never fetches missing projects or revisions implicitly.
+
+MCP's existing `branch` argument selects Central's branch and manifest. Mutations
+save files in their owning repositories. Explicit commits save components first,
+pin their exact SHAs in Central's manifest, then commit Central. Optional GitHub
+publication pushes required component commits before Central. See the
+[User Guide](https://www.reqvire.org/user-guide) and
+[MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.
+
 The Explorer UI is embedded in release/npm binaries. Source builds are for
 development and must build the Explorer bundle before compiling Rust.
+
+---
+
+# Development setup
+
+An optional Hermit environment in `bin/` pins the Rust, Node, Bun, Python,
+ripgrep and Google Repo versions used for development. Activate it with
+`source bin/activate-hermit`, then run `hermit install` and `make build`.
+System Git, Make, a native linker and browser system libraries remain OS
+prerequisites. See [Contributor setup](doc/README.md#development-quick-start)
+for build, browser and multi-repository test instructions.
 
 ---
 

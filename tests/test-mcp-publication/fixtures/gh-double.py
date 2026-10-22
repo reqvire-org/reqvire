@@ -28,7 +28,8 @@ if args == ['--version']:
 elif operation == 'auth status':
     assert '--active' in args and '--hostname' in args
 elif operation == 'repo view':
-    print(json.dumps({'nameWithOwner': config.get('repository', 'test/project'), 'viewerPermission': config.get('permission', 'READ')}))
+    requested = args[2].split('/', 1)[1]
+    print(json.dumps({'nameWithOwner': config.get('repository', requested), 'viewerPermission': config.get('permission', 'READ')}))
 elif args[0] == 'api':
     print(json.dumps({'ahead_by': config.get('ahead_by', 1)}))
 elif operation == 'pr list':

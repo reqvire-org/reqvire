@@ -8,6 +8,7 @@ use walkdir::WalkDir;
 pub struct WorkspaceScope {
     pub root: PathBuf,
     pub git_worktrees: Vec<PathBuf>,
+    pub repo: Option<std::sync::Arc<crate::repo_workspace::RepoWorkspace>>,
 }
 
 impl WorkspaceScope {
@@ -17,6 +18,27 @@ impl WorkspaceScope {
 
     pub fn discover_from(root: PathBuf) -> Result<Self, ReqvireError> {
         let root = normalize_existing_path(root)?;
+        if let Some(scope) = crate::mutation_io::workspace_scope() {
+            if scope.root == root {
+                return Ok(scope);
+            }
+        }
+        if let Some(manifest) = crate::repo_workspace::selected_manifest(&root)? {
+            let owner = crate::repo_workspace::git_text(&root, &["rev-parse", "--show-toplevel"])?;
+            if Path::new(&owner).canonicalize()? != root {
+                return Err(ReqvireError::PathError(
+                    "Repo mode requires Central's Git worktree at the workspace root".into(),
+                ));
+            }
+            let repo = crate::repo_workspace::RepoWorkspace::load(&root, manifest)?;
+            let mut git_worktrees = vec![root.clone()];
+            git_worktrees.extend(repo.projects.iter().map(|p| root.join(&p.path)));
+            return Ok(Self {
+                root,
+                git_worktrees,
+                repo: Some(std::sync::Arc::new(repo)),
+            });
+        }
         let mut roots = Vec::new();
         let mut seen = FxHashSet::default();
 
@@ -29,6 +51,7 @@ impl WorkspaceScope {
             return Ok(Self {
                 root,
                 git_worktrees: roots,
+                repo: None,
             });
         }
 
@@ -63,6 +86,7 @@ impl WorkspaceScope {
         Ok(Self {
             root,
             git_worktrees: roots,
+            repo: None,
         })
     }
 
@@ -80,6 +104,28 @@ impl WorkspaceScope {
 
     pub fn is_eligible_path(&self, path: &Path) -> bool {
         let absolute = absolute_logical_path(path);
+        if self.repo.is_some() {
+            let Some(owner) = self.git_worktree_for_path(&absolute) else {
+                return false;
+            };
+            if absolute.strip_prefix(&self.root).is_ok_and(|p| {
+                p.components()
+                    .any(|c| matches!(c, Component::Normal(n) if n == ".repo" || n == ".git"))
+            }) {
+                return false;
+            }
+            let mut parent = absolute.parent();
+            while let Some(path) = parent {
+                if path == owner {
+                    return true;
+                }
+                if path.join(".git").exists() {
+                    return false;
+                }
+                parent = path.parent();
+            }
+            return false;
+        }
         absolute.starts_with(&self.root)
             && self
                 .git_worktrees
@@ -93,6 +139,38 @@ impl WorkspaceScope {
             .iter()
             .filter(|git_root| absolute.starts_with(*git_root))
             .max_by_key(|git_root| git_root.components().count())
+    }
+
+    pub fn owned_files(&self) -> Result<Vec<PathBuf>, ReqvireError> {
+        let mut files = std::collections::BTreeSet::new();
+        for owner in &self.git_worktrees {
+            let paths = crate::repo_workspace::git_text(
+                owner,
+                &[
+                    "ls-files",
+                    "-z",
+                    "--cached",
+                    "--others",
+                    "--exclude-standard",
+                ],
+            )?;
+            for relative in paths.split('\0').filter(|p| !p.is_empty()) {
+                let path = owner.join(relative);
+                if self.git_worktree_for_path(&path) == Some(owner)
+                    && self.is_eligible_path(&path)
+                    && path.is_file()
+                {
+                    if !path.canonicalize()?.starts_with(owner) {
+                        return Err(ReqvireError::PathError(format!(
+                            "Source symlink escapes repository: {}",
+                            path.display()
+                        )));
+                    }
+                    files.insert(path);
+                }
+            }
+        }
+        Ok(files.into_iter().collect())
     }
 }
 
