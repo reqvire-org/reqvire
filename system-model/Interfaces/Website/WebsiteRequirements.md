@@ -47,17 +47,14 @@ WHEN documenting MCP deployments, the system SHALL explain listening addresses a
 
 WHEN documenting MCP mutations, the system SHALL distinguish mutation permission from opt-in automatic commits and explain the unchanged ownership and clean-start rules.
 
-WHEN documenting model collaboration, the system SHALL explain unified browser branch selection backed by independent worktree contexts, accepted-only commits, optional GitHub availability, and explicit same-repository publication according to the referenced contracts.
+WHEN documenting model collaboration, the system SHALL explain unified browser branch selection backed by independent worktree contexts, accepted-only commits, optional GitHub availability, and publication through pinned declared repositories according to the referenced contracts.
 
 #### Metadata
   * type: requirement
 
 #### Contract References
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
-  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
-  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [MCP HEAD Refresh Input Protection Specification](../MCP/HeadRefresh.md#mcp-head-refresh-input-protection-specification)
+  * [MCP Worktree HEAD Refresh Specification](../MCP/HeadRefresh.md#mcp-worktree-head-refresh-specification)
   * [MCP Accepted Change Commit Specification](../MCP/Specifications.md#mcp-accepted-change-commit-specification)
   * [MCP Branch Push Specification](../MCP/Specifications.md#mcp-branch-push-specification)
   * [MCP Coverage Scope Selection Specification](../MCP/Specifications.md#mcp-coverage-scope-selection-specification)
@@ -75,19 +72,23 @@ WHEN documenting model collaboration, the system SHALL explain unified browser b
   * [MCP Pull Request Creation Specification](../MCP/Specifications.md#mcp-pull-request-creation-specification)
   * [MCP Semantic Query Tools Specification](../MCP/Specifications.md#mcp-semantic-query-tools-specification)
   * [MCP Server Command Specification](../MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
   * [MCP Streamable HTTP Transport Safety Specification](../MCP/Specifications.md#mcp-streamable-http-transport-safety-specification)
+  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
   * [MCP Worktree Context Isolation Specification](../MCP/Specifications.md#mcp-worktree-context-isolation-specification)
   * [MCP Worktree Creation Specification](../MCP/Specifications.md#mcp-worktree-creation-specification)
   * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
   * [MCP Worktree Worker Sessions Specification](../MCP/Specifications.md#mcp-worktree-worker-sessions-specification)
-  * [MCP Worktree HEAD Refresh Specification](../MCP/HeadRefresh.md#mcp-worktree-head-refresh-specification)
-  * [MCP HEAD Refresh Input Protection Specification](../MCP/HeadRefresh.md#mcp-head-refresh-input-protection-specification)
   * [Serve Command Embedded MCP Endpoint Specification](../MCP/Specifications.md#serve-command-embedded-mcp-endpoint-specification)
   * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Explorer Worktree HEAD Refresh Specification](../WebExplorer/HeadRefresh.md#explorer-worktree-head-refresh-specification)
   * [Explorer Worktree Runtime Isolation Specification](../WebExplorer/Specifications.md#explorer-worktree-runtime-isolation-specification)
   * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
-  * [Explorer Worktree HEAD Refresh Specification](../WebExplorer/HeadRefresh.md#explorer-worktree-head-refresh-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
   * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
   * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
@@ -95,6 +96,7 @@ WHEN documenting model collaboration, the system SHALL explain unified browser b
 #### Relations
   * definedBy: [Website Assistant Integration Documentation Specification](WebsiteSpecifications.md#website-assistant-integration-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [McpServer.tsx](../../../website/src/pages/McpServer.tsx)
 ---
 
 ### Website Command and Workflow Documentation
@@ -110,16 +112,14 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * type: requirement
 
 #### Contract References
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
-  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
-  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
   * [CLI Coverage Scope Selection Specification](../CLI/Specifications.md#cli-coverage-scope-selection-specification)
   * [CLI Interface Structure Contract Specification](../CLI/Specifications.md#cli-interface-structure-contract-specification)
   * [CLI Managed Query Artifacts Specification](../CLI/Specifications.md#cli-managed-query-artifacts-specification)
   * [MCP Formatting Tool Specification](../MCP/Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](../MCP/Specifications.md#mcp-lint-fix-tool-specification)
+  * [MCP Stdio Process Lifecycle Specification](../MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [MCP Update Element Tool Specification](../MCP/Specifications.md#mcp-update-element-tool-specification)
   * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Explorer Automatic Store Refresh Specification](../WebExplorer/Specifications.md#explorer-automatic-store-refresh-specification)
   * [Explorer Coverage Scope and Display Specification](../WebExplorer/Specifications.md#explorer-coverage-scope-and-display-specification)
@@ -128,8 +128,11 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
   * [Explorer Verification Trace Rendering Specification](../WebExplorer/Specifications.md#explorer-verification-trace-rendering-specification)
   * [Explorer Worktree Selection Specification](../WebExplorer/Specifications.md#explorer-worktree-selection-specification)
   * [Serve Command Contract Specification](../WebExplorer/Specifications.md#serve-command-contract-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
   * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
   * [Coverage Scope Specification](../../Reports/ModelReports/Specifications.md#coverage-scope-specification)
@@ -138,6 +141,7 @@ The system SHALL explain coverage scope selection and ranked hierarchical capabi
 #### Relations
   * definedBy: [Website Command and Workflow Documentation Specification](WebsiteSpecifications.md#website-command-and-workflow-documentation-specification)
   * derivedFrom: [Public Documentation Website](#public-documentation-website)
+  * satisfiedBy: [UserGuide.tsx](../../../website/src/pages/UserGuide.tsx)
 ---
 
 ### Website Home Messaging

@@ -12,6 +12,8 @@ When a caller explicitly selects a Repo manifest or starts at an initialized Rep
 
 #### Relations
   * derivedFrom: [Explicit Workspace Selection](Commands.md#explicit-workspace-selection)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [main.rs](../../../crates/reqvire-cli/src/main.rs)
 ---
 
 ### CLI Repo Manifest Selection Specification

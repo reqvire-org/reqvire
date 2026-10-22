@@ -149,6 +149,7 @@ WHEN a client explicitly requests a commit in an owned context, the system SHALL
 #### Relations
   * definedBy: [MCP Accepted Change Commit Specification](Specifications.md#mcp-accepted-change-commit-specification)
   * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_repo.rs](../../../crates/reqvire-cli/src/mcp_repo.rs)
   * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
 ---
 
@@ -468,7 +469,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned worktrees.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned Central worktrees. Declared component checkouts may be detached at their selected commits, with their own cleanliness and ownership checks.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
 - The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Only the dedicated checked HEAD-refresh operation may adopt an eligible external HEAD on the same branch; it cannot bypass ownership or transaction recovery.
@@ -485,6 +486,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
   * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_repo.rs](../../../crates/reqvire-cli/src/mcp_repo.rs)
   * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
   * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
@@ -1217,6 +1219,7 @@ WHEN a client requests removal of a clean server-created worktree, the system SH
 #### Relations
   * definedBy: [MCP Managed Worktree Removal Specification](Specifications.md#mcp-managed-worktree-removal-specification)
   * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---
 
@@ -1279,6 +1282,7 @@ WHEN a client requests a new model branch from an explicit base, the system SHAL
 #### Relations
   * definedBy: [MCP Worktree Creation Specification](Specifications.md#mcp-worktree-creation-specification)
   * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---
 

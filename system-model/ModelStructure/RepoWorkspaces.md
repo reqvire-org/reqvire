@@ -13,11 +13,16 @@ When a workspace is selected through a Repo manifest, the system SHALL resolve C
 
 #### Relations
   * derivedFrom: [Workspace Root Path Authority](ModelManagement.md#workspace-root-path-authority)
+  * satisfiedBy: [config.rs](../../crates/reqvire-core/src/config.rs)
+  * satisfiedBy: [repo_workspace.rs](../../crates/reqvire-core/src/repo_workspace.rs)
+  * satisfiedBy: [workspace.rs](../../crates/reqvire-core/src/workspace.rs)
 ---
 
 ### Manifest-Defined Workspace Scope Specification
 
 The owning Central Git worktree remains the effective workspace and identifier root. Its versioned Repo manifest selects declared project paths and revisions. Repo resolves the effective manifest, including supported composition; source scope includes Central itself and the resolved declared projects. A different manifest checkout or remote manifest branch cannot silently replace the selected Central worktree's versioned selection.
+
+Require Git, Python 3 and initialized local Google Repo metadata at the Central root. The caller explicitly initializes and synchronizes the Repo client before admission. Track the selected manifest and its includes in Central; keep Repo administration and component checkouts out of Central's tracked files. Resolve Central-owned inputs with the initialized Repo implementation. Support includes, extend-project composition, relative fetch URLs, remote aliases and remote-level revision precedence; reject Repo submanifests. A checkout may name its remote differently when it has one unambiguous matching repository identity, including equivalent SSH URL spellings. A conflicting declared remote is rejected.
 
 Resolve project revision names to concrete available local commits and retain the selected manifest inputs and per-project revision provenance with the loaded model. Project files remain Central-relative identifiers. Repository identity is ownership/provenance metadata, not an element namespace. Capture tracked inputs separately from Central and each declared repository so that Central ignoring the component checkout directory does not hide declared project sources. Workspace .reqvireignore exclusions remain global; a repository's Git ignores apply within its own ownership boundary. Exclude Repo metadata, copied dependency/build models and undeclared component repositories from this mode.
 
