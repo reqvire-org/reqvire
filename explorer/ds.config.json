@@ -197,11 +197,7 @@
         "mode": "browser",
         "timeoutMs": 240000
       }
-    },
-    "mutationChecks": [
-      "lint:style",
-      "typecheck"
-    ]
+    }
   },
   "behaviorLibraries": [
     "@sigma/edge-curve",
@@ -227,5 +223,21 @@
     "restrictedImports": [
       "sonner"
     ]
+  },
+  "acceptance": {
+    "checks": [
+      "lint:style",
+      "typecheck"
+    ],
+    "behaviorChecks": true
+  },
+  "validation": {
+    "checks": [
+      "lint:style",
+      "typecheck",
+      "test",
+      "build:app"
+    ],
+    "behaviorChecks": true
   }
 }
