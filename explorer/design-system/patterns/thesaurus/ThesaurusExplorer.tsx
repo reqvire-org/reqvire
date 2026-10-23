@@ -11,7 +11,7 @@ import {
   type NodeProps,
   type ReactFlowInstance,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+import { flowCanvasClasses } from "../graphs/FlowCanvasSkin/FlowCanvasSkin";
 import { RouteFrame, RouteLayout } from "../shell";
 import { WorkspaceShell } from "../content/WorkspaceShell";
 import { useLatestRef } from "../../hooks/useLatestRef";
@@ -730,6 +730,7 @@ function ThesaurusSchemeMap({
     <main className="ux-thesaurus-scheme-map" aria-label="Concept scheme map">
       <div className="ux-thesaurus-scheme-map-canvas" role="img" aria-label={`${schemeLabel} concept map`}>
         <ReactFlow
+          className={flowCanvasClasses()}
           nodes={layout.nodes}
           edges={layout.edges}
           nodeTypes={THESAURUS_NODE_TYPES}

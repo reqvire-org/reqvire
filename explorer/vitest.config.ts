@@ -20,6 +20,10 @@ export default defineConfig({
     ],
   },
   test: {
+    // Keep DOM/layout workers bounded alongside the app and ADS preview compiler.
+    pool: "forks",
+    maxWorkers: 2,
+    execArgv: ["--max-old-space-size=1200"],
     globals: true,
     environment: "jsdom",
     css: true,

@@ -442,3 +442,6 @@ export { flowLayoutEngine } from "./patterns/reports/flowLayoutEngine";
 
 export { RendererNotice } from "./components/core/RendererNotice";
 export type { RendererNoticeProps, RendererNoticeTone } from "./components/core/RendererNotice";
+
+
+export { flowCanvasClasses } from "./patterns/graphs/FlowCanvasSkin/FlowCanvasSkin";

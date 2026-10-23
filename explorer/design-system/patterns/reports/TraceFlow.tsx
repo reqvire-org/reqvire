@@ -5,7 +5,7 @@ import {
   BaseEdge, Handle, MarkerType, Position, ReactFlow, getViewportForBounds,
   type Edge, type EdgeProps, type Node, type NodeProps, type ReactFlowInstance,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+import { flowCanvasClasses } from "../graphs/FlowCanvasSkin/FlowCanvasSkin";
 import { Button } from "../../components/core/Button";
 import { Icon } from "../../components/core/Icon";
 import { IconButton } from "../../components/core/IconButton";
@@ -448,7 +448,7 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, controls, co
     <div className="ux-trace-flow-canvas" ref={canvas}>
       {/* Outside the transformed viewport: layout consumes the actual shared CSS dimensions. */}
       <div className="ux-trace-flow-node-size" ref={nodeProbe} aria-hidden="true" />
-      {graph && <ReactFlow key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={initializeCanvas}
+      {graph && <ReactFlow className={flowCanvasClasses()} key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={initializeCanvas}
         onNodeClick={(event, node) => {
           // Register with React Flow so read-only nodes retain browser pointer events.
           // Embedded links and controls handle their own actions.

@@ -30,7 +30,7 @@ Git, Bash, Make and a native C/C++ linker/toolchain are operating-system
 prerequisites. Browser checks also need Chromium and its system libraries.
 
 The optional [Hermit](https://cashapp.github.io/hermit/usage/get-started/)
-environment pins Rust/Cargo 1.92.0, Node.js 24.22.1, Bun 1.3.13, Python 3.12.3,
+environment pins Rust/Cargo 1.92.0, Node.js 24.22.1, Bun 1.4.2, Python 3.12.3,
 ripgrep 15.2.0 and Google Repo 2.70. The Repo source is pinned to an exact Git
 commit and exposed as `REQVIRE_TEST_REPO_SOURCE`, so the multi-repository tests
 create real Repo clients entirely from local objects.
@@ -65,7 +65,7 @@ itself performs no network fetch. Full browser coverage needs a browser:
 
 ```bash
 cd explorer
-npm exec -- playwright install --with-deps chromium --only-shell
+bun --bun x --no-install playwright install --with-deps chromium --only-shell
 cd ..
 REQVIRE_TEST_BROWSER=/absolute/path/to/chrome-headless-shell ./tests/run_all.sh
 ```

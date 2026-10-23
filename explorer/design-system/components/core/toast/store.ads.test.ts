@@ -1,13 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import test from "node:test";
-import ts from "typescript";
-
-// The store has no runtime dependencies. Compile its TypeScript with the project's
-// existing compiler, so these lifecycle tests need no extra test framework.
-const source = readFileSync(new URL("../design-system/components/core/toast/store.ts", import.meta.url), "utf8");
-const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } });
-const { ToastStore, createToastApi } = await import(`data:text/javascript;base64,${Buffer.from(compiled.outputText).toString("base64")}`);
+import { test } from "vitest";
+import { ToastStore, createToastApi } from "./store";
 
 function fixture() {
   const store = new ToastStore();
@@ -65,7 +58,7 @@ test("manual and automatic dismissal invoke the right callback once", () => {
   store.dismiss(second, true);
   assert.equal(manual, 1);
   assert.equal(automatic, 1);
-  const record = store.getSnapshot().find((item) => item.id === first);
+  const record = store.getSnapshot().find((item) => item.id === first)!;
   store.remove(first, record.revision);
   assert.equal(store.getSnapshot().length, 1);
 });
@@ -93,7 +86,7 @@ test("a successful promise updates the same card and unwrap preserves its value"
 test("promise rejection and synchronous factory errors remain available through unwrap", async () => {
   const { store, toast } = fixture();
   const error = new Error("Offline");
-  const handle = toast.promise(() => { throw error; }, { loading: "Working", success: "Done", error: (reason) => reason.message });
+  const handle = toast.promise(() => { throw error; }, { loading: "Working", success: "Done", error: (reason) => reason instanceof Error ? reason.message : String(reason) });
   await assert.rejects(handle.unwrap(), (reason) => reason === error);
   assert.equal(store.getSnapshot()[0].message, "Offline");
   assert.equal(store.getSnapshot()[0].variant, "danger");
@@ -101,8 +94,8 @@ test("promise rejection and synchronous factory errors remain available through 
 
 test("settling a promise cannot resurrect a dismissed toast", async () => {
   const { store, toast } = fixture();
-  let resolve;
-  const handle = toast.promise(new Promise((done) => { resolve = done; }), { loading: "Working", success: "Done", error: "Failed" });
+  let resolve!: (value: string) => void;
+  const handle = toast.promise(new Promise<string>((done) => { resolve = done; }), { loading: "Working", success: "Done", error: "Failed" });
   const revision = store.getSnapshot()[0].revision;
   toast.dismiss(handle.id);
   store.remove(handle.id, revision);
@@ -113,8 +106,8 @@ test("settling a promise cannot resurrect a dismissed toast", async () => {
 
 test("an older promise cannot overwrite a newer request with the same id", async () => {
   const { store, toast } = fixture();
-  let resolve;
-  const older = toast.promise(new Promise((done) => { resolve = done; }), { id: "save", loading: "Old request", success: "Old result", error: "Failed" });
+  let resolve!: (value: string) => void;
+  const older = toast.promise(new Promise<string>((done) => { resolve = done; }), { id: "save", loading: "Old request", success: "Old result", error: "Failed" });
   const newer = toast.promise(Promise.resolve("New result"), { id: "save", loading: "New request", success: (value) => value, error: "Failed" });
   await newer.unwrap();
   resolve("Old result");

@@ -45,8 +45,10 @@ for information needed to complete or recover a task.
 The port keeps source stacking, timings, gestures, queued timers, focus restoration,
 and transition cleanup. It reuses Reqvire's Button, IconButton, Icon, and Spinner,
 adds missing motion/geometry tokens without replacing existing theme values,
-and registers the component-owned Oxlint rules in `ds.config.json`. The DS tool
-loads those registrations during the normal project build.
+and declares notification usage in ADS-managed `usage.notifications` and
+`usage.restrictedImports` policies in `ds.config.json`. Native ADS gates enforce
+those policies during the normal build. Store lifecycle tests are colocated in
+`store.ads.test.ts` and run through the ordinary project Vitest command.
 The geometry helper may write only its exact registered properties.
 
 ## Quick start
@@ -200,20 +202,18 @@ Preact nodes directly. Callback arguments are toast ids, and `toast.promise()`
 returns `{ id, unwrap }`; these are native API contracts, not a promise of full
 Sonner API compatibility.
 
-Toast-specific Oxlint rules are colocated in
-[toast.oxlint.mjs](toast.oxlint.mjs).
-[oxlint-design-system.mjs](../../../../scripts/oxlint-design-system.mjs) exposes
-them as a project plugin. [ds.config.json](../../../../ds.config.json) registers
-and enables them; `ads lint-config` refreshes ignored `.ds/oxlintrc.json` during
-`npm run lint:ds` and the normal build. These tooling modules are not exported
-by the runtime barrel or bundled into the application.
+ADS owns notification usage enforcement. [ds.config.json](../../../../ds.config.json)
+registers `toast` and `Toaster` under `usage.notifications` and restricts the
+`sonner` package under `usage.restrictedImports`. `ads check` runs these native
+guards directly; guarded acceptance and validation use the same gate. There is
+no project lint plugin or additional lint runner.
 
 | Rule | Enforced boundary |
 |------|-------------------|
-| `design-system/toast-client-usage` | Reject direct render/module-scope toast calls and toast calls in `use server` modules |
-| `design-system/toast-effect-id` | Require an explicit id for notifications directly created in React or Preact effects with statically inspectable options |
-| `design-system/toaster-root-mount` | Restrict mounting to configured root files; reject direct conditional mounts and repeated static ids in one file |
-| `no-restricted-imports` | Consume the native public API; reject Sonner imports and DS implementation paths |
+| `notification-client-usage` | Reject direct render/module-scope calls and calls in `use server` modules |
+| `notification-effect-id` | Require an explicit id for notifications directly created in React or Preact effects with statically inspectable options |
+| `notification-host-root` / `-conditional` / `-duplicate` | Restrict hosts to registered roots; reject direct conditional mounts and repeated static ids in one file |
+| `usage-restricted-import` | Reject direct Sonner package/subpath imports; consume the native public API |
 
 Configure `rootFiles` in `ds.config.json` for a consuming app's actual
 entry/layout. Imported aliases and namespace imports are recognized. The rules
@@ -229,16 +229,16 @@ store/promise lifecycle behavior.
 Run the component checks and normal builds from the `explorer/` workspace:
 
 ```sh
-npm run test:toast
-npm run build
-npm run build:showcase
+bun run test
+bun run build
+bun run build:showcase
 ```
 
-[test-toast.mjs](../../../../scripts/test-toast.mjs) checks store snapshots,
+[store.ads.test.ts](store.ads.test.ts) checks store snapshots,
 callbacks, scope teardown, promise settlement, and stale updates.
-[test-toast-usage.mjs](../../../../scripts/test-toast-usage.mjs) checks accepted
-and rejected lint cases. The build runs the shared lint guards, type checking,
-and the Explorer app and showcase builds.
+ADS tests cover accepted/rejected usage policies in the native checker. The
+project build runs that shared gate, type checking, application tests and
+registered browser checks.
 
 For browser verification, open the native Toast scenario in the MCP showcase. Compare with the actual Sonner
 component in a separate reference page, using identical content and settings.
@@ -262,6 +262,6 @@ and registered rules in [ds.config.json](../../../../ds.config.json).
 against the existing `components/core/Toast` scenario. The colocated browser spec
 checks action callbacks, close controls, promise updates in place and keyboard
 focus restoration through the real MCP App. Run
-`npm run test:ads -- --unit components/core/Toaster` from `explorer/`.
-Store lifecycle and usage-rule tests remain in `npm test`; application browser
+`bunx --no-install ads verify . --unit components/core/Toaster` from `explorer/`.
+Store lifecycle tests remain in `bun run test`; usage-rule regressions live in ADS; application browser
 checks still verify the app-root mount and real server integration.

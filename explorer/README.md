@@ -18,7 +18,7 @@ present.
 
 ## Build & embed flow
 
-`npm run build` runs source checks, unit/integration tests and registered ADS
+`bun run build` runs source checks, unit/integration tests and registered ADS
 browser checks. Any failure stops the build:
 
 ```
@@ -26,17 +26,25 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + test + build:app + test:ads
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.32` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.38` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
-Oxlint is pinned to `1.72.0` so guarded candidate linting also works inside the
-ignored `.ds/` workspace; `1.69.0` can incorrectly select no source files there.
-The app, MCP preview compiler and optional design-system bundle share the ADS
-Linaria tag resolver to preserve custom-property arithmetic during extraction.
-`npm run lint` runs shared ADS architecture checks and core/registered Oxlint
-rules (`lint:ds`), then Biome CSS correctness checks (`lint:style`). Build hooks
-refresh ignored `.ds/oxlintrc.json`, validate source, and generate configured
-icons before application and standalone showcase builds. Renderer exceptions
-and non-state hooks are explicit config; Toast usage rules remain component-owned.
+Bun 1.4.1+ manages dependencies and runs MCP and ADS compilation.
+Node 24 runs Vitest with a 1,200 MiB heap ceiling and at most two workers, and the
+existing Vite app/kit builds with a 1,600 MiB heap ceiling. The 121-node flow
+integration case stalls and grows memory when Vitest is forced onto Bun; it
+passes under Node. `scripts/run-node.mjs` verifies a real Node executable,
+rejects Bun's `node` shim, and prepends the selected Node directory for child
+processes. It prefers the pinned Hermit Node, then PATH or installed nvm Node 24;
+set `REQVIRE_NODE` to select an explicit executable. Missing real Node fails
+immediately. `bun run test` preserves this explicitly selected runtime.
+The Bun runtime exceeded a bounded 4 GiB process scope for this Vite workload,
+including with `--smol`; the Node build passed in that scope. The app, MCP previews and
+optional design-system bundle share the ADS Linaria processing contract.
+`bun run lint` runs ADS architecture and configured usage checks once
+(`lint:ds`), followed by Biome CSS checks (`lint:style`). Toast usage policy lives
+in `ds.config.json` under `usage`; ADS enforces it directly in local checks,
+guarded acceptance and validation. No project lint plugin or Oxlint pass remains.
+Build hooks run the same ADS gate and asset generation before checked builds.
 Document presentation is owned by the Linaria `documentClasses()` helper in
 `patterns/shell/DocumentSkin.ts`, applied to the body by both browser mounts.
 Its base cascade layer preserves component precedence and styles portals too.
@@ -47,7 +55,7 @@ implementation workflows; shared rules belong to the
 [ADS tooling contract](https://github.com/reqvire-org/ads/blob/main/docs/ADS.md).
 
 The public `ExplorerWorkspace` and screen patterns are shared by production
-adapters and the fixture showcase. Run `npm run dev:showcase` and select Composition → Explorer workspace to inspect
+adapters and the fixture showcase. Run `bun run dev:showcase` and select Composition → Explorer workspace to inspect
 the real UI with local data. Tokens, Components and Patterns provide independently
 mountable scenarios. Fixture code has no application imports; full-app
 routing/store tests remain under `src/test/`.
@@ -67,8 +75,8 @@ See the [graph guide](design-system/patterns/graphs/README.md#forceatlas-browser
 for browser profiling commands and interpretation.
 
 
-Biome uses `biome.css.json` and runs only on CSS; formatting is disabled. Oxlint
-continues to check TypeScript/JavaScript. The duplicate-selector rule is in
+Biome uses `biome.css.json` and runs only on CSS; formatting is disabled. ADS
+checks architecture and declared notification usage in TypeScript/JavaScript. The duplicate-selector rule is in
 Biome's nursery group, so its tested version is pinned. This replaces Stylelint
 and removes its unpatched `braces` dependency chain. See
 [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
@@ -85,12 +93,12 @@ From the repository root, `make explorer` installs dependencies when its
 successful-install receipt is absent or older than the package manifests, then
 runs the checked application build. `make explorer-deps` performs dependency
 setup only. Remove `explorer/node_modules/.reqvire-deps.stamp` to force a fresh
-install after changing Node or npm configuration. `REQVIRE_BUILD_EXPLORER=1`
+install after changing Bun configuration. `REQVIRE_BUILD_EXPLORER=1`
 also requests a checked frontend build during Cargo compilation.
 
 The application consumes design-system source through `@ds`; it does not require a
-standalone kit. `npm run build:all` builds the checked application plus that
-optional kit. `npm run build:ds-bundle` uses
+standalone kit. `bun run build:all` builds the checked application plus that
+optional kit. `bun run build:ds-bundle` uses
 `design-system/vite.bundle.config.ts` and external Preact globals; its
 generated outputs are separate from the application bundle and are not tracked.
 The bundle-only commands require checks to have run first.
@@ -101,32 +109,32 @@ The bundle-only commands require checks to have run first.
 
 ```bash
 cd explorer
-npm install
-npm run dev        # local dev server (uses src/store/devFixture.ts)
-npm run typecheck  # tsc --noEmit
-npm test           # Vitest application/ADS tests + toast store and usage-rule tests
-npm run test:ads   # registered browser checks through ADS's isolated preview host
-npm run build      # source checks + unit/integration tests + SPA build + ADS browser checks
-npm run ads-mcp          # stdio MCP + showcase; guarded editing enabled
-npm run ads-read-mcp     # stdio MCP + showcase; read-only
-npm run dev:showcase    # MCP client showcase; open the printed URL
-npm run build:showcase  # checked MCP preview resource graph -> .ds/preview/
-npm run build:mcp-previews -- --watch  # advanced: compiler without the managed host
+bun install
+bun run dev        # local dev server (uses src/store/devFixture.ts)
+bun run typecheck  # tsc --noEmit
+bun run test           # Vitest application and colocated ADS unit tests
+bun run test:ads   # registered browser checks through ADS's isolated preview host
+bun run build      # source checks + unit/integration tests + SPA build + ADS browser checks
+bun run ads-mcp          # stdio MCP + showcase; guarded editing enabled
+bun run ads-read-mcp     # stdio MCP + showcase; read-only
+bun run dev:showcase    # MCP client showcase; open the printed URL
+bun run build:showcase  # checked MCP preview resource graph -> .ds/preview/
+bun run build:mcp-previews -- --watch  # advanced: compiler without the managed host
 ```
 
 ### Browser verification
 
 `playwright.ads.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
 The owners' `.ads.contract.ts` files register the checks with the `widget`
-profile in `ds.config.json`. `npm run test:ads` first validates and compiles the
+profile in `ds.config.json`. `bun run test:ads` first validates and compiles the
 preview graph, then calls `ads verify .`, which starts
 and closes an isolated MCP preview host and supplies the selected cases to the
 project's `test:behavior` runner. No running MCP session or fixed port is needed.
 The managed preview watcher reuses the matching validated graph, keeping cold
 compilation outside its bounded App startup wait. Preparation failures stop
 verification; browser timeouts and interaction assertions remain unchanged.
-Use `npm run test:ads -- --unit components/controls/WorktreeSelector` to select
-one owner. Run the lower-level `test:behavior` command through ADS so it receives
+After building previews, run `bunx --no-install ads verify . --unit
+components/controls/WorktreeSelector` to select one owner. Run the lower-level `test:behavior` command through ADS so it receives
 the verification request and scenario URLs.
 
 Registered checks cover branch-picker selection/dismissal, toast actions and
@@ -139,14 +147,14 @@ application tests under `src/` and colocated ADS unit tests.
 Local browser checks use installed Google Chrome, matching MCP capture settings.
 Set `REQVIRE_TEST_BROWSER` (or `CHROME_BIN`) to an absolute browser executable
 path to use another Chrome/Chromium installation. CI installs the project's
-locked Playwright Chromium with `npx --no-install playwright install --with-deps
+locked Playwright Chromium with `bun --bun x --no-install playwright install --with-deps
 chromium --only-shell` before building. Browser installation is explicit, never
 part of the source build. Failure evidence is saved in `.ds/verification/`.
 `types/ads-verification.d.ts` supplies the missing development-helper declaration
 for the installed ADS helper without relaxing production TypeScript checks.
 
 `build:app` and the MCP preview compiler remain compilation commands; the preview
-compiler validates with `npm run check`, not the test-running `build` command.
+compiler runs native ADS gates and the configured `lint:style`/`typecheck` checks.
 This keeps verification from recursively invoking itself. PR/release workflows
 use the checked build, and PR CI retains the application browser suite after
 building the Rust CLI. The bundle-only commands are for those internal stages.
@@ -161,7 +169,7 @@ The SPA reads an immutable browser-local **Project Store** seed produced from
 
 1. `window.reqvireProjectStore` — a global set by `assets/project-store.js`
    loaded by the SPA before Preact mounts.
-2. The dev fixture, only during `npm run dev` (no seed → `MissingStoreNotice`
+2. The dev fixture, only during `bun run dev` (no seed → `MissingStoreNotice`
    in production builds).
 
 The runtime seed has this shape:
@@ -221,25 +229,25 @@ From the repository root:
 
 ```sh
 cd explorer
-npm ci
-npm run ads-mcp -- --port 4191
+bun install --frozen-lockfile
+bun run ads-mcp -- --port 4191
 ```
 
-Open **http://127.0.0.1:4191/**. Use `npm run ads-read-mcp -- --port 4191` instead
+Open **http://127.0.0.1:4191/**. Use `bun run ads-read-mcp -- --port 4191` instead
 for read-only MCP; run one command at a time. Both start the showcase and managed
-preview compiler. `npm run dev:showcase` starts the browser-only runtime.
-These launch commands use `npx --yes @reqvire-org/ads@0.3.32`; build checks and
-the preview compiler use the same published version installed by `npm ci`.
+preview compiler. `bun run dev:showcase` starts the browser-only runtime.
+These launch commands use the exact published ADS version in `bun.lock`, as do
+build checks and the preview compiler. Bun 1.3.13 or newer is required.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
 
 ```sh
-npx --yes @reqvire-org/ads@0.3.32 mcp explorer --mutations
+bun explorer/node_modules/@reqvire-org/ads/dist/cli.mjs mcp explorer --mutations
 ```
 
-MCP clients launching the npm scripts should use `npm --silent run ads-mcp` or
-`npm --silent run ads-read-mcp` to keep stdout exclusive to JSON-RPC. Restart the
+MCP clients launching scripts should use `bun --silent run ads-mcp` or
+`bun --silent run ads-read-mcp` to keep stdout exclusive to JSON-RPC. Restart the
 MCP connection after changing client configuration or upgrading ADS.
 
 The managed preview compiler keeps a persistent Vite graph and reuses unchanged
@@ -254,4 +262,6 @@ Read `ads://guides/captures` for settings, named targets and resource freshness.
 The project declares Playwright as a development dependency and configures
 `mcp.capture.channel: "chrome"`, which requires a locally installed Google Chrome.
 To use Playwright Chromium instead, remove that channel setting and run
-`npx playwright install chromium` from `explorer/`.
+`bun --bun x --no-install playwright install chromium` from `explorer/`.
+
+React Flow canvas structure is adapted from xyflow 12.12.0 under MIT. Its shared project-owned styling and retained source notice live in the [FlowCanvasSkin guide](design-system/patterns/graphs/FlowCanvasSkin/README.md). The graph engine remains an installed dependency.

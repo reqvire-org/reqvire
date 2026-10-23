@@ -7,46 +7,6 @@
   "stylesEntry": "styles.css",
   "tokenDir": "tokens",
   "inlineStyleFiles": [],
-  "oxlint": {
-    "plugins": [
-      {
-        "name": "design-system",
-        "path": "scripts/oxlint-design-system.mjs"
-      }
-    ],
-    "rules": {
-      "design-system/toast-client-usage": "error",
-      "design-system/toast-effect-id": "error",
-      "design-system/toaster-root-mount": [
-        "error",
-        {
-          "rootFiles": [
-            "src/App.tsx",
-            "design-system/components/core/Toast.ads.scenario.tsx"
-          ]
-        }
-      ],
-      "no-restricted-imports": [
-        "error",
-        {
-          "paths": [
-            {
-              "name": "sonner",
-              "message": "Use the project-owned toast API from @ds."
-            }
-          ],
-          "patterns": [
-            {
-              "group": [
-                "sonner/*"
-              ],
-              "message": "Use the project-owned toast API from @ds."
-            }
-          ]
-        }
-      ]
-    }
-  },
   "boundaries": {
     "styleWrites": [
       {
@@ -220,15 +180,6 @@
   "framework": "preact",
   "mcp": {
     "previewManifest": ".ds/preview/manifest.json",
-    "previewWatch": {
-      "command": "npm",
-      "args": [
-        "run",
-        "build:mcp-previews",
-        "--",
-        "--watch"
-      ]
-    },
     "apps": [],
     "showcaseTitle": "Reqvire Design System",
     "capture": {
@@ -237,11 +188,44 @@
     "behaviorProfiles": {
       "widget": {
         "runner": "playwright",
-        "command": "npm",
-        "args": ["run", "test:behavior", "--"],
+        "command": "bun",
+        "args": [
+          "run",
+          "test:behavior",
+          "--"
+        ],
         "mode": "browser",
         "timeoutMs": 240000
       }
-    }
+    },
+    "mutationChecks": [
+      "lint:style",
+      "typecheck"
+    ]
+  },
+  "behaviorLibraries": [
+    "@sigma/edge-curve",
+    "@sigma/node-image",
+    "@xyflow/react",
+    "elkjs",
+    "graphology",
+    "graphology-layout-forceatlas2",
+    "graphology-layout-noverlap",
+    "sigma"
+  ],
+  "usage": {
+    "notifications": [
+      {
+        "api": "toast",
+        "host": "Toaster",
+        "rootFiles": [
+          "src/App.tsx",
+          "design-system/components/core/Toast.ads.scenario.tsx"
+        ]
+      }
+    ],
+    "restrictedImports": [
+      "sonner"
+    ]
   }
 }

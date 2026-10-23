@@ -216,12 +216,12 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 ## Caveats
 
 1. **Fonts** are Geist and Geist Mono, vendored in `assets/fonts/*.woff2` and referenced relatively from `tokens/fonts.css`, so the kit and standalone artifacts work offline with no app server.
-2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `npm run generate:icons`.
+2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `bun run generate:icons`.
 3. **Canonical source.** This directory is source, not an exported artifact. Generated bundles, generated CSS, generated browser icons, and showcase dist output must be rebuilt, not edited.
 
 ## Scenarios and MCP showcase
 
-Run `npm run dev:showcase` from `explorer/`, or open the MCP-reported showcase
+Run `bun run dev:showcase` from `explorer/`, or open the MCP-reported showcase
 URL. ADS owns the neutral host and its Tokens, Components, Patterns and Composition
 navigation. This project owns the compiled Preact views inside its preview App.
 

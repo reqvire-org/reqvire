@@ -36,19 +36,24 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Set up Node.js
+      - name: Set up Node for the Vite application build
         uses: actions/setup-node@v5
         with:
           node-version: "24"
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+
       - name: Install Explorer dependencies
-        run: cd explorer && npm ci
+        run: cd explorer && bun install --frozen-lockfile
 
       - name: Install headless Chromium for Explorer checks
-        run: cd explorer && npx --no-install playwright install --with-deps chromium --only-shell
+        run: cd explorer && bun --bun x --no-install playwright install --with-deps chromium --only-shell
 
       - name: Build Explorer SPA bundle
-        run: cd explorer && npm run build
+        run: cd explorer && bun run build
 
       - name: Build Reqvire binary
         run: cargo build --release --locked

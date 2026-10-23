@@ -22,10 +22,9 @@
     },
     "ads": {
       "type": "stdio",
-      "command": "npx",
+      "command": "./bin/bun",
       "args": [
-        "-y",
-        "@reqvire-org/ads@0.3.32",
+        "explorer/node_modules/@reqvire-org/ads/dist/cli.mjs",
         "mcp",
         "explorer",
         "--mutations"

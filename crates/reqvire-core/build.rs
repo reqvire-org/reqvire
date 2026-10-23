@@ -1,7 +1,7 @@
 //! Build script: embeds the built Explorer SPA (Vite) `dist/`.
 //!
 //! By default, `cargo build` consumes an existing `explorer/dist`. Set
-//! `REQVIRE_BUILD_EXPLORER=1` to run `npm run build` in the repository
+//! `REQVIRE_BUILD_EXPLORER=1` to run `bun run build` in the repository
 //! `explorer` directory first.
 //! The script then recursively copies `explorer/dist` into
 //! `OUT_DIR/explorer_bundle` and generates a manifest of `(relative_path,
@@ -36,14 +36,13 @@ fn main() {
         "scripts",
         "index.html",
         "package.json",
-        "package-lock.json",
+        "bun.lock",
         "ds.config.json",
         "vite.config.ts",
         "preact.config.ts",
         "tsconfig.json",
         "vitest.config.ts",
         "biome.css.json",
-        ".oxlintignore",
         "design-system/assets",
         "design-system/components",
         "design-system/composition",
@@ -71,21 +70,21 @@ fn main() {
 
     // Build the Explorer SPA only when explicitly requested.
     if rebuild {
-        let status = Command::new("npm")
+        let status = Command::new("bun")
             .arg("run")
             .arg("build")
             .current_dir(&explorer_dir)
             .status()
             .unwrap_or_else(|error| panic!(
-                "could not run `npm run build` in {} ({error}); install Node/npm and run `cd explorer && npm ci` first",
+                "could not run `bun run build` in {} ({error}); install Bun and run `cd explorer && bun install --frozen-lockfile` first",
                 explorer_dir.display()
             ));
-        assert!(status.success(), "`npm run build` failed (status {status}) in {}; refusing to embed stale Explorer assets", explorer_dir.display());
+        assert!(status.success(), "`bun run build` failed (status {status}) in {}; refusing to embed stale Explorer assets", explorer_dir.display());
     }
 
     if !dist.join("index.html").is_file() {
         panic!(
-            "explorer/dist bundle not found at {}. Run `cd explorer && npm ci && npm run build` first.",
+            "explorer/dist bundle not found at {}. Run `cd explorer && bun install --frozen-lockfile && bun run build` first.",
             dist.display()
         );
     }

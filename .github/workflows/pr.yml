@@ -24,26 +24,31 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: "24"
-
       - name: Install shell test dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --yes ripgrep
 
+      - name: Set up Node for the Vite application build
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+
       - name: Install Explorer dependencies
-        run: cd explorer && npm ci
+        run: cd explorer && bun install --frozen-lockfile
 
       - name: Install headless Chromium for Explorer and end-to-end checks
-        run: cd explorer && npx --no-install playwright install --with-deps chromium --only-shell
+        run: cd explorer && bun --bun x --no-install playwright install --with-deps chromium --only-shell
 
       - name: Build Explorer SPA and standalone design-system bundles
         # crates/reqvire-core/build.rs embeds explorer/dist into the binary at compile time,
         # so the bundle must be built before cargo build/test.
-        run: cd explorer && npm run build:all
+        run: cd explorer && bun run build:all
 
       - name: Build CLI for Rust and end-to-end tests
         run: cargo build --release --locked --bin reqvire
