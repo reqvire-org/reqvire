@@ -41,7 +41,7 @@ The system shall implement semi-structured markdown format specifications that d
   * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
   * satisfiedBy: [subsection.rs](../../crates/reqvire-core/src/subsection.rs)
   * specify: [Defining Model Structure](ModelStructureFeature.md#defining-model-structure)
-  * verifiedBy: [Format Command Requirements Verification](../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
+  * verifiedBy: [Formatting Operations Verification](../Verifications/Operations/Formatting/FormattingVerifications.md#formatting-operations-verification)
   * verifiedBy: [Invalid Header Structure Test](../Verifications/Operations/Validation/ValidationVerifications.md#invalid-header-structure-test)
 ---
 
@@ -75,6 +75,24 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
   * satisfiedBy: [relation.rs](../../crates/reqvire-core/src/relation.rs)
 ---
 
+### Fenced Code Content Preservation
+
+WHEN processing fenced code in model-element content, the system SHALL treat the code as literal content and preserve its boundaries and source text during parsing, model edits and formatting, while continuing normal structural parsing outside the code according to the owned specification.
+
+#### Details
+This requirement refines Markdown structure handling for code examples. It prevents literal headings and declarations from changing model structure or hiding later authored elements, and preserves code during serialization.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
+  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
+  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
+  * verifiedBy: [Fenced Code Block Parsing Verification](../Verifications/ModelStructure/ParsingVerifications.md#fenced-code-block-parsing-verification)
+---
+
 ### Reserved Subsections Support
 
 The system SHALL support reserved subsections with predefined structure and behavior.
@@ -105,22 +123,4 @@ IF a reserved subsection violates its applicable element-type or entry constrain
   * verifiedBy: [Contract Bindings Output Rendering Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-output-rendering-verification)
   * verifiedBy: [Contract Bindings Subsection Parsing Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-subsection-parsing-verification)
   * verifiedBy: [Contract Bindings Validation Verification](../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-validation-verification)
----
-
-### Fenced Code Content Preservation
-
-WHEN processing fenced code in model-element content, the system SHALL treat the code as literal content and preserve its boundaries and source text during parsing, model edits and formatting, while continuing normal structural parsing outside the code according to the owned specification.
-
-#### Details
-This requirement refines Markdown structure handling for code examples. It prevents literal headings and declarations from changing model structure or hiding later authored elements, and preserves code during serialization.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
-  * satisfiedBy: [crud_ops.rs](../../crates/reqvire-core/src/graph_registry/crud_ops.rs)
-  * satisfiedBy: [parser.rs](../../crates/reqvire-core/src/parser.rs)
-  * satisfiedBy: [queries.rs](../../crates/reqvire-core/src/semantic_contract/queries.rs)
-  * verifiedBy: [Fenced Code Block Parsing Verification](../Verifications/ModelStructure/ParsingVerifications.md#fenced-code-block-parsing-verification)
 ---

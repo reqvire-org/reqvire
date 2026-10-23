@@ -42,7 +42,7 @@ fi
 
 # Perform move operation (no section argument - sections were removed)
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Only Element" "specifications/Target.md" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Only Element" "specifications/Target.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 

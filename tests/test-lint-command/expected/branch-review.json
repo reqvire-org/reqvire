@@ -1,0 +1,16 @@
+[
+  {
+    "type": "multi_branch_convergence",
+    "element": {
+      "identifier": "specifications/BranchReview.md#branch-review-leaf",
+      "name": "Branch Review Leaf",
+      "file": "specifications/BranchReview.md"
+    },
+    "common_ancestor": "specifications/BranchReview.md#branch-review-root",
+    "branch_paths": [
+      "specifications/BranchReview.md#branch-review-left",
+      "specifications/BranchReview.md#branch-review-right"
+    ],
+    "rationale": "This element reaches the common ancestor through multiple branches. Both branches may be semantically necessary (element derives from ancestor in multiple contexts), OR one branch may represent a modeling error. Human review is required to determine if all branches are valid."
+  }
+]

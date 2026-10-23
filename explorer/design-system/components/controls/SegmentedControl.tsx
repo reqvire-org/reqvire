@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { ReactNode } from "react";
+import { type ComponentChildren } from "preact";
 
 const baseUX = css`
   display: inline-flex;
@@ -63,8 +63,9 @@ const skinX = css`
 
 export interface SegmentedControlItem<T extends string> {
   value: T;
-  label?: ReactNode;
-  icon?: ReactNode;
+  label?: ComponentChildren;
+  icon?: ComponentChildren;
+  tooltip?: string;
 }
 
 export interface SegmentedControlProps<T extends string> {
@@ -91,6 +92,8 @@ export function SegmentedControl<T extends string>({
             key={item.value}
             type="button"
             aria-pressed={active}
+            aria-label={item.label ? undefined : item.tooltip}
+            title={item.tooltip}
             className={cx("ds-segmented__item", itemBaseUX, active && "is-active")}
             onClick={() => onChange(item.value)}
           >

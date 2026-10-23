@@ -10,7 +10,6 @@ use crate::semantic_store::SemanticModelStore;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
 use std::path::{Path, PathBuf};
 
 const SCHEMA_VERSION: &str = "2026-10-06.project-store.v5";
@@ -111,6 +110,7 @@ pub struct ProjectStoreRelation {
     pub target_kind: String,
     pub relation_type: String,
     pub canonical_relation_type: String,
+    pub inverse_relation_type: Option<&'static str>,
     pub source_relation_types: Vec<String>,
     pub authored: bool,
     pub generated_opposite: bool,
@@ -381,6 +381,7 @@ fn project_store_git_worktrees() -> Vec<ProjectStoreGitWorktree> {
 
 fn git_output_in_dir<const N: usize>(dir: &Path, args: [&str; N]) -> Option<String> {
     let output = std::process::Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
         .current_dir(dir)
         .args(args)
         .output()
@@ -1134,6 +1135,9 @@ fn build_relations(
             target_id: relation.target_id,
             target_kind: relation.target_kind,
             relation_type: relation.canonical_relation_type.clone(),
+            inverse_relation_type: relation::RELATION_TYPES
+                .get(relation.canonical_relation_type.as_str())
+                .and_then(|info| info.opposite),
             canonical_relation_type: relation.canonical_relation_type,
             source_relation_types: relation.source_relation_types.into_iter().collect(),
             authored: relation.authored,
@@ -1417,13 +1421,13 @@ fn enrich_resource_sources(resources: &mut BTreeMap<String, ProjectStoreResource
             continue;
         }
         let absolute_path = project_root.join(source_path);
-        let Ok(metadata) = fs::metadata(&absolute_path) else {
-            continue;
-        };
-        if !metadata.is_file() || metadata.len() > 512 * 1024 {
+        if !crate::mutation_io::file_size(&absolute_path).is_some_and(|size| size <= 512 * 1024) {
             continue;
         }
-        if let Ok(source_text) = fs::read_to_string(&absolute_path) {
+        if let Ok(source_text) = crate::mutation_io::read_to_string(&absolute_path) {
+            if source_text.len() > 512 * 1024 {
+                continue;
+            }
             resource.source_text = Some(source_text);
         }
     }
@@ -1777,7 +1781,18 @@ ext:UnusedTerm a owl:Class ;
             .expect("element should register");
 
         let elements = build_elements(&registry);
-        let (_relations, mut resources) = build_relations(&registry);
+        let (relations, mut resources) = build_relations(&registry);
+        let evidence = relations
+            .iter()
+            .find(|relation| relation.canonical_relation_type == "satisfiedBy")
+            .expect("evidence relation should be exported");
+        assert_eq!(evidence.inverse_relation_type, Some("satisfy"));
+        let hierarchy = relations
+            .iter()
+            .find(|relation| relation.canonical_relation_type == "derive")
+            .expect("hierarchy should use the core traversal direction");
+        assert_eq!(hierarchy.inverse_relation_type, Some("derivedFrom"));
+        assert_eq!(hierarchy.target_id, "system-model/API.md#api-requirement");
         enrich_resource_sources(&mut resources);
         let (files, _folders) = build_files_and_folders(&registry, &resources);
         let search = build_search_documents(

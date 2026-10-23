@@ -10,6 +10,7 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct SnapshotFiles {
     pub root: PathBuf,
+    pub workspace: Option<Arc<crate::workspace::WorkspaceScope>>,
     pub files: Arc<BTreeMap<PathBuf, Arc<Vec<u8>>>>,
     pub executable: Arc<BTreeSet<PathBuf>>,
 }
@@ -21,6 +22,7 @@ struct Context {
     files: SnapshotFiles,
     overlay: BTreeMap<PathBuf, Option<PreparedFile>>,
     changed: BTreeSet<PathBuf>,
+    removed_directories: BTreeSet<PathBuf>,
     model: Option<Arc<ModelManager>>,
     capture: bool,
 }
@@ -37,6 +39,7 @@ impl SnapshotFiles {
                 files: self.clone(),
                 overlay: BTreeMap::new(),
                 changed: BTreeSet::new(),
+                removed_directories: BTreeSet::new(),
                 model,
                 capture: false,
             });
@@ -45,6 +48,15 @@ impl SnapshotFiles {
     }
 }
 impl SnapshotGuard {
+    pub fn removed_directories(&self) -> BTreeSet<PathBuf> {
+        CONTEXT.with(|slot| {
+            slot.borrow()
+                .as_ref()
+                .expect("active snapshot")
+                .removed_directories
+                .clone()
+        })
+    }
     pub fn capture_dependencies(&self) {
         CONTEXT.with(|s| s.borrow_mut().as_mut().expect("active snapshot").capture = true);
     }
@@ -84,6 +96,13 @@ impl Drop for SnapshotGuard {
 }
 pub fn active() -> bool {
     CONTEXT.with(|slot| slot.borrow().is_some())
+}
+pub fn workspace_scope() -> Option<crate::workspace::WorkspaceScope> {
+    CONTEXT.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .and_then(|c| c.files.workspace.as_deref().cloned())
+    })
 }
 pub fn model() -> Option<Arc<ModelManager>> {
     CONTEXT.with(|slot| {
@@ -167,6 +186,16 @@ pub fn read(path: impl AsRef<Path>) -> io::Result<Vec<u8>> {
 }
 pub fn read_to_string(path: impl AsRef<Path>) -> io::Result<String> {
     String::from_utf8(read(path)?).map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))
+}
+pub fn file_size(path: impl AsRef<Path>) -> Option<u64> {
+    let path = absolute(path.as_ref());
+    CONTEXT.with(|slot| match slot.borrow().as_ref() {
+        Some(context) => context.file(&path).map(|bytes| bytes.len() as u64),
+        None => std::fs::metadata(path)
+            .ok()
+            .filter(|m| m.is_file())
+            .map(|m| m.len()),
+    })
 }
 pub fn is_file(path: impl AsRef<Path>) -> bool {
     let path = absolute(path.as_ref());
@@ -277,6 +306,14 @@ pub fn remove_dir_all(path: impl AsRef<Path>) -> io::Result<()> {
         for path in paths {
             remove_file(path)?;
         }
+        let path = absolute(path.as_ref());
+        CONTEXT.with(|slot| {
+            let mut context = slot.borrow_mut();
+            let context = context.as_mut().expect("active snapshot");
+            writable(context, &path)?;
+            context.removed_directories.insert(path);
+            Ok::<_, io::Error>(())
+        })?;
         Ok(())
     } else {
         std::fs::remove_dir_all(path)
@@ -303,6 +340,7 @@ mod tests {
         let root = directory.path().to_path_buf();
         let files = SnapshotFiles {
             root: root.clone(),
+            workspace: None,
             files: Arc::new(BTreeMap::from([(
                 root.join("a.txt"),
                 Arc::new(b"accepted".to_vec()),

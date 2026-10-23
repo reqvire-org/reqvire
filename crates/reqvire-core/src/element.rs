@@ -565,6 +565,9 @@ pub struct Element {
     #[serde(skip)]
     pub id: String,
     pub content: String,
+    /// Original prose lines retained for diagnostics; never part of model evidence.
+    #[serde(skip)]
+    pub(crate) content_source_lines: Vec<(usize, String)>,
     pub relations: Vec<Relation>,
     pub identifier: String,
     pub file_path: String,
@@ -628,6 +631,7 @@ impl Element {
             name: name.to_string(),
             id,
             content: "".to_string(),
+            content_source_lines: Vec::new(),
             hash_impact_content: "".to_string(),
             relations: vec![],
             identifier: identifier.to_string(),
@@ -658,7 +662,25 @@ impl Element {
         self.content.push_str(content);
     }
 
+    pub(crate) fn add_content_at_line(&mut self, content: &str, line: usize) {
+        self.content_source_lines.extend(
+            content
+                .split_terminator('\n')
+                .enumerate()
+                .map(|(offset, text)| (line + offset, text.to_string())),
+        );
+        self.add_content(content);
+    }
+
     pub fn freeze_content(&mut self) {
+        let leading_lines = self
+            .content
+            .chars()
+            .take_while(|c| matches!(c, '\n' | '\t'))
+            .filter(|c| *c == '\n')
+            .count();
+        self.content_source_lines
+            .drain(..leading_lines.min(self.content_source_lines.len()));
         // Trim newlines and tabs from the beginning and end.
         let trimmed = self.content.trim_matches(&['\n', '\t'][..]);
 

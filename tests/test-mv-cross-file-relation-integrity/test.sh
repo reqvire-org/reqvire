@@ -59,7 +59,7 @@ assert_file_matches() {
 #      causing "Missing relation target" validation error.
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Capability A" "specifications/SubDir/SubRequirements.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Capability A" "specifications/SubDir/SubRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 

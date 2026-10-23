@@ -347,8 +347,22 @@ fn rdf_term_json(term: &Term) -> Value {
 
 pub fn lint_tool(
     args: &Value,
+    enable_mutations: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
+    if bool_arg(args, "fix", false) {
+        if !enable_mutations {
+            return Err(ReqvireError::ProcessError(
+                "lint with fix=true requires --enable-mutations".to_string(),
+            ));
+        }
+        let mut model = super::arg_helpers::load_mutation_model(excluded_filename_patterns)?;
+        return crate::operations::lint_repair(
+            &mut model,
+            bool_arg(args, "fixable", false),
+            bool_arg(args, "auditable", false),
+        );
+    }
     let model = crate::operations::load_model_lenient(excluded_filename_patterns)?;
     let report = crate::operations::lint_report(&model.graph_registry);
     parse_json_string(report.to_json_string(

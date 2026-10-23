@@ -9,7 +9,7 @@ Workflow:
 - For standalone Thesaurus changes, inspect `reqvire.concept_schemes.list`, `reqvire.concepts.list`, or `reqvire.concepts.get` before planning edits.
 - Use native `concept-scheme` and `concept` Markdown elements for Reqvire concept authoring. Concept schemes own `concept_base` and `concept_prefix` directly. Do not plan new concept authoring as Turtle-authored `skos:Concept` resources inside ontology elements.
 - If mutation tools are enabled, preview changes first with each tool's dry-run or preview mode when available.
-- After edits, run or request validation evidence through `reqvire.validate`, `reqvire.lint`, coverage, traces, or the matching MCP report tools.
+- After edits, use MCP lint, coverage, traces, and accepted-revision evidence. Standalone validation is a CLI operation; no `reqvire.validate` MCP tool exists.
 
 Answer discipline:
 - Keep canonical model semantics current; do not rely on legacy section names.

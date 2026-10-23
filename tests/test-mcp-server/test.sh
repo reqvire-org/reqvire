@@ -626,14 +626,6 @@ EOF
 jq -e '.global_counters.total_elements == 1' "$TEST_DIR/output/binary-search.json" >/dev/null \
   || fail "Reqvire binary search should find Test Requirement Beta" "$TEST_DIR/output/binary-search.json"
 
-set +e
-(cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --transport stdio) > "$TEST_DIR/output/mcp-stdio-removed.stdout" 2> "$TEST_DIR/output/mcp-stdio-removed.stderr"
-STDIO_EXIT=$?
-set +e
-if [ "$STDIO_EXIT" -eq 0 ]; then
-  fail "stdio MCP transport should not be accepted"
-fi
-
 DEFAULT_OUTPUT="$TEST_DIR/output/mcp-default.jsonl"
 DEFAULT_PORT="$(pick_port)"
 DEFAULT_OUTPUT_PREFIX="$TEST_DIR/output/mcp-default"
@@ -1049,5 +1041,16 @@ fi
 if ! grep -q "MCP startup validation failed" "$TEST_DIR/output/mcp-invalid-startup.stderr"; then
   fail "startup validation diagnostics should mention MCP startup validation" "$TEST_DIR/output/mcp-invalid-startup.stderr"
 fi
+
+PROSE_STATUS=0
+python3 "$TEST_SCRIPT_DIR/../prose_links.py" mcp "$REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/prose-link-checks.txt" 2> "$TEST_DIR/output/prose-link-checks.stderr" || PROSE_STATUS=$?
+if [ "$PROSE_STATUS" -ne 0 ]; then
+  cat "$TEST_DIR/output/prose-link-checks.stderr"
+fi
+diff -u "$TEST_SCRIPT_DIR/expected/prose-link-checks.txt" "$TEST_DIR/output/prose-link-checks.txt" || exit 1
+[ "$PROSE_STATUS" -eq 0 ] || exit 1
+
+python3 "$TEST_SCRIPT_DIR/check_transports.py" "${REAL_REQVIRE_BIN:-$REQVIRE_BIN}" "$TEST_DIR" || exit 1
 
 exit 0

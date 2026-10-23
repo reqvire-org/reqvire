@@ -1,6 +1,8 @@
 PASS successful-fixture-cleanup
 PASS failed-fixture-retention
 PASS concurrent-run-isolation
+PASS optimized-default-without-debug-fallback
+PASS terminal-input-does-not-suspend-suites
 PASS executable-snapshot-survives-source-replacement
 PASS missing-executable-fails-startup
 PASS non-executable-fails-startup

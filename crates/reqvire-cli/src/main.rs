@@ -5,6 +5,7 @@ mod mcp;
 mod mcp_github;
 mod mcp_http;
 mod mcp_process;
+mod mcp_repo_worktrees;
 mod mcp_session;
 mod mcp_worker;
 mod mcp_worktrees;
@@ -37,7 +38,13 @@ async fn main() {
         std::process::exit(1);
     }
 
+    if let Err(err) = reqvire::repo_workspace::set_manifest_selection(args.manifest.clone()) {
+        error!("{}", err);
+        std::process::exit(1);
+    }
+
     // Run `handle_command` and get exit code
+    let json_output = cli::wants_json(&args);
     let exit_code = handle_command(args, &get_excluded_filename_patterns_glob_set())
         .await
         .unwrap_or_else(|e| {
@@ -52,6 +59,10 @@ async fn main() {
                     }
                 }
                 ReqvireError::ValidationDiagnostics { related_errors, .. } => {
+                    if json_output {
+                        cli::print_validation_results(&related_errors, true);
+                        return 1;
+                    }
                     let mut messages: Vec<String> =
                         related_errors.iter().map(|err| err.to_string()).collect();
                     messages.sort();

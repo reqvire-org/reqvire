@@ -1,15 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { projectCoverage } from "../lib/coverage";
 import { DEFAULT_VIEW, parseHash, routeForCoverage } from "../router/routes";
 import { useExplorerLocation, writeExplorerUrl } from "../router/location";
 import type { ExplorerProjectStore } from "../store/types";
 
-export const COVERAGE_ISSUES = [
-  { id: "unverified-requirements", label: "Unverified requirements", field: "unverified_leaf_requirements", emptyLabel: "All leaf requirements have verification." },
-  { id: "unimplemented-requirements", label: "Unimplemented requirements", field: "uncovered_requirements", emptyLabel: "All requirements in scope are implementation-covered." },
-  { id: "unsatisfied-verifications", label: "Unsatisfied verifications", field: "unsatisfied_test_verifications", emptyLabel: "All test verifications have evidence." },
-  { id: "orphaned-verifications", label: "Orphaned verifications", field: "orphaned_verifications", emptyLabel: "Every verification links to a requirement." },
-] as const;
+export { COVERAGE_ISSUES } from "@ds";
 interface Selection { scopeId: string | null; notice: string | null; }
 function readPreferences(key: string): Selection {
   let stored;
@@ -23,8 +18,8 @@ export function useCoverageNavigation(store: ExplorerProjectStore, worktreeRouti
   const url = new URL(location);
   const route = parseHash(url.hash, DEFAULT_VIEW);
   const active = route.view === "coverage" && !route.elementId;
-  const requested = url.searchParams.get("worktree_id");
-  const displayed = !worktreeRouting || !requested || requested === store.project.worktree_id;
+  const requested = url.searchParams.get("branch");
+  const displayed = !worktreeRouting || !requested || requested === store.project.branch;
   const identity = [store.project.workspace_root, store.project.repository, store.project.name];
   if (store.project.worktree_id) identity.push(store.project.worktree_id);
   const key = `reqvire:coverage:${JSON.stringify(identity)}`;
@@ -57,15 +52,15 @@ export function useCoverageNavigation(store: ExplorerProjectStore, worktreeRouti
   }, [key, initial]);
   const serialized = JSON.stringify(selection);
   useEffect(() => {
-    if (!displayed || JSON.stringify(selectionRef.current) !== serialized) return;
+    if (!displayed || window.location.href !== location || JSON.stringify(selectionRef.current) !== serialized) return;
     update(selection);
     if (active) {
       const nextUrl = new URL(location);
       nextUrl.hash = routeForCoverage(scopeId);
-      if (worktreeRouting && store.project.worktree_id) nextUrl.searchParams.set("worktree_id", store.project.worktree_id);
+      if (worktreeRouting && store.project.branch) nextUrl.searchParams.set("branch", store.project.branch);
       writeExplorerUrl(nextUrl, true);
     }
-  }, [active, displayed, serialized, update, location, worktreeRouting, store.project.worktree_id]);
+  }, [active, displayed, serialized, update, location, worktreeRouting, store.project.branch]);
 
   const setCoverageScopeId = useCallback((nextScope: string | null) => {
     if (!navigationRef.current.displayed) return;

@@ -94,7 +94,7 @@ pub(crate) struct CodeFence {
 }
 
 impl CodeFence {
-    pub(crate) fn is_open(&self) -> bool {
+    pub(crate) const fn is_open(&self) -> bool {
         self.length > 0
     }
 
@@ -116,7 +116,7 @@ impl CodeFence {
 }
 
 /// Real subsection headings, excluding fenced examples and details content.
-fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
+pub(crate) fn subsection_headers(content: &str) -> Vec<(usize, &str)> {
     let mut headers = Vec::new();
     let mut fence = CodeFence::default();
     let mut details = false;
@@ -445,7 +445,9 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
     let mut found_header = false;
 
     let mut content_fence = CodeFence::default();
-    for (line_num, line) in content.split_terminator('\n').enumerate() {
+    for (line_num, raw_line) in content.split_terminator('\n').enumerate() {
+        // Normalize document line endings; fenced payload bytes remain data.
+        let line = raw_line.strip_suffix('\r').unwrap_or(raw_line);
         let trimmed = line.trim();
         let was_open = content_fence.is_open();
         if !in_details_block && content_fence.consume(trimmed) {
@@ -455,7 +457,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 }
             }
             if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", raw_line), line_num + 1);
             }
             continue;
         }
@@ -463,7 +465,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
         // Handle <details> blocks
         if in_details_block {
             if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
             }
             if trimmed.starts_with("</details>") {
                 in_details_block = false;
@@ -536,7 +538,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
             // If transitioning to content-bearing subsection, add the header to content
             if subsection.is_content_bearing() {
                 if let Some(element) = &mut current_element {
-                    element.add_content(&format!("\n{}\n", line));
+                    element.add_content_at_line(&format!("\n{}\n", line), line_num);
                 }
             }
 
@@ -560,7 +562,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                 if trimmed.starts_with("<details") {
                     in_details_block = true;
                 }
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
             }
 
         // Parse metadata
@@ -902,6 +904,7 @@ fn parse_single_element_file(
 ) -> (Vec<Element>, Vec<ReqvireError>, String) {
     let mut errors = Vec::new();
     let mut element_content = String::new();
+    let mut content_source_lines = Vec::new();
     let mut element_relations: Vec<Relation> = Vec::new();
     let mut element_contract_bindings: Vec<ContractBindingEntry> = Vec::new();
     let mut element_contract_references = Vec::new();
@@ -933,6 +936,7 @@ fn parse_single_element_file(
         if in_document {
             element_content.push_str(line);
             element_content.push('\n');
+            content_source_lines.push((line_num + 1, line.to_string()));
             continue;
         }
 
@@ -1160,6 +1164,7 @@ fn parse_single_element_file(
         Some(ElementType::Requirement(RequirementType::System)),
     );
     element.content = element_content;
+    element.content_source_lines = content_source_lines;
     metadata.insert("_single_element_format".to_string(), "true".to_string());
     element.metadata = metadata;
     element.set_type_from_metadata();
@@ -1210,7 +1215,9 @@ pub fn parse_elements(
     let mut file_element_counter: usize = 0;
 
     let mut content_fence = CodeFence::default();
-    for (line_num, line) in content.split_terminator('\n').enumerate() {
+    for (line_num, raw_line) in content.split_terminator('\n').enumerate() {
+        // Normalize document line endings; fenced payload bytes remain data.
+        let line = raw_line.strip_suffix('\r').unwrap_or(raw_line);
         let trimmed = line.trim();
         let was_open = content_fence.is_open();
         if !in_details_block && content_fence.consume(trimmed) {
@@ -1220,7 +1227,7 @@ pub fn parse_elements(
                 }
             }
             if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", raw_line), line_num + 1);
             }
             continue;
         }
@@ -1228,7 +1235,7 @@ pub fn parse_elements(
         if in_details_block {
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    element.add_content(&format!("{}\n", line));
+                    element.add_content_at_line(&format!("{}\n", line), line_num + 1);
                 }
             }
 
@@ -1244,7 +1251,7 @@ pub fn parse_elements(
             in_details_block = true;
             if let Some(element) = &mut current_element {
                 if !skip_current_element {
-                    element.add_content(&format!("{}\n", line));
+                    element.add_content_at_line(&format!("{}\n", line), line_num + 1);
                 }
             }
             continue;
@@ -1390,7 +1397,7 @@ pub fn parse_elements(
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
                     if subsection.is_content_bearing() {
-                        element.add_content(&format!("\n{}\n", line));
+                        element.add_content_at_line(&format!("\n{}\n", line), line_num);
                     }
                 }
             }
@@ -1406,12 +1413,12 @@ pub fn parse_elements(
                     in_details_block = true;
                 }
 
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
             }
         } else if in_details_block && !skip_current_element {
             // Still inside <details> block under 'Details' subsection
             if let Some(element) = &mut current_element {
-                element.add_content(&format!("{}\n", line));
+                element.add_content_at_line(&format!("{}\n", line), line_num + 1);
             }
         } else if current_subsection == SubSection::Metadata && !skip_current_element {
             if trimmed.is_empty() {

@@ -1,12 +1,16 @@
 """Exercise the real shell runner in disposable repositories without sockets."""
 import os
 from pathlib import Path
+import fcntl
+import pty
 import re
+import select
 import shutil
 import signal
 import subprocess
 import sys
 import tempfile
+import termios
 import time
 
 
@@ -133,6 +137,68 @@ def concurrency(h):
     assert (logs_b / "test-same.log").read_text() == "second\n"
     assert h.fixture("first") != h.fixture("second")
     assert not h.fixture("first").exists() and not h.fixture("second").exists()
+
+
+def default_executable(h):
+    h.env.pop("REQVIRE_BIN")
+    release = h.root / "target/release/reqvire"
+    release.parent.mkdir(parents=True)
+    shutil.copy2(h.binary, release)
+    debug = h.root / "target/debug/reqvire"
+    debug.parent.mkdir(parents=True)
+    debug.write_text('#!/bin/sh\nprintf "unintended debug build\\n"\n')
+    debug.chmod(0o755)
+    h.suite("test-default", '[[ "$("$REQVIRE_BIN" --version)" == "stub invocation" ]]\n')
+    output = h.finish(h.start("default", "test-default"))
+    assert reported_path(output, "Reqvire binary") == release, output
+    release.unlink()
+    h.finish(h.start("missing-release", "test-default"), expected=127)
+    assert not (h.observations / "missing-release.fixture").exists(), "fell back to debug build"
+    assert not list(h.temp.iterdir()), "default executable check leaked scratch files"
+
+
+def terminal_input(h):
+    h.suite("test-stdin", '''
+python3 -c 'import os; assert os.read(0, 1) == b"", "suite stdin must be EOF"'
+''')
+    master, slave = pty.openpty()
+
+    def attach_terminal():
+        os.setsid()
+        fcntl.ioctl(0, termios.TIOCSCTTY, 0)
+
+    process = subprocess.Popen(
+        ["bash", str(h.suites / "run_tests.sh"), "test-stdin"],
+        env={**h.env, "RUNNER_CASE": "terminal"}, cwd=h.root,
+        stdin=slave, stdout=slave, stderr=slave, preexec_fn=attach_terminal,
+    )
+    os.close(slave)
+    output = bytearray()
+    try:
+        # A background suite inheriting the controlling terminal stops on read.
+        # Keep draining output while waiting so terminal buffering cannot hang us.
+        deadline = time.monotonic() + 8
+        while process.poll() is None:
+            assert time.monotonic() < deadline, "terminal-launched suite stalled reading stdin"
+            if select.select([master], [], [], 0.05)[0]:
+                try:
+                    chunk = os.read(master, 65536)
+                except OSError:
+                    break  # The child closed the terminal.
+                if not chunk:
+                    break
+                output.extend(chunk)
+        assert process.wait(timeout=2) == 0, output.decode(errors="replace")
+        assert not h.fixture("terminal").exists(), "terminal-launched fixture leaked"
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=12)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait(timeout=3)
+        os.close(master)
 
 
 def executable_snapshot(h):
@@ -302,6 +368,8 @@ for name, function in (
     ("successful-fixture-cleanup", success),
     ("failed-fixture-retention", failure),
     ("concurrent-run-isolation", concurrency),
+    ("optimized-default-without-debug-fallback", default_executable),
+    ("terminal-input-does-not-suspend-suites", terminal_input),
     ("executable-snapshot-survives-source-replacement", executable_snapshot),
     ("missing-executable-fails-startup", lambda h: invalid_executable(h, True)),
     ("non-executable-fails-startup", lambda h: invalid_executable(h, False)),

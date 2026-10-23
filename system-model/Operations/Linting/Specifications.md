@@ -8,7 +8,7 @@
  - `source`, `target`, and `relation_type`
  - owning source root
  - owning target root
- - rationale that states why the relation breaks submodel ownership and should be converted to contract-bindings-based coupling.
+ - rationale that identifies the ownership boundary and directs the author to choose compatible coupling: Contract References for review context, Contract Bindings for independent implementation obligations, or another permitted relation for the actual source and target types. Contract dependencies belong on requirements and target uniquely requirement-owned contracts; the diagnostic must not prescribe a binding without establishing that intent.
 - Report such findings in:
  - default text output under **Needs Manual Review**
  - `--auditable` output
@@ -28,9 +28,9 @@
 #### Details
 Auto-fix behavior:
 - Applies fixes only for issues categorized as auto-fixable.
-- Modifies affected markdown files directly.
+- Stages affected model documents through the complete-candidate validation and canonical transactional persistence gates.
 - Removes redundant verify relations from verification elements where safe.
-- Preserves unrelated content and formatting.
+- Preserves unrelated content and untouched file bytes; normalizes affected documents through default canonical formatting.
 - Reports all applied changes (files modified, relations removed).
 - Skips issues categorized as needing manual review.
 
@@ -53,7 +53,7 @@ Specification for lint command output format and content structure.
  * List of affected elements with file paths and identifiers
  * Specific relations flagged as redundant
  * Brief explanation of why the relation is redundant, including which intermediate paths provide alternate routes
-- For auto-fixable issues: indicate these can be fixed with `--fix` flag
+- For auto-fixable issues: identify the safe repair as MCP `reqvire.lint` with `fix: true` and mutation enablement; CLI lint remains inspection only
 - For manual review issues: explain why human judgment is required
 
 **JSON Output Structure:**
@@ -95,7 +95,7 @@ Authorization (root)
 API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.
 
 Detection is expected to:
-- Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths
+- Inspect hierarchical ancestor reachability from each direct parent to identify the nearest eligible common ancestor reached through distinct branches
 - Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)
 - Report the element, the common ancestor, and all distinct branch paths
 - Categorize as **needs manual review** since determining semantic necessity requires human judgment
@@ -112,73 +112,17 @@ This enables the model author to review and decide:
 
 ### Redundant Hierarchical Relations Specification
 
-Technical specification for detecting and auto-removing redundant derivedFrom relations in the requirement hierarchy.
+Contract for redundant direct hierarchical edges.
 
 #### Details
-**What is Redundant:**
+- A direct `derivedFrom` edge from A to ancestor C is redundant when an alternate path from A to C exists through other `derivedFrom` edges. One intermediate chain or multiple converging paths both qualify.
+- Determine redundancy from hierarchical graph reachability for the source element's direct parents. Verification graph presentation and synthetic verification elements do not determine the repair policy.
+- Categorize eligible redundant direct edges as auto-fixable. Permitted repair removes those edges while preserving intermediate paths, unrelated content and manual-review findings.
+- Convergence without a direct edge to the common ancestor is a separate manual-review case. Do not infer a new direct edge or choose which branch to remove.
+- Cross-submodel ownership violations remain manual review and are excluded from automatic removal.
+- Report affected identifiers, the redundant direct relations and alternate reachability. The shared mutation transaction owns validation and canonical persistence; this contract owns redundancy classification.
 
-A derivedFrom relation is redundant when:
-- An element has a direct derivedFrom relation to an ancestor requirement
-- The same element also reaches that ancestor through other derivedFrom relations via intermediate elements
-- The hierarchy chain is already established through other paths (single or multiple convergent paths)
-
-**Core Principle**: If an element has a direct relation to an ancestor AND that ancestor is reachable through any other path(s), the direct relation adds no traceability value and can be safely auto-removed.
-
-This applies to:
-- **Single-chain redundancy**: Element reaches ancestor through exactly one intermediate path
-- **Multi-path/branching redundancy**: Element reaches ancestor through multiple convergent paths
-
-**Detection Logic:**
-
-The system is expected to use verification trace tree logic for detection:
-- Create a virtual/dummy verification element
-- Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations
-- Apply the same trace tree building logic used for verification upward traceability
-- The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor
-- Identify which intermediate paths provide the alternate routes to the ancestor
-
-This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.
-
-**Safe Auto-Removal Criteria:**
-
-A redundant hierarchical derivation relation is expected to be considered safe to auto-remove when ALL of the following conditions are met:
-1. **Direct relation exists**: Element A has a direct derivedFrom relation to element C
-2. **Alternate path exists**: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)
-3. **Transitive redundancy**: The direct A → C relation is redundant because C is reachable through other derivedFrom relations
-
-**Examples:**
-
-*Single-chain redundancy (auto-removable):*
-```
-Requirement A
- → Requirement B
- → Requirement C
-
-Redundant: A → C (can be safely auto-removed)
-Reason: C is reachable via A → B → C
-```
-
-*Multi-path/branching redundancy (auto-removable):*
-```
-Authorization A
- → Public API B → API Specification D
- → Management API C → API Specification D
-
-Redundant: A → D (can be safely auto-removed)
-Reason: D is reachable via A → B → D and A → C → D
-```
-
-**Auto-Removal Behavior:**
-
-When auto-fix mode is activated, the system is expected to:
-- Remove ALL redundant derivedFrom relations where alternate paths exist
-- Preserve traceability through intermediate elements
-- Maintain model coherence by ensuring all elements remain reachable through non-redundant paths
-- Report removed relations to the user for transparency
-- Show which intermediate paths provide the alternate routes
-- Categorize ALL redundant hierarchical relations as **auto-fixable** since the direct relation adds no value when alternate paths exist
-
-**Implementation Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
+For example, A derivedFrom B and B derivedFrom C make A derivedFrom C redundant. A derivedFrom B and D, with B and D each derivedFrom C, also make a direct A derivedFrom C edge redundant; retaining only the two branches requires semantic review rather than automatic branch removal.
 
 #### Metadata
   * type: specification
@@ -186,14 +130,14 @@ When auto-fix mode is activated, the system is expected to:
 
 ### Redundant Verify Relations Detection Contract Specification
 
+Contract for redundant direct verification edges.
+
 #### Details
-Redundant verify relation detection behavior:
-- Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
-- Uses verification trace tree analysis to determine ancestor reachability.
-- Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
-- Reuses trace-tree logic from [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction).
-- Reports redundant direct verify relations as model noise.
-- Categorizes these findings as auto-fixable.
+- A directly verified requirement is redundant when it is reachable through requirement `derivedFrom` ancestry from at least two other requirements directly verified by the same concrete verification.
+- Count distinct directly verified requirements that reach the candidate ancestor. Those starts need not be leaf requirements. One other directly verified descendant is insufficient for this finding.
+- Use the shared ancestor-reachability analysis; retain every direct verification target in trace graphs regardless of whether lint classifies a relation as redundant.
+- Report the verification, redundant direct ancestor targets and rationale; classify these findings as auto-fixable.
+- Permitted repair removes only eligible redundant direct `verify` edges. Coverage roll-up alone does not establish that a separate parent integration verification is redundant.
 
 #### Metadata
   * type: specification

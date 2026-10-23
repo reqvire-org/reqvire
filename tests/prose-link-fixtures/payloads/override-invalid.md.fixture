@@ -1,0 +1,9 @@
+### Prose Source
+
+Use [delivery contract](Targets.md#target-specification).
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Authoring Capability](Targets.md#authoring-capability)

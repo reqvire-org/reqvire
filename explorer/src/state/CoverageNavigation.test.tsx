@@ -1,5 +1,5 @@
-import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { act, cleanup, renderHook, waitFor } from "@/test/render";
+import { type ComponentChildren } from "preact";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { loadStoreCandidate } from "../store/loadStore";
@@ -16,9 +16,9 @@ beforeEach(() => { localStorage.clear(); history.replaceState(null, "", "/"); })
 function setup(hash: string, routing = false) {
   const loaded = loadStoreCandidate(structuredClone(fixture));
   if (!loaded.ok) throw new Error(loaded.reason);
-  let store = { ...loaded.store, project: { ...loaded.store.project, worktree_id: "a" } };
-  history.replaceState(null, "", `/${routing ? "?worktree_id=a" : ""}${hash}`);
-  const wrapper = ({ children }: { children: ReactNode }) => <StoreProvider store={store} schemaMismatch={null}>
+  let store = { ...loaded.store, project: { ...loaded.store.project, worktree_id: "private-a", branch: "a" } };
+  history.replaceState(null, "", `/${routing ? "?branch=a" : ""}${hash}`);
+  const wrapper = ({ children }: { children: ComponentChildren }) => <StoreProvider store={store} schemaMismatch={null}>
     <ExplorerUiStateProvider worktreeRouting={routing}>{children}</ExplorerUiStateProvider>
   </StoreProvider>;
   const hook = renderHook(() => ({ ui: useExplorerUiState(), router: useHashRoute() }), { wrapper });
@@ -80,7 +80,7 @@ describe("Coverage scope navigation", () => {
     act(() => writeExplorerUrl(target));
     expect(hook.result.current.ui.coverageScopeId).toBe(root);
     expect(location.href).toBe(target.href);
-    const b = { ...hook.store, project: { ...hook.store.project, worktree_id: "b" } };
+    const b = { ...hook.store, project: { ...hook.store.project, worktree_id: "private-b", branch: "b" } };
     hook.change(b);
     expect(hook.result.current.ui.coverageScopeId).toBeNull();
     expect(location.hash).toBe(routeForCoverage(null));

@@ -41,7 +41,7 @@ assert_output_matches() {
 # ==================================
 echo "Test 1: Basic merge - two requirements into one..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Source Requirement One" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-basic-merge.md" "$TEST_DIR/specifications/Requirements.md" "Basic merge result does not match expected"
 
@@ -100,7 +100,7 @@ cp "${TEST_SCRIPT_DIR}/specifications/Requirements.md" "$TEST_DIR/specifications
 cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specifications/Verifications.md"
 
 # Merge two sources at once
-cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" "Source Requirement Two" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Source Requirement One" "Source Requirement Two" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/04-multi-merge.md" "$TEST_DIR/specifications/Requirements.md" "Multi-merge result does not match expected"
 
@@ -117,7 +117,7 @@ cp "${TEST_SCRIPT_DIR}/specifications/Requirements.md" "$TEST_DIR/specifications
 cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specifications/Verifications.md"
 
 set +e
-MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Test Verification" 2>&1)
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Test Verification" 2>&1)
 MERGE_EXIT=$?
 set -e
 
@@ -141,7 +141,7 @@ echo ""
 echo "Test 6: Merge into self error..."
 
 set +e
-MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Target Requirement" 2>&1)
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Target Requirement" 2>&1)
 MERGE_EXIT=$?
 set -e
 
@@ -165,7 +165,7 @@ echo ""
 echo "Test 7: Non-existent source error..."
 
 set +e
-MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Non Existent Element" 2>&1)
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Non Existent Element" 2>&1)
 MERGE_EXIT=$?
 set -e
 
@@ -197,7 +197,7 @@ BACKUP_DIR="/tmp/reqvire-merge-backup-$$"
 mkdir -p "$BACKUP_DIR"
 cp "$TEST_DIR/specifications/Requirements.md" "$BACKUP_DIR/backup_requirements.md"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Source Requirement One" --dry-run > /dev/null 2>&1
 
 # File should be unchanged
 if ! cmp -s "$TEST_DIR/specifications/Requirements.md" "$BACKUP_DIR/backup_requirements.md"; then
@@ -222,7 +222,7 @@ cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specification
 
 # Both source and target have derivedFrom: System Requirements
 # After merge, should only appear once
-cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Source Requirement One" > /dev/null 2>&1
 
 # Count derivedFrom in target element (should be 1)
 DEDUP_COUNT=$(grep -A 20 "### Target Requirement" "$TEST_DIR/specifications/Requirements.md" | grep -c "derivedFrom.*system-requirements" || true)
@@ -248,7 +248,7 @@ cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specification
 # This reproduces the bug where merging multiple sources causes unexpected deletion
 # Attempting to merge 3 sources into Target Requirement
 set +e
-MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" "Source Requirement Two" "Unrelated Requirement" 2>&1)
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "Source Requirement One" "Source Requirement Two" "Unrelated Requirement" 2>&1)
 MERGE_EXIT=$?
 set -e
 
@@ -345,7 +345,7 @@ BEFORE_TEST11="$(mktemp /tmp/reqvire-merge-before11-XXXXXX.md)"
 cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST11"
 
 set +e
-MERGE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "External Source" 2>&1)
+MERGE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "Target Requirement" "External Source" 2>&1)
 MERGE_MULTIROOT_EXIT=$?
 set -e
 

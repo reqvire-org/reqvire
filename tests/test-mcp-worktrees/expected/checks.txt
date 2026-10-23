@@ -44,6 +44,9 @@ PASS read-only-mcp/branch-worktree-created-on-demand
 PASS read-only-mcp/prepared-worktree-persists
 PASS mcp/create-isolated-context
 PASS mcp/open-idempotent
+PASS mcp/branch-selector-catalog
+PASS mcp/obsolete-selector-rejected
+PASS mcp/branch-resources-and-prompts
 PASS mcp/ambiguous-selector-rejected
 PASS mcp/unknown-selector-tool-error
 PASS mcp/invalid-selector-protocol-error
@@ -56,6 +59,9 @@ PASS mcp/original-protected
 PASS mcp/remove-keeps-branch
 PASS serve/create-isolated-context
 PASS serve/open-idempotent
+PASS serve/branch-selector-catalog
+PASS serve/obsolete-selector-rejected
+PASS serve/branch-resources-and-prompts
 PASS serve/ambiguous-selector-rejected
 PASS serve/unknown-selector-tool-error
 PASS serve/invalid-selector-protocol-error

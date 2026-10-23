@@ -203,7 +203,7 @@ async fn serve_worktrees(State(state): State<ServeState>) -> Response<Body> {
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct BranchLoad {
-    worktree_id: String,
+    branch: String,
 }
 async fn load_worktree(
     State(state): State<ServeState>,
@@ -212,12 +212,12 @@ async fn load_worktree(
     let RuntimeSource::Worktrees(worktrees) = state.runtime else {
         return response_with_status(StatusCode::NOT_FOUND);
     };
-    let id = selection.worktree_id;
-    let requested = id.clone();
+    let branch = selection.branch;
+    let requested = branch.clone();
     let result = tokio::task::spawn_blocking(move || {
         worktrees
-            .load_browser_context(Some(&id))
-            .map(|c| c.metadata())
+            .load_browser_context(Some(&branch))
+            .map(|c| c.public_metadata())
     })
     .await;
     let value = match result {
@@ -232,7 +232,7 @@ async fn load_worktree(
         .header(header::CONTENT_TYPE, "application/json")
         .header(header::CACHE_CONTROL, "no-store")
         .body(Body::from(
-            serde_json::json!({"worktree_id":requested,"error":value}).to_string(),
+            serde_json::json!({"branch":requested,"error":value}).to_string(),
         ))
         .expect("response uses a valid status and static headers")
 }
@@ -241,7 +241,7 @@ async fn selected_context(
     uri: &Uri,
     load: bool,
 ) -> Result<Arc<crate::mcp_worktrees::Context>, ReqvireError> {
-    let id = crate::mcp_worktrees::parse_selector(uri.query())?;
+    let branch = crate::mcp_worktrees::parse_selector(uri.query())?;
     let initial_read = uri.path() == "/api/project-store";
     let worktrees = Arc::clone(
         state
@@ -250,24 +250,24 @@ async fn selected_context(
     );
     tokio::task::spawn_blocking(move || {
         if load {
-            worktrees.load_browser_context(id.as_deref())
+            worktrees.load_browser_context(branch.as_deref())
         } else if initial_read {
-            worktrees.browser_context(id.as_deref())
+            worktrees.browser_context(branch.as_deref())
         } else {
-            worktrees.published_browser_context(id.as_deref())
+            worktrees.published_browser_context(branch.as_deref())
         }
     })
     .await
     .map_err(|e| ReqvireError::ProcessError(e.to_string()))?
 }
 async fn snapshot_for(state: &ServeState, uri: &Uri) -> Result<Arc<RuntimeSnapshot>, ReqvireError> {
-    let id = crate::mcp_worktrees::parse_selector(uri.query())?;
+    let branch = crate::mcp_worktrees::parse_selector(uri.query())?;
     if state.has_worktrees() {
         return selected_context(state, uri, uri.path() == "/assets/project-store.js")
             .await?
             .runtime();
     }
-    if id.is_some() {
+    if branch.is_some() {
         return Err(ReqvireError::ProcessError(
             "Worktree selection is unavailable on this server".into(),
         ));
@@ -277,18 +277,23 @@ async fn snapshot_for(state: &ServeState, uri: &Uri) -> Result<Arc<RuntimeSnapsh
 fn context_error(uri: &Uri, error: ReqvireError) -> Response<Body> {
     Response::builder().status(StatusCode::SERVICE_UNAVAILABLE)
         .header(header::CONTENT_TYPE,"application/json").header(header::CACHE_CONTROL,"no-store")
-        .body(Body::from(serde_json::json!({"error":error.to_string(),"worktree_id":crate::mcp_worktrees::parse_selector(uri.query()).ok().flatten()}).to_string())).expect("response uses a valid status and static headers")
+        .body(Body::from(serde_json::json!({"error":error.to_string(),"branch":crate::mcp_worktrees::parse_selector(uri.query()).ok().flatten()}).to_string())).expect("response uses a valid status and static headers")
 }
 fn shell_response(method: Method, uri: &Uri, worktrees: bool) -> Response<Body> {
     if !worktrees {
         return static_response(method, "text/html; charset=utf-8", index_html());
     }
     let mut html = String::from_utf8_lossy(index_html()).into_owned();
-    if let Ok(Some(id)) = crate::mcp_worktrees::parse_selector(uri.query()) {
-        let id = percent_encoding::utf8_percent_encode(&id, percent_encoding::NON_ALPHANUMERIC);
+    let branch = match crate::mcp_worktrees::parse_selector(uri.query()) {
+        Ok(branch) => branch,
+        Err(failure) => return context_error(uri, failure),
+    };
+    if let Some(branch) = branch {
+        let branch =
+            percent_encoding::utf8_percent_encode(&branch, percent_encoding::NON_ALPHANUMERIC);
         html = html.replace(
             "assets/project-store.js",
-            &format!("assets/project-store.js?worktree_id={id}"),
+            &format!("assets/project-store.js?branch={branch}"),
         );
     }
     html = html.replace(
@@ -329,26 +334,24 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         return static_response(method, content_type_for_path(&request_path), content);
     }
 
-    let root =
-        if state.has_worktrees() {
-            let selected =
-                selected_context(&state, &uri, false).await.and_then(|c| {
-                    let status = c.metadata();
-                    if status["recovery_required"] == true {
-                        return Err(ReqvireError::ProcessError(format!(
-                        "Worktree {} requires recovery; local file downloads are unavailable: {}",
-                        c.id, status["diagnostic"].as_str().unwrap_or("incomplete restoration")
-                    )));
-                    }
-                    Ok(c.root.clone())
-                });
-            match selected {
-                Ok(root) => Some(root),
-                Err(e) => return context_error(&uri, e),
-            }
-        } else {
-            None
+    let root = if state.has_worktrees() {
+        let selected = match selected_context(&state, &uri, false).await {
+            Ok(context) => tokio::task::spawn_blocking(move || {
+                context.check_file_download()?;
+                Ok(context.root.clone())
+            })
+            .await
+            .map_err(|e| ReqvireError::ProcessError(e.to_string()))
+            .and_then(|result| result),
+            Err(error) => Err(error),
         };
+        match selected {
+            Ok(root) => Some(root),
+            Err(e) => return context_error(&uri, e),
+        }
+    } else {
+        None
+    };
     if let Some(response) =
         workspace_file_response_at(method.clone(), &request_path, root.as_deref())
     {
@@ -1015,7 +1018,7 @@ mod tests {
             let id = rows
                 .iter()
                 .find(|row| row["branch"] == branch)
-                .expect("test fixture operation should succeed")["worktree_id"]
+                .expect("test fixture operation should succeed")["branch"]
                 .as_str()
                 .expect("expected a string in the test response");
             let get = |path: String| {
@@ -1026,7 +1029,7 @@ mod tests {
                         .expect("build test HTTP request"),
                 )
             };
-            let response = get(format!("/api/project-store?worktree_id={id}"))
+            let response = get(format!("/api/project-store?branch={id}"))
                 .await
                 .unwrap();
             assert_eq!(response.status(), StatusCode::OK);
@@ -1039,7 +1042,7 @@ mod tests {
                 .iter()
                 .any(|e| e["name"] == name));
             let seed = body(
-                get(format!("/assets/project-store.js?worktree_id={id}"))
+                get(format!("/assets/project-store.js?branch={id}"))
                     .await
                     .unwrap(),
             )
@@ -1047,11 +1050,11 @@ mod tests {
             assert!(seed.contains(id));
             assert!(!seed.contains("reqvireLiveRefresh"));
             assert_eq!(
-                body(get(format!("/shared.txt?worktree_id={id}")).await.unwrap()).await,
+                body(get(format!("/shared.txt?branch={id}")).await.unwrap()).await,
                 asset
             );
             assert_eq!(
-                get(format!("/api/project-store/manifest?worktree_id={id}"))
+                get(format!("/api/project-store/manifest?branch={id}"))
                     .await
                     .unwrap()
                     .status(),
@@ -1066,14 +1069,14 @@ mod tests {
         let id = rows
             .iter()
             .find(|row| row["branch"] == "second")
-            .expect("test fixture operation should succeed")["worktree_id"]
+            .expect("test fixture operation should succeed")["branch"]
             .as_str()
             .expect("expected a string in the test response");
         let response = app
             .clone()
             .oneshot(
                 Request::builder()
-                    .uri(format!("/api/project-store?worktree_id={id}"))
+                    .uri(format!("/api/project-store?branch={id}"))
                     .body(Body::empty())
                     .expect("build test HTTP request"),
             )
@@ -1087,7 +1090,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
-                    .body(Body::from(json!({"worktree_id":id}).to_string()))
+                    .body(Body::from(json!({"branch":id}).to_string()))
                     .expect("build test HTTP request"),
             )
             .await
@@ -1097,7 +1100,7 @@ mod tests {
             .clone()
             .oneshot(
                 Request::builder()
-                    .uri(format!("/api/project-store?worktree_id={id}"))
+                    .uri(format!("/api/project-store?branch={id}"))
                     .body(Body::empty())
                     .expect("build test HTTP request"),
             )
@@ -1106,7 +1109,7 @@ mod tests {
         assert!(body(response).await.contains("Fresh Subject"));
         for id in [
             "unknown",
-            unavailable["worktree_id"]
+            unavailable["branch"]
                 .as_str()
                 .expect("expected a string in the test response"),
         ] {
@@ -1114,7 +1117,7 @@ mod tests {
                 .clone()
                 .oneshot(
                     Request::builder()
-                        .uri(format!("/api/project-store?worktree_id={id}"))
+                        .uri(format!("/api/project-store?branch={id}"))
                         .body(Body::empty())
                         .expect("build test HTTP request"),
                 )
@@ -1163,13 +1166,17 @@ mod tests {
         std::fs::write(root.join("evidence.txt"), "original evidence").unwrap();
         git(&["add", "."]);
         git(&["commit", "-qm", "baseline"]);
-        let executable = std::env::current_exe()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX));
+        let executable = std::env::var_os("REQVIRE_TEST_BIN")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|| {
+                std::env::current_exe()
+                    .expect("test executable")
+                    .parent()
+                    .expect("deps directory")
+                    .parent()
+                    .expect("target directory")
+                    .join(format!("reqvire{}", std::env::consts::EXE_SUFFIX))
+            });
         let manager = crate::mcp_worktrees::Worktrees::start(
             root,
             &executable,
@@ -1332,7 +1339,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         .expect("test fixture operation should succeed");
         let created=manager.handle("tools/call",json!({"name":"reqvire.worktree.create","arguments":{"branch":"second","base_ref":"main"}})).expect("test fixture operation should succeed");
         assert_ne!(created["isError"], true, "{created}");
-        let id = created["structuredContent"]["worktree_id"]
+        let id = created["structuredContent"]["branch"]
             .as_str()
             .expect("expected a string in the test response");
         let other_root = std::path::PathBuf::from(
@@ -1345,7 +1352,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         state.runtime = RuntimeSource::Worktrees(Arc::clone(&manager));
         let app = explorer_routes().with_state(state);
         for (selected, branch, asset) in [
-            (manager.original.as_str(), "main", "original bytes"),
+            ("main", "main", "original bytes"),
             (id, "second", "second bytes"),
         ] {
             let get = |path: String| {
@@ -1356,38 +1363,31 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                         .expect("build test HTTP request"),
                 )
             };
-            let store = get(format!("/api/project-store?worktree_id={selected}"))
+            let store = get(format!("/api/project-store?branch={selected}"))
                 .await
                 .unwrap();
             assert_eq!(store.status(), StatusCode::OK);
             let store: Value = serde_json::from_str(&body(store).await)
                 .expect("test fixture operation should succeed");
             assert_eq!(store["store"]["project"]["branch"], branch);
-            assert_eq!(store["store"]["project"]["worktree_id"], selected);
+            assert!(store["store"]["project"]["worktree_id"].is_string());
             assert_eq!(
-                body(
-                    get(format!("/shared.txt?worktree_id={selected}"))
-                        .await
-                        .unwrap()
-                )
-                .await,
+                body(get(format!("/shared.txt?branch={selected}")).await.unwrap()).await,
                 asset
             );
-            let manifest = get(format!(
-                "/api/project-store/manifest?worktree_id={selected}"
-            ))
-            .await
-            .unwrap();
+            let manifest = get(format!("/api/project-store/manifest?branch={selected}"))
+                .await
+                .unwrap();
             assert_eq!(manifest.status(), StatusCode::OK);
             let seed = body(
-                get(format!("/assets/project-store.js?worktree_id={selected}"))
+                get(format!("/assets/project-store.js?branch={selected}"))
                     .await
                     .unwrap(),
             )
             .await;
             assert!(seed.contains(selected));
             assert_eq!(
-                get(format!("/ontologies.ttl?worktree_id={selected}"))
+                get(format!("/ontologies.ttl?branch={selected}"))
                     .await
                     .unwrap()
                     .status(),
@@ -1407,7 +1407,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                     .oneshot(
                         Request::builder()
                             .method(method)
-                            .uri(format!("{path}?worktree_id=missing"))
+                            .uri(format!("{path}?branch=missing"))
                             .body(Body::empty())
                             .expect("build test HTTP request"),
                     )
@@ -1461,7 +1461,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             .expect("expected an array in the test response")
             .iter()
             .find(|r| r["branch"] == "dirty-selection")
-            .expect("expected an array in the test response")["worktree_id"]
+            .expect("expected an array in the test response")["branch"]
             .as_str()
             .expect("expected a string in the test response");
         let response = app
@@ -1471,7 +1471,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                     .method(Method::POST)
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
-                    .body(Body::from(json!({"worktree_id":target}).to_string()))
+                    .body(Body::from(json!({"branch":target}).to_string()))
                     .expect("build test HTTP request"),
             )
             .await
@@ -1490,7 +1490,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                     .method(Method::POST)
                     .uri("/api/worktrees/load")
                     .header(header::CONTENT_TYPE, "application/json")
-                    .body(Body::from(json!({"worktree_id":target}).to_string()))
+                    .body(Body::from(json!({"branch":target}).to_string()))
                     .expect("build test HTTP request"),
             )
             .await
@@ -1503,7 +1503,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             let response = app
                 .oneshot(
                     Request::builder()
-                        .uri(format!("/escape.txt?worktree_id={id}"))
+                        .uri(format!("/escape.txt?branch={id}"))
                         .body(Body::empty())
                         .expect("build test HTTP request"),
                 )

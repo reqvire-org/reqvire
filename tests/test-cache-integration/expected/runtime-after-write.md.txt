@@ -15,4 +15,3 @@ Another capability.
 #### Metadata
   * type: capability
 ---
-

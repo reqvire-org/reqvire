@@ -1,11 +1,30 @@
 # Elements
 
+### Canonical Graph Storage Specification
+
+Canonical graph storage and relation-target resolution within one model snapshot.
+
+#### Details
+- The registry owns one canonical element payload per identifier. Its impact adjacency stores target identifiers and relation triggers, without embedded copies of target elements or their adjacency.
+- Stored canonical node and edge records are bounded by the number of elements and retained relations, independently of registration order and repeated relation or size-estimate rebuilds. This bound excludes element-content byte lengths and separately constructed report trees.
+- Adjacency is rebuilt from normalized element relations after inverse relations have been populated. Only resolvable model-element targets of impact-propagating relation types become adjacency edges; external resources and missing targets keep their existing handling.
+- Rename, move, relation removal, and element removal preserve target resolution within the same registry. Traversal reads current canonical target content and file locations.
+- A cloned mutation candidate owns independent canonical elements and adjacency. Candidate edits cannot alter an accepted graph or cause either graph to resolve a target through the other graph.
+- Recursive change-impact report nodes are constructed separately from canonical storage. Existing report field names, relation triggers, traversal order, and cycle guards remain unchanged.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Canonical Graph Storage](ModelManagement.md#canonical-graph-storage)
+---
+
 ### Capability Collect Traversal Specification
 
 #### Details
 Semantic-query collection MUST include its authored Query/Produces content and resolve upstream used ontology context. Ontology downstream collection MUST include native queries using reachable ontology.
 
-Collect supports `capability`, `requirement`, and `ontology` start elements.
+Collect supports `capability`, `requirement`, `ontology`, `semantic-query`, `concept-scheme`, and `concept` start elements.
 
 Default collection excludes implementation/evidence relations (`satisfiedBy`, `satisfy`, `verify`, `verifiedBy`) from structural hierarchy views.
 
@@ -23,6 +42,8 @@ When starting from an `ontology`:
 - UPSTREAM traverses parent ontology elements through `derivedFrom`.
 - DOWNSTREAM traverses child ontology elements through `derive` and includes semantic contracts and semantic queries that use each reachable ontology element through `use`/`usedBy`.
 - The collected content is for semantic authoring context; full RDF/SHACL export remains the responsibility of the `semantic export` command.
+
+When starting from a `semantic-query`, include its authored query content and upstream used ontology context; downstream collection includes the query without executing it. Concept-scheme and concept starts traverse their concept-family context through `derivedFrom` upstream or `derive` downstream within the scheme.
 
 The `specifiedBy`/`specify` bridge is therefore directional:
 - Requirement UPSTREAM uses the bridge to add capability context.
@@ -103,6 +124,63 @@ When a contract element declares requirement governance metadata keys (`status`,
   * type: specification
 ---
 
+### Contract Reference Mutation Specification
+
+Contract Reference mutations preserve the distinction between review dependencies and implementation obligations.
+
+#### Details
+The typed MCP link tool with `source`, `relation_type: "referenceContract"` and `target` MUST add a Contract Reference through shared core target selection. The typed unlink tool with `source` and `target` MUST detect and remove a matching reference and remove an empty subsection.
+
+Create, override, link, unlink, relink, move, rename, merge, and removal operations MUST validate resulting references before persistence. Invalid edits MUST preserve source files. Dry runs MUST return reviewable diffs without writing files.
+
+Incoming Contract References and externally authored contract ownership MUST survive replacement of their target in the complete override candidate. Changes to the replacement's type or ownership MUST be checked against those retained contract dependencies; invalid candidates MUST preserve the original model and authored files. General identity, hierarchy, full-definition scope, and transaction semantics belong to the atomic override behavior.
+
+Overriding a referenced contract into another file MUST transfer its incoming references and externally authored ownership relations to the replacement identifier. The replacement content and all rewritten dependencies MUST be validated and persisted atomically. Dry-run output MUST show the replacement and dependency rewrites while preserving authored files.
+
+Moving or renaming a contract, file, or folder MUST update incoming reference identifiers and display labels. Moving a referencing requirement MUST recalculate its relative links. Merging requirements MUST retain and deduplicate references; a merged element containing both bindings and references MUST fail atomically. Removing a target through a model operation MUST clean up incoming references. External deletion leaving unresolved references MUST fail validation.
+
+Merging compatible contracts owned by the same requirement MUST preserve one distinct owner of the surviving contract. Every incoming reference to a merged contract MUST resolve to the surviving identifier. References that converge on that identifier MUST be deduplicated per consumer, and ownership relations that converge on the same owner-contract pair MUST be deduplicated. The resulting model MUST validate before persistence.
+
+Shared core and MCP mutations MUST share the same model operations and validation. The `referenceContract` token denotes subsection authoring; it MUST NOT be accepted as an ordinary Relations entry.
+
+#### Metadata
+  * type: specification
+---
+
+### Contract Reference Semantics Specification
+
+Contract References declare content dependencies that propagate change impact without contributing to the contract owner's implementation fulfillment.
+
+#### Details
+Contract dependency is the umbrella term for Contract Bindings and Contract References. Bindings assign shared implementation obligations; references identify contract content needed for change-impact review. The authored subsection names MUST remain `Contract Bindings` and `Contract References`.
+
+A requirement MUST author references under `#### Contract References`, using Markdown-link list entries with the same workspace-relative identifier normalization as Contract Bindings. Same-file and cross-file identifiers MUST resolve to contracts authored in multi-element files or the existing single-element contract format.
+
+Fragment-only and file-qualified reference identifiers MUST use the shared relation-target fragment normalization before target lookup and duplicate detection. Within `Model.md`, `#Error-Response-Specification` and `Model.md#Error-Response-Specification` MUST resolve to the same canonical contract identifier as `#error-response-specification`.
+
+A reference MUST target an existing `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` element owned by exactly one requirement through `define`/`definedBy`. Only requirements MAY author Contract References. File paths, external URLs, unowned contracts, and other element types MUST be rejected as reference targets.
+
+Ownership validation MUST check both the distinct owner count and the owner's requirement type in the supplied model snapshot. Invalid ownership MUST produce a diagnostic identifying the owner and referenced contract.
+
+Contract Bindings and Contract References MUST be mutually exclusive on each element. An element containing entries in both sections MUST be rejected, including when the sections target different contracts. Duplicate normalized targets within Contract References MUST be rejected by validation. A target appearing in both Contract References and Relations MUST be rejected as a redundant declaration.
+
+Contract References MUST form acyclic requirement dependencies. For cycle validation, a requirement depends on its immediate parent requirements and on the owners of its explicitly referenced or bound contracts. Each authored dependency is considered in this direction; generated inverse relations MUST NOT create artificial cycles. A reference MUST be rejected if the referenced contract owner can reach the referencing requirement through these dependencies, including a reference to a contract owned by the source itself. This includes reciprocal references, longer reference chains, and cycles combining references with bindings or requirement ancestry. Diagnostics MUST identify the participating requirements and contract targets.
+
+Acyclic references within a requirement hierarchy and between capability roots MUST remain valid. Evaluate reference cycles against the supplied model snapshot's current ownership, references, bindings, and requirement ancestry.
+
+Implementation assessment MUST exclude reference edges from required contributions, terminal classification, implementation evidence, blockers, and capability roll-up. A contract owner with only reference consumers remains terminal unless it has requirement children or binding consumers. An implemented documentation requirement referencing its contract MUST NOT make the owner implementation-covered.
+
+Formatting MUST preserve the reference section as structured data, render current target names, normalize relative links, and produce deterministic ordering. Reference entries MUST remain separate from bindings in canonical element records and model revision hashing.
+
+#### Concept References
+  * [Contract Binding](../Thesaurus/Thesaurus.md#contract-binding)
+  * [Contract Dependency](../Thesaurus/Thesaurus.md#contract-dependency)
+  * [Contract Reference](../Thesaurus/Thesaurus.md#contract-reference)
+
+#### Metadata
+  * type: specification
+---
+
 ### Contract Specification
 
 Reqvire implements requirement contracts through explicit contract elements linked to requirements.
@@ -166,25 +244,6 @@ Element size estimates are expected to be optional model-build metadata.
   * define: [Opt-In Element Size Estimate Model Build](ModelManagement.md#opt-in-element-size-estimate-model-build)
 ---
 
-### Canonical Graph Storage Specification
-
-Canonical graph storage and relation-target resolution within one model snapshot.
-
-#### Details
-- The registry owns one canonical element payload per identifier. Its impact adjacency stores target identifiers and relation triggers, without embedded copies of target elements or their adjacency.
-- Stored canonical node and edge records are bounded by the number of elements and retained relations, independently of registration order and repeated relation or size-estimate rebuilds. This bound excludes element-content byte lengths and separately constructed report trees.
-- Adjacency is rebuilt from normalized element relations after inverse relations have been populated. Only resolvable model-element targets of impact-propagating relation types become adjacency edges; external resources and missing targets keep their existing handling.
-- Rename, move, relation removal, and element removal preserve target resolution within the same registry. Traversal reads current canonical target content and file locations.
-- A cloned mutation candidate owns independent canonical elements and adjacency. Candidate edits cannot alter an accepted graph or cause either graph to resolve a target through the other graph.
-- Recursive change-impact report nodes are constructed separately from canonical storage. Existing report field names, relation triggers, traversal order, and cycle guards remain unchanged.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Canonical Graph Storage](ModelManagement.md#canonical-graph-storage)
----
-
 ### Element Type Metadata Specification
 
 Specification for declaring element types in markdown documents through the Metadata subsection.
@@ -201,6 +260,31 @@ Element types are identified through a reserved `type` metadata property in the 
 
 #### Metadata
   * type: specification
+---
+
+### Fenced Code Content Preservation Specification
+
+#### Details
+These rules define the backtick-fence behavior shared by model-file parsing, single-element add/override parsing, reserved-subsection discovery, semantic-query extraction and Markdown formatting.
+
+##### Fence Boundaries
+- An opening fence MUST contain at least three consecutive backticks. Optional language information MAY follow, but the information string MUST NOT contain backticks.
+- An opening fence MAY appear after surrounding whitespace, an unordered list marker (`*`, `-`, `+`) or an ordered list marker (one to nine digits followed by `.` or `)`). List markers MUST be followed by a space or tab. Indented and nested list examples MUST be recognized.
+- A closing fence MUST contain at least as many consecutive backticks as the opening fence and otherwise only surrounding whitespace. Shorter runs, list-prefixed runs and runs with trailing non-whitespace text MUST remain literal code content.
+- Element headings, reserved subsection headings, metadata, relations, concept references, separators and HTML-details markers inside an open fence MUST NOT be interpreted as model structure.
+- Structural parsing MUST resume after the matching closing fence so actual metadata, relations and later referenced elements remain visible.
+
+##### Source Preservation
+- Parsing MUST retain the fence and its literal content without rewriting the code.
+- Add, override and MCP formatting with `fix: true` MUST preserve code-block bytes, including indentation, blank lines and literal headings, while normalizing model structure outside the fence.
+- Reserved-subsection discovery MUST ignore list-fenced examples before real Ontology and Query subsections. Extracted blocks MUST retain their language and source location; semantic-query exports MUST retain their document bytes.
+- Fence state MUST remain separate from existing HTML-details handling so a fence-like line inside an HTML-details block cannot hide later elements.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Fenced Code Content Preservation](StructureAndParsing.md#fenced-code-content-preservation)
 ---
 
 ### Ignore Files Specification
@@ -358,6 +442,16 @@ Each graph-backed operation specification is expected to define:
 
 Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior contracts.
 
+##### Shared Validation Gate
+- Before any graph-backed mutation persists files or publishes accepted state, invoke shared model validation on the complete resulting candidate. Consume the shared rule and diagnostic contracts referenced by the owning requirement; operation contracts own invocation, atomic rejection, and persistence rather than redefining those rules.
+- Apply this gate to create, content replacement or override, remove, move, rename, merge, file and folder moves, link, unlink, and relink. Shared core and MCP authoring entry points use the same operation-level gate; safe lint repair candidates use it as well; supported dry runs validate identically without writing files.
+- Use candidate content, element membership, identifiers, ownership, and canonical relations. Do not validate against the accepted snapshot or stale derived concept payloads. Apply the shared identifier normalization before lookup and duplicate detection.
+- Validate changes to otherwise untouched elements when candidate membership or addressing makes their existing prose destinations resolve to model elements. Creation, replacement, moves, renames, and merges cannot bypass prose-link validation by checking only submitted text.
+- Reject invalid relation endpoints, requirement fulfillment or taxonomy cycles, contract dependencies, SHACL references, query context, and authored prose links through the shared validators. An invalid contract-owner type must fail before persistence. Local operation rules may add constraints without weakening shared validation.
+- Rejection preserves all authored source bytes and the accepted graph; invalid dry runs must not report successful edits. Subsequent valid operations must not observe candidate changes from a rejected transaction.
+- Canonically serialize affected model documents within the shared transaction before durable acceptance; preserve the authored relation subset by default.
+- Return the shared structured diagnostics, guidance, and repair examples without reducing them to a generic mutation failure. Source and target context must describe the candidate occurrence that caused rejection.
+
 #### Metadata
   * type: specification
 
@@ -408,7 +502,7 @@ Reqvire implements relation semantics for ownership, hierarchy, capability speci
 - Requirement fulfillment dependencies MUST combine immediate requirement children through `derive` with every distinct requirement explicitly binding a contract owned through `definedBy`. The dependency direction is parent to child and contract owner to consumer; inverse relation records and repeated paths MUST NOT create duplicate contributions.
 - The combined fulfillment graph MUST be acyclic, including cycles within one capability root, cycles spanning several roots, and cycles combining hierarchy with bindings. Direct implementation artifacts MUST NOT exempt a cycle. Acyclic sharing and unused contracts remain valid.
 - Validation and implementation rollup MUST use the same fulfillment dependency definition. Cyclic models MUST be rejected before graph-dependent reports, and mutations MUST reject cyclic candidate graphs before persisting source changes.
-- Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or ontology concept references.
+- Authored relation tokens must map to a declared semantic relation family. Generic semantic escape-hatch relations are not part of the canonical model; authors should use a semantically specific relation family or Concept References to native concepts on permitted source types.
 
 #### Concept References
   * [Relation Family](../Thesaurus/Thesaurus.md#relation-family)
@@ -527,9 +621,9 @@ This contract delegates the canonical Markdown grammar to `MarkdownStructure` an
 
 Consumers of this contract must treat the following as one structure contract:
 - Supported document forms are the parser-recognized `# Elements` multi-element document and `# Element` single-element document.
-- Element headings, reserved subsections, metadata blocks, relation lists, Contract Bindings, Concept References, ontology blocks, and SHACL shape blocks are interpreted according to the Markdown structure model.
+- Element headings, reserved subsections, metadata blocks, relation lists, Contract Bindings, Contract References, Concept References, ontology blocks, and SHACL shape blocks are interpreted according to the Markdown structure model.
 - Element IDs are derived from element names; element identifiers are workspace-root-relative file paths plus element fragments.
-- Relation targets and Contract Bindings targets use the same identifier resolution, normalization, and validation rules as model parsing.
+- Relation targets and both contract dependency kinds use the same identifier resolution, normalization, and validation rules as model parsing.
 - Presentation or documentation consumers must not invent a parallel Markdown grammar or alternative identifier scheme.
 
 #### Metadata
@@ -576,7 +670,7 @@ Parser-facing behavior remains:
 - `type` metadata uses the exact element-type token declared in the semantic vocabulary.
 - `other` and `other-TYPENAME` are custom extension types that cannot author semantic relations.
 - `other-TYPENAME` requires at least one character after `other-`; `other-` alone is invalid.
-- Custom types should be used only when no supported canonical element type fits; semantic meaning should be expressed through ontology concept references or a specific supported type.
+- Custom types should be used only when no supported canonical element type fits; semantic meaning should be expressed through Concept References to native concepts on permitted source types or a specific supported type. Ontology and semantic-contract elements use their compatible ontology channels rather than Concept References.
 
 #### Metadata
   * type: specification
@@ -590,14 +684,16 @@ Parser-facing behavior remains:
 Usage guidelines for selecting appropriate verification types.
 
 #### Details
-**Default Verification Type:**
-- `verification` - Verification through testing (equivalent to `test-verification`)
+**Explicit Verification Type:**
+- Select a concrete verification method explicitly. Omitted `type` defaults to `requirement`; `verification` is not a canonical type token.
+- Evidence-backed `test-verification` and `formal-proof-verification` require `satisfiedBy` evidence. Other concrete verification methods do not author satisfaction edges.
 
 **Type Selection Guidelines:**
 - **Verification-objective**: Verification planning or grouping objective. It is the mandatory parent for concrete verification work through `derivedFrom` and does not use `verify` or `satisfiedBy`.
 - **Test-verification**: Quantitative requirements, functional behavior, performance criteria
 - **Analysis-verification**: Design constraints, architectural requirements, compliance with standards
 - **Inspection-verification**: Documentation requirements, labeling, configuration settings
+- **Formal-proof-verification**: Formal proofs, model-checking results and proof artifacts
 - **Demonstration-verification**: User-facing capabilities, workflow requirements, integration scenarios
 
 #### Metadata
@@ -619,11 +715,15 @@ The effective Reqvire workspace root defines path normalization, identifier stor
 - Git root detection is used to classify eligible files and artifacts by Git worktree membership and to collect revision, branch, remote, and dirty-state metadata; it must not change path normalization.
 - All internal paths are normalized to workspace-root-relative format for storage.
 
+**Source Selection Modes:**
+- Ordinary Git mode discovers containing and descendant Git worktrees under the existing rules below.
+- Repo mode narrows the participating worktree inventory to Central and its declared projects through manifest-defined source selection. The common path and Git containment rules remain in force; an undeclared nested repository is not admitted by generic discovery.
+
 **Git Worktree Eligibility Rules:**
 - A file or artifact is eligible for SOI model processing only when it is inside the effective workspace root and inside a Git worktree.
 - A workspace-root descendant folder that is not inside any Git worktree is ignored, including Markdown files, local assets, implementation files, and evidence artifacts under that folder.
 - When the workspace root is a child of a Git worktree, files under the workspace root remain eligible because they are inside that parent Git worktree; files outside the workspace root remain out of scope.
-- When the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
+- In ordinary Git mode, when the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
 - Nested Git worktrees remain ordinary workspace subdirectories for addressing; their repository identity may be reported as metadata but does not alter the workspace-root-relative identifier.
 - Local InternalPath evidence, static assets, implementation files, and resource targets must also be inside an eligible Git worktree before they are included in resources reports, exports, semantic model facts, or other consumer-facing evidence/resource views.
 
@@ -650,96 +750,14 @@ The effective Reqvire workspace root defines path normalization, identifier stor
 - Model mutations must not persist files outside the effective workspace root or into workspace folders that are outside all eligible Git worktrees.
 
 **Workspace-Root Consumer Rules:**
-- `format --fix` may rewrite authored links to canonical source-relative Markdown links for readability, but the resolved targets must remain workspace-root-relative identifiers internally.
+- MCP formatting with `fix: true` may rewrite authored links to canonical source-relative Markdown links for readability, but the resolved targets must remain workspace-root-relative identifiers internally.
 - Migration and mutation commands must write changed files by resolving registry paths against the effective workspace root; they must not prepend the caller's pre-startup directory, a parent Git path, or a nested Git repository path.
 - `change-impact` compares workspace-root-relative model snapshots built from eligible Git-worktree files and artifacts. A Git commit argument is a single-repository convenience adapter for materializing a base workspace snapshot; it must not redefine identifier roots.
 - Semantic export, model JSON, coverage, resources, traces, search, diagnostics, and diff output must expose workspace-root-relative file paths and element identifiers.
 - Consumer records, static export manifests, source target metadata, and element target metadata must use workspace-root-relative paths for eligible Git-worktree content only.
 - Tooling workspace state may include Git metadata for eligible worktrees, but tool inputs, outputs, evidence references, mutation diffs, and resources must use workspace-root-relative paths.
-- Nested repositories may provide revision metadata in future integrations, but model relations and identifiers continue to use one workspace-root-relative path namespace.
+- Nested repositories retain their own source-control provenance, while model relations and identifiers continue to use one workspace-root-relative path namespace.
 
 #### Metadata
   * type: specification
----
-
-### Contract Reference Semantics Specification
-
-Contract References declare content dependencies that propagate change impact without contributing to the contract owner's implementation fulfillment.
-
-#### Details
-Contract dependency is the umbrella term for Contract Bindings and Contract References. Bindings assign shared implementation obligations; references identify contract content needed for change-impact review. The authored subsection names MUST remain `Contract Bindings` and `Contract References`.
-
-A requirement MUST author references under `#### Contract References`, using Markdown-link list entries with the same workspace-relative identifier normalization as Contract Bindings. Same-file and cross-file identifiers MUST resolve to contracts authored in multi-element files or the existing single-element contract format.
-
-Fragment-only and file-qualified reference identifiers MUST use the shared relation-target fragment normalization before target lookup and duplicate detection. Within `Model.md`, `#Error-Response-Specification` and `Model.md#Error-Response-Specification` MUST resolve to the same canonical contract identifier as `#error-response-specification`. Parsing and mutation commands MUST apply the same normalization.
-
-A reference MUST target an existing `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` element owned by exactly one requirement through `define`/`definedBy`. Only requirements MAY author Contract References. File paths, external URLs, unowned contracts, and other element types MUST be rejected as reference targets.
-
-Ownership validation MUST check both the distinct owner count and the owner's requirement type in the candidate model. Editing a referenced contract's owner to another element type MUST fail before persistence, with a diagnostic identifying the invalid ownership and referenced contract.
-
-Contract Bindings and Contract References MUST be mutually exclusive on each element. An element containing entries in both sections MUST be rejected, including when the sections target different contracts. Duplicate normalized targets within Contract References MUST be rejected by validation. A target appearing in both Contract References and Relations MUST be rejected as a redundant declaration.
-
-Contract References MUST form acyclic requirement dependencies. For cycle validation, a requirement depends on its immediate parent requirements and on the owners of its explicitly referenced or bound contracts. Each authored dependency is considered in this direction; generated inverse relations MUST NOT create artificial cycles. A reference MUST be rejected if the referenced contract owner can reach the referencing requirement through these dependencies, including a reference to a contract owned by the source itself. This includes reciprocal references, longer reference chains, and cycles combining references with bindings or requirement ancestry. Diagnostics MUST identify the participating requirements and contract targets.
-
-Acyclic references within a requirement hierarchy and between capability roots MUST remain valid. Reference-cycle validation MUST run before publishing reports and before persisting any mutation, including link, relink, create, override, hierarchy or ownership edits, and merge. Invalid candidate models MUST leave authored files unchanged.
-
-Implementation assessment MUST exclude reference edges from required contributions, terminal classification, implementation evidence, blockers, and capability roll-up. A contract owner with only reference consumers remains terminal unless it has requirement children or binding consumers. An implemented documentation requirement referencing its contract MUST NOT make the owner implementation-covered.
-
-Formatting MUST preserve the reference section as structured data, render current target names, normalize relative links, and produce deterministic ordering. Reference entries MUST remain separate from bindings in canonical element records and model revision hashing.
-
-#### Concept References
-  * [Contract Binding](../Thesaurus/Thesaurus.md#contract-binding)
-  * [Contract Dependency](../Thesaurus/Thesaurus.md#contract-dependency)
-  * [Contract Reference](../Thesaurus/Thesaurus.md#contract-reference)
-
-#### Metadata
-  * type: specification
----
-
-### Contract Reference Mutation Specification
-
-Contract Reference mutations preserve the distinction between review dependencies and implementation obligations.
-
-#### Details
-`link <requirement> referenceContract <target>` MUST add a Contract Reference, resolving a target name or contract identifier through the existing link command. `unlink <requirement> <target>` MUST detect and remove a matching Contract Reference and remove an empty subsection.
-
-Create, override, link, unlink, relink, move, rename, merge, and removal operations MUST validate resulting references before persistence. Invalid edits MUST preserve source files. Dry runs MUST return reviewable diffs without writing files.
-
-Overriding an element at the same identifier MUST preserve incoming references and externally authored relations, including ownership. Changes to its type or ownership MUST be validated against those retained dependencies. An invalid override MUST preserve the original model and authored files.
-
-Overriding a referenced contract into another file MUST transfer its incoming references and externally authored ownership relations to the replacement identifier. The replacement content and all rewritten dependencies MUST be validated and persisted atomically. Dry-run output MUST show the replacement and dependency rewrites while preserving authored files.
-
-Moving or renaming a contract, file, or folder MUST update incoming reference identifiers and display labels. Moving a referencing requirement MUST recalculate its relative links. Merging requirements MUST retain and deduplicate references; a merged element containing both bindings and references MUST fail atomically. Removing a target through a model operation MUST clean up incoming references. External deletion leaving unresolved references MUST fail validation.
-
-Merging compatible contracts owned by the same requirement MUST preserve one distinct owner of the surviving contract. Every incoming reference to a merged contract MUST resolve to the surviving identifier. References that converge on that identifier MUST be deduplicated per consumer, and ownership relations that converge on the same owner-contract pair MUST be deduplicated. The resulting model MUST validate before persistence.
-
-CLI and MCP mutations MUST share the same model operations and validation. The `referenceContract` token denotes subsection authoring; it MUST NOT be accepted as an ordinary Relations entry.
-
-#### Metadata
-  * type: specification
----
-
-### Fenced Code Content Preservation Specification
-
-#### Details
-These rules define the backtick-fence behavior shared by model-file parsing, single-element add/override parsing, reserved-subsection discovery, semantic-query extraction and Markdown formatting.
-
-##### Fence Boundaries
-- An opening fence MUST contain at least three consecutive backticks. Optional language information MAY follow, but the information string MUST NOT contain backticks.
-- An opening fence MAY appear after surrounding whitespace, an unordered list marker (`*`, `-`, `+`) or an ordered list marker (one to nine digits followed by `.` or `)`). List markers MUST be followed by a space or tab. Indented and nested list examples MUST be recognized.
-- A closing fence MUST contain at least as many consecutive backticks as the opening fence and otherwise only surrounding whitespace. Shorter runs, list-prefixed runs and runs with trailing non-whitespace text MUST remain literal code content.
-- Element headings, reserved subsection headings, metadata, relations, concept references, separators and HTML-details markers inside an open fence MUST NOT be interpreted as model structure.
-- Structural parsing MUST resume after the matching closing fence so actual metadata, relations and later referenced elements remain visible.
-
-##### Source Preservation
-- Parsing MUST retain the fence and its literal content without rewriting the code.
-- Add, override and `format --fix` MUST preserve code-block bytes, including indentation, blank lines and literal headings, while normalizing model structure outside the fence.
-- Reserved-subsection discovery MUST ignore list-fenced examples before real Ontology and Query subsections. Extracted blocks MUST retain their language and source location; semantic-query exports MUST retain their document bytes.
-- Fence state MUST remain separate from existing HTML-details handling so a fence-like line inside an HTML-details block cannot hide later elements.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [Fenced Code Content Preservation](StructureAndParsing.md#fenced-code-content-preservation)
 ---

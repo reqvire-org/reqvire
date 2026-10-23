@@ -91,7 +91,8 @@ export function routeForSelection(view: "model" | "traces" | "thesaurus" | "onto
 /** A branch choice resumes that context's preferences once its snapshot is available. */
 export function worktreeUrl(currentUrl: string, identifier: string): URL {
   const url = new URL(currentUrl);
-  url.searchParams.set("worktree_id", identifier);
+  url.searchParams.delete("worktree_id");
+  url.searchParams.set("branch", identifier);
   const route = parseHash(url.hash, DEFAULT_VIEW);
   if (route.elementId) return url;
   const view = route.view;

@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { ELEMENT_TYPES, elementRole, type ElementType } from "../../palette";
 
@@ -69,15 +69,15 @@ const skinX = css`
 
 const roleSkinX = css`
   &[data-element-role="capability"] {
-    --ds-typebadge-color: var(--capability);
-    --ds-typebadge-tint: var(--capability-tint);
-    --ds-typebadge-ink: var(--capability-ink);
+    --ds-typebadge-color: var(--color-role-capability);
+    --ds-typebadge-tint: var(--color-role-capability-tint);
+    --ds-typebadge-ink: var(--color-role-capability-ink);
   }
 
   &[data-element-role="requirement"] {
-    --ds-typebadge-color: var(--requirement);
-    --ds-typebadge-tint: var(--requirement-tint);
-    --ds-typebadge-ink: var(--requirement-ink);
+    --ds-typebadge-color: var(--color-role-requirement);
+    --ds-typebadge-tint: var(--color-role-requirement-tint);
+    --ds-typebadge-ink: var(--color-role-requirement-ink);
   }
 
   &[data-element-role="contract"],
@@ -87,71 +87,71 @@ const roleSkinX = css`
   &[data-element-role="state"],
   &[data-element-role="input-output"],
   &[data-element-role="specification"] {
-    --ds-typebadge-color: var(--contract);
-    --ds-typebadge-tint: var(--contract-tint);
-    --ds-typebadge-ink: var(--contract-ink);
+    --ds-typebadge-color: var(--color-role-contract);
+    --ds-typebadge-tint: var(--color-role-contract-tint);
+    --ds-typebadge-ink: var(--color-role-contract-ink);
   }
 
   &[data-element-role="semantic-contract"] {
-    --ds-typebadge-color: var(--semantic-contract);
-    --ds-typebadge-tint: var(--semantic-contract-tint);
-    --ds-typebadge-ink: var(--semantic-contract-ink);
+    --ds-typebadge-color: var(--color-role-semantic-contract);
+    --ds-typebadge-tint: var(--color-role-semantic-contract-tint);
+    --ds-typebadge-ink: var(--color-role-semantic-contract-ink);
   }
 
   &[data-element-role="verification-objective"] {
-    --ds-typebadge-color: var(--verification-objective);
-    --ds-typebadge-tint: var(--verification-objective-tint);
-    --ds-typebadge-ink: var(--verification-objective-ink);
+    --ds-typebadge-color: var(--color-role-verification-objective);
+    --ds-typebadge-tint: var(--color-role-verification-objective-tint);
+    --ds-typebadge-ink: var(--color-role-verification-objective-ink);
   }
 
   &[data-element-role="verification"] {
-    --ds-typebadge-color: var(--verification);
-    --ds-typebadge-tint: var(--verification-tint);
-    --ds-typebadge-ink: var(--verification-ink);
+    --ds-typebadge-color: var(--color-role-verification);
+    --ds-typebadge-tint: var(--color-role-verification-tint);
+    --ds-typebadge-ink: var(--color-role-verification-ink);
   }
 
   &[data-element-role="semantic-query"],
   &[data-element-role="ontology"] {
-    --ds-typebadge-color: var(--ontology);
-    --ds-typebadge-tint: var(--ontology-tint);
-    --ds-typebadge-ink: var(--ontology-ink);
+    --ds-typebadge-color: var(--color-role-ontology);
+    --ds-typebadge-tint: var(--color-role-ontology-tint);
+    --ds-typebadge-ink: var(--color-role-ontology-ink);
   }
 
   &[data-element-role="concept"] {
-    --ds-typebadge-color: var(--concept);
-    --ds-typebadge-tint: var(--concept-tint);
-    --ds-typebadge-ink: var(--concept-ink);
+    --ds-typebadge-color: var(--color-role-concept);
+    --ds-typebadge-tint: var(--color-role-concept-tint);
+    --ds-typebadge-ink: var(--color-role-concept-ink);
   }
 
   &[data-element-role="concept-scheme"] {
-    --ds-typebadge-color: var(--concept-scheme);
-    --ds-typebadge-tint: var(--concept-scheme-tint);
-    --ds-typebadge-ink: var(--concept-scheme-ink);
+    --ds-typebadge-color: var(--color-role-concept-scheme);
+    --ds-typebadge-tint: var(--color-role-concept-scheme-tint);
+    --ds-typebadge-ink: var(--color-role-concept-scheme-ink);
   }
 
   &[data-element-role="concept-reference"] {
-    --ds-typebadge-color: var(--concept-reference);
-    --ds-typebadge-tint: var(--concept-reference-tint);
-    --ds-typebadge-ink: var(--concept-reference-ink);
+    --ds-typebadge-color: var(--color-role-concept-reference);
+    --ds-typebadge-tint: var(--color-role-concept-reference-tint);
+    --ds-typebadge-ink: var(--color-role-concept-reference-ink);
   }
 
   &[data-element-role="resource"] {
-    --ds-typebadge-color: var(--resource);
-    --ds-typebadge-tint: var(--resource-tint);
-    --ds-typebadge-ink: var(--resource-ink);
+    --ds-typebadge-color: var(--color-role-resource);
+    --ds-typebadge-tint: var(--color-role-resource-tint);
+    --ds-typebadge-ink: var(--color-role-resource-ink);
   }
 
   &[data-element-role="other"] {
-    --ds-typebadge-color: var(--other);
-    --ds-typebadge-tint: var(--other-tint);
-    --ds-typebadge-ink: var(--other-ink);
+    --ds-typebadge-color: var(--color-role-other);
+    --ds-typebadge-tint: var(--color-role-other-tint);
+    --ds-typebadge-ink: var(--color-role-other-ink);
   }
 `;
 
-export interface TypeBadgeProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
+export interface TypeBadgeProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
   type?: string | null;
   family?: string | null;
-  children?: ReactNode;
+  children?: ComponentChildren;
   dot?: boolean;
   tinted?: boolean;
 }

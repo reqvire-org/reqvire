@@ -1,0 +1,16 @@
+[
+  {
+    "code": "model-element-link-in-prose",
+    "context": {
+      "element_id": "model/Source.md#prose-source",
+      "element_type": "capability",
+      "file": "model/Source.md",
+      "line": 5
+    },
+    "guidance_present": true,
+    "target": {
+      "element_id": "model/Targets.md#target-specification",
+      "element_type": "specification"
+    }
+  }
+]

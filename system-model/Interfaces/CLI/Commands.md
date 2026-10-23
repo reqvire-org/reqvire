@@ -10,91 +10,35 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+
 #### Relations
   * definedBy: [CLI Interface Structure Contract Specification](Specifications.md#cli-interface-structure-contract-specification)
-  * derive: [CLI Add Element Command](#cli-add-element-command)
   * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
   * derive: [CLI Collect Command](#cli-collect-command)
   * derive: [CLI Containment Command](#cli-containment-command)
   * derive: [CLI Coverage Command](#cli-coverage-command)
-  * derive: [CLI Diff Output](#cli-diff-output)
   * derive: [CLI Lint Command](#cli-lint-command)
-  * derive: [CLI Merge Element Command](#cli-merge-element-command)
   * derive: [CLI Migrate Command](#cli-migrate-command)
   * derive: [CLI Model Command](#cli-model-command)
-  * derive: [CLI Move Asset Command](#cli-move-asset-command)
-  * derive: [CLI Move Element Command](#cli-move-element-command)
-  * derive: [CLI Move File Command](#cli-move-file-command)
   * derive: [CLI Ontologies Command](#cli-ontologies-command)
-  * derive: [CLI Relink Command](#cli-relink-command)
-  * derive: [CLI Remove Asset Command](#cli-remove-asset-command)
-  * derive: [CLI Remove Element Command](#cli-remove-element-command)
-  * derive: [CLI Rename Element Command](#cli-rename-element-command)
   * derive: [CLI Resources Command](#cli-resources-command)
   * derive: [CLI Search Command](#cli-search-command)
   * derive: [CLI Size Estimate JSON Option](#cli-size-estimate-json-option)
   * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Traces Command](#cli-traces-command)
   * derive: [Explicit Workspace Selection](#explicit-workspace-selection)
-  * derive: [Format Command](#format-command)
   * derive: [Validate Command](#validate-command)
   * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
----
-
-### CLI Add Element Command
-
-The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or the `--content` argument, validating the structure, and inserting it into the target file.
-
-#### Details
-Implementation details shall follow the associated contract specifications. Ontology rebasing under override is governed by the reused create-element workflow and ontology-aware mutation contracts.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [CLI Add Element Command Contract Specification](Specifications.md#cli-add-element-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Add Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-add-element-test)
 ---
 
 ### CLI Change Impact Report Command
 
-The system shall provide a command-line interface for initiating change impact analysis and controlling output formats.
+The system SHALL provide a command-line interface that compares a base workspace snapshot with the current workspace and emits the resulting change-impact report in the requested supported format.
 
 #### Details
-Command invocation: `reqvire change-impact [OPTIONS]`
-
-**Analysis Options**:
-- `--git-commit <hash>`: Specify a source-control commit reference used to materialize the base workspace snapshot for the current single-worktree comparison mode
-- Support analyzing changes between a base workspace snapshot and the current workspace snapshot
-- Enable specifying elements to analyze by ID or pattern
-- Allow limiting analysis to specific relation types
-- Support depth limitations for large models
-
-**Output Options**:
-- `--json`: Output structured JSON impact data
-- Default to formatted text reports
-- Integrate with text, JSON, and downstream reporting workflows
-
-**Integration Support**:
-- Support integration with CI/CD pipelines
-- Enable calling from external systems via API
-- Support webhook triggers for automated analysis
-- Allow scripting of analysis operations
+Command invocation, base-commit selection, default comparison scope and text/JSON output behavior SHALL follow the owned command contract. External automation may invoke that supported command; this requirement does not define additional selectors, depth controls, API endpoints or webhook services.
 
 #### Metadata
   * type: requirement
@@ -136,6 +80,23 @@ Implementation details shall follow the associated contract specifications.
   * verifiedBy: [CLI Collect Command Test](../../Verifications/Reports/ModelReports/ReportingVerifications.md#cli-collect-command-test)
 ---
 
+### CLI Collect Element Selection
+
+When a collect command selects an existing root element, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before collection.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * derivedFrom: [CLI Collect Command](#cli-collect-command)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+---
+
 ### CLI Containment Command
 
 The system shall provide a `containment` command that emits JSON containment hierarchy data showing the folder/file/element hierarchy.
@@ -152,9 +113,9 @@ The `containment` command shall:
   * type: requirement
 
 #### Contract References
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [ContainmentView](../WebExplorer/ContainmentView.md#containmentview)
   * [Model Browser and Graph Specification](../WebExplorer/Specifications.md#model-browser-and-graph-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
   * definedBy: [Short Mode Behavior](Behaviors.md#short-mode-behavior)
@@ -203,28 +164,13 @@ When a user selects a capability for a coverage command, the system SHALL return
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
-### CLI Diff Output
-
-The CLI shall provide a standardized diff-style output contract for commands that preview or report file modifications.
-
-#### Details
-The diff output contract shall define a shared presentation format for command results that show line-level file changes.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [diff.rs](../../../crates/reqvire-core/src/diff.rs)
----
-
 ### CLI JSON File Output Option
 
-The system shall provide an `--output <FILE>` option on CLI commands that emit JSON, allowing JSON output to be written to a file instead of stdout.
+The system SHALL provide an `--output <FILE>` option on CLI JSON report commands, allowing report data to be written to a file instead of stdout.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
+Native artifact exporters retain their own serialization and file-publication contracts, including managed query export, semantic/concept export, and static Explorer export.
 
 #### Metadata
   * type: requirement
@@ -238,51 +184,22 @@ Implementation details shall follow the associated contract specifications.
 
 ### CLI Lint Command
 
-The system shall implement a `lint` command that analyzes model quality and detects issues in requirements relations, providing categorized output that distinguishes between auto-fixable issues and those requiring manual review.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
+When command-line lint inspection is requested, the system SHALL report categorized model-quality findings without modifying model sources and SHALL reject repair arguments with MCP guidance.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Cross-Submodel Hierarchical Relation Detection Specification](../../Operations/Linting/Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
-  * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
+  * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Multi-Branch Convergence Detection Specification](../../Operations/Linting/Specifications.md#multi-branch-convergence-detection-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+  * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
 
 #### Relations
   * definedBy: [CLI Lint Command Contract Specification](Specifications.md#cli-lint-command-contract-specification)
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
----
-
-### CLI Merge Element Command
-
-The system shall provide a `merge` command to combine multiple elements into a target element.
-
-#### Details
-Detailed invocation, source/target argument, output/error, delegation, and ontology merge boundary behavior shall follow the associated command specification and model-operation contracts.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
-  * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [CLI Merge Element Command Contract Specification](Specifications.md#cli-merge-element-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
 ---
 
 ### CLI Migrate Command
@@ -295,11 +212,12 @@ Implementation details shall follow the associated contract specifications. The 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Supported Element Types Specification](../../ModelStructure/Specifications.md#supported-element-types-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
 #### Relations
   * definedBy: [CLI Migrate Command Contract Specification](Specifications.md#cli-migrate-command-contract-specification)
@@ -337,107 +255,6 @@ Implementation details shall follow the associated contract specifications. The 
   * verifiedBy: [Model Command Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#model-command-verification)
 ---
 
-### CLI Move Asset Command
-
-The system shall provide a `mv-asset` command to move or rename InternalPath files and automatically update all references across the model.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [CLI Move Asset Command Contract Specification](Specifications.md#cli-move-asset-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [Move Asset Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#move-asset-command-verification)
----
-
-### CLI Move Element Command
-
-The system shall provide a `mv` command to move existing model elements to different file locations while automatically updating all relations that reference the moved element.
-
-#### Details
-The command shall reject moving an element into an existing `# Element` file when that move would create more than one element in the target document file.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
-
-#### Relations
-  * definedBy: [CLI Move Element Command Contract Specification](Specifications.md#cli-move-element-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Move Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-element-test)
-  * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
----
-
-### CLI Move File Command
-
-The system shall provide a `mv-file` command that exposes the file-move operation through the CLI.
-
-#### Details
-Detailed path arguments, dry-run/JSON output, target validation, squash behavior, and shared operation delegation shall follow the associated command specification and model-operation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [CLI Move File Command Contract Specification](Specifications.md#cli-move-file-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Move File Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-file-test)
-  * verifiedBy: [Subdirectory Processing Verification](../../Verifications/Operations/Validation/ValidationVerifications.md#subdirectory-processing-verification)
----
-
-### CLI Move Folder Command
-
-The system shall provide a `mv-folder` command that exposes the folder-move operation through the CLI.
-
-#### Details
-Detailed path arguments, dry-run/JSON output, recursive move behavior, target-collision rejection, reference updates, and shared operation delegation shall follow the associated command specification and model-operation contract.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
-
-#### Relations
-  * definedBy: [CLI Move Folder Command Contract Specification](Specifications.md#cli-move-folder-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Move Folder Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-move-folder-test)
----
-
 ### CLI Ontologies Command
 
 The system shall provide semantic export CLI commands for selectable Reqvire semantic RDF layers and standalone native concept-scheme workflows.
@@ -461,110 +278,9 @@ Detailed layer names, default layer behavior, Turtle/JSON-LD serialization, name
   * verifiedBy: [CLI Ontologies Command Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
-### CLI Relink Command
-
-The system shall provide a `relink` command that exposes the atomic relation relink operation.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
-  * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * definedBy: [CLI Relink Command Contract Specification](Specifications.md#cli-relink-command-contract-specification)
-  * definedBy: [Mutating Command Hierarchy Safety Contract Specification](Specifications.md#mutating-command-hierarchy-safety-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * verifiedBy: [Atomic Relation Relink Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#atomic-relation-relink-test)
----
-
-### CLI Remove Asset Command
-
-The system shall provide an `rm-asset` command to remove InternalPath files and automatically remove all references from the model.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [CLI Remove Asset Command Contract Specification](Specifications.md#cli-remove-asset-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [Remove Asset Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-asset-command-verification)
----
-
-### CLI Remove Element Command
-
-The system shall provide an `rm` command to delete existing model elements and automatically remove all relations referencing the deleted element.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-  * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
-
-#### Relations
-  * definedBy: [CLI Remove Element Command Contract Specification](Specifications.md#cli-remove-element-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Remove Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-remove-element-test)
----
-
-### CLI Rename Element Command
-
-The system shall provide a `rename` command to rename existing model elements while automatically updating all relations that reference the renamed element.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [CLI Rename Element Command Contract Specification](Specifications.md#cli-rename-element-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Rename Element Test](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#cli-rename-element-test)
----
-
 ### CLI Resources Command
 
-The system shall provide a `resources` command that generates the resources report for InternalPath relation targets and contract_bindings targets.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
+The system SHALL provide a `resources` command that generates the local artifact inventory according to the shared resources report contract.
 
 #### Metadata
   * type: requirement
@@ -662,8 +378,8 @@ The system SHALL obtain trace results and filter diagnostics from the shared tra
   * type: requirement
 
 #### Contract References
-  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
   * [Type Validation Error Behavior](../../Operations/Validation/Behaviors.md#type-validation-error-behavior)
+  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
   * definedBy: [CLI Traces Command Contract Specification](Specifications.md#cli-traces-command-contract-specification)
@@ -692,10 +408,7 @@ When the shared trace operation returns a report, the system SHALL serialize it 
 
 ### Detailed Error Handling and Logging
 
-The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
+When a supported command-line request fails, the system SHALL return contextual diagnostics and actionable guidance with a nonzero exit status while keeping logging separate from structured result output.
 
 #### Metadata
   * type: requirement
@@ -728,83 +441,6 @@ Detailed global option, startup ordering, normal/MCP command behavior, fallback 
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * verifiedBy: [Explicit Workspace Selection Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#explicit-workspace-selection-verification)
----
-
-### Format Command
-
-The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.
-
-#### Details
-Implementation details shall follow the associated contract specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [Format Command Contract Specification](Specifications.md#format-command-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
-  * verifiedBy: [Element Ordering Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#element-ordering-verification)
-  * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
-  * verifiedBy: [Full Relations Insertion Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#full-relations-insertion-verification)
----
-
-### Relation Commands
-
-The system SHALL provide unified CLI commands for relation, Contract Binding, and Contract Reference management.
-
-#### Details
-When a user links or unlinks a Contract Reference, the system SHALL apply the reference mutation contract through the shared model-operation implementation.
-
-When a reference mutation fails validation, the system SHALL preserve the authored files.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-  * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
-  * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
-  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
-
-#### Relations
-  * definedBy: [Relation Commands Contract Specification](Specifications.md#relation-commands-contract-specification)
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * verifiedBy: [Link Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#link-command-verification)
-  * verifiedBy: [Unlink Command Verification](../../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#unlink-command-verification)
----
-
-### Contract Bindings Commands
-
-The system shall provide contract_bindings management through the unified link/unlink commands using the 'bindContract' keyword.
-
-#### Details
-Contract Bindings management is a specialization of the unified relation command surface. Detailed `bindContract`, auto-detection, dry-run, JSON, persistence, idempotency, and cleanup behavior shall follow the relation command contract and contract_bindings behavior contracts.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
-  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
-
-#### Relations
-  * definedBy: [Contract Bindings Input Auto-Detection Behavior](Behaviors.md#contract-bindings-input-auto-detection-behavior)
-  * derivedFrom: [Relation Commands](#relation-commands)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * verifiedBy: [Bind Contract Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#bind-contract-command-verification)
-  * verifiedBy: [Remove Contract Binding Command Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#remove-contract-binding-command-verification)
 ---
 
 ### Validate Command
@@ -841,24 +477,7 @@ When Reqvire is invoked through its npm package, the system SHALL launch the pac
   * type: requirement
 
 #### Relations
-  * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
   * definedBy: [npm CLI Launch Specification](Specifications.md#npm-cli-launch-specification)
+  * derivedFrom: [CLI interface](../InterfacesRequirements.md#cli-interface)
   * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
----
-
-### CLI Collect Element Selection
-
-When a collect command selects an existing root element, the system SHALL resolve an exact name or canonical identifier through the shared element-selection contract before collection.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
-
-#### Relations
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * satisfiedBy: [collect.rs](../../../crates/reqvire-core/src/report/collect.rs)
-  * derivedFrom: [CLI Collect Command](#cli-collect-command)
-  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---

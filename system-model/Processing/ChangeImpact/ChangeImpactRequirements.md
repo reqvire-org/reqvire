@@ -13,11 +13,11 @@ Change impact detection encompasses:
 
 When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
-Change impact compares a base workspace snapshot with the current workspace snapshot. The current single-repository Git commit option is a convenience for materializing the base snapshot from one repository; it does not make Git root the identifier root. All detected paths, relocations, relation targets, contract_bindings targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
+Change impact compares a base workspace snapshot with the current workspace snapshot. The current single-repository Git commit option is a convenience for materializing the base snapshot from one repository; it does not make Git root the identifier root. All detected paths, relocations, relation targets, contract dependency targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
 
 **Contract Element Changes:**
-- Contract element content changes (hash changes) shall propagate change impact through the model via their contract_bindings relationships
-- Contract Bindings identifier location changes (moved/renamed Contract elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
+- Contract element content changes (hash changes) shall propagate change impact through the model to both binding and reference consumers through their distinct dependency relationships
+- Contract dependency identifier location changes (moved or renamed contract elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
 
 #### Metadata
   * type: requirement
@@ -33,6 +33,29 @@ Change impact compares a base workspace snapshot with the current workspace snap
   * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
   * verifiedBy: [Contract Bindings Change Impact Verification](../../Verifications/Operations/ModelOperations/ContractBindingVerifications.md#contract-bindings-change-impact-verification)
   * verifiedBy: [Impact Scope Summary Test](../../Verifications/Processing/ChangeImpact/ChangeImpactVerifications.md#impact-scope-summary-test)
+---
+
+### Contract Reference Change Propagation
+
+When referenced contract content changes, the system SHALL identify referencing requirements and their downstream context for change-impact review.
+
+#### Details
+When a referencing requirement changes, the system SHALL propagate impact according to its own relationships while preserving the direction of its Contract References.
+
+When multiple acyclic dependency paths reach the same element, the system SHALL terminate impact traversal and report the affected elements deterministically.
+
+WHEN a referencing requirement is reached through multiple impact paths, the system SHALL preserve its reference dependency provenance and assess each affected element once.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+
+#### Relations
+  * definedBy: [Contract Reference Change Impact Specification](Specifications.md#contract-reference-change-impact-specification)
+  * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
 ---
 
 ### Requirements Change Propagation
@@ -61,28 +84,5 @@ The system shall implement a model change analyzer that identifies structural mo
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
----
-
-### Contract Reference Change Propagation
-
-When referenced contract content changes, the system SHALL identify referencing requirements and their downstream context for change-impact review.
-
-#### Details
-When a referencing requirement changes, the system SHALL propagate impact according to its own relationships while preserving the direction of its Contract References.
-
-When multiple acyclic dependency paths reach the same element, the system SHALL terminate impact traversal and report the affected elements deterministically.
-
-WHEN a referencing requirement is reached through multiple impact paths, the system SHALL preserve its reference dependency provenance and assess each affected element once.
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
-
-#### Relations
-  * derivedFrom: [Change Impact Detection](#change-impact-detection)
-  * definedBy: [Contract Reference Change Impact Specification](Specifications.md#contract-reference-change-impact-specification)
   * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
 ---

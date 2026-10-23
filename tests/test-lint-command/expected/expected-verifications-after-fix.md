@@ -35,7 +35,7 @@ Expected redundant relation: specifications/SystemRequirements.md#authorization 
 
 #### Relations
   * derivedFrom: [Verification Objective](#verification-objective)
-  * verify: [Public API](../SystemRequirements.md#public-api)
-  * verify: [Management API](../SystemRequirements.md#management-api)
   * verify: [API Specification](../SystemRequirements.md#api-specification)
+  * verify: [Management API](../SystemRequirements.md#management-api)
+  * verify: [Public API](../SystemRequirements.md#public-api)
 ---

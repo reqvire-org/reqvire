@@ -1,0 +1,5 @@
+PASS allowed-authoring
+PASS disk-links-and-guidance
+PASS disk-single-element-file-link
+PASS disk-capability-guidance
+PASS model-read-gate

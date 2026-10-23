@@ -46,7 +46,7 @@ class Server(revision_e2e.McpServer):
              *(["--enable-commits"] if commits else []), *options, *extra_args], cwd=workspace,
             stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True,
             env={**os.environ, "TOKIO_WORKER_THREADS": "4",
-                 "RUST_LOG": "reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug", **(environment or {})})
+                 "RUST_LOG": "error,reqvire::model=debug,reqvire::model_cache=debug,reqvire::utils=debug", **(environment or {})})
 
     def counts(self):
         log = (self.output / "server.log").read_text()

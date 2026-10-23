@@ -2,24 +2,13 @@
 
 ### Document Structure Specification
 
-Rules for normalizing document hierarchical structure during formatting.
+Canonical model document structure.
 
 #### Details
-**Page Header:**
-- Always output `# Elements` as the page header (all specification files must have this header)
-
-**Section Header:**
-- Add a default section header `## Elements` when elements exist without an explicit section header
-- Preserve existing section headers when present (starting with `## `)
-- Correctly distinguish between level 1 headers (`# `) and level 2 or deeper headers (`##`, `###`)
-
-**Default Header Names:**
-- Page header: Always `# Elements` (required for all specification files)
-- Section header: "Elements" (the default section name used by parser)
-
-**Normalization Rules:**
-1. If document has `# Elements` then `###` (no `##`): Add section header only
-2. If document has `# Elements` and `##`: No header additions needed
+- Preserve a valid multi-element `# Elements` document or single-element `# Element` document. Single-element files retain exactly one element and cannot gain a sibling during normalization.
+- In `# Elements` documents, emit H3 element headings and H4 reserved subsections. In `# Element` documents, retain H2 metadata, optional relations and the named body; headings within that body remain its content. Normalize structural spacing and separators for the selected form. Preserve ordinary page text and eligible non-reserved content instead of introducing legacy `## Elements` sections.
+- Preserve Markdown code fences and their bytes; literal headings inside them are not model structure.
+- Use the same document writer for default formatting and mutation persistence. Formatting does not migrate invalid legacy headers or infer repairs for invalid models; known migrations remain separate.
 
 #### Metadata
   * type: specification
@@ -52,6 +41,10 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 - Display changes with sequential line numbering that reflects final file positions
 - Provide context lines with proper line number continuity
 
+**Semantic Repair Boundary:**
+- Consume the prose-link classification and guidance referenced by the owning requirement. Formatting must not silently move an invalid prose link into a relation, Contract Binding, Contract Reference, or Concept Reference, because the valid repair depends on author intent and source/target compatibility.
+- Preserve the shared diagnostic and repair examples when reporting such a violation. Formatting normalization must not make the invalid dependency appear valid by changing its label or choosing a relation automatically.
+
 #### Metadata
   * type: specification
 ---
@@ -61,7 +54,7 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 #### Details
 Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
 
-When --with-full-relations is active:
+When the core full-relations option is enabled, exposed as MCP `with_full_relations: true`:
 - All relations from the model registry are written to the Relations subsection
 - Relations are sorted according to the Relation Ordering Normalization requirement
 
@@ -71,17 +64,14 @@ When --with-full-relations is active:
 
 ### Relation Ordering Specification
 
-Rules for sorting relations within elements for deterministic output.
+Contract for deterministic authored relation ordering.
 
 #### Details
-**Sort Criteria:**
-1. Primary sort: Alphabetically by relation type name (e.g., `derivedFrom` before `satisfiedBy`, `satisfiedBy` before `verifiedBy`)
-2. Secondary sort: Alphabetically by target identifier within the same relation type
-
-**Benefits:**
-- Deterministic output regardless of parsing order or HashMap iteration order
-- Consistent formatting across all specification files
-- Easier diff comparison between file versions
+1. For concept and concept-scheme elements, order relation families by priority: `derivedFrom`, `broader`, `narrower`, `related`, `exactMatch`, `closeMatch`, then all remaining compatible relation types.
+2. For other element types, all relation types share the same priority.
+3. Within equal priority, sort alphabetically by relation type name; within the same type, sort alphabetically by resolved target identifier, file path or URL according to target kind.
+4. Apply the same ordering to authored and explicitly materialized generated relations. The default formatter preserves the authored relation subset.
+5. Priority affects serialization only; it does not convert concept associations into taxonomy or change relation semantics.
 
 #### Metadata
   * type: specification

@@ -158,10 +158,10 @@ describe("manifest refresh transactions", () => {
   });
 
   it("rejects wrong-context chunks without changing the committed snapshot", async () => {
-    const initial = { ...smallStore(), project: { ...smallStore().project, worktree_id: "selected" } };
+    const initial = { ...smallStore(), project: { ...smallStore().project, worktree_id: "private-selected", branch: "selected" } };
     const seed = wireSnapshot(initial);
     const client = new ManifestStoreClient(initial, seed.seed, "selected");
-    let latest = wireSnapshot({ ...initial, project: { ...initial.project, worktree_id: "other" } });
+    let latest = wireSnapshot({ ...initial, project: { ...initial.project, worktree_id: "private-other", branch: "other" } });
     const fetchMock = vi.fn(async (url: string, init: RequestInit = {}) =>
       new URL(url, "http://localhost").pathname.endsWith("/manifest")
         ? manifestResponse(latest) : chunkResponse(latest, init));
@@ -174,7 +174,7 @@ describe("manifest refresh transactions", () => {
     expect(() => { next.result.store.elements[0].metadata.changed = "Mutation"; }).toThrow(TypeError);
     expect(fetchMock.mock.calls.filter(([url]) => url.includes("/manifest")).every(([, init]) =>
       new Headers(init?.headers).get("If-None-Match") === `"${seed.revision}"`)).toBe(true);
-    expect(fetchMock.mock.calls.every(([url]) => new URL(url, "http://localhost").searchParams.get("worktree_id") === "selected")).toBe(true);
+    expect(fetchMock.mock.calls.every(([url]) => new URL(url, "http://localhost").searchParams.get("branch") === "selected")).toBe(true);
   });
 
   it("recovers from an invalid seed manifest by fetching all required chunks", async () => {

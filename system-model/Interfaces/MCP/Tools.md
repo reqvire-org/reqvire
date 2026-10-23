@@ -31,6 +31,10 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Shared Core Operation Layer Specification](../Specifications.md#shared-core-operation-layer-specification)
+
 #### Relations
   * definedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
@@ -58,6 +62,220 @@ The system shall expose MCP protocol compatibility and Reqvire tool interface co
   * verifiedBy: [MCP Contract Versioning Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-versioning-verification)
 ---
 
+### MCP Formatting Tool
+
+The system SHALL expose a typed MCP formatting tool that previews without writes by default and applies deterministic formatting only when mutations are enabled.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [Element Ordering Behavior](../../Operations/Formatting/Behaviors.md#element-ordering-behavior)
+  * [Format Duplicate Removal Behavior](../../Operations/Formatting/Behaviors.md#format-duplicate-removal-behavior)
+  * [Document Structure Specification](../../Operations/Formatting/Specifications.md#document-structure-specification)
+  * [Format Consistency Specification](../../Operations/Formatting/Specifications.md#format-consistency-specification)
+  * [Full Relations Insertion Contract Specification](../../Operations/Formatting/Specifications.md#full-relations-insertion-contract-specification)
+  * [Relation Ordering Specification](../../Operations/Formatting/Specifications.md#relation-ordering-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Formatting Tool Specification](Specifications.md#mcp-formatting-tool-specification)
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * specify: [MCP Model Maintenance](../InterfacesFeature.md#mcp-model-maintenance)
+---
+
+### MCP Lint Fix Tool
+
+When an MCP client requests lint repair with mutations enabled, the system SHALL apply only safe auto-fixable findings through the shared validated, canonical model mutation transaction.
+
+#### Details
+When mutation mode is disabled, the system SHALL retain lint inspection and reject repair requests before side effects.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Operation Command Contract Specification](../../ModelStructure/Specifications.md#operation-command-contract-specification)
+  * [Lint Auto-fix Capability Contract Specification](../../Operations/Linting/Specifications.md#lint-auto-fix-capability-contract-specification)
+  * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [lint.rs](../../../crates/reqvire-core/src/lint.rs)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
+  * specify: [MCP Model Maintenance](../InterfacesFeature.md#mcp-model-maintenance)
+---
+
+### MCP Model Change Publication
+
+WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to its authorized owning repository remotes.
+
+#### Details
+Automatic commits remain an independent, default-disabled option. The context transaction owns component-first commit ordering and the Central manifest checkpoint in Repo mode. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [MCP Change Publication](../InterfacesFeature.md#mcp-change-publication)
+---
+
+### MCP Accepted Change Commit
+
+WHEN a client explicitly requests a commit in an owned context, the system SHALL commit only that context's accepted uncommitted model changes and advance its expected HEAD after successful Git publication.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Accepted Change Commit Specification](Specifications.md#mcp-accepted-change-commit-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_repo.rs](../../../crates/reqvire-cli/src/mcp_repo.rs)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+---
+
+### MCP Branch Push
+
+WHEN a client requests publication of a committed owned branch, the system SHALL push its accepted HEAD to the identically named branch of the pinned remote without rewriting remote history.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
+  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Branch Push Specification](Specifications.md#mcp-branch-push-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+---
+
+### MCP Commit Outcome Reconciliation
+
+WHEN automatic or explicit local commit publication is interrupted in an owned context, the system SHALL verify the local Git outcome, complete index publication and accept the exact validated published candidate without repeating the ref side effect, or report confirmed non-publication with rollback for an automatic mutation and retained pending edits for an explicit commit.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Commit Outcome Reconciliation Specification](Specifications.md#mcp-commit-outcome-reconciliation-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * verifiedBy: [MCP Accepted Change Commit Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-accepted-change-commit-verification)
+---
+
+### MCP GitHub Tool Availability
+
+WHILE GitHub integration is explicitly enabled, the system SHALL advertise publication tools only after successful noninteractive startup checks and SHALL expose their unavailability without preventing local MCP model work.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+---
+
+### MCP Publication Scope and Recovery
+
+WHEN a repository publication operation executes, the system SHALL constrain it to the selected owned context and pinned repository and SHALL report failure or uncertain outcome without losing accepted local work.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+  * satisfiedBy: [mcp_process.rs](../../../crates/reqvire-cli/src/mcp_process.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Pull Request Commenting
+
+WHEN a client requests a comment on a pull request in the pinned repository, the system SHALL publish the supplied body to that pull request and return the confirmed comment identity.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
+  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Pull Request Commenting Specification](Specifications.md#mcp-pull-request-commenting-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+---
+
+### MCP Pull Request Creation
+
+WHEN a client requests a pull request for a pushed owned branch with an explicit base, the system SHALL create or identify a matching pull request within the pinned repository.
+
+#### Concept References
+  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
+  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Pull Request Creation Specification](Specifications.md#mcp-pull-request-creation-specification)
+  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
+  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+---
+
 ### MCP Model Evidence Tools
 
 The system shall expose MCP read tools that return model evidence needed by external tools and AI agents.
@@ -80,14 +298,14 @@ WHEN a caller requests contract-reference filtering, the system SHALL apply the 
   * type: requirement
 
 #### Contract References
-  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
-  * [Contract Reference Evidence Projection Specification](../../Reports/ModelReports/Specifications.md#contract-reference-evidence-projection-specification)
   * [Requirement Governance Metadata Specification](../../ModelStructure/Specifications.md#requirement-governance-metadata-specification)
-  * [Flexible Search Type Filtering Contract Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-contract-specification)
-  * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
+  * [SearchFiltering](../../Reports/ModelReports/SearchFiltering.md#searchfiltering)
   * [Collect Content Specification](../../Reports/ModelReports/Specifications.md#collect-content-specification)
-  * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
+  * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
+  * [Contract Reference Evidence Projection Specification](../../Reports/ModelReports/Specifications.md#contract-reference-evidence-projection-specification)
+  * [Flexible Search Type Filtering Contract Specification](../../Reports/ModelReports/Specifications.md#flexible-search-type-filtering-contract-specification)
   * [Ontology Collection Output Specification](../../Reports/ModelReports/Specifications.md#ontology-collection-output-specification)
+  * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
 
 #### Relations
@@ -96,6 +314,23 @@ WHEN a caller requests contract-reference filtering, the system SHALL apply the 
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * satisfiedBy: [read_tools.rs](../../../crates/reqvire-core/src/tool_interface/read_tools.rs)
   * verifiedBy: [MCP Model Evidence Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-model-evidence-tools-verification)
+---
+
+### MCP Model Evidence Element Selection
+
+When an MCP model-evidence tool selects an existing source element, the system SHALL apply the shared element-selection contract within the requested model context before producing evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+
+#### Relations
+  * derivedFrom: [MCP Model Evidence Tools](#mcp-model-evidence-tools)
+  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
+  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
+  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
 ---
 
 ### MCP Semantic Query Tools
@@ -109,8 +344,8 @@ Detailed engine, graph composition, graph-role metadata, query-form result shape
   * type: requirement
 
 #### Contract References
-  * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
   * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+  * [Semantic Relation Family Projection Specification](../../Reports/ModelReports/Specifications.md#semantic-relation-family-projection-specification)
 
 #### Relations
   * definedBy: [MCP Semantic Query Tools Specification](Specifications.md#mcp-semantic-query-tools-specification)
@@ -139,13 +374,17 @@ When guiding contract authoring, refactoring, exploration, implementation planni
   * type: requirement
 
 #### Contract References
+  * [MCP Formatting Tool Specification](Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](Specifications.md#mcp-lint-fix-tool-specification)
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
 
 #### Relations
   * definedBy: [MCP Prompt Guidance Specification](Specifications.md#mcp-prompt-guidance-specification)
   * derivedFrom: [MCP Semantic Query Tools](#mcp-semantic-query-tools)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [mcp_prompts.rs](../../../crates/reqvire-core/src/mcp_prompts.rs)
   * verifiedBy: [MCP Prompt Guidance Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-prompt-guidance-verification)
 ---
 
@@ -230,10 +469,10 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned worktrees.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned Central worktrees. Declared component checkouts may be detached at their selected commits, with their own cleanliness and ownership checks.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
-- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL reject unexpected branch or HEAD changes.
+- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Only the dedicated checked HEAD-refresh operation may adopt an eligible external HEAD on the same branch; it cannot bypass ownership or transaction recovery.
 - The MCP server shall make observed model revision visible to clients for read responses.
 - The MCP server shall keep post-mutation model state synchronized before serving dependent reads.
 
@@ -247,6 +486,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
   * definedBy: [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_repo.rs](../../../crates/reqvire-cli/src/mcp_repo.rs)
   * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
   * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
@@ -264,84 +504,343 @@ When a client creates, removes, or relinks a Contract Reference, the system SHAL
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
 
 #### Relations
   * definedBy: [MCP Mutation Execution Flow Specification](Specifications.md#mcp-mutation-execution-flow-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
-  * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
-  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/tool_interface/mod.rs)
-  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
   * verifiedBy: [MCP Mutation Execution Flow Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-execution-flow-verification)
 ---
 
 ### MCP Mutation Tool Safety
 
-The system shall expose model mutation tools only through typed Reqvire core operations that preserve operation-specific preview behavior, validation, persistence guarantees, and post-mutation diagnostics.
-
-#### Details
-- The MCP interface shall expose mutation tools only after explicit mutation enablement.
-- MCP model mutation tools shall use Reqvire core mutation logic.
-- MCP model mutation tools shall preserve Reqvire semantic model validation, including contract_bindings compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
-- MCP model mutation tools shall preserve Reqvire filesystem persistence behavior.
-- MCP model mutation tools shall expose folder moves through the same recursive move, identifier update, reference update, preview, validation, and persistence behavior as the CLI `mv-folder` command.
-- MCP mutation results shall report changed model evidence.
-- MCP mutation execution shall refresh MCP-visible model state after successful mutation.
+The system SHALL expose model authoring exclusively through typed MCP tools with mutation enablement, complete candidate validation and canonical transactional persistence.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
   * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
-  * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
-  * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
-  * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
-  * [Rename Element Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#rename-element-operation-contract-specification)
-  * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
-  * [Move File Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-file-operation-contract-specification)
-  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
   * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
   * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
+  * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
+  * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
+  * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
+  * [Move File Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-file-operation-contract-specification)
+  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
   * [Relation Consistency Maintenance Contract Specification](../../Operations/ModelOperations/Specifications.md#relation-consistency-maintenance-contract-specification)
-  * [In-Memory Model Build Cache Specification](../../ModelStructure/Specifications.md#in-memory-model-build-cache-specification)
+  * [Rename Element Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#rename-element-operation-contract-specification)
 
 #### Relations
   * definedBy: [MCP Mutation Tool Safety Specification](Specifications.md#mcp-mutation-tool-safety-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
-  * satisfiedBy: [format.rs](../../../crates/reqvire-core/src/format.rs)
-  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * specify: [MCP Model Authoring](../InterfacesFeature.md#mcp-model-authoring)
   * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
 ---
 
-### MCP Move Folder Tool
+### MCP Add Element Tool
 
-The system shall expose a typed `reqvire.move_folder` MCP mutation tool for moving or renaming a folder subtree through the shared folder-move operation.
-
-#### Details
-- The tool shall be omitted unless mutation tools are explicitly enabled.
-- The tool shall accept source folder, target folder, and preview/execution controls as typed MCP fields.
-- The tool shall delegate recursive relocation, identifier rewrites, relation updates, contract_bindings updates, Concept References updates, InternalPath updates, validation, preview, and persistence to the shared folder-move operation.
-- The tool shall report moved folders, moved files, moved elements, changed referencing files, validation status, and affected scope.
+The system SHALL expose typed MCP tools to create or replace a model element from typed Markdown content under the supported interface permissions.
 
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Create Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#create-element-workflow-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
 #### Relations
+  * definedBy: [MCP Add Element Tool Specification](Specifications.md#mcp-add-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Add Element Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-add-element-tool-verification)
+---
+
+### MCP Merge Elements Tool
+
+The system SHALL expose typed MCP tools to merge selected elements into a compatible target under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Merge Content Transformation Behavior](../../Operations/ModelOperations/Behaviors.md#merge-content-transformation-behavior)
+  * [Merge Type Compatibility Constraint](../../Operations/ModelOperations/Constraints.md#merge-type-compatibility-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Merge Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#merge-element-workflow-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Merge Elements Tool Specification](Specifications.md#mcp-merge-elements-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+---
+
+### MCP Move Asset Tool
+
+The system SHALL expose typed MCP tools to move or rename an evidence asset and update model references to it under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Move Asset Tool Specification](Specifications.md#mcp-move-asset-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Move Asset Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-move-asset-tool-verification)
+---
+
+### MCP Move Element Tool
+
+The system SHALL expose typed MCP tools to relocate a selected element and rewrite its affected references under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Move Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#move-element-workflow-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Move Element Tool Specification](Specifications.md#mcp-move-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Move Element Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-move-element-tool-verification)
+---
+
+### MCP Move File Tool
+
+The system SHALL expose typed MCP tools to move a model file and its contained elements under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Move File Tool Specification](Specifications.md#mcp-move-file-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Move File Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-move-file-tool-verification)
+---
+
+### MCP Move Folder Tool
+
+The system SHALL expose a typed MCP mutation tool to move or rename a model folder subtree through the shared folder-move operation.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Target Location Constraint](../../Operations/ModelOperations/Constraints.md#target-location-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Move Folder Operation Contract Specification](../../Operations/ModelOperations/Specifications.md#move-folder-operation-contract-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Move Folder Tool Specification](Specifications.md#mcp-move-folder-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Move Folder Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-move-folder-tool-verification)
+  * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
+---
+
+### MCP Relation Management Tools
+
+The system SHALL expose typed MCP tools to manage typed relations and requirement-owned contract dependencies under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
+  * [Relation Operations Specification](../../ModelStructure/Specifications.md#relation-operations-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Relation Management Tools Specification](Specifications.md#mcp-relation-management-tools-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Link Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-link-tool-verification)
+  * verifiedBy: [MCP Unlink Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-unlink-tool-verification)
+---
+
+### MCP Contract Binding Tools
+
+The system SHALL expose typed MCP tools to add and remove independent implementation dependencies on compatible requirement-owned contracts under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Contract Bindings Hierarchical Independence Constraint](../../ModelStructure/Constraints.md#contract-bindings-hierarchical-independence-constraint)
+  * [Contract Bindings Satisfied Contract Constraint](../../ModelStructure/Constraints.md#contract-bindings-satisfied-contract-constraint)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+
+#### Relations
+  * definedBy: [MCP Contract Binding Tools Behavior](Specifications.md#mcp-contract-binding-tools-behavior)
+  * derivedFrom: [MCP Relation Management Tools](#mcp-relation-management-tools)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Contract Binding Removal Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-binding-removal-verification)
+  * verifiedBy: [MCP Contract Binding Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-binding-tool-verification)
+---
+
+### MCP Relink Tool
+
+The system SHALL expose typed MCP tools to replace a relation or supported contract-reference target atomically under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Atomic Relink Validity Constraint](../../Operations/ModelOperations/Constraints.md#atomic-relink-validity-constraint)
+  * [Atomic Relation Relink Workflow Specification](../../Operations/ModelOperations/Specifications.md#atomic-relation-relink-workflow-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Relink Tool Specification](Specifications.md#mcp-relink-tool-specification)
+  * definedBy: [Mutating Command Hierarchy Safety Contract Specification](Specifications.md#mutating-command-hierarchy-safety-contract-specification)
+  * derivedFrom: [MCP Relation Management Tools](#mcp-relation-management-tools)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+---
+
+### MCP Remove Asset Tool
+
+The system SHALL expose typed MCP tools to remove an evidence asset and clean up its model references under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Remove Asset Tool Specification](Specifications.md#mcp-remove-asset-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Remove Asset Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-remove-asset-tool-verification)
+---
+
+### MCP Remove Element Tool
+
+The system SHALL expose typed MCP tools to remove a selected element while preserving the remaining model under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Delete Element Workflow Specification](../../Operations/ModelOperations/Specifications.md#delete-element-workflow-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Remove Element Tool Specification](Specifications.md#mcp-remove-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Remove Element Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-remove-element-tool-verification)
+---
+
+### MCP Rename Element Tool
+
+The system SHALL expose typed MCP tools to rename a selected element and update its identity and references under the supported interface permissions.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Diff Output Format Specification](../Specifications.md#diff-output-format-specification)
+  * [Dry-Run Mode Behavior](../../ModelStructure/Behaviors.md#dry-run-mode-behavior)
+  * [File Persistence Behavior](../../ModelStructure/Behaviors.md#file-persistence-behavior)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
+
+#### Relations
+  * definedBy: [MCP Rename Element Tool Specification](Specifications.md#mcp-rename-element-tool-specification)
+  * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
+  * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
+  * verifiedBy: [MCP Rename Element Tool Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-rename-element-tool-verification)
+---
+
+### MCP Update Element Tool
+
+WHEN a mutation-enabled MCP client requests a focused element edit, the system SHALL expose the shared selected-content editing operation through a typed context-bound tool with preview and revision-aware change evidence.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [Focused Element Editing Specification](../../Operations/ModelOperations/Specifications.md#focused-element-editing-specification)
+
+#### Relations
+  * definedBy: [MCP Update Element Tool Specification](Specifications.md#mcp-update-element-tool-specification)
   * derivedFrom: [MCP Mutation Tool Safety](#mcp-mutation-tool-safety)
   * satisfiedBy: [definitions.rs](../../../crates/reqvire-core/src/tool_interface/definitions.rs)
-  * satisfiedBy: [dispatch.rs](../../../crates/reqvire-core/src/tool_interface/dispatch.rs)
   * satisfiedBy: [mutation_tools.rs](../../../crates/reqvire-core/src/tool_interface/mutation_tools.rs)
-  * verifiedBy: [MCP Mutation Tool Safety Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-mutation-tool-safety-verification)
 ---
 
 ### MCP Protocol Standard Conformance
@@ -378,13 +877,13 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * type: requirement
 
 #### Contract References
-  * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
-  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
-  * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
-  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
-  * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
+  * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Impact Scope Computation Specification](../../Processing/ChangeImpact/Specifications.md#impact-scope-computation-specification)
+  * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
+  * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
+  * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
+  * [Verification Trace Tree Construction](../../Verification/Traceability/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
   * definedBy: [MCP Quality Traceability Tools Specification](Specifications.md#mcp-quality-traceability-tools-specification)
@@ -423,9 +922,9 @@ Detailed resource listing, template, read, revision metadata, non-mutating behav
   * type: requirement
 
 #### Contract References
-  * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Containment View Report Contract Specification](../../Reports/ModelReports/Specifications.md#containment-view-report-contract-specification)
   * [Requirement Submodels Report Specification](../../Reports/ModelReports/Specifications.md#requirement-submodels-report-specification)
+  * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
 
 #### Relations
   * definedBy: [MCP Resource Interface Specification](Specifications.md#mcp-resource-interface-specification)
@@ -441,14 +940,16 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 
 #### Details
 - The MCP server command shall start protocol service mode for the current Reqvire workspace.
+- WHEN a supported transport is selected, the system SHALL start that transport for the resolved workspace.
+- IF transport selection or transport-specific options are incompatible, THEN the system SHALL reject startup before model loading or protocol service.
 - The MCP server command shall keep server startup behavior outside the MCP tool surface.
 - The MCP server command shall expose read/report tools by default.
 - The MCP server command shall expose mutation tools only when mutation capability is explicitly enabled at startup.
 - The MCP server command SHALL disable automatic commits by default and SHALL accept an explicit commit opt-in only when mutation capability is enabled.
 - WHEN GitHub publication is requested, the system SHALL apply startup availability checks and expose diagnostic state independently of local mutation and commit enablement.
 - The MCP server command shall support opt-in element size estimates when explicitly enabled at startup.
-- WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
-- WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
+- WHILE HTTP transport is selected, WHEN additional browser origins are configured at startup, the system SHALL apply them to the MCP endpoint's origin policy.
+- WHILE HTTP transport is selected, WHEN additional endpoint hostnames are configured at startup, the system SHALL apply them to the MCP endpoint's host policy.
 
 #### Metadata
   * type: requirement
@@ -479,7 +980,7 @@ The system shall serve MCP model state from Reqvire core parsing, refreshing sou
 - The MCP server shall report enough revision state for clients to reason about cache freshness.
 - Read-only MCP shall refresh stale model state before returning authoritative model evidence, including changes to active exclusions and model construction dependencies without requiring a restart.
 - Read-only MCP SHALL allow independent requests to execute concurrently within bounded admission and execution limits, without blocking the asynchronous transport or bypassing controlled workspace writes and core cache freshness checks.
-- Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external edits or rebuilding the filesystem cache on each request.
+- Mutation-enabled MCP shall reuse its accepted model and captured source inputs for reads and candidate preparation without importing external model edits or rebuilding the filesystem cache on each request. An eligible dedicated HEAD refresh shall use normal validated loading to replace its captured files, model and semantic store while retaining context identity. Artifact-only changes retain the public model revision; allowed current-exclusion changes may alter model membership and revision.
 - Mutation-enabled MCP SHALL allow bounded concurrent audited snapshot reads, preserve each read's captured model identity through its response, and keep mutation preparation and publication serialized within the selected context.
 - Mutation-enabled MCP shall publish complete graph, page, and semantic state only after candidate validation, successful persistence, and a successful commit when enabled under the ownership contract.
 
@@ -493,10 +994,10 @@ The system shall serve MCP model state from Reqvire core parsing, refreshing sou
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
-  * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
   * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [model_cache.rs](../../../crates/reqvire-core/src/model_cache.rs)
   * satisfiedBy: [mutation_io.rs](../../../crates/reqvire-core/src/mutation_io.rs)
+  * satisfiedBy: [arg_helpers.rs](../../../crates/reqvire-core/src/tool_interface/arg_helpers.rs)
 ---
 
 ### MCP Shared Operation Interfaces
@@ -509,7 +1010,9 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
+  * [Shared Core Operation Layer Specification](../Specifications.md#shared-core-operation-layer-specification)
   * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
 
@@ -527,14 +1030,42 @@ Detailed request/result types, shared operation semantics, adapter boundary, dis
   * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
+### MCP Stdio Process Lifecycle
+
+WHILE serving a local MCP client over standard input and output, the system SHALL keep protocol output separate from diagnostics and SHALL release owned runtime resources when the client connection ends or the server is terminated.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Stdio Transport
+
+WHEN a local MCP client selects standard input and output transport, the system SHALL serve the resolved project workspace through the same typed engineering operations and permission boundaries as the HTTP interface.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [reqvire.js](../../../npm/reqvire/bin/reqvire.js)
+---
+
 ### MCP Streamable HTTP Transport
 
 The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Details
-- The MCP server shall use Streamable HTTP as the only supported MCP transport.
 - The MCP server shall start an RMCP-backed HTTP endpoint by default.
-- The MCP server shall not expose newline-delimited stdio JSON-RPC compatibility mode.
 - MCP transport mechanics shall not change Reqvire tool semantics.
 
 #### Metadata
@@ -542,7 +1073,6 @@ The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Relations
   * definedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
-  * derive: [Serve Command Embedded MCP Endpoint](../WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
@@ -570,8 +1100,8 @@ WHEN HTTP transport is enabled, the system SHALL provide MCP-compliant request h
 #### Relations
   * definedBy: [MCP Streamable HTTP Transport Safety Specification](Specifications.md#mcp-streamable-http-transport-safety-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * satisfiedBy: [mcp_http.rs](../../../crates/reqvire-cli/src/mcp_http.rs)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_http.rs](../../../crates/reqvire-cli/src/mcp_http.rs)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
 ---
 
@@ -596,7 +1126,7 @@ Detailed schema-source, semantic evidence, mutation/error result, versioning, an
 
 ### MCP Tool Exposure Scope
 
-The system SHALL expose only specified Reqvire model operations and typed worktree, commit, and same-repository publication operations as MCP tools.
+The system SHALL expose only specified Reqvire model operations and typed worktree, commit, and authorized owning-repository publication operations as MCP tools.
 
 #### Details
 Detailed supported-operation, exclusion, internal/server-management boundary, startup-validation, and MCP contract rules shall follow the associated specification.
@@ -624,10 +1154,13 @@ The system shall classify every MCP tool by side-effect behavior so clients and 
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [MCP Formatting Tool Specification](Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](Specifications.md#mcp-lint-fix-tool-specification)
+
 #### Relations
   * definedBy: [MCP Tool Side Effect Classification Specification](Specifications.md#mcp-tool-side-effect-classification-specification)
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
   * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
@@ -655,36 +1188,39 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 
 ### MCP Worktree Model Sessions
 
-WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup Git repository through one MCP endpoint.
+WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository through one MCP endpoint, including manifest-defined Repo workspaces.
 
 #### Details
-Worktree administration is an explicit repository operation. It does not change the original checkout branch or broaden the workspace boundary of any model operation.
-
-#### Metadata
-  * type: requirement
+Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * specify: [MCP Worktree Model Management](../InterfacesFeature.md#mcp-worktree-model-management)
 ---
 
-### MCP Model Change Publication
+### MCP Managed Worktree Removal
 
-WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to the same remote repository.
+WHEN a client requests removal of a clean server-created worktree, the system SHALL stop that context and remove only its disposable worktree while retaining the branch and commits.
 
-#### Details
-Automatic commits remain an independent, default-disabled option. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
 
 #### Metadata
   * type: requirement
 
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
 
 #### Relations
-  * specify: [MCP Change Publication](../InterfacesFeature.md#mcp-change-publication)
+  * definedBy: [MCP Managed Worktree Removal Specification](Specifications.md#mcp-managed-worktree-removal-specification)
+  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---
 
 ### MCP Worktree Context Isolation
@@ -694,199 +1230,20 @@ WHEN a request addresses a model worktree context, the system SHALL execute it a
 #### Details
 The child worker-session requirement implements the MCP side of this boundary. Explorer runtime consumers implement the same boundary through Contract Bindings; references alone do not contribute implementation coverage.
 
-#### Metadata
-  * type: requirement
-
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
 
 #### Contract Bindings
   * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
 
 #### Relations
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
   * definedBy: [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
----
-
-### MCP Worktree Creation
-
-WHEN a client requests a new model branch from an explicit base, the system SHALL create and validate an isolated Git worktree before returning an owned context for that branch.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * definedBy: [MCP Worktree Creation Specification](Specifications.md#mcp-worktree-creation-specification)
----
-
-### MCP Worktree Opening and Inventory
-
-WHEN a client selects an existing branch, the system SHALL open an eligible worktree context for that branch without switching any existing checkout and SHALL expose context and ownership information through read-only inventory.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * definedBy: [MCP Worktree Opening and Inventory Specification](Specifications.md#mcp-worktree-opening-and-inventory-specification)
----
-
-### MCP Managed Worktree Removal
-
-WHEN a client requests removal of a clean server-created worktree, the system SHALL stop that context and remove only its disposable worktree while retaining the branch and commits.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * definedBy: [MCP Managed Worktree Removal Specification](Specifications.md#mcp-managed-worktree-removal-specification)
----
-
-### MCP Accepted Change Commit
-
-WHEN a client explicitly requests a commit in an owned context, the system SHALL commit only that context's accepted uncommitted model changes and advance its expected HEAD after successful Git publication.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP Accepted Change Commit Specification](Specifications.md#mcp-accepted-change-commit-specification)
----
-
-### MCP GitHub Tool Availability
-
-WHILE GitHub integration is explicitly enabled, the system SHALL advertise publication tools only after successful noninteractive startup checks and SHALL expose their unavailability without preventing local MCP model work.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
----
-
-### MCP Publication Scope and Recovery
-
-WHEN a repository publication operation executes, the system SHALL constrain it to the selected owned context and pinned repository and SHALL report failure or uncertain outcome without losing accepted local work.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [mcp_process.rs](../../../crates/reqvire-cli/src/mcp_process.rs)
-  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
----
-
-### MCP Branch Push
-
-WHEN a client requests publication of a committed owned branch, the system SHALL push its accepted HEAD to the identically named branch of the pinned remote without rewriting remote history.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
-  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP Branch Push Specification](Specifications.md#mcp-branch-push-specification)
----
-
-### MCP Pull Request Creation
-
-WHEN a client requests a pull request for a pushed owned branch with an explicit base, the system SHALL create or identify a matching pull request within the pinned repository.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
-  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP Pull Request Creation Specification](Specifications.md#mcp-pull-request-creation-specification)
----
-
-### MCP Pull Request Commenting
-
-WHEN a client requests a comment on a pull request in the pinned repository, the system SHALL publish the supplied body to that pull request and return the confirmed comment identity.
-
-#### Metadata
-  * type: requirement
-
-#### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-  * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
-  * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
-
-#### Relations
-  * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * definedBy: [MCP Pull Request Commenting Specification](Specifications.md#mcp-pull-request-commenting-specification)
 ---
 
 ### MCP Worktree Worker Sessions
@@ -895,52 +1252,55 @@ WHEN an MCP request targets an admitted worktree context, the system SHALL route
 
 IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission or verified reconciliation of its recorded commit outcome.
 
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
 #### Metadata
   * type: requirement
+
+#### Relations
+  * definedBy: [MCP Worktree Worker Sessions Specification](Specifications.md#mcp-worktree-worker-sessions-specification)
+  * derivedFrom: [MCP Worktree Context Isolation](#mcp-worktree-context-isolation)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Worktree Creation
+
+WHEN a client requests a new model branch from an explicit base, the system SHALL create and validate an isolated Git worktree before returning an owned context for that branch.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
 
-#### Relations
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
-  * definedBy: [MCP Worktree Worker Sessions Specification](Specifications.md#mcp-worktree-worker-sessions-specification)
-  * derivedFrom: [MCP Worktree Context Isolation](#mcp-worktree-context-isolation)
----
-
-### MCP Commit Outcome Reconciliation
-
-WHEN automatic or explicit local commit publication is interrupted in an owned context, the system SHALL verify the local Git outcome, complete index publication and accept the exact validated published candidate without repeating the ref side effect, or report confirmed non-publication with rollback for an automatic mutation and retained pending edits for an explicit commit.
-
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Worktree Creation Specification](Specifications.md#mcp-worktree-creation-specification)
+  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Worktree Opening and Inventory
+
+WHEN a client selects an existing branch, the system SHALL open an eligible worktree context for that branch without switching any existing checkout and SHALL expose context and ownership information through read-only inventory.
 
 #### Concept References
-  * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Relations
-  * definedBy: [MCP Commit Outcome Reconciliation Specification](Specifications.md#mcp-commit-outcome-reconciliation-specification)
-  * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
-  * satisfiedBy: [mcp_session.rs](../../../crates/reqvire-cli/src/mcp_session.rs)
-  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * verifiedBy: [MCP Accepted Change Commit Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-accepted-change-commit-verification)
----
-
-### MCP Model Evidence Element Selection
-
-When an MCP model-evidence tool selects an existing source element, the system SHALL apply the shared element-selection contract within the requested model context before producing evidence.
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Existing Element Selection Specification](../../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
 
 #### Relations
-  * satisfiedBy: [mod.rs](../../../crates/reqvire-core/src/operations/mod.rs)
-  * satisfiedBy: [semantic_tools.rs](../../../crates/reqvire-core/src/tool_interface/semantic_tools.rs)
-  * derivedFrom: [MCP Model Evidence Tools](#mcp-model-evidence-tools)
-  * verifiedBy: [Existing Element Selection Verification](../../Verifications/ModelStructure/ElementSelectionVerifications.md#existing-element-selection-verification)
+  * definedBy: [MCP Worktree Opening and Inventory Specification](Specifications.md#mcp-worktree-opening-and-inventory-specification)
+  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---

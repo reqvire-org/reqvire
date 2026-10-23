@@ -22,14 +22,21 @@ Apply this workflow to engineering obligations. Cosmetic adjustments reuse exist
 This guide is split into domain-specific guides for better organization:
 
 - **[tests/CLAUDE.md](tests/CLAUDE.md)** - Guide for writing and executing end-to-end tests
-- **[explorer/DS.md](explorer/DS.md)** - Read before visual Explorer changes. Shared design-system components, product patterns, and tokens own sizing and layout constraints; application views consume their public APIs.
+- **Explorer UI** - Use the DS workflow skills for visual changes. The [local design-system guide](explorer/design-system/readme.md) records Reqvire conventions and source locations; component and pattern guides document their APIs and behavior.
 - **Core Development** (see sections below) - Guide for Rust code development, architecture, and components
 
 ## Building and Running Reqvire
 
+The optional Hermit environment pins the development tools. From the repository
+root, run `source bin/activate-hermit` then `hermit install`; see
+[Contributor setup](doc/README.md#development-quick-start) for full prerequisites.
+Commit only bootstrap/version selectors and package definitions. Downloaded
+packages stay in Hermit's user cache; `.hermit/`, build outputs and dependencies
+are Git-ignored.
+
 ### Basic cargo Commands
 - Build: `cargo build`
-- Run specific commands: `cargo run -- format` or `./target/debug/reqvire format`
+- Run inspection commands: `cargo run -- validate` or `./target/debug/reqvire lint`
 - Test: `cargo test`
 - Test specific: `cargo test <test_name>`
 - Lint: `cargo clippy -- -D warnings`
@@ -38,12 +45,14 @@ This guide is split into domain-specific guides for better organization:
 ### Development Commands
 
 **For working with specifications, use the Reqvire skills:**
-- `reqvire:syseng` - System and requirements engineering
-- `reqvire:task-master` - Task planning from requirement changes
+- `reqvire-syseng` - System and requirements engineering
+- `reqvire-audit` - Model quality, coverage, and change-impact review
+
+Shared packages live in `skills/`; task planning is part of `reqvire-syseng`.
 
 #### Essential Development Commands
 - **Validate**: `./target/debug/reqvire validate [--json]`
-- **Format**: `./target/debug/reqvire format [--fix]`
+- **Authoring and formatting**: typed MCP tools; start `./target/debug/reqvire mcp --enable-mutations`. `reqvire.format` previews by default; `fix: true` applies formatting. Successful authored-model mutations format affected documents automatically.
 - **Search**: `./target/debug/reqvire search [--json] [--short] [--filter-*]`
 - **Serve**: `./target/debug/reqvire serve --port 8080`
 

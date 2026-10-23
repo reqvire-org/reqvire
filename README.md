@@ -34,7 +34,23 @@ Use Reqvire to:
 
 ## Latest Changes
 
-Reqvire 1.0.0 is the first stable release. It formalizes the current model around ontologies, capabilities, requirements, semantic contracts, verification objectives, and concrete verification evidence.
+**Breaking change: model authoring now uses MCP.** Reqvire's typed MCP tools are
+the supported interface for creating and editing system models. Accepted
+mutations validate the candidate model and automatically persist canonical
+formatting. Start `reqvire mcp --enable-mutations` to enable authoring,
+formatting application, and safe lint repair.
+
+The CLI authoring commands `add`, `rm`, `mv`, `rename`, `merge`, `mv-file`,
+`mv-folder`, `link`, `unlink`, `relink`, `mv-asset`, and `rm-asset` have been
+removed, including their previews. CLI `format` moves to the MCP tool
+`reqvire.format`; CLI `lint --fix` moves to `reqvire.lint` with `fix: true`.
+Formatting preview and lint inspection are available through MCP in read-only
+mode; applying either requires mutations to be enabled.
+
+The CLI continues to provide validation, lint inspection, discovery, coverage,
+reports, exports, managed-query inspection, and server startup. Migration
+remains a **CLI-only operation** so incompatible models can be upgraded before
+the MCP server passes startup validation.
 
 For older workspaces, preview supported breaking model updates with:
 
@@ -43,7 +59,10 @@ reqvire migrate
 reqvire migrate --fix
 ```
 
-`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations such as legacy document header cleanup, verification-objective holder creation, contract relation cleanup, and legacy `Contract Bindings` heading migration to `Contract Bindings`.
+`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations
+such as legacy document header cleanup, verification-objective holder creation,
+contract relation cleanup, and migration of legacy contract section headings to
+`Contract Bindings`.
 
 ---
 
@@ -83,8 +102,49 @@ The effective workspace root is the path used for Reqvire identifiers and
 relative paths. It must contain at least one eligible Git worktree; files under
 the workspace but outside Git worktrees are ignored by model processing.
 
+### Multi-repository models
+
+Use a Central Git worktree with a **versioned Google Repo manifest** to combine
+its own model with declared component repositories. Runtime prerequisites are
+Git, Python 3 and an initialized Google Repo client. Install the `repo` launcher
+and explicitly run `repo init` and `repo sync` before using Reqvire. Track the
+selected manifest and includes in Central; keep `.repo/` and component checkout
+directories ignored by Central Git. All declared projects must be local, inside
+Central, at the selected revisions, and match their declared repository identity.
+Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
+
+```bash
+# From an already initialized and synced Central checkout
+reqvire validate                         # auto-select .repo/manifest.xml
+reqvire --manifest default.xml validate  # explicit Central manifest
+reqvire --manifest default.xml serve --enable-mcp --enable-mutations
+```
+
+CLI, MCP and Explorer share the combined model and Central-relative identifiers.
+Workspace `.reqvireignore` rules remain global; each repository's Git ignores
+apply to its own files. A selected manifest failure is an error, and Reqvire
+never fetches missing projects or revisions implicitly.
+
+MCP's existing `branch` argument selects Central's branch and manifest. Mutations
+save files in their owning repositories. Explicit commits save components first,
+pin their exact SHAs in Central's manifest, then commit Central. Optional GitHub
+publication pushes required component commits before Central. See the
+[User Guide](https://www.reqvire.org/user-guide) and
+[MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.
+
 The Explorer UI is embedded in release/npm binaries. Source builds are for
 development and must build the Explorer bundle before compiling Rust.
+
+---
+
+# Development setup
+
+An optional Hermit environment in `bin/` pins the Rust, Node, Bun, Python,
+ripgrep and Google Repo versions used for development. Activate it with
+`source bin/activate-hermit`, then run `hermit install` and `make build`.
+System Git, Make, a native linker and browser system libraries remain OS
+prerequisites. See [Contributor setup](doc/README.md#development-quick-start)
+for build, browser and multi-repository test instructions.
 
 ---
 
@@ -92,7 +152,7 @@ development and must build the Explorer bundle before compiling Rust.
 
 Reqvire exposes model context through an MCP server and ships setup assets for
 Claude Code and Codex. Full setup details live in the documentation:
-[https://www.reqvire.org/coding_assistants.html](https://www.reqvire.org/coding_assistants.html)
+[Coding Assistants](https://www.reqvire.org/coding-assistants)
 
 ## MCP Server
 
@@ -109,6 +169,18 @@ npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace mcp
 ```
 
 This exposes Reqvire engineering context to AI assistants through the Model Context Protocol (MCP).
+
+Model authoring is available through typed MCP tools only. Start the server with
+`--enable-mutations` for CRUD tools and their previews, formatting application,
+and safe lint repair. Successful authored-model mutations automatically persist
+canonical formatting. `reqvire.format` previews and `reqvire.lint` inspection
+remain available in read-only mode.
+
+The CLI retains validation, lint inspection, coverage, discovery, reports,
+exports, managed-query inspection, and server startup. `migrate` and
+`migrate --fix` remain CLI operations so incompatible source can be upgraded
+before validated MCP startup. CLI CRUD, `format` (including preview), and
+`lint --fix` have been removed; removed invocations fail before model loading.
 
 Reqvire MCP uses Streamable HTTP. Start the server with the command above, then point MCP clients at:
 
@@ -129,6 +201,35 @@ Example MCP client configuration:
 }
 ```
 
+Use `mcp --transport stdio` for a client that launches Reqvire locally. HTTP
+remains the default; `mcp --transport http` selects it explicitly. Stdio uses
+one Reqvire process for the selected project without a listening port:
+
+```json
+{
+  "mcpServers": {
+    "reqvire": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y", "@reqvire-org/reqvire@latest",
+        "--workspace", "/absolute/path/to/project",
+        "mcp", "--transport", "stdio"
+      ]
+    }
+  }
+}
+```
+
+Client configuration syntax varies; use the client's command/args form and an
+absolute workspace path when its launch directory is uncertain. Append
+`--enable-mutations` when authoring is required. Mutation
+startup still requires a clean, valid, exclusively owned Git worktree; commits
+remain a separate `--enable-commits` opt-in. HTTP listener and access options
+(`--host`, `--port`, `--allow-origin`, `--allow-host`) are rejected with stdio.
+Protocol messages use stdout and diagnostics use stderr. Closing stdin ends the
+server session, releases workers and locks, and preserves pending model work.
+
 The MCP server exposes tools, resources, and prompts. Prompt templates include
 regular Reqvire workflows such as model exploration, change planning, and
 verification coverage review, plus semantic workflows for vocabulary-driven
@@ -140,88 +241,65 @@ Enable mutation tools:
 reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ```
 
+After committing implementation or evidence changes outside MCP, call
+`reqvire.worktree.refresh_head` with the selected `branch`. It checks and
+guards the captured branch commit and reloads through normal validated loading
+without creating a commit; `dry_run: true` checks only. Changes to currently eligible
+model documents and their consumed semantic inputs require full validated admission
+instead. Ignore-file changes are allowed; current rules determine eligibility and
+the model loaded after refresh. Mutation-enabled
+Explorer uses HEAD mode on branch selection and provides **Refresh HEAD** for
+the selected context. Blocked refreshes retain the accepted view and identify
+the inputs or Git state that need attention.
+
+Tool contract version 3 uses exact local branch names for context-bound MCP
+tools and prompts, and percent-encoded `?branch=...` for MCP resources. Open an
+existing branch with `reqvire.worktree.open`, or create one with
+`reqvire.worktree.create`; use `from_branch` to select the source for a relative
+base. An optional branch may be omitted with one loaded context; multiple
+contexts require it. Branch names are the public interface. Opaque worktree IDs are private runtime/cache identity; public responses, picker, browser URLs and HTTP routes use branch names.
+Version 3 rejects the removed MCP ID selectors; inspect discovery and tool
+contract compatibility when upgrading an older client or build.
+
 ---
 
-## Claude Code
+## Assistant Skills
 
-The Reqvire Claude Code plugin is distributed through the reqvire-org plugin
-marketplace. Marketplace installation is the default Claude Code path:
-
-```text
-/plugin marketplace add https://github.com/reqvire-org/reqvire
-/plugin install reqvire@reqvire-org
-```
-
-For environments that use the local Claude skills folder directly:
+The shared packages in [`skills/`](./skills) work with Codex, Claude Code, and
+other agents supported by the [skills CLI](https://github.com/vercel-labs/skills).
+Install from the repository's **main branch**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-claude-skill.sh | bash
+npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills
 ```
 
----
-
-## Codex Skills
-
-This repository includes installable Codex skill packages for Reqvire model work:
-
-```text
-codex-skills/reqvire-syseng
-codex-skills/reqvire-audit
-codex-skills/reqvire-ontology-authoring
-codex-skills/reqvire-concept-authoring
-```
-
-Use `reqvire-syseng` for semantic engineering, capability, requirement,
-verification, traceability, migration, and general Reqvire CLI workflows.
-
-Use `reqvire-audit` for validation, linting, coverage, change-impact, and
-model-review evidence workflows.
-
-Use `reqvire-ontology-authoring` for ontology scoping, OWL/Turtle vocabulary,
-semantic contracts, structural-to-concept bridges, namespace decisions, and ontology
-refactoring.
-
-Use `reqvire-concept-authoring` for native concept-scheme and concept
-thesaurus authoring, SKOS terminology, concept taxonomies, labels, definitions,
-scope notes, examples, mappings, and concept references.
-
-The skills use the npm package directly:
+The installer prompts for skills and target agents. Installation is scoped to
+this project by default. To install all four skills globally for Codex and Claude Code:
 
 ```bash
-npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace validate
+npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills --agent codex claude-code --skill '*' --global
 ```
 
-To pin workflows to a specific Reqvire version:
+To install just one skill for a project:
 
 ```bash
-export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
+npx skills add https://github.com/reqvire-org/reqvire/tree/main/skills --agent codex --skill reqvire-syseng
 ```
 
-Install globally:
+- `reqvire-syseng`: capability, requirement, contract, verification, traceability, and MBSE workflows.
+- `reqvire-audit`: validation, linting, coverage, change impact, and model review.
+- `reqvire-ontology-authoring`: OWL/Turtle vocabulary, semantic contracts, namespaces, and ontology refactoring.
+- `reqvire-concept-authoring`: native SKOS schemes, concepts, mappings, and terminology.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install-codex-skill.sh | bash
-```
+Rerun the install command to refresh skills from main, then restart your assistant.
+The skills use the Reqvire npm runner and typed MCP tools; installing them does
+not install or start an MCP server. See [the shared skill guide](./doc/SKILLS.md)
+for local checkout installation and Reqvire version pinning.
 
-The installer uses `CODEX_HOME` if set, otherwise defaults to:
-
-```text
-~/.codex
-```
-
-Installed locations:
-
-```text
-$CODEX_HOME/skills/reqvire-syseng
-$CODEX_HOME/skills/reqvire-audit
-$CODEX_HOME/skills/reqvire-ontology-authoring
-$CODEX_HOME/skills/reqvire-concept-authoring
-```
-
-Restart Codex after installing or updating the skill.
-
-See:
-[doc/CODEX_SKILLS.md](./doc/CODEX_SKILLS.md)
+The Claude marketplace plugin and custom curl installers are deprecated. Existing
+plugin users should disable or uninstall the Reqvire plugin through Claude Code's
+`/plugin` manager, then install the shared skills with `--agent claude-code`.
+Shared skill names use the `reqvire-*` prefix.
 
 ---
 

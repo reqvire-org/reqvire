@@ -51,12 +51,12 @@ release = (root / ".github/workflows/release.yml").read_text()
 
 def workers(workflow, stale=False, fail=None):
     selected = [(name, cmd, block) for name, cmd, block in steps(workflow)
-                if "cargo test " in cmd or ("cargo build " in cmd and "--release" not in cmd)]
+                if "cargo test " in cmd or ("cargo build " in cmd and "--bin reqvire" in cmd)]
     with tempfile.TemporaryDirectory(prefix="reqvire-workflow-check-") as temp:
         folder = Path(temp)
         commands = folder / "commands"
         commands.mkdir()
-        target = folder / "target/debug"
+        target = folder / "target/release"
         target.mkdir(parents=True)
         executable = target / "reqvire"
         if stale:
@@ -69,11 +69,12 @@ echo "$1" >> "$TRACE"
 case "$1" in
   build)
     [[ "${FAIL_STAGE:-}" != build ]] || exit 7
-    printf '#!/bin/sh\\necho current-worker\\n' > target/debug/reqvire
-    chmod +x target/debug/reqvire
+    [[ "$*" == "build --release --locked --bin reqvire" ]]
+    printf '#!/bin/sh\\necho current-worker\\n' > target/release/reqvire
+    chmod +x target/release/reqvire
     ;;
   test)
-    [[ "$REQVIRE_TEST_BIN" == "$PWD/target/debug/reqvire" ]]
+    [[ "$REQVIRE_TEST_BIN" == "$PWD/target/release/reqvire" ]]
     [[ "$("$REQVIRE_TEST_BIN")" == current-worker ]]
     [[ "${FAIL_STAGE:-}" != test ]] || exit 9
     ;;
@@ -106,14 +107,22 @@ def policy():
     assert "needs: test" in validation, "validator does not depend on this run's build"
     assert "uses: actions/download-artifact@" in validation, "current compiled CLI is not consumed"
     assert pr.count("name: reqvire-pr-cli") == 2, "built and downloaded artifact names differ"
+    upload = pr.split("      - name: Share current CLI with model validation", 1)[1].split("      - name:", 1)[0]
+    assert "id: share_cli" in upload, "CLI upload does not expose its result"
+    assert "cli_artifact_id: ${{ steps.share_cli.outputs.artifact-id }}" in pr, "actual uploaded artifact is not exposed to dependents"
+    assert "if: ${{ !cancelled() && needs.test.outputs.cli_artifact_id != '' }}" in validation, "validation can run without an uploaded CLI or is suppressed by unrelated later test failures"
+    assert "path: target/release/reqvire" in upload, "optimized CLI is not uploaded"
+    assert "path: target/release" in validation, "optimized CLI is not downloaded to its expected path"
+    shell = next(block for name, _, block in steps(pr) if name == "Run shell end-to-end tests")
+    assert "REQVIRE_BIN: ${{ github.workspace }}/target/release/reqvire" in shell, "E2E does not use the optimized current CLI"
 
 
 def model_gate(invalid):
     command = next(cmd for name, cmd, _ in steps(pr) if name == "Validate Requirements via validate command")
-    assert "./target/debug/reqvire validate" in command, "validation must use current compiled binary"
+    assert "./target/release/reqvire validate" in command, "validation must use current optimized binary"
     with tempfile.TemporaryDirectory(prefix="reqvire-validation-gate-") as temp:
         folder = Path(temp)
-        target = folder / "target/debug"
+        target = folder / "target/release"
         target.mkdir(parents=True)
         (target / "reqvire").symlink_to(binary)
         content = (root / "tests/test-cache-integration/fixtures/model.md.txt").read_text()

@@ -15,16 +15,17 @@ use rmcp::{
         ListToolsResult, PaginatedRequestParams, Prompt, ReadResourceRequestParams,
         ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
     },
-    service::{MaybeSendFuture, RequestContext, RoleServer},
+    service::{MaybeSendFuture, QuitReason, RequestContext, RoleServer},
     transport::streamable_http_server::{
         session::local::LocalSessionManager, StreamableHttpServerConfig, StreamableHttpService,
     },
-    ErrorData as McpError,
+    ErrorData as McpError, ServiceExt,
 };
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::future::Future;
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::{RwLock, Semaphore};
 
 pub fn capacity_error() -> McpError {
@@ -356,7 +357,7 @@ impl ServerHandler for ReqvireMcpServer {
 /// RMCP's typed ReadResourceResult contains only `contents`, so converting a
 /// resource result to that type loses protocol-level `_meta`. Keep its normal
 /// dispatch for other methods and carry resource metadata in a raw result at
-/// the service boundary shared by standalone and embedded HTTP MCP.
+/// the service boundary shared by stdio, standalone HTTP and embedded HTTP MCP.
 #[derive(Clone)]
 struct ReqvireMcpTransport(ReqvireMcpServer);
 
@@ -399,13 +400,10 @@ impl rmcp::Service<RoleServer> for ReqvireMcpTransport {
         ServerHandler::get_info(&self.0)
     }
 }
-pub async fn serve_http(
+fn standalone_server(
     options: McpOptions<'_>,
     excluded_filename_patterns: &GlobSet,
-    host: &str,
-    port: u16,
-    http_access: &HttpAccess,
-) -> Result<(), ReqvireError> {
+) -> Result<ReqvireMcpServer, ReqvireError> {
     let McpOptions {
         enable_mutations,
         enable_commits,
@@ -427,10 +425,88 @@ pub async fn serve_http(
     } else {
         None
     };
-    let server = server_with_worktrees(worktrees, with_size_estimates, excluded_filename_patterns);
     if !enable_mutations {
         shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
     }
+    Ok(server_with_worktrees(
+        worktrees,
+        with_size_estimates,
+        excluded_filename_patterns,
+    ))
+}
+
+fn shutdown_signal() -> Result<impl Future<Output = ()>, ReqvireError> {
+    #[cfg(unix)]
+    {
+        use tokio::signal::unix::{signal, SignalKind};
+        let mut interrupt = signal(SignalKind::interrupt())?;
+        let mut terminate = signal(SignalKind::terminate())?;
+        Ok(async move {
+            tokio::select! {
+                _ = interrupt.recv() => {},
+                _ = terminate.recv() => {},
+            }
+        })
+    }
+    #[cfg(not(unix))]
+    {
+        Ok(async {
+            let _ = tokio::signal::ctrl_c().await;
+        })
+    }
+}
+
+pub async fn serve_stdio(
+    options: McpOptions<'_>,
+    excluded_filename_patterns: &GlobSet,
+) -> Result<(), ReqvireError> {
+    // Install signal handlers before startup and keep stdout exclusively for RMCP.
+    let shutdown = shutdown_signal()?;
+    tokio::pin!(shutdown);
+    let server = standalone_server(options, excluded_filename_patterns)?;
+    let worktrees = server.worktrees.clone();
+    let result = async {
+        let running = tokio::select! {
+            result = ReqvireMcpTransport(server).serve(rmcp::transport::stdio()) => {
+                result.map_err(|e| ReqvireError::ProcessError(format!("MCP stdio initialization error: {e}")))?
+            }
+            _ = &mut shutdown => return Ok(()),
+        };
+        let cancellation = running.cancellation_token();
+        let waiting = running.waiting();
+        tokio::pin!(waiting);
+        let reason = tokio::select! {
+            result = &mut waiting => result,
+            _ = &mut shutdown => {
+                cancellation.cancel();
+                tokio::time::timeout(Duration::from_secs(3), &mut waiting)
+                    .await
+                    .map_err(|_| ReqvireError::ProcessError("MCP stdio shutdown timed out".into()))?
+            }
+        }
+        .map_err(|e| ReqvireError::ProcessError(format!("MCP stdio service error: {e}")))?;
+        if let QuitReason::JoinError(error) = reason {
+            return Err(ReqvireError::ProcessError(format!("MCP stdio task error: {error}")));
+        }
+        Ok(())
+    }
+    .await;
+    // Blocking tool tasks can outlive RMCP cancellation. Stop all owned workers
+    // explicitly before main exits, releasing locks without altering Git state.
+    if let Some(worktrees) = worktrees {
+        worktrees.shutdown();
+    }
+    result
+}
+
+pub async fn serve_http(
+    options: McpOptions<'_>,
+    excluded_filename_patterns: &GlobSet,
+    host: &str,
+    port: u16,
+    http_access: &HttpAccess,
+) -> Result<(), ReqvireError> {
+    let server = standalone_server(options, excluded_filename_patterns)?;
 
     let listener = tokio::net::TcpListener::bind((listener_hostname(host), port))
         .await
@@ -674,7 +750,11 @@ fn handle_tool_call(
         && params.arguments.get("dry_run").and_then(Value::as_bool) == Some(true);
     let mut arguments = params.arguments;
     if prepared_preview {
-        arguments["dry_run"] = json!(false);
+        // Focused edits retain preview intent for their revision precondition
+        // and stage their own virtual writes under the active snapshot.
+        if params.name != "reqvire.update_element" {
+            arguments["dry_run"] = json!(false);
+        }
     }
     let outcome = registry
         .call_tool(&params.name, &arguments)
@@ -811,9 +891,18 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
         _ => ("reqvire_error", None),
     };
 
+    let mut message = err.to_string();
+    for diagnostic in err
+        .diagnostics()
+        .iter()
+        .filter(|diagnostic| !diagnostic.guidance.is_empty())
+    {
+        message.push('\n');
+        message.push_str(&diagnostic.to_string());
+    }
     let mut error = json!({
         "code": code,
-        "message": err.to_string(),
+        "message": message,
         "tool": tool_name,
         "recoverability": recoverability_hint(code),
         "related_errors": related_errors
@@ -825,25 +914,16 @@ fn reqvire_error(tool_name: &str, err: ReqvireError) -> Value {
 }
 
 fn diagnostic_to_value(diagnostic: &ValidationDiagnostic) -> Value {
-    let mut value = json!({
-        "code": diagnostic.code,
-        "message": diagnostic.message,
-    });
-    if let Some(context) = &diagnostic.context {
-        let mut ctx = serde_json::Map::new();
-        if let Some(file) = &context.file {
-            ctx.insert("file".to_string(), Value::String(file.clone()));
-        }
-        if let Some(line) = context.line {
-            ctx.insert("line".to_string(), Value::Number(line.into()));
-        }
-        if let Some(column) = context.column {
-            ctx.insert("column".to_string(), Value::Number(column.into()));
-        }
-        if let Some(element_id) = &context.element_id {
-            ctx.insert("element_id".to_string(), Value::String(element_id.clone()));
-        }
-        value["context"] = Value::Object(ctx);
+    let mut value =
+        serde_json::to_value(diagnostic).expect("validation diagnostic is serializable");
+    // Preserve the existing omission of absent source-context fields.
+    if let Some(context) = value.get_mut("context").and_then(Value::as_object_mut) {
+        context.retain(|_, value| !value.is_null());
+    } else {
+        value
+            .as_object_mut()
+            .expect("diagnostic object")
+            .remove("context");
     }
     value
 }

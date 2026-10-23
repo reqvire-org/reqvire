@@ -1,0 +1,30 @@
+[
+  {
+    "code": "model-element-link-in-prose",
+    "context": {
+      "element_id": "model/Source.md#prose-source",
+      "element_type": "requirement",
+      "file": "model/Source.md",
+      "line": 5
+    },
+    "guidance_present": true,
+    "target": {
+      "element_id": "model/Targets.md#target-specification",
+      "element_type": "specification"
+    }
+  },
+  {
+    "code": "model-element-link-in-prose",
+    "context": {
+      "element_id": "model/Source.md#prose-source",
+      "element_type": "requirement",
+      "file": "model/Source.md",
+      "line": 8
+    },
+    "guidance_present": true,
+    "target": {
+      "element_id": "model/Targets.md#target-concept",
+      "element_type": "concept"
+    }
+  }
+]

@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Shared black-box assertions, invoked by the existing owning E2E suites.
 
@@ -87,7 +88,7 @@ class Checks:
         self.results.append(f"{'PASS' if passed else 'FAIL'} {label}")
 
     def cli(self, root, binary, args, ok=True):
-        result = subprocess.run([binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
+        result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
         self.artifacts.append({"args": args, "exit": result.returncode,
                                "stdout": result.stdout, "stderr": result.stderr})
         require((result.returncode == 0) == ok,
@@ -183,7 +184,7 @@ def cli_reads(checks, root, binary, profile):
     def help_check():
         commands = [("semantic", "query", action, "--help") for action in ("list", "validate", "export", "check")] if profile == "queries" else [(profile, "--help")]
         for args in commands:
-            result = subprocess.run([binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
+            result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=root, text=True, capture_output=True, timeout=20)
             require(result.returncode == 0 and "name" in result.stdout.lower() and "identifier" in result.stdout.lower(),
                     "Selector help must advertise exact names and canonical identifiers: " + " ".join(args))
     checks.check("cli/" + profile + "/selector-help", help_check)
@@ -484,13 +485,13 @@ def mcp(checks, base, binary):
                 contexts = {}
                 def context_control():
                     inventory = server.tool("reqvire.worktree.list")["worktrees"]
-                    contexts["origin"] = next(row["worktree_id"] for row in inventory if row["original"])
-                    contexts["child"] = server.tool("reqvire.worktree.create", branch="selection-child", base_ref="HEAD")["worktree_id"]
+                    contexts["origin"] = next(row["branch"] for row in inventory if row["original"])
+                    contexts["child"] = server.tool("reqvire.worktree.create", branch="selection-child", base_ref="HEAD")["branch"]
                     parent = (TESTS / "fixtures/element-selection/Model.md").read_text().split("### Child Requirement\n", 1)[1].split("---", 1)[0]
                     content = "### Child Requirement\n" + parent.replace("preserve the selected subject", "provide distinct child context evidence")
-                    server.tool("reqvire.add_element", worktree_id=contexts["child"], file="Model.md", content=content, override_existing=True)
-                    a = server.tool("reqvire.read_element", worktree_id=contexts["origin"], identifier=identifier("Child Requirement"))
-                    b = server.tool("reqvire.read_element", worktree_id=contexts["child"], identifier=identifier("Child Requirement"))
+                    server.tool("reqvire.add_element", branch=contexts["child"], file="Model.md", content=content, override_existing=True)
+                    a = server.tool("reqvire.read_element", branch=contexts["origin"], identifier=identifier("Child Requirement"))
+                    b = server.tool("reqvire.read_element", branch=contexts["child"], identifier=identifier("Child Requirement"))
                     require(a["identifier"] == b["identifier"] and a["name"] == b["name"] and a["content"] != b["content"],
                             "Context control did not establish different accepted content at the same relative identifier")
                     contexts["expected"] = {"origin": a, "child": b}
@@ -498,16 +499,16 @@ def mcp(checks, base, binary):
                 for context in ("origin", "child"):
                     def context_selection(context=context):
                         expected = contexts["expected"][context]
-                        selected = server.tool("reqvire.read_element", worktree_id=contexts[context], name=identifier("Child Requirement"))
+                        selected = server.tool("reqvire.read_element", branch=contexts[context], name=identifier("Child Requirement"))
                         require(selected == expected, "Selection escaped its requested context")
                     checks.check(prefix + "/two-context/" + context + "/identifier-parity", context_selection)
                 def foreign_context():
                     content = "### Context Only\n\nA child-context capability.\n\n#### Metadata\n  * type: capability\n"
-                    server.tool("reqvire.add_element", worktree_id=contexts["child"], file="Model.md", content=content)
-                    before = server.tool("reqvire.model_revision", worktree_id=contexts["origin"])
-                    result = server.raw_tool("reqvire.read_element", worktree_id=contexts["origin"], name=identifier("Context Only"))
+                    server.tool("reqvire.add_element", branch=contexts["child"], file="Model.md", content=content)
+                    before = server.tool("reqvire.model_revision", branch=contexts["origin"])
+                    result = server.raw_tool("reqvire.read_element", branch=contexts["origin"], name=identifier("Context Only"))
                     error_result(result, "reqvire.read_element", identifier("Context Only"))
-                    require(server.tool("reqvire.model_revision", worktree_id=contexts["origin"]) == before, "Foreign selector changed the origin snapshot")
+                    require(server.tool("reqvire.model_revision", branch=contexts["origin"]) == before, "Foreign selector changed the origin snapshot")
                 checks.check(prefix + "/foreign-context-identifier-rejected", foreign_context)
     for mode in ("mcp", "serve"):
         root = base / (mode + "-readonly-fixture")

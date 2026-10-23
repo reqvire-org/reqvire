@@ -4,6 +4,8 @@
 
 This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently, and reuses completed model builds with correct source freshness and publication.
 
+Manifest-defined workspace acceptance includes real Repo/local-Git fixtures proving complete declared-project discovery, workspace-relative ownership and source parity, plus precise rejection of unavailable or escaping selections.
+
 #### Metadata
   * type: verification-objective
 
@@ -17,6 +19,32 @@ This objective groups verification that Reqvire parses element structure, subsec
   * derive: [Non-Reserved Subsections Content Test](#non-reserved-subsections-content-test)
   * derive: [Requirement Governance Metadata Verification](#requirement-governance-metadata-verification)
   * derive: [Specification File Identification Test](#specification-file-identification-test)
+---
+
+### Canonical Graph Storage Verification
+
+Verify bounded canonical graph storage, current target resolution, and isolation of mutation candidates while preserving change-impact report behavior.
+
+#### Details
+- Rebuild cyclic and reconvergent helper graphs repeatedly, including size-estimate rebuilding and reversed registration order. Count serialized canonical element payloads and adjacency edges; counts remain equal to the fixture's vertices and retained edges without nested target payloads.
+- Normalize relative identifiers and propagate inverse relations before building adjacency. Repeating relation-context preparation produces the same edges and retains authored/generated relation provenance.
+- Clone an accepted graph, then edit, rename, move, relink, and remove candidate targets. Assert current target content and locations in reports, preserved report JSON fields and cycle guards, and unchanged accepted graph data.
+- Run the existing change-impact and CRUD E2E golden comparisons for capability and contract propagation, element relocation, relation consistency, relinking, and cross-file moves.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
+  * satisfiedBy: [test.sh](../../../tests/test-capability-change-impact/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-contract-bindings/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-detection/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-change-impact-element-relocation/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-crud-relation-consistency/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-mv-cross-file-relation-integrity/test.sh)
+  * satisfiedBy: [test.sh](../../../tests/test-relink-command/test.sh)
+  * verify: [Canonical Graph Storage](../../ModelStructure/ModelManagement.md#canonical-graph-storage)
 ---
 
 ### Contract Element Type Parsing Test
@@ -78,32 +106,6 @@ This test verifies that the system rejects Contract elements that include a Rela
   * verify: [Contract Element Structure Constraints](../../ModelStructure/ModelManagement.md#contract-element-structure-constraints)
 ---
 
-### Canonical Graph Storage Verification
-
-Verify bounded canonical graph storage, current target resolution, and isolation of mutation candidates while preserving change-impact report behavior.
-
-#### Details
-- Rebuild cyclic and reconvergent helper graphs repeatedly, including size-estimate rebuilding and reversed registration order. Count serialized canonical element payloads and adjacency edges; counts remain equal to the fixture's vertices and retained edges without nested target payloads.
-- Normalize relative identifiers and propagate inverse relations before building adjacency. Repeating relation-context preparation produces the same edges and retains authored/generated relation provenance.
-- Clone an accepted graph, then edit, rename, move, relink, and remove candidate targets. Assert current target content and locations in reports, preserved report JSON fields and cycle guards, and unchanged accepted graph data.
-- Run the existing change-impact and CRUD E2E golden comparisons for capability and contract propagation, element relocation, relation consistency, relinking, and cross-file moves.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
-  * verify: [Canonical Graph Storage](../../ModelStructure/ModelManagement.md#canonical-graph-storage)
-  * satisfiedBy: [graph_registry.rs](../../../crates/reqvire-core/src/graph_registry.rs)
-  * satisfiedBy: [test.sh](../../../tests/test-capability-change-impact/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-change-impact-contract-bindings/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-change-impact-detection/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-change-impact-element-relocation/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-crud-relation-consistency/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-relink-command/test.sh)
-  * satisfiedBy: [test.sh](../../../tests/test-mv-cross-file-relation-integrity/test.sh)
----
-
 ### Element Size Estimate Model Build Verification
 
 This verification shall prove that element size estimates are computed only when model building explicitly enables them.
@@ -126,73 +128,17 @@ Expected checks:
 
 ### Element Subsection Parsing Test
 
-This test verifies that the system correctly extracts and parses element subsections (Metadata, Relations, Details) and element content from markdown documents.
+Verify parsing of ordinary element prose and structured declarations through current search output.
 
 #### Details
+The linked parsing fixture establishes:
+- Names and fragments normalize according to the element identity rules, and relation targets resolve with normalized fragments.
+- Explicit type metadata is parsed and omitted type metadata defaults to requirement. The fixture exercises representative types rather than every native element family.
+- Search JSON groups records under `files`, with an `elements` array for each source file. Element records expose their canonical `identifier`, name, type, content and relation data through the search contract.
+- Metadata and Relations declarations are parsed separately from prose and their headers are absent from element `content`.
+- Main description and the authored `#### Details` heading/body remain in `content`; there is no separate `details` field. Multi-paragraph Details text is preserved.
 
-##### Acceptance Criteria
-**Subsection Extraction:**
-- System shall identify and extract Metadata subsection (level 4 heading)
-- System shall identify and extract Relations subsection (level 4 heading)
-- System shall identify and extract Details subsection (level 4 heading) when present
-- System shall parse element content (text before first subsection)
-- System shall exclude subsection headers and content from main element content
-
-**Metadata Parsing:**
-- System shall extract element type from `* type:` metadata entry
-- System shall support all element types: capability, requirement, ontology, semantic-contract, verification, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, constraint, behavior, specification, state, input-output, other
-- System shall assign default type 'requirement' when no type metadata present
-
-**Relations Parsing:**
-- System shall extract relation type (derivedFrom, verifiedBy, verify, satisfiedBy)
-- System shall extract relation target (element identifier with file path and fragment)
-- System shall normalize target fragment identifiers
-- System shall support multiple relations of same or different types
-- System shall validate relation targets exist in model
-
-**Content Extraction:**
-- System shall extract element description text before subsections
-- System shall preserve markdown formatting in content
-- System shall NOT include subsection headers in content
-- System shall NOT include subsection body text in content
-
-**Details Subsection:**
-- System shall extract Details subsection content when present
-- System shall preserve multi-paragraph Details content
-- System shall store Details separately from main content
-
-##### Test Criteria
-1. **Metadata subsection parsing:**
-   - Create elements with various element types in Metadata
-   - Query model via JSON output
-   - Verify `element_type` field matches metadata
-   - Test all supported element types
-
-2. **Relations subsection parsing:**
-   - Create elements with multiple relations
-   - Query model via JSON output
-   - Verify `relations` array contains all relations
-   - Verify each relation has `relation_type` and `target` fields
-   - Verify target fragments are normalized
-
-3. **Content extraction:**
-   - Create element with description text before subsections
-   - Query model via JSON output
-   - Verify `content` field contains description
-   - Verify content does NOT include subsection headers
-   - Verify content does NOT include metadata or relations
-
-4. **Details subsection parsing:**
-   - Create element with Details subsection
-   - Query model via JSON output
-   - Verify `details` field is populated
-   - Verify details content is separate from main content
-   - Test multi-paragraph details
-
-5. **JSON structure validation:**
-   - Verify JSON output contains `elements` array
-   - Verify each element has required fields: `element_id`, `name`, `file_path`, `section`, `element_type`, `content`
-   - Verify optional fields present when applicable: `details`, `relations`, `metadata`
+Contract dependency, native concept, ontology, Shapes and Query/Produces declarations have separate focused verification evidence. This fixture does not claim exhaustive native-type or declaration validation, a flat `elements` root, section-container fields, or exclusion of prose subsections.
 
 #### Metadata
   * type: test-verification
@@ -216,7 +162,7 @@ Verify that literal Markdown examples in fenced code cannot alter model structur
 - Real metadata and relations following a closing fence are parsed, and later elements remain addressable.
 - Closing fences require the same delimiter, at least the opening length, and no trailing non-whitespace text. Shorter fences and backtick runs with trailing text cannot end the block.
 - File parsing and single-element add/override parsing produce the same element type, relations and retained code content.
-- Running `format --fix` on every fence example preserves the fenced code byte-for-byte, retains actual element types and relations, and produces a model that validates successfully.
+- Applying the shared formatter to every fence example preserves the fenced code byte-for-byte, retains actual element types and relations, and produces a model that validates successfully.
 - Reserved-subsection discovery still finds actual ontology/query blocks after list-fenced examples and retains their language, source line and exported bytes.
 - The RED reproduction uses three list-introduced fences with irregular indentation, followed by a referenced element; validation succeeds and every following element is discovered.
 
@@ -224,9 +170,11 @@ Verify that literal Markdown examples in fenced code cannot alter model structur
 1. Validate a bare-fence control containing fake headings, metadata and relations, then assert only the authored real elements and relations are reported.
 2. Repeat for unordered markers, ordered markers, nested lists and the three-fence RED pattern; require successful validation and exact expected element names/types.
 3. Exercise longer delimiters, shorter apparent closers and trailing-text apparent closers; assert normal parsing resumes only at the matching closing fence.
-4. Add an element containing list-fenced examples through the CLI, then override it; verify retained code content, type and relations through JSON output.
+4. Exercise shared create and override parsing with an element containing list-fenced examples; verify retained code content, type and relations through JSON output.
 5. Put list-fenced examples before real Ontology and Query subsections; verify successful semantic validation, source locations and exact query export.
-6. Run `format --fix` for each fence example, compare the resulting code block against its original bytes with `diff -u`, then validate and inspect the formatted model.
+6. Apply the shared formatter to each fence example, compare the resulting code block against its original bytes with `diff -u`, then validate and inspect the formatted model.
+
+The current CLI regression harness exercises the shared parser, mutation parser and formatter. Its evidence establishes those core behaviors; MCP creation/override and formatting acceptance remain in the corresponding protocol plans, pending executable harness migration.
 
 #### Metadata
   * type: test-verification
@@ -425,14 +373,14 @@ Regression execution passes for coordinated construction, superseded publication
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
   * satisfiedBy: [mcp_cache_tests.rs](../../../crates/reqvire-cli/src/mcp_cache_tests.rs)
   * satisfiedBy: [mcp_session_tests.rs](../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * satisfiedBy: [model_cache_tests.rs](../../../crates/reqvire-core/src/model_cache_tests.rs)
+  * satisfiedBy: [semantic_store.rs](../../../crates/reqvire-core/src/semantic_store.rs)
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---
 
 ### Non-Reserved Subsections Content Test
 
-This test verifies that non-reserved subsections (subsections other than Relations, Details, Metadata, Contract Bindings) are correctly included in the element's content field.
+This test verifies that ordinary authored prose subsections, distinguished from declaration-only Metadata, Relations, Contract Bindings and Contract References are correctly included in the element's content field.
 
 #### Details
 
@@ -444,12 +392,8 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 - Non-reserved subsections shall behave like `#### Details` (content goes into element's content field)
 
 **Reserved Subsection Behavior:**
-- Reserved subsections (Relations, Metadata, Contract Bindings) shall NOT be included in element content
+- Declaration-only subsections (Relations, Metadata, Contract Bindings and Contract References) shall NOT be included in element content; structured semantic payload sections follow their type-specific contracts
 - `#### Details` subsection header and its content shall be included in element content
-
-**Format Command:**
-- Format command shall preserve non-reserved subsections within their parent element
-- Format command shall NOT move non-reserved subsection content to page level
 
 ##### Test Criteria
 1. **Non-reserved subsection parsing:**
@@ -462,11 +406,7 @@ This test verifies that non-reserved subsections (subsections other than Relatio
    - Run reqvire search --json
    - Verify page_content does NOT contain non-reserved subsection content
 
-3. **Format preservation:**
-   - Run reqvire format on file with non-reserved subsections
-   - Verify format does not propose moving subsection content to page level
-   - Run reqvire format --fix
-   - Verify subsections remain under their parent element
+The search fixture and expected output establish parsing and content placement. Formatting preservation is covered by the formatting acceptance plan; this search-only evidence does not establish MCP formatting behavior.
 
 #### Metadata
   * type: test-verification
@@ -474,6 +414,29 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-search-all-capabilities/test.sh)
   * verify: [Reserved Subsections Support](../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
+---
+
+### Repo Manifest Workspace Source Verification
+
+Verify the manifest-defined source boundary through real initialized Repo clients and local Git remotes.
+
+#### Details
+- Run `mcp/complete-declared-snapshot` and `serve/complete-declared-snapshot`: CLI and mutation-enabled MCP return the same Central and declared component elements, including a Central requirement's component contract reference and the workspace-relative component identifier.
+- Run the CLI manifest cases: explicit `--manifest default.xml` selects the same complete model; an invalid or missing selected manifest is rejected with its path. The explicit case also resolves a Central-only include and extend-project selection without substituting the separate manifest checkout, accepts a different checkout remote alias and verifies relative fetch and equivalent SSH URL identities. Initialized Repo discovery rejects duplicate, overlapping or escaping project paths, unavailable commits, missing checkouts, symlink escapes and foreign remote identities without changing inputs or Git state. A nested Git repository absent from the manifest does not contribute model elements.
+- The suite requires the real Repo launcher and a local git-repo source checkout through `REQVIRE_TEST_REPO_SOURCE`. Repo initialization/synchronization uses only local fixture remotes. The optional Hermit development environment supplies the launcher and pinned source with a local bootstrap ref. Missing dependencies fail fixture preparation; they do not count as successful feature rejection.
+- Compare the committed expected outcome file with the accumulated case outcomes. Every expected outcome is PASS; a failed source admission or a missing selector remains a failing acceptance case.
+- Within the existing explicit-manifest case, count real Python Repo-resolver launches for CLI validation with one and then 64 distinct file evidence references. Require a nonzero and identical count of Repo manifest-resolution processes, and successful target validation in both runs. Each subsequent invocation still rejects a missing selected manifest or invalid project selection; reuse does not outlive the validation pass.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [check_repo_workspaces.py](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
+  * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)
+  * verify: [CLI Repo Manifest Selection](../../Interfaces/CLI/RepoWorkspaces.md#cli-repo-manifest-selection)
+  * verify: [Manifest-Defined Workspace Scope](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope)
 ---
 
 ### Requirement Governance Metadata Verification

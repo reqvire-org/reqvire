@@ -151,7 +151,7 @@ fi
 
 cp "$TEST_DIR/specifications/ConceptReferences.md" /tmp/concept-references-before-delete.md
 set +e
-DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Service Endpoint" 2>&1)
+DELETE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Service Endpoint" 2>&1)
 DELETE_EXIT=$?
 set -e
 if [ $DELETE_EXIT -eq 0 ]; then
@@ -173,7 +173,7 @@ do
   fi
 done
 if ! diff -u /tmp/concept-references-before-delete.md "$TEST_DIR/specifications/ConceptReferences.md"; then
-  echo "FAILED: failed ontology delete should not persist file changes"
+  echo "FAILED: failed native concept delete should not persist file changes"
   exit 1
 fi
 

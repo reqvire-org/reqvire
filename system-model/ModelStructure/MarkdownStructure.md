@@ -10,115 +10,80 @@
 
 # Markdown Structure Specification
 
-## Elements in Markdown Documents
+## Supported Document Forms
 
-An **Element** is a uniquely identifiable system element within a Markdown document. It starts with a `###` header and includes all content under that header until the next header of the same or higher hierarchy.
+The first H1 selects the document grammar. A multi-element document starts with `# Elements`; a single-element document starts with `# Element`. Headings inside fenced code are literal content in either form.
 
-### Structure of an Element
+### Multi-Element Documents
 
-1. **Element Header**
-  - The `###` header defines the start of an element.
-  - The text of the `###` header serves as the **element name**.
-  - The element name must be globally unique to ensure unambiguous references.
+- Each element starts with a nonempty `### <Element Name>` heading.
+- Its content extends to the next structural heading of the same or higher level, or the end of the document.
+- Reserved element subsections use H4 headings, such as `#### Metadata`, `#### Relations`, and `#### Details`, subject to element-type applicability.
+- Ordinary H2 page sections organize source text without creating graph elements or changing logical ownership. Core placement indices count elements across the file.
+- Formatting preserves page content and document form while normalizing element spacing and separators.
 
-2. **Element Content**
-  - The element includes all content under the `###` header until:
-    - The next `###` header, or
-    - A higher-level header (`##`, `#`), or
-    - The end of the document.
-  - The content can include:
-    - Text
-    - Subheaders (e.g., `####`)
-    - Bullet points, code blocks, tables, etc.
-
-
-## Rules for Elements
-
-1. **Header Format**:
-   - An element must start with a `###` header.
-   - The `###` header text must not be empty.
-
-2. **Global Uniqueness**:
-   - Element names must be globally unique across all files in the model.
-   - Element names serve as stable IDs for element identity independent of file location.
-   - File location is the only containment property tracked by the system.
-
-3. **Nested Subheaders**:
-   - Subheaders within an element defined with `####` header are part of the same element and do not create new elements.
-
-4. **No Overlapping Content**:
-   - Content in an element belongs exclusively to that element and cannot overlap with another.
-
-## Section Headers (H2) - Not Tracked
-
-Section headers (`## Header`) may exist in markdown documents for visual organization but are **not tracked** by the system:
-- The parser ignores `##` headers during model construction
-- Elements are indexed by their position within the file, not within sections
-- When writing/formatting files, existing `##` headers are preserved but not managed
-- The `--index` parameter in CLI commands refers to element position in the entire file
-
-### Examples of Elements
-
-Single Element:
 ```markdown
-### My Element
+# Elements
 
-This is the content of My Element.
+### Example Model
 
-#### Subsection
-Additional details about My Element.
+Ability to describe an example system.
+
+#### Metadata
+  * type: capability
+
+---
+
+### Example Requirement
+
+The system SHALL provide the example behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Example Model](#example-model)
 ```
 
-Multiple Elements:
+### Single-Element Documents
+
+- The file contains exactly one named element.
+- `## Metadata` supplies its type and other permitted metadata; `## Relations` supplies optional structural declarations.
+- A dynamic `## <Actual Element Name>` section supplies the element name and body. H2 sections are structural in this document form.
+- The named body may contain arbitrary Markdown headings. They remain content of the single element rather than creating siblings.
+- Formatting retains the H2 metadata, relation and named-body layout; it does not convert the element to an H3 collection entry.
+
 ```markdown
-### Element One
+# Element
 
-This is the content of Element One.
+## Metadata
+  * type: specification
 
-### Element Two
+## Relations
+  * define: [Example Requirement](Requirements.md#example-requirement)
 
-This is the content of Element Two.
+## Example Behavior Specification
+
+Definition of the example behavior.
+
+### Payload
+
+Detailed payload content remains part of this specification.
 ```
 
-Nested Subheaders:
-```markdown
-### Main Element
-This is the main element content.
+## Names, Identity and Addressing
 
-#### Subsection
-Details about the subsection.
+- Element names are globally unique across the effective model scope.
+- The element ID is derived from its name; the canonical identifier combines its workspace-relative file path and normalized name fragment.
+- Relocation changes addressing while retaining the name-derived identity. Source folders and files describe containment rather than logical capability or requirement ownership.
+- Empty names, duplicate names, incompatible relations and invalid reserved subsections are rejected according to the shared model rules.
 
-#### Another Subsection
-More details about another subsection.
-```
+## Element Content and Reserved Subsections
 
-### Invalid Cases
+Body text and permitted non-reserved subsections carry readable domain prose. Reserved subsections carry structured metadata, relations, contract dependencies, concept references, ontology, shapes or query content according to the element type.
 
-Element headers empty:
-```
-###
-```
+In a multi-element document, each reserved H4 subsection occurs at most once within an element and ends at the next subsection or structural element boundary. Single-element metadata and relations use the H2 layout above; the named body retains its own Markdown content.
 
-Headers not unique within the model:
-```markdown
-### Duplicate
-Content of the first duplicate.
+Requirements contain obligations and intent-level clarification; requirement-owned contracts contain precise definitions and interface behavior. Capabilities describe abilities. Concepts define terminology, ontology defines structural meaning, and semantic contracts contain reusable SHACL checks.
 
-### Duplicate
-Content of the second duplicate.
-```
-
-## Subsections in Markdown documents
-
-An element may contain different **Subsections**, some of which are strictly defined, while others allow free-form content.
-- **Reserved Subsections**: These subsections follow a predefined structure and behavior.
-- **Other Subsections**: These allow additional descriptive or supporting information.
-
-Subsections starts with the `#### Subsection Name` and ends either with new element or next subsection.
-Subsection must be located **within an element chunk**.
-
-The `#### ` header marks the beginning of the subsection.
-It must appear directly within an element chunk, **following** the `###` header of the parent element and any preceding content, including previous subsections.
-Each element chunk can have **at most one** `#### SubsectionName` subsection where 'SubsectionName' is a unique name of the subsection within an element.
-
-Some subsections are **reserved** with predefined structure and behavior, while others allow free-form content. The specific reserved subsections are defined separately as capabilities of the system.
+Readable prose does not hyperlink to model elements. Declare dependencies on responsible requirements with Contract Bindings or Contract References, and bind terminology through permitted Concept References. Literal code examples retain their authored links and headings as content.

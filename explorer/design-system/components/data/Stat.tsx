@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
 const baseUX = css`
@@ -43,9 +43,9 @@ const baseUXRow = css`
   gap: var(--ds-statrow-gap, var(--space-3) var(--space-8));
 `;
 
-export type StatProps = Omit<HTMLAttributes<HTMLSpanElement>, "style"> & {
-  label: ReactNode;
-  value: ReactNode;
+export type StatProps = Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> & {
+  label: ComponentChildren;
+  value: ComponentChildren;
   stacked?: boolean;
 };
 
@@ -73,7 +73,7 @@ export function Stat({
   );
 }
 
-export type StatRowProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & { children: ReactNode };
+export type StatRowProps = Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> & { children: ComponentChildren };
 
 export function StatRow({
   children,

@@ -1,0 +1,34 @@
+# Elements
+
+### Component Capability
+
+Provide component behavior.
+
+#### Metadata
+  * type: capability
+---
+
+### Component Requirement
+
+The system SHALL expose the selected component behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Updated Shared Specification](../../Model.md#updated-shared-specification)
+
+#### Relations
+  * specify: [Component Capability](#component-capability)
+---
+
+### Component Specification
+
+The selected component behavior is alpha.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Component Requirement](#component-requirement)
+---

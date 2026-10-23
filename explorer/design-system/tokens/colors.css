@@ -13,6 +13,9 @@
 
 @layer base {
   :root {
+    --color-showcase-canvas: #fafafa;
+    --color-showcase-ink: #444444;
+    --color-showcase-border: #dddddd;
     /* ── oklch runtime primitives ─────────────────────────────────
        Mirrors @theme but as real CSS custom properties so
        getPropertyValue() and color-mix() in CSS can read them.   */
@@ -34,7 +37,7 @@
     --color-slate-950: oklch(17.74% 0.0178 263.96);
 
     /* Warm surfaces */
-    --color-warm-0:   oklch(100% 0 0);
+    --color-warm-0:   var(--color-slate-0);
     --color-warm-25:  oklch(98.5% 0.0041 91.45);
     --color-warm-50:  oklch(97.33% 0.007 88.64);
     --color-warm-100: oklch(95.8% 0.0083 91.48);
@@ -51,6 +54,9 @@
     --color-rose-600: oklch(58.58% 0.222 17.58);
     --color-rose-700: oklch(51.43% 0.1978 16.93);
     --color-rose-800: oklch(45.46% 0.1713 13.7);
+
+    /* Shared red paint for status and shape roles. */
+    --color-red-600: oklch(57.71% 0.2152 27.33);
 
     /* Element type solid fills */
     --color-capability:  oklch(88.48% 0.0546 243.39);
@@ -76,15 +82,15 @@
     --color-rdf-datatype:    oklch(74.73% 0.1295 81.69);
     --color-rdf-restriction: oklch(86.9%  0.0198 252.89);
     --color-rdf-classexpr:   oklch(92.88% 0.0126 255.51);
-    --color-rdf-nodeshape:   oklch(57.71% 0.2152 27.33);
-    --color-rdf-propshape:   oklch(51.43% 0.1978 16.93);
+    --color-rdf-nodeshape:   var(--color-red-600);
+    --color-rdf-propshape:   var(--color-rose-700);
     --color-rdf-resource:    oklch(70.38% 0.123  182.5);
-    --color-rdf-shacl:       oklch(63.68% 0.2078 25.33);
+    --color-rdf-shacl:       var(--color-semantic-contract);
 
     /* Status */
     --color-success: oklch(61.41% 0.1485 152.91);
     --color-warning: oklch(76.52% 0.1552 84.7);
-    --color-danger:  oklch(57.71% 0.2152 27.33);
+    --color-danger:  var(--color-red-600);
     --color-info:    oklch(65.18% 0.1809 253.92);
 
     /* Edge */
@@ -127,7 +133,7 @@
     --slate-900: #161d27;
     --slate-950: #0d1119;
 
-    --warm-0:   #ffffff;
+    --warm-0:   var(--slate-0);
     --warm-25:  #fbfaf7;
     --warm-50:  #f8f6f1;
     --warm-100: #f3f1eb;
@@ -151,80 +157,80 @@
        Tints:        auto-derived from solid + bg-surface;
                      no -tint-d needed, dark mode adapts via bg-surface. */
 
-    --capability:     var(--color-capability);
-    --capability-ink: #1565c0;
-    --capability-tint: color-mix(in oklch, var(--capability) 15%, var(--bg-surface));
+    --color-role-capability:     var(--color-capability);
+    --color-role-capability-ink: #1565c0;
+    --color-role-capability-tint: color-mix(in oklch, var(--color-role-capability) 15%, var(--bg-surface));
 
-    --requirement:     var(--color-requirement);
-    --requirement-ink: #512da8;
-    --requirement-tint: color-mix(in oklch, var(--requirement) 15%, var(--bg-surface));
+    --color-role-requirement:     var(--color-requirement);
+    --color-role-requirement-ink: #512da8;
+    --color-role-requirement-tint: color-mix(in oklch, var(--color-role-requirement) 15%, var(--bg-surface));
 
-    --contract:     var(--color-contract);
-    --contract-ink: #e65100;
-    --contract-tint: color-mix(in oklch, var(--contract) 15%, var(--bg-surface));
+    --color-role-contract:     var(--color-contract);
+    --color-role-contract-ink: #e65100;
+    --color-role-contract-tint: color-mix(in oklch, var(--color-role-contract) 15%, var(--bg-surface));
 
-    --semantic-contract:     var(--color-semantic-contract);
-    --semantic-contract-ink: #b71c1c;
-    --semantic-contract-tint: color-mix(in oklch, var(--semantic-contract) 15%, var(--bg-surface));
+    --color-role-semantic-contract:     var(--color-semantic-contract);
+    --color-role-semantic-contract-ink: #b71c1c;
+    --color-role-semantic-contract-tint: color-mix(in oklch, var(--color-role-semantic-contract) 15%, var(--bg-surface));
 
-    --verification:     var(--color-verification);
-    --verification-ink: #2e7d32;
-    --verification-tint: color-mix(in oklch, var(--verification) 15%, var(--bg-surface));
+    --color-role-verification:     var(--color-verification);
+    --color-role-verification-ink: #2e7d32;
+    --color-role-verification-tint: color-mix(in oklch, var(--color-role-verification) 15%, var(--bg-surface));
     /* Same verification hue; tonal segments distinguish report subtypes. */
-    --verification-type-test: var(--verification);
-    --verification-type-formal-proof: color-mix(in oklch, var(--verification) 75%, var(--text-strong));
-    --verification-type-analysis: color-mix(in oklch, var(--verification) 45%, var(--text-strong));
-    --verification-type-inspection: color-mix(in oklch, var(--verification) 70%, var(--bg-surface));
-    --verification-type-demonstration: color-mix(in oklch, var(--verification) 45%, var(--bg-surface));
-    --verification-objective:     var(--color-verification-objective);
-    --verification-objective-ink: #0b3d12;
-    --verification-objective-tint: color-mix(in oklch, var(--verification-objective) 15%, var(--bg-surface));
+    --color-role-verification-type-test: var(--color-role-verification);
+    --color-role-verification-type-formal-proof: color-mix(in oklch, var(--color-role-verification) 75%, var(--text-strong));
+    --color-role-verification-type-analysis: color-mix(in oklch, var(--color-role-verification) 45%, var(--text-strong));
+    --color-role-verification-type-inspection: color-mix(in oklch, var(--color-role-verification) 70%, var(--bg-surface));
+    --color-role-verification-type-demonstration: color-mix(in oklch, var(--color-role-verification) 45%, var(--bg-surface));
+    --color-role-verification-objective:     var(--color-verification-objective);
+    --color-role-verification-objective-ink: #0b3d12;
+    --color-role-verification-objective-tint: color-mix(in oklch, var(--color-role-verification-objective) 15%, var(--bg-surface));
 
-    --ontology:     var(--color-ontology);
-    --ontology-ink: #6f5600;
-    --ontology-tint: color-mix(in oklch, var(--ontology) 15%, var(--bg-surface));
+    --color-role-ontology:     var(--color-ontology);
+    --color-role-ontology-ink: #6f5600;
+    --color-role-ontology-tint: color-mix(in oklch, var(--color-role-ontology) 15%, var(--bg-surface));
 
-    --concept:     var(--color-rdf-concept);
-    --concept-ink: var(--ontology-ink);
-    --concept-tint: color-mix(in oklch, var(--concept) 18%, var(--bg-surface));
-    --concept-scheme:     var(--color-rdf-concept-scheme);
-    --concept-scheme-ink: var(--ontology-ink);
-    --concept-scheme-tint: color-mix(in oklch, var(--concept-scheme) 18%, var(--bg-surface));
-    --thesaurus-map-scheme-node-bg: color-mix(in oklch, var(--concept-scheme) 12%, var(--bg-surface));
+    --color-role-concept:     var(--color-rdf-concept);
+    --color-role-concept-ink: var(--color-role-ontology-ink);
+    --color-role-concept-tint: color-mix(in oklch, var(--color-role-concept) 18%, var(--bg-surface));
+    --color-role-concept-scheme:     var(--color-rdf-concept-scheme);
+    --color-role-concept-scheme-ink: var(--color-role-ontology-ink);
+    --color-role-concept-scheme-tint: color-mix(in oklch, var(--color-role-concept-scheme) 18%, var(--bg-surface));
+    --color-role-thesaurus-map-scheme-node-bg: color-mix(in oklch, var(--color-role-concept-scheme) 12%, var(--bg-surface));
 
-    --resource:     var(--color-resource);
-    --resource-ink: #8d6e00;
-    --resource-tint: color-mix(in oklch, var(--resource) 15%, var(--bg-surface));
+    --color-role-resource:     var(--color-resource);
+    --color-role-resource-ink: #8d6e00;
+    --color-role-resource-tint: color-mix(in oklch, var(--color-role-resource) 15%, var(--bg-surface));
 
-    --other:     var(--color-other);
-    --other-ink: #616161;
-    --other-tint: color-mix(in oklch, var(--other) 15%, var(--bg-surface));
+    --color-role-other:     var(--color-other);
+    --color-role-other-ink: #616161;
+    --color-role-other-tint: color-mix(in oklch, var(--color-role-other) 15%, var(--bg-surface));
 
-    --node-generic-fill: var(--color-node-generic-fill);
+    --color-role-node-generic-fill: var(--color-node-generic-fill);
 
     /* ── RDF / ontology-graph palette ────────────────────────────── */
-    --rdf-class:       var(--color-rdf-class);
-    --rdf-objprop:     var(--color-rdf-objprop);
-    --rdf-dtprop:      var(--color-rdf-dtprop);
-    --rdf-rdfprop:     var(--color-rdf-rdfprop);
-    --rdf-concept:     var(--color-rdf-concept);
-    --rdf-concept-scheme: var(--color-rdf-concept-scheme);
-    --concept-reference: var(--color-concept-reference);
-    --concept-reference-ink: color-mix(in oklch, var(--concept-reference) 58%, var(--slate-950));
-    --concept-reference-tint: color-mix(in oklch, var(--concept-reference) 18%, var(--bg-surface));
-    --rdf-individual:  var(--color-rdf-individual);
-    --rdf-datatype:    var(--color-rdf-datatype);
-    --rdf-restriction: var(--color-rdf-restriction);
-    --rdf-classexpr:   var(--color-rdf-classexpr);
-    --rdf-nodeshape:   var(--color-rdf-nodeshape);
-    --rdf-propshape:   var(--color-rdf-propshape);
-    --rdf-resource:    var(--color-rdf-resource);
-    --rdf-shacl:       var(--color-rdf-shacl);
-    --rdf-class-tint:       color-mix(in srgb, var(--rdf-class) 12%, var(--bg-surface));
-    --rdf-class-border:     color-mix(in srgb, var(--rdf-class) 36%, var(--border-default));
-    --rdf-objprop-border:   color-mix(in srgb, var(--rdf-objprop) 34%, var(--border-default));
-    --rdf-dtprop-border:    color-mix(in srgb, var(--rdf-dtprop) 34%, var(--border-default));
-    --rdf-shacl-border:     color-mix(in srgb, var(--rdf-shacl) 34%, var(--border-default));
+    --color-role-rdf-class:       var(--color-rdf-class);
+    --color-role-rdf-objprop:     var(--color-rdf-objprop);
+    --color-role-rdf-dtprop:      var(--color-rdf-dtprop);
+    --color-role-rdf-rdfprop:     var(--color-rdf-rdfprop);
+    --color-role-rdf-concept:     var(--color-rdf-concept);
+    --color-role-rdf-concept-scheme: var(--color-rdf-concept-scheme);
+    --color-role-concept-reference: var(--color-concept-reference);
+    --color-role-concept-reference-ink: color-mix(in oklch, var(--color-role-concept-reference) 58%, var(--slate-950));
+    --color-role-concept-reference-tint: color-mix(in oklch, var(--color-role-concept-reference) 18%, var(--bg-surface));
+    --color-role-rdf-individual:  var(--color-rdf-individual);
+    --color-role-rdf-datatype:    var(--color-rdf-datatype);
+    --color-role-rdf-restriction: var(--color-rdf-restriction);
+    --color-role-rdf-classexpr:   var(--color-rdf-classexpr);
+    --color-role-rdf-nodeshape:   var(--color-rdf-nodeshape);
+    --color-role-rdf-propshape:   var(--color-rdf-propshape);
+    --color-role-rdf-resource:    var(--color-rdf-resource);
+    --color-role-rdf-shacl:       var(--color-rdf-shacl);
+    --color-role-rdf-class-tint:       color-mix(in srgb, var(--color-role-rdf-class) 12%, var(--bg-surface));
+    --color-role-rdf-class-border:     color-mix(in srgb, var(--color-role-rdf-class) 36%, var(--border-default));
+    --color-role-rdf-objprop-border:   color-mix(in srgb, var(--color-role-rdf-objprop) 34%, var(--border-default));
+    --color-role-rdf-dtprop-border:    color-mix(in srgb, var(--color-role-rdf-dtprop) 34%, var(--border-default));
+    --color-role-rdf-shacl-border:     color-mix(in srgb, var(--color-role-rdf-shacl) 34%, var(--border-default));
 
     /* ── Status ─────────────────────────────────────────────────── */
     --success: var(--color-success);
@@ -241,11 +247,11 @@
     --info-border:    color-mix(in srgb, var(--info)    34%, var(--border-default));
 
     /* ── Graph edge colors ───────────────────────────────────────── */
-    --edge-default: var(--color-edge-default);
-    --edge-derive:  var(--color-requirement);
-    --edge-satisfy: var(--color-verification);
-    --edge-trace:   var(--color-slate-400);
-    --edge-bind:  var(--color-edge-bind);
+    --color-role-edge-default: var(--color-edge-default);
+    --color-role-edge-derive:  var(--color-requirement);
+    --color-role-edge-satisfy: var(--color-verification);
+    --color-role-edge-trace:   var(--color-slate-400);
+    --color-role-edge-bind:  var(--color-edge-bind);
 
     /* ── Accent state surfaces ──────────────────────────────────── */
     --accent-bg-hover:   color-mix(in srgb, var(--accent) 5%, transparent);
@@ -284,8 +290,8 @@
     --border-panel:   color-mix(in srgb, var(--border-subtle) 65%, transparent);
     --border-focus:   var(--rose-600);
     --control-swatch-ring: color-mix(in srgb, var(--slate-950) 8%, transparent);
-    --element-icon-ring: color-mix(in srgb, var(--slate-950) 18%, transparent);
-    --element-icon-ring-inverse: color-mix(in srgb, var(--slate-0) 10%, transparent);
+    --color-role-element-icon-ring: color-mix(in srgb, var(--slate-950) 18%, transparent);
+    --color-role-element-icon-ring-inverse: color-mix(in srgb, var(--slate-0) 10%, transparent);
 
     --accent:         var(--rose-600);
     --accent-hover:   var(--rose-700);
@@ -299,7 +305,6 @@
     --scroll-thumb:   var(--slate-300);
     --scroll-track:   transparent;
 
-    color-scheme: light;
   }
 
   /* ── Dark theme — navy-slate ────────────────────────────────────
@@ -308,17 +313,17 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --capability-ink:    #90caf9;
-      --requirement-ink:   #b39ddb;
-      --contract-ink:      #ffb74d;
-      --semantic-contract-ink: #ef9a9a;
-      --verification-ink:  #81c784;
-      --verification-objective-ink: #9ccc65;
-      --ontology-ink:      #e3cd7b;
-      --resource-ink:      #ffd95e;
-      --other-ink:         #bdbdbd;
+      --color-role-capability-ink:    #90caf9;
+      --color-role-requirement-ink:   #b39ddb;
+      --color-role-contract-ink:      #ffb74d;
+      --color-role-semantic-contract-ink: #ef9a9a;
+      --color-role-verification-ink:  #81c784;
+      --color-role-verification-objective-ink: #9ccc65;
+      --color-role-ontology-ink:      #e3cd7b;
+      --color-role-resource-ink:      #ffd95e;
+      --color-role-other-ink:         #bdbdbd;
 
-      --edge-default: #3a4555;
+      --color-role-edge-default: #3a4555;
 
       --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
       --accent-bg-selected: rgba(251,113,133,0.18);
@@ -360,22 +365,21 @@
       --focus-ring:    rgba(251,113,133,0.55);
       --scroll-thumb:  #2f3b4c;
 
-      color-scheme: dark;
     }
   }
 
-  [data-theme="dark"], .dark {
-    --capability-ink:    #90caf9;
-    --requirement-ink:   #b39ddb;
-    --contract-ink:      #ffb74d;
-    --semantic-contract-ink: #ef9a9a;
-    --verification-ink:  #81c784;
-    --verification-objective-ink: #9ccc65;
-    --ontology-ink:      #e3cd7b;
-    --resource-ink:      #ffd95e;
-    --other-ink:         #bdbdbd;
+  :root[data-theme="dark"], :root.dark {
+    --color-role-capability-ink:    #90caf9;
+    --color-role-requirement-ink:   #b39ddb;
+    --color-role-contract-ink:      #ffb74d;
+    --color-role-semantic-contract-ink: #ef9a9a;
+    --color-role-verification-ink:  #81c784;
+    --color-role-verification-objective-ink: #9ccc65;
+    --color-role-ontology-ink:      #e3cd7b;
+    --color-role-resource-ink:      #ffd95e;
+    --color-role-other-ink:         #bdbdbd;
 
-    --edge-default: #3a4555;
+    --color-role-edge-default: #3a4555;
 
     --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
     --accent-bg-selected: rgba(251,113,133,0.18);
@@ -417,6 +421,13 @@
     --focus-ring:    rgba(251,113,133,0.55);
     --scroll-thumb:  #2f3b4c;
 
-    color-scheme: dark;
+  }
+}
+
+@layer base {
+  :root[data-theme="dark"] {
+    --color-showcase-canvas: #181818;
+    --color-showcase-ink: #dddddd;
+    --color-showcase-border: #444444;
   }
 }

@@ -70,11 +70,11 @@ assert_json_diff \
 
 cp "$TEST_DIR/specifications/SemanticContracts.md" /tmp/semantic-contract-lint-before-fix.md
 set +e
-FIX_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --fix 2>&1)
+FIX_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" lint --fix 2>&1)
 FIX_EXIT=$?
 set -e
-if [ $FIX_EXIT -ne 0 ]; then
-  echo "FAILED: lint --fix exit code ${FIX_EXIT}"
+if [ $FIX_EXIT -eq 0 ] || ! grep -q "startup validation failed" <<< "$FIX_OUTPUT"; then
+  echo "FAILED: MCP repair must reject an invalid startup model"
   echo "$FIX_OUTPUT"
   exit 1
 fi

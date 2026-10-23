@@ -89,7 +89,6 @@ verify_content_matches() {
 test_json_output "validate" "validate.json" true validate
 verify_content_matches "validate" "validate.json" true validate
 
-test_json_output "format" "format.json" true format
 
 test_json_output "search" "search.json" true search
 verify_content_matches "search" "search.json" true search
@@ -118,39 +117,6 @@ echo "" >> specifications/Requirements.md
 git add -A > /dev/null 2>&1 && git commit -m "test change" > /dev/null 2>&1
 
 test_json_output "change-impact" "change-impact.json" true change-impact
-
-# ========================================
-# CRUD commands (with --dry-run)
-# ========================================
-
-test_json_output "add" "add.json" true add "specifications/Requirements.md" \
-  --content "### Added Element
-
-A new element for testing.
-
-#### Metadata
-  * type: requirement
-" --dry-run
-
-test_json_output "rm" "rm.json" true rm "Test Verification Beta" --dry-run
-
-test_json_output "mv" "mv.json" true mv "Test Verification Beta" "specifications/Other.md" --dry-run
-
-test_json_output "rename" "rename.json" true rename "Test Verification Beta" "Renamed Verification" --dry-run
-
-test_json_output "merge" "merge.json" true merge "Test Verification Alpha" "Test Verification Beta" --dry-run
-
-test_json_output "mv-file" "mv-file.json" true mv-file "specifications/Requirements.md" "specifications/Moved.md" --dry-run
-
-test_json_output "link" "link.json" true link "Test Requirement Beta" satisfiedBy "https://example.com/evidence" --dry-run
-
-test_json_output "unlink" "unlink.json" true unlink "Test Verification Alpha" "Test Requirement Alpha" --dry-run
-
-test_json_output "relink" "relink.json" true relink "Test Verification Alpha" verify "Test Requirement Alpha" "Test Requirement Beta" --dry-run
-
-test_json_output "mv-asset" "mv-asset.json" true mv-asset "docs/asset.txt" "docs/asset-renamed.txt" --dry-run
-
-test_json_output "rm-asset" "rm-asset.json" true rm-asset "docs/asset.txt" --dry-run
 
 # ========================================
 # Error case: --output without --json

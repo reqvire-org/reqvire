@@ -80,7 +80,7 @@ Resolution rules:
 - Imported terms are available for semantic-reference validation through the ontology element that declared the external source.
 - Imported terms are inherited by ontology descendants of the declaring ontology element.
 - Imported terms are visible to semantic contracts that use the declaring ontology context or an ontology descendant context.
-- Built-in external ontology source terms are visible to ontology elements and semantic contracts without requiring a local `#### External Ontology` declaration. Non-ontology concept references resolve to generated native `concept` resources typed as `skos:Concept`.
+- Built-in external ontology source terms are visible to ontology elements and semantic contracts without requiring a local `#### External Ontology` declaration. Concept References on permitted non-ontology, non-semantic-contract elements resolve to generated native `concept` resources typed as `skos:Concept`.
 - Imported terms remain marked as external declarations in semantic metadata.
 - Imported terms do not count as authored project-owned term declarations for duplicate authored-term validation.
 - Standard reserved RDF, RDFS, OWL, XSD, and SHACL vocabulary remains handled through the reserved vocabulary registry rather than local external source declarations.

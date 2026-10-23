@@ -59,4 +59,3 @@ Test capability root for migrated requirement fixtures.
 #### Relations
   * specifiedBy: [System Requirements](#system-requirements)
 ---
-

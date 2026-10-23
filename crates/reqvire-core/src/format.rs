@@ -27,6 +27,16 @@ pub fn format_files(
     dry_run: bool,
     with_full_relations: bool,
 ) -> Result<FormatResult, ReqvireError> {
+    format_selected_files(registry, dry_run, with_full_relations, None)
+}
+
+/// Canonically serialize selected model documents, preserving all other bytes.
+pub fn format_selected_files(
+    registry: &GraphRegistry,
+    dry_run: bool,
+    with_full_relations: bool,
+    selected: Option<&std::collections::BTreeSet<std::path::PathBuf>>,
+) -> Result<FormatResult, ReqvireError> {
     let base_dir = workspace::workspace_root()?;
 
     let grouped_elements = registry.group_elements_by_location();
@@ -38,6 +48,9 @@ pub fn format_files(
     sorted_files.sort_by(|a, b| a.0.cmp(&b.0));
 
     for (file_path, elements) in sorted_files {
+        if selected.is_some_and(|paths| !paths.contains(&base_dir.join(&file_path))) {
+            continue;
+        }
         // Generate the new markdown content for this file
         let mut new_content =
             registry.generate_file_markdown(&file_path, &elements, with_full_relations);
@@ -88,7 +101,7 @@ pub fn format_files(
 }
 
 /// Apply basic formatting rules to generated markdown content
-fn apply_formatting_rules(content: &str) -> String {
+pub(crate) fn apply_formatting_rules(content: &str) -> String {
     // Since we're generating from the model, we only need basic cleanup
     // of content that comes from original files (element content, page content, section content)
 

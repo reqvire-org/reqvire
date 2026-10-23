@@ -24,7 +24,7 @@ def git(*args):
 
 
 def run(label, *args):
-    result = subprocess.run([os.environ["REQVIRE_BIN"], *args, "--json"], cwd=ROOT,
+    result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else os.environ["REQVIRE_BIN"], *args, "--json"], cwd=ROOT,
                             text=True, capture_output=True, timeout=40)
     (OUTPUT / f"rm-artifact-links-{label}.json").write_text(result.stdout)
     (OUTPUT / f"rm-artifact-links-{label}.stderr").write_text(result.stderr)

@@ -10,6 +10,46 @@ Curated conceptual vocabulary for Reqvire system-model authoring, search, explan
   * concept_prefix: concept
 ---
 
+### Accepted HEAD
+
+The Git commit recorded as the baseline of an admitted worktree context's accepted state. It remains distinct from the branch tip observed on disk until a controlled transition adopts that tip.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [MCP Worktree Context](#mcp-worktree-context)
+  * related: [Observed HEAD](#observed-head)
+---
+
+### Atomic Model Mutation
+
+A model change whose complete candidate becomes accepted as one indivisible transition, with no partially accepted intermediate model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Mutation](#model-mutation)
+  * related: [Element Deletion](#element-deletion)
+  * related: [Element Override](#element-override)
+---
+
+### Authored Element Definition
+
+The author-supplied content, metadata, and structured declarations of one model element, distinct from generated inverse relations and declarations authored on other elements.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Element](#element)
+  * related: [Element Override](#element-override)
+---
+
 ### Authored Relation Predicate
 
 Source relation predicate that preserves the relation token authored in Reqvire Markdown.
@@ -19,7 +59,7 @@ Source relation predicate that preserves the relation token authored in Reqvire 
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Predicate Layer](#relation-predicate-layer)
+  * related: [Relation Predicate Layer](#relation-predicate-layer)
 ---
 
 ### Built In External Ontology Source
@@ -43,7 +83,7 @@ Coherent ability the system can provide or support.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
 ---
 
 ### Change Impact
@@ -55,8 +95,8 @@ Analysis of model elements, artifacts, verifications, and semantic context affec
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Traceability](#traceability)
   * related: [Semantic Export](#semantic-export)
+  * related: [Traceability](#traceability)
   * related: [Verification Coverage](#verification-coverage)
 ---
 
@@ -77,16 +117,28 @@ Terminal-oriented interface for invoking Reqvire operations and reports.
 
 ### Concept Reference
 
-Human-readable binding from non-ontology model prose to curated SKOS concepts.
+An explicit declaration binding readable terminology on a permitted non-ontology, non-semantic-contract model element to a native curated concept and its generated SKOS identity.
 
 #### Metadata
   * type: concept
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Ontology Projection](#ontology-projection)
+  * related: [Semantic Model](#semantic-model)
   * related: [Traceability](#traceability)
+---
+
+### Concrete Verification
+
+Executable, inspectable, demonstrable, analytical, or formal verification method.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Verification](#verification)
 ---
 
 ### Contract Binding
@@ -142,16 +194,16 @@ Documentation references an error-response specification so that schema changes 
   * related: [Contract Binding](#contract-binding)
 ---
 
-### Concrete Verification
+### Edit Target
 
-Executable, inspectable, demonstrable, analytical, or formal verification method.
+Selected element text or subsection that bounds a focused element edit.
 
 #### Metadata
   * type: concept
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Verification](#verification)
+  * related: [Focused Element Edit](#focused-element-edit)
 ---
 
 ### Element
@@ -163,7 +215,83 @@ Addressable Reqvire model item with metadata, prose, sections, and optional rela
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
+---
+
+### Element Deletion
+
+A model mutation that removes an existing element and ends its presence in the resulting model.
+
+#### Scope Note
+Deletion can remove dependency targets and leave children without an owner. It is distinct from replacing the definition of an element that retains its identity.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Mutation](#model-mutation)
+  * related: [Element Identity](#element-identity)
+  * related: [Element Override](#element-override)
+---
+
+### Element Identity
+
+The stable association that identifies the same model element across revisions of its authored definition, independently of its current file location.
+
+#### Scope Note
+Reqvire distinguishes the stable name-derived element ID from the workspace-relative file-and-fragment identifier used to address it. An override retains the name-derived identity; relocation changes the address.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Element](#element)
+  * related: [Element Override](#element-override)
+---
+
+### Element Override
+
+An atomic model mutation that replaces the authored definition of an existing element while retaining that element's identity and relationships authored by other elements that point to it.
+
+#### Scope Note
+An override replaces a complete authored definition. Text-only editing and appending a section are narrower editing operations; deletion ends the element's presence.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Atomic Model Mutation](#atomic-model-mutation)
+  * related: [Authored Element Definition](#authored-element-definition)
+  * related: [Element Deletion](#element-deletion)
+  * related: [Element Identity](#element-identity)
+  * related: [Incoming Relation](#incoming-relation)
+---
+
+### Element Subsection
+
+Named region within one authored element definition whose content and applicability follow the document grammar and element type.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
+---
+
+### Element Text
+
+Opening human-readable content of an element before its first subsection boundary.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Authored Element Definition](#authored-element-definition)
 ---
 
 ### Explorer Interface
@@ -190,7 +318,7 @@ RDF serialization format used by an external ontology source.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### External Ontology Namespace
@@ -202,7 +330,7 @@ Namespace IRI provided by an external ontology source.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### External Ontology Prefix
@@ -214,7 +342,7 @@ Prefix label assigned to an external ontology source namespace.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### External Ontology Resource
@@ -226,7 +354,7 @@ Ontology document IRI or provenance resource associated with an external ontolog
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### External Ontology Source
@@ -238,9 +366,9 @@ Local or built-in ontology dependency used for term resolution and validation wi
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Ontology Projection](#ontology-projection)
   * related: [Semantic Export](#semantic-export)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### External Ontology Source Path
@@ -252,7 +380,7 @@ Workspace-root-relative path to an external ontology source file inside an eligi
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### External Ontology Subset Construct Query
@@ -264,7 +392,20 @@ Construct-query pattern that selects and describes the used subset of an externa
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Ontology Projection](#ontology-projection)
+  * broader: [Query](#query)
+  * related: [Ontology Projection](#ontology-projection)
+---
+
+### Focused Element Edit
+
+Atomic change confined to selected text or a permitted subsection of one element, retaining its identity and authored declarations outside that selection.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Atomic Model Mutation](#atomic-model-mutation)
 ---
 
 ### Git Worktree
@@ -276,7 +417,7 @@ Local Git worktree whose files may participate in the SOI model when they are in
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
   * related: [Workspace Root](#workspace-root)
 ---
 
@@ -289,6 +430,33 @@ Conceptual area covering ownership, status, priority, risk, review readiness, an
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+---
+
+### HEAD Mode
+
+A branch-viewing policy that resolves the current local branch tip through the context's acceptance rules instead of selecting a historical commit as a separate model identity.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [HEAD Refresh](#head-refresh)
+---
+
+### HEAD Refresh
+
+A triggered operation that checks protected inputs between accepted and observed commits and, when eligible, reloads the committed snapshot through normal validated model loading.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Observed HEAD](#observed-head)
+  * related: [Protected Model Input](#protected-model-input)
 ---
 
 ### Implementation Coverage
@@ -307,6 +475,23 @@ Implementation coverage describes modeled implementation evidence, not proof tha
   * related: [Requirement Contract](#requirement-contract)
   * related: [Traceability](#traceability)
   * related: [Verification Coverage](#verification-coverage)
+---
+
+### Incoming Relation
+
+A directed model relationship viewed from the element it targets, whose declaration is authored on another element.
+
+#### Scope Note
+Incoming direction is relative to the target element. A generated inverse is a view of an authored declaration, not a second independent declaration.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Model Relation](#model-relation)
+  * related: [Element Override](#element-override)
+  * related: [Traceability](#traceability)
 ---
 
 ### Integration
@@ -329,7 +514,46 @@ Human or machine surface that exposes Reqvire model semantics or operations.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Integration](#integration)
+  * related: [Integration](#integration)
+---
+
+### MCP Worktree Context
+
+An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a Repo workspace the owning worktree is Central; its versioned manifest selects the component checkouts included in that same context.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
+  * related: [Workspace Root](#workspace-root)
+---
+
+### Manifest Project
+
+A component repository declared by the effective Repo manifest, with a workspace-relative checkout path and a selected revision. Its files retain their repository ownership while participating in the combined model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Repo Manifest](#repo-manifest)
+---
+
+### Model Change Publication
+
+The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. In a Repo workspace, component commits are recorded by the Central manifest before the Central commit saves the combined view. Pull requests and review comments remain repository-specific.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Git Worktree](#git-worktree)
+  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
 ---
 
 ### Model Context Protocol Interface
@@ -356,9 +580,22 @@ Rule that only workspace-contained files and artifacts inside Git worktrees part
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
   * related: [Git Worktree](#git-worktree)
+  * related: [Model Structure](#model-structure)
   * related: [Workspace Root](#workspace-root)
+---
+
+### Model Mutation
+
+A change to the accepted structure or authored definitions of a system model.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Model Change Publication](#model-change-publication)
+  * related: [Model Structure](#model-structure)
 ---
 
 ### Model Relation
@@ -370,7 +607,7 @@ Projection record for one authored Reqvire relation edge.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * related: [Relation Model](#relation-model)
 ---
 
 ### Model Structure
@@ -393,8 +630,8 @@ Clean semantic export filtered to one ontology base or term namespace.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
-  * related: [Semantic Export](#semantic-export)
+  * broader: [Semantic Export](#semantic-export)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Normalized Relation Predicate
@@ -406,8 +643,21 @@ Generated relation-family predicate intended for semantic traversal, graph proje
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Predicate Layer](#relation-predicate-layer)
   * related: [Relation Family Construct Query](#relation-family-construct-query)
+  * related: [Relation Predicate Layer](#relation-predicate-layer)
+---
+
+### Observed HEAD
+
+The current commit reached through a worktree's local branch reference when Git state is inspected. Observing this commit does not establish that its files or model have been accepted by the running context.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Accepted HEAD](#accepted-head)
+  * related: [Git Worktree](#git-worktree)
 ---
 
 ### Ontology Document
@@ -419,7 +669,7 @@ Ontology document identity that groups contributed semantic terms under an ontol
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Ontology Element
@@ -431,7 +681,8 @@ Reqvire model element that authors reusable RDF/OWL vocabulary.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * broader: [Element](#element)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Ontology Projection
@@ -443,8 +694,8 @@ Generated semantic facts that classify authored OWL/RDFS/SHACL constructs for gr
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Relation Family Construct Query](#relation-family-construct-query)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Ontology Source Of Truth
@@ -456,7 +707,7 @@ Authored ontology model that governs generated semantic and runtime ontology art
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Owl Built In Datatype
@@ -480,7 +731,7 @@ Kernel registry of RDF, RDFS, OWL, XSD, and SHACL reserved vocabulary recognized
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Owl Reserved Vocabulary Term
@@ -492,7 +743,22 @@ Reserved vocabulary IRI recognized by the semantic kernel in valid vocabulary po
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Owl Reserved Vocabulary Registry](#owl-reserved-vocabulary-registry)
+  * related: [Owl Reserved Vocabulary Registry](#owl-reserved-vocabulary-registry)
+  * related: [Semantic Model](#semantic-model)
+---
+
+### Protected Model Input
+
+A currently eligible model source, or a semantic source or source-resolution dependency declared by a currently eligible model owner, whose change requires full validated admission rather than guarded HEAD refresh. Current exclusion rules determine owner eligibility; changing those rules is not itself a protected-input change. A referenced implementation or evidence artifact can instead have only an existence dependency; a file can serve both roles.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [External Ontology Source](#external-ontology-source)
+  * related: [HEAD Refresh](#head-refresh)
+  * related: [Model Eligibility Boundary](#model-eligibility-boundary)
 ---
 
 ### Query
@@ -504,7 +770,7 @@ Structured question over model, ontology, or semantic graph context.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Raw External Ontology Graph
@@ -516,7 +782,7 @@ Parsed dependency graph loaded from an external ontology source before used-subs
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### Relation Family
@@ -528,7 +794,7 @@ Stable semantic grouping of authored relation names and inverse pairs.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * related: [Relation Model](#relation-model)
 ---
 
 ### Relation Family Construct Query
@@ -540,7 +806,8 @@ Construct-query pattern that materializes normalized relation-family facts for s
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * broader: [Query](#query)
+  * related: [Relation Model](#relation-model)
   * related: [Semantic Export](#semantic-export)
 ---
 
@@ -553,8 +820,8 @@ Conceptual model for authored and normalized relation families connecting Reqvir
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Traceability](#traceability)
   * related: [Change Impact](#change-impact)
+  * related: [Traceability](#traceability)
 ---
 
 ### Relation Predicate Layer
@@ -566,7 +833,7 @@ Conceptual distinction between source-authored relation predicates and generated
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * related: [Relation Model](#relation-model)
 ---
 
 ### Relation Rule
@@ -578,7 +845,7 @@ Controlled rule for relation name, endpoint compatibility, direction, ownership,
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * related: [Relation Model](#relation-model)
 ---
 
 ### Relation Semantic Pattern
@@ -590,7 +857,31 @@ Semantic pattern describing relation behavior such as hierarchy, bridge, ownersh
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Relation Model](#relation-model)
+  * related: [Relation Model](#relation-model)
+---
+
+### Repo Manifest
+
+A version-controlled description of a Repo workspace's component repositories, their checkout paths and selected revisions. A Central worktree's manifest defines that branch's component view.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+---
+
+### Repo Workspace
+
+A model workspace rooted in a Central Git worktree whose versioned manifest selects component repository checkouts managed by the Repo tool. The Central branch identifies the context; project revisions identify its component content.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [MCP Worktree Context](#mcp-worktree-context)
+  * related: [Repo Manifest](#repo-manifest)
 ---
 
 ### Report
@@ -602,7 +893,7 @@ Generated view or output that presents selected model structure, semantic contex
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Requirement
@@ -614,7 +905,7 @@ Obligation the system must satisfy.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
   * related: [Verification Coverage](#verification-coverage)
 ---
 
@@ -630,8 +921,20 @@ Precise terms that define a requirement, including source basis, specifications,
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
   * related: [Semantic Contract](#semantic-contract)
+---
+
+### Revision-Locked Manifest
+
+A Repo manifest recording exact component commit identifiers so that its saved component view can be reconstructed independently of moving branch tips.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * broader: [Repo Manifest](#repo-manifest)
 ---
 
 ### Runtime Ontology Artifact
@@ -643,9 +946,9 @@ Generated Reqvire ontology snapshot embedded by runtime code as bootstrap vocabu
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Ontology Source Of Truth](#ontology-source-of-truth)
   * related: [Semantic Export](#semantic-export)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Runtime Ontology Namespace
@@ -657,7 +960,7 @@ Runtime vocabulary namespace selected for Reqvire bootstrap ontology generation.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Semantic Contract
@@ -669,8 +972,8 @@ Reusable SHACL profile that uses ontology vocabulary and constrains requirements
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Ontology Projection](#ontology-projection)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Semantic Export
@@ -682,9 +985,9 @@ RDF, JSON-LD, or graph-oriented output generated from authored ontology, SHACL, 
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Semantic Model](#semantic-model)
   * related: [Ontology Projection](#ontology-projection)
   * related: [Runtime Ontology Artifact](#runtime-ontology-artifact)
+  * related: [Semantic Model](#semantic-model)
 ---
 
 ### Semantic Model
@@ -698,6 +1001,21 @@ Conceptual area covering ontology, semantic contracts, RDF export, SHACL shape c
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
 ---
 
+### Semantic Query
+
+A named SPARQL query artifact with an ontology vocabulary context, source provenance, and optional description of its intended results.
+
+#### Scope Note
+Query form describes SELECT, ASK, CONSTRUCT, or DESCRIBE syntax. Query purpose describes its intended use by consumers.
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
+  * related: [Semantic Export](#semantic-export)
+---
+
 ### Structured Payload
 
 Machine-readable request or response data exchanged through a Reqvire interface.
@@ -707,7 +1025,7 @@ Machine-readable request or response data exchanged through a Reqvire interface.
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Interface](#interface)
+  * related: [Interface](#interface)
 ---
 
 ### Submodel
@@ -719,7 +1037,7 @@ Scoped model region rooted in capability, ontology, or another supported model b
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
+  * related: [Model Structure](#model-structure)
 ---
 
 ### Terminal Requirement
@@ -763,7 +1081,7 @@ Materialized subset of an external ontology source containing terms and support 
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [External Ontology Source](#external-ontology-source)
+  * related: [External Ontology Source](#external-ontology-source)
 ---
 
 ### Verification
@@ -786,9 +1104,9 @@ Computed state describing whether requirement obligations are verified and capab
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Verification](#verification)
   * related: [Change Impact](#change-impact)
   * related: [Concrete Verification](#concrete-verification)
+  * related: [Verification](#verification)
 ---
 
 ### Verification Objective
@@ -800,7 +1118,7 @@ Planning concept that groups verification intent before concrete verification ev
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Verification](#verification)
+  * related: [Verification](#verification)
 ---
 
 ### Workspace Root
@@ -812,49 +1130,7 @@ Effective Reqvire process root used as the SOI model path, identifier, diagnosti
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Model Structure](#model-structure)
   * related: [Git Worktree](#git-worktree)
   * related: [Model Eligibility Boundary](#model-eligibility-boundary)
----
-
-### Semantic Query
-
-A named SPARQL query artifact with an ontology vocabulary context, source provenance, and optional description of its intended results.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Semantic Export](#semantic-export)
-
-#### Scope Note
-Query form describes SELECT, ASK, CONSTRUCT, or DESCRIBE syntax. Query purpose describes its intended use by consumers.
----
-
-### MCP Worktree Context
-
-An independently addressed MCP model session rooted in one Git worktree, with its own branch identity, accepted model state, and operation lifecycle.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Git Worktree](#git-worktree)
-  * related: [Workspace Root](#workspace-root)
-  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
----
-
-### Model Change Publication
-
-The progression of accepted model changes into local Git history, a remote branch, and a pull request or review comment in the same repository.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Git Worktree](#git-worktree)
-  * related: [Model Context Protocol Interface](#model-context-protocol-interface)
+  * related: [Model Structure](#model-structure)
 ---

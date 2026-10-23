@@ -204,7 +204,7 @@ reqvire:OntologyDocument a owl:Class ;
   rdfs:comment "Generated or authored ontology document identified by ontology base IRI and containing contributed ontology terms." .
 reqvire:File a owl:Class ;
   rdfs:subClassOf reqvire:Artifact ;
-  rdfs:comment "Workspace-local file artifact inside an eligible Git worktree and referenced by Reqvire relations, contract_bindings, or evidence links." .
+  rdfs:comment "Workspace-local file artifact inside an eligible Git worktree and referenced by compatible Reqvire resource or evidence relations." .
 reqvire:CustomElement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Custom model extension element whose authored metadata type follows other-TYPENAME and cannot author canonical semantic relations." .
@@ -233,6 +233,7 @@ reqvire:CustomElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for custom other-TYPENAME extensions that cannot author canonical semantic relations." .
 reqvire:ElementIdentity a owl:Class ;
+  reqvire:mapsToConcept concept:ElementIdentity ;
   rdfs:comment "Stable identity concept used to track an element independently of its current file location." .
 reqvire:ElementId a owl:Class ;
   rdfs:subClassOf reqvire:ElementIdentity ;
@@ -241,9 +242,9 @@ reqvire:ElementIdentifier a owl:Class ;
   rdfs:subClassOf reqvire:ElementIdentity ;
   rdfs:comment "Location-based address that combines file path and fragment for authored references." .
 reqvire:ElementLocation a owl:Class ;
-  rdfs:comment "File and section location context for an element, separate from stable identity." .
+  rdfs:comment "Source file and element position context, separate from stable identity." .
 reqvire:ReferenceTargetKind a owl:Class ;
-  rdfs:comment "Stable semantic category for relation or contract_bindings target resolution." .
+  rdfs:comment "Stable semantic category for relation and contract-dependency target resolution." .
 reqvire:ElementIdentifierTarget a owl:Class ;
   rdfs:subClassOf reqvire:ReferenceTargetKind ;
   rdfs:comment "Reference target category that resolves to a specific model element." .
@@ -332,7 +333,7 @@ reqvire:referenceTargetKindName a owl:DatatypeProperty ;
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
-  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through contract_bindings, and verified by evidence." ;
+  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, enriched through native concept references, and assessed through implementation and verification coverage rolled up from those requirements." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;

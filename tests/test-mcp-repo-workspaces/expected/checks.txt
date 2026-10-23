@@ -1,0 +1,15 @@
+PASS mcp/complete-declared-snapshot
+PASS serve/complete-declared-snapshot
+PASS cli/explicit-manifest-selection
+PASS cli/invalid-selected-manifest-rejected
+PASS cli/invalid-project-boundaries-rejected
+PASS cli/only-declared-project-sources
+PASS mcp/central-branch-component-revisions
+PASS mcp/cross-project-preview-apply
+PASS mcp/explicit-component-first-commit
+PASS mcp/automatic-component-first-commit
+PASS mcp/dirty-component-admission
+PASS mcp/failed-central-checkpoint-retains-component
+PASS serve/combined-publication-and-branch-picker
+PASS mcp/failed-dependency-push-preserves-central
+PASS mcp/dependency-first-push

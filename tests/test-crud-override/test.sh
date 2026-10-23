@@ -10,8 +10,7 @@ set -uo pipefail
 # - Operation reports as "Updated" rather than "Added"
 # - New content replaces old content completely
 # - Model validates after override
-# - Override is rejected when element has children that would be orphaned
-# - Error message lists orphaned children with resolution guidance
+# - Override preserves incoming children and validates the complete replacement
 # - Override succeeds when element has no children
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -49,7 +48,7 @@ New details section added.
 '
 
 set +e
-OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+OVERRIDE_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 OVERRIDE_EXIT=$?
 set -e
 
@@ -98,7 +97,7 @@ This is a duplicate.
 '
 
 set +e
-DUPLICATE_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
+DUPLICATE_OUTPUT=$(cd "$TEST_DIR" && echo "$DUPLICATE_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md 2>&1)
 DUPLICATE_EXIT=$?
 set -e
 
@@ -129,7 +128,7 @@ This is a brand new capability.
 '
 
 set +e
-ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+ADD_OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 ADD_EXIT=$?
 set -e
 
@@ -156,15 +155,15 @@ if [ $VALIDATION_EXIT -ne 0 ]; then
 fi
 
 # ==================================
-# Test 4: Override with orphaned children prevention (should fail)
+# Test 4: Preview a parent override without deleting its child
 # ==================================
 
 # Capability A now has Capability B as a child (from Test 3)
-# Attempting to override Capability A should be rejected
+# Its definition can change without unlinking Capability B.
 
 DRYRUN_ELEMENT='### Capability A
 
-Attempted override that would orphan Capability B.
+Updated parent definition that retains Capability B.
 
 #### Metadata
   * type: requirement
@@ -174,37 +173,19 @@ Attempted override that would orphan Capability B.
 '
 
 set +e
-DRYRUN_OUTPUT=$(cd "$TEST_DIR" && echo "$DRYRUN_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override --dry-run 2>&1)
+DRYRUN_OUTPUT=$(cd "$TEST_DIR" && echo "$DRYRUN_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override --dry-run 2>&1)
 DRYRUN_EXIT=$?
 set -e
 
-# Override should FAIL due to orphaned children prevention
-if [ $DRYRUN_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Override should be rejected (would orphan Capability B)"
+# Override should succeed without persisting the preview.
+if [ $DRYRUN_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Parent override preview should retain Capability B"
   echo "$DRYRUN_OUTPUT"
   exit 1
 fi
 
-# Verify error message mentions orphaned children
-if ! echo "$DRYRUN_OUTPUT" | grep -qi "orphan"; then
-  echo "❌ FAILED: Error message should mention orphaned children"
-  echo "Got: $DRYRUN_OUTPUT"
-  exit 1
-fi
-
-# Verify error message lists Capability B
-if ! echo "$DRYRUN_OUTPUT" | grep -q "Capability B"; then
-  echo "❌ FAILED: Error message should list Capability B as orphaned child"
-  echo "Got: $DRYRUN_OUTPUT"
-  exit 1
-fi
-
-# Verify error provides resolution guidance
-if ! echo "$DRYRUN_OUTPUT" | grep -qi "delete.*child\|link.*parent"; then
-  echo "❌ FAILED: Error message should provide resolution guidance"
-  echo "Got: $DRYRUN_OUTPUT"
-  exit 1
-fi
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/02-after-add-capability-b.md" \
+  "$TEST_DIR/specifications/Requirements.md" "Parent override preview wrote source"
 
 # ==================================
 # Test 5: Override element without children (should succeed)
@@ -224,7 +205,7 @@ This is UPDATED Capability B content.
 '
 
 set +e
-OVERRIDE_B_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_B_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+OVERRIDE_B_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_B_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md --override 2>&1)
 OVERRIDE_B_EXIT=$?
 set -e
 
@@ -252,5 +233,18 @@ if [ $VALIDATION_EXIT -ne 0 ]; then
   echo "$VALIDATION_OUTPUT"
   exit 1
 fi
+
+PROSE_STATUS=0
+python3 "$TEST_SCRIPT_DIR/../prose_links.py" crud "$REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/prose-link-checks.txt" 2> "$TEST_DIR/output/prose-link-checks.stderr" || PROSE_STATUS=$?
+if [ "$PROSE_STATUS" -ne 0 ]; then
+  cat "$TEST_DIR/output/prose-link-checks.stderr"
+fi
+diff -u "$TEST_SCRIPT_DIR/expected/prose-link-checks.txt" "$TEST_DIR/output/prose-link-checks.txt" || exit 1
+[ "$PROSE_STATUS" -eq 0 ] || exit 1
+
+python3 "$TEST_SCRIPT_DIR/check_atomic.py" "$REAL_REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/atomic-checks.txt" || exit 1
+diff -u "$TEST_SCRIPT_DIR/expected/atomic-checks.txt" "$TEST_DIR/output/atomic-checks.txt" || exit 1
 
 exit 0

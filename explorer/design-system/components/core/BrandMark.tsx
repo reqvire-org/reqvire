@@ -1,9 +1,10 @@
-import type { ImgHTMLAttributes } from "react";
+import { type ImgHTMLAttributes } from "preact";
 import { css, cx } from "@linaria/atomic";
 import logoMarkUrl from "../../assets/logo-mark.svg?url";
 
-export interface BrandMarkProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "style"> {
+export interface BrandMarkProps extends Omit<(ImgHTMLAttributes<HTMLImageElement> & { className?: string }), "src" | "style" | "alt" | "role"> {
   decorative?: boolean;
+  alt?: string;
 }
 
 const baseUX = css`

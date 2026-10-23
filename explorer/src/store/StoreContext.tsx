@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, type ComponentChildren } from "preact";
+import { useContext, useMemo } from "preact/hooks";
 import { prepareModelFlow, type ModelFlowIndex } from "../lib/modelFlow";
 import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
 import { buildFileManagerModel, buildProjectFileTree, projectWorktrees, type FileManagerModel, type ProjectWorktree, type TreeFolder } from "../lib/fileTrees";
@@ -37,7 +38,7 @@ export function StoreProvider({
 }: {
   store: ExplorerProjectStore;
   schemaMismatch: string | null;
-  children: ReactNode;
+  children: ComponentChildren;
 }) {
   const contextId = JSON.stringify([store.project.workspace_root, store.project.worktree_id]);
   const { elements, resources, relations, contract_bindings, contract_references, concept_refs, traces } = store;

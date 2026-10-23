@@ -19,6 +19,21 @@ await withBrowser(profile, async ({ evaluate, loadPage: loadDocument, reloadPage
     window.Worker = class extends OriginalWorker {
       constructor(url, options) { super(url, options); window.traceWorkerUrls.push(String(url)); }
     };
+    // Make delayed handle measurements deterministic: viewport initialization
+    // can precede SVG edge rendering, especially after changing direction.
+    const OriginalResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = class extends OriginalResizeObserver {
+      constructor(callback) {
+        super((entries, observer) => {
+          if (entries.some(entry => entry.target.classList.contains("react-flow__node"))) {
+            setTimeout(() => {
+              const connected = entries.filter(entry => entry.target.isConnected);
+              if (connected.length) callback(connected, observer);
+            }, 150);
+          } else callback(entries, observer);
+        });
+      }
+    };
     window.traceDocument = Math.random();
   ` });
   async function ready() {
@@ -32,14 +47,21 @@ await withBrowser(profile, async ({ evaluate, loadPage: loadDocument, reloadPage
     }, label);
   }
   async function graphMatches() {
-    const actual = await evaluate(() => {
-      const region = document.querySelector('[aria-label="Verification trace flow"]');
-      return { nodes: [...region.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort(),
-        edges: [...region.querySelectorAll(".react-flow__edge")].map(edge => edge.dataset.id).sort(),
-        labels: [...region.querySelectorAll(".react-flow__edge text")].map(edge => edge.textContent),
-        summary: region.querySelector(".ux-trace-flow-summary").textContent,
-        mermaid: Boolean(region.querySelector(".mermaid")),
-      };
+    let actual;
+    await waitFor(async () => {
+      actual = await evaluate(() => {
+        const region = document.querySelector('[aria-label="Verification trace flow"]');
+        return { nodes: [...region.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort(),
+          edges: [...region.querySelectorAll(".react-flow__edge")].map(edge => edge.dataset.id).sort(),
+          labels: [...region.querySelectorAll(".react-flow__edge text")].map(edge => edge.textContent),
+          summary: region.querySelector(".ux-trace-flow-summary").textContent,
+          mermaid: Boolean(region.querySelector(".mermaid")),
+        };
+      });
+      return actual.nodes.length === expectedNodes.length && actual.edges.length === expectedEdges.length
+        && actual.labels.length === expectedEdges.length;
+    }).catch(cause => {
+      throw new Error(`Trace renderer did not finish: ${actual?.nodes.length}/${expectedNodes.length} nodes, ${actual?.edges.length}/${expectedEdges.length} edges, ${actual?.labels.length}/${expectedEdges.length} labels`, { cause });
     });
     assert.deepEqual(actual.nodes, expectedNodes);
     assert.deepEqual(actual.edges, expectedEdges);

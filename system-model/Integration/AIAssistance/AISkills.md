@@ -22,10 +22,10 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 
 ### AI Skill Installer Distribution
 
-The system shall provide remote, no-clone skill installers whose downloadable manifests stay synchronized with the supported Claude and Codex skill artifact files.
+The system SHALL distribute a single assistant-neutral skill collection installable from the repository's main branch without requiring a user-managed clone.
 
 #### Details
-Remote installer distribution details shall follow the associated contract specification.
+Distribution and installation follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -34,73 +34,40 @@ Remote installer distribution details shall follow the associated contract speci
   * definedBy: [AI Skill Installer Distribution Specification](#ai-skill-installer-distribution-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
   * satisfiedBy: [README.md](../../../README.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
-  * satisfiedBy: [AnalyzeCoverage.md](../../../claude-plugins/skills/audit/reference/AnalyzeCoverage.md)
-  * satisfiedBy: [AnalyzeModel.md](../../../claude-plugins/skills/audit/reference/AnalyzeModel.md)
-  * satisfiedBy: [ChangeImpact.md](../../../claude-plugins/skills/audit/reference/ChangeImpact.md)
-  * satisfiedBy: [Lint.md](../../../claude-plugins/skills/audit/reference/Lint.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
-  * satisfiedBy: [ConceptAuthoring.md](../../../claude-plugins/skills/concept-authoring/reference/ConceptAuthoring.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
-  * satisfiedBy: [OntologyAuthoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyAuthoring.md)
-  * satisfiedBy: [OntologyRefactoring.md](../../../claude-plugins/skills/ontology-authoring/reference/OntologyRefactoring.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
-  * satisfiedBy: [AddCapability.md](../../../claude-plugins/skills/syseng/reference/AddCapability.md)
-  * satisfiedBy: [AddRequirement.md](../../../claude-plugins/skills/syseng/reference/AddRequirement.md)
-  * satisfiedBy: [AddVerification.md](../../../claude-plugins/skills/syseng/reference/AddVerification.md)
-  * satisfiedBy: [CapabilitySemanticContractRefactor.md](../../../claude-plugins/skills/syseng/reference/CapabilitySemanticContractRefactor.md)
-  * satisfiedBy: [Collect.md](../../../claude-plugins/skills/syseng/reference/Collect.md)
-  * satisfiedBy: [ConsolidateRequirements.md](../../../claude-plugins/skills/syseng/reference/ConsolidateRequirements.md)
-  * satisfiedBy: [Containment.md](../../../claude-plugins/skills/syseng/reference/Containment.md)
-  * satisfiedBy: [ContainmentStructureRefactor.md](../../../claude-plugins/skills/syseng/reference/ContainmentStructureRefactor.md)
-  * satisfiedBy: [CreatingTasks.md](../../../claude-plugins/skills/syseng/reference/CreatingTasks.md)
-  * satisfiedBy: [DesignDocOwnership.md](../../../claude-plugins/skills/syseng/reference/DesignDocOwnership.md)
-  * satisfiedBy: [Link.md](../../../claude-plugins/skills/syseng/reference/Link.md)
-  * satisfiedBy: [Move.md](../../../claude-plugins/skills/syseng/reference/Move.md)
-  * satisfiedBy: [Remove.md](../../../claude-plugins/skills/syseng/reference/Remove.md)
-  * satisfiedBy: [RenameElement.md](../../../claude-plugins/skills/syseng/reference/RenameElement.md)
-  * satisfiedBy: [Setup.md](../../../claude-plugins/skills/syseng/reference/Setup.md)
-  * satisfiedBy: [SpecificationLanguageCleanup.md](../../../claude-plugins/skills/syseng/reference/SpecificationLanguageCleanup.md)
-  * satisfiedBy: [SpecificationsExtractionLogic.md](../../../claude-plugins/skills/syseng/reference/SpecificationsExtractionLogic.md)
-  * satisfiedBy: [SubmodelRefactor.md](../../../claude-plugins/skills/syseng/reference/SubmodelRefactor.md)
-  * satisfiedBy: [VerificationAlignment.md](../../../claude-plugins/skills/syseng/reference/VerificationAlignment.md)
-  * satisfiedBy: [explore.md](../../../claude-plugins/skills/syseng/reference/explore.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
-  * satisfiedBy: [AnalyzeCoverage.md](../../../codex-skills/reqvire-audit/references/AnalyzeCoverage.md)
-  * satisfiedBy: [AnalyzeModel.md](../../../codex-skills/reqvire-audit/references/AnalyzeModel.md)
-  * satisfiedBy: [ChangeImpact.md](../../../codex-skills/reqvire-audit/references/ChangeImpact.md)
-  * satisfiedBy: [Lint.md](../../../codex-skills/reqvire-audit/references/Lint.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
-  * satisfiedBy: [openai.yaml](../../../codex-skills/reqvire-concept-authoring/agents/openai.yaml)
-  * satisfiedBy: [ConceptAuthoring.md](../../../codex-skills/reqvire-concept-authoring/references/ConceptAuthoring.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
-  * satisfiedBy: [openai.yaml](../../../codex-skills/reqvire-ontology-authoring/agents/openai.yaml)
-  * satisfiedBy: [OntologyAuthoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyAuthoring.md)
-  * satisfiedBy: [OntologyRefactoring.md](../../../codex-skills/reqvire-ontology-authoring/references/OntologyRefactoring.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
-  * satisfiedBy: [AddCapability.md](../../../codex-skills/reqvire-syseng/references/AddCapability.md)
-  * satisfiedBy: [AddRequirement.md](../../../codex-skills/reqvire-syseng/references/AddRequirement.md)
-  * satisfiedBy: [AddVerification.md](../../../codex-skills/reqvire-syseng/references/AddVerification.md)
-  * satisfiedBy: [CapabilitySemanticContractRefactor.md](../../../codex-skills/reqvire-syseng/references/CapabilitySemanticContractRefactor.md)
-  * satisfiedBy: [Collect.md](../../../codex-skills/reqvire-syseng/references/Collect.md)
-  * satisfiedBy: [ConsolidateRequirements.md](../../../codex-skills/reqvire-syseng/references/ConsolidateRequirements.md)
-  * satisfiedBy: [Containment.md](../../../codex-skills/reqvire-syseng/references/Containment.md)
-  * satisfiedBy: [ContainmentStructureRefactor.md](../../../codex-skills/reqvire-syseng/references/ContainmentStructureRefactor.md)
-  * satisfiedBy: [CreatingTasks.md](../../../codex-skills/reqvire-syseng/references/CreatingTasks.md)
-  * satisfiedBy: [DesignDocOwnership.md](../../../codex-skills/reqvire-syseng/references/DesignDocOwnership.md)
-  * satisfiedBy: [Link.md](../../../codex-skills/reqvire-syseng/references/Link.md)
-  * satisfiedBy: [Move.md](../../../codex-skills/reqvire-syseng/references/Move.md)
-  * satisfiedBy: [Remove.md](../../../codex-skills/reqvire-syseng/references/Remove.md)
-  * satisfiedBy: [RenameElement.md](../../../codex-skills/reqvire-syseng/references/RenameElement.md)
-  * satisfiedBy: [Setup.md](../../../codex-skills/reqvire-syseng/references/Setup.md)
-  * satisfiedBy: [SpecificationLanguageCleanup.md](../../../codex-skills/reqvire-syseng/references/SpecificationLanguageCleanup.md)
-  * satisfiedBy: [SpecificationsExtractionLogic.md](../../../codex-skills/reqvire-syseng/references/SpecificationsExtractionLogic.md)
-  * satisfiedBy: [SubmodelRefactor.md](../../../codex-skills/reqvire-syseng/references/SubmodelRefactor.md)
-  * satisfiedBy: [VerificationAlignment.md](../../../codex-skills/reqvire-syseng/references/VerificationAlignment.md)
-  * satisfiedBy: [explore.md](../../../codex-skills/reqvire-syseng/references/explore.md)
-  * satisfiedBy: [CODEX_SKILLS.md](../../../doc/CODEX_SKILLS.md)
-  * satisfiedBy: [install-claude-skill.sh](../../../scripts/install-claude-skill.sh)
-  * satisfiedBy: [install-codex-skill.sh](../../../scripts/install-codex-skill.sh)
+  * satisfiedBy: [SKILLS.md](../../../doc/SKILLS.md)
+  * satisfiedBy: [SKILL.md](../../../skills/reqvire-audit/SKILL.md)
+  * satisfiedBy: [AnalyzeCoverage.md](../../../skills/reqvire-audit/references/AnalyzeCoverage.md)
+  * satisfiedBy: [AnalyzeModel.md](../../../skills/reqvire-audit/references/AnalyzeModel.md)
+  * satisfiedBy: [ChangeImpact.md](../../../skills/reqvire-audit/references/ChangeImpact.md)
+  * satisfiedBy: [Lint.md](../../../skills/reqvire-audit/references/Lint.md)
+  * satisfiedBy: [SKILL.md](../../../skills/reqvire-concept-authoring/SKILL.md)
+  * satisfiedBy: [openai.yaml](../../../skills/reqvire-concept-authoring/agents/openai.yaml)
+  * satisfiedBy: [ConceptAuthoring.md](../../../skills/reqvire-concept-authoring/references/ConceptAuthoring.md)
+  * satisfiedBy: [SKILL.md](../../../skills/reqvire-ontology-authoring/SKILL.md)
+  * satisfiedBy: [openai.yaml](../../../skills/reqvire-ontology-authoring/agents/openai.yaml)
+  * satisfiedBy: [OntologyAuthoring.md](../../../skills/reqvire-ontology-authoring/references/OntologyAuthoring.md)
+  * satisfiedBy: [OntologyRefactoring.md](../../../skills/reqvire-ontology-authoring/references/OntologyRefactoring.md)
+  * satisfiedBy: [SKILL.md](../../../skills/reqvire-syseng/SKILL.md)
+  * satisfiedBy: [AddCapability.md](../../../skills/reqvire-syseng/references/AddCapability.md)
+  * satisfiedBy: [AddRequirement.md](../../../skills/reqvire-syseng/references/AddRequirement.md)
+  * satisfiedBy: [AddVerification.md](../../../skills/reqvire-syseng/references/AddVerification.md)
+  * satisfiedBy: [CapabilitySemanticContractRefactor.md](../../../skills/reqvire-syseng/references/CapabilitySemanticContractRefactor.md)
+  * satisfiedBy: [Collect.md](../../../skills/reqvire-syseng/references/Collect.md)
+  * satisfiedBy: [ConsolidateRequirements.md](../../../skills/reqvire-syseng/references/ConsolidateRequirements.md)
+  * satisfiedBy: [Containment.md](../../../skills/reqvire-syseng/references/Containment.md)
+  * satisfiedBy: [ContainmentStructureRefactor.md](../../../skills/reqvire-syseng/references/ContainmentStructureRefactor.md)
+  * satisfiedBy: [CreatingTasks.md](../../../skills/reqvire-syseng/references/CreatingTasks.md)
+  * satisfiedBy: [DesignDocOwnership.md](../../../skills/reqvire-syseng/references/DesignDocOwnership.md)
+  * satisfiedBy: [Link.md](../../../skills/reqvire-syseng/references/Link.md)
+  * satisfiedBy: [Move.md](../../../skills/reqvire-syseng/references/Move.md)
+  * satisfiedBy: [Remove.md](../../../skills/reqvire-syseng/references/Remove.md)
+  * satisfiedBy: [RenameElement.md](../../../skills/reqvire-syseng/references/RenameElement.md)
+  * satisfiedBy: [Setup.md](../../../skills/reqvire-syseng/references/Setup.md)
+  * satisfiedBy: [SpecificationLanguageCleanup.md](../../../skills/reqvire-syseng/references/SpecificationLanguageCleanup.md)
+  * satisfiedBy: [SpecificationsExtractionLogic.md](../../../skills/reqvire-syseng/references/SpecificationsExtractionLogic.md)
+  * satisfiedBy: [SubmodelRefactor.md](../../../skills/reqvire-syseng/references/SubmodelRefactor.md)
+  * satisfiedBy: [VerificationAlignment.md](../../../skills/reqvire-syseng/references/VerificationAlignment.md)
+  * satisfiedBy: [explore.md](../../../skills/reqvire-syseng/references/explore.md)
   * satisfiedBy: [CodingAssistants.tsx](../../../website/src/pages/CodingAssistants.tsx)
   * verifiedBy: [AI Skill Installer Manifest Verification](../../Verifications/Integration/AIAssistance/AISkillVerifications.md#ai-skill-installer-manifest-verification)
 ---
@@ -115,11 +82,19 @@ Instruction contract details shall follow the associated contract specification.
 #### Metadata
   * type: requirement
 
+#### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
+  * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+
 #### Relations
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
-  * satisfiedBy: [VerificationAlignment.md](../../../codex-skills/reqvire-syseng/references/VerificationAlignment.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
-  * satisfiedBy: [VerificationAlignment.md](../../../claude-plugins/skills/syseng/reference/VerificationAlignment.md)
   * definedBy: [AI Skills Instruction Contract Specification](#ai-skills-instruction-contract-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
 ---
@@ -135,38 +110,38 @@ Artifact contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Contract References
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
   * [MCP Prompt Guidance Specification](../../Interfaces/MCP/Specifications.md#mcp-prompt-guidance-specification)
+  * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+  * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
 
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
   * derivedFrom: [AI Assistant Skill-Guided Reqvire Modeling](#ai-assistant-skill-guided-reqvire-modeling)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/audit/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/concept-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-audit/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-concept-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
-  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
   * verifiedBy: [AI Skill CLI Command Reference Verification](../../Verifications/Integration/AIAssistance/AISkillVerifications.md#ai-skill-cli-command-reference-verification)
 ---
 
 ### AI Skill Installer Distribution Specification
 
-AI skill installer distribution defines the supported no-clone installer behavior for assistant skill packages.
+AI skill distribution uses the standard skills CLI to install the canonical repository package.
 
 #### Details
-Installer distribution rules:
-- Claude Code marketplace installation remains the default Claude Code installation path.
-- The Claude direct installer shall install the checked-in Claude skill package into `$CLAUDE_HOME/skills`, defaulting to `~/.claude/skills` when `CLAUDE_HOME` is unset.
-- The Codex direct installer shall install the checked-in Codex skill package into `$CODEX_HOME/skills`, defaulting to `~/.codex/skills` when `CODEX_HOME` is unset.
-- Direct installers shall support local checkout execution by copying local skill directories.
-- Direct installers shall support remote `curl ... | bash` execution by downloading from `REQVIRE_REPO_RAW`, defaulting to the Reqvire GitHub raw URL.
-- Remote installers shall stage downloads in a temporary directory and replace a target skill directory only after that skill has been fully staged.
-- Installer manifests shall list every file that belongs to the corresponding remote skill package, including reference documents and assistant-specific metadata files.
-- Any addition, removal, or rename under `claude-plugins/skills` or `codex-skills` shall be treated as a change-impact trigger for the direct installer manifests.
+- Maintain exactly four shared skill packages under the repository-root `skills/` directory: `reqvire-syseng`, `reqvire-audit`, `reqvire-ontology-authoring`, and `reqvire-concept-authoring`.
+- Each package contains `SKILL.md` with the matching stable skill name, its complete supporting references, and any applicable assistant metadata. The same package serves Claude Code and Codex.
+- README and website installation examples explicitly select `https://github.com/reqvire-org/reqvire/tree/main/skills` with `npx skills add`; show agent selection for `codex` and `claude-code`, optional `--global` installation, and `--skill` selection.
+- Project installation is the default. The skills CLI owns target-agent discovery, installation scope, and copying or symlinking; do not claim that custom Reqvire home-directory settings control that CLI.
+- Use the same source URL to reinstall or update skills from main. Local checkout installation may use `npx skills add ./skills`.
+- Deprecate the Claude marketplace plugin and discontinue marketplace packaging, duplicate assistant source trees, and custom curl-based installer scripts. Existing marketplace users receive guidance to disable or uninstall the old plugin and install the shared skills.
+- Installation documentation distinguishes reusable skills from the Reqvire executable and MCP server. Installing skills alone does not start an MCP server or enable mutations.
 
 #### Metadata
   * type: specification
@@ -192,6 +167,8 @@ Instruction contract rules:
 - Guidance MUST place bindings on the requirements responsible for the obligation, preserve the mutual exclusion of binding and reference sections on one requirement, and preserve acyclic dependencies including mixed reference, binding, and ancestry paths.
 - Model-refactor examples include correct and incorrect examples where that improves assistant behavior.
 
+Interface guidance follows the owning requirement's boundary and maintenance references. Authoring/refactoring workflows use typed MCP tools with mutation enablement, including their previews; inspection, validation and exports may use retained CLI commands. Formatting is MCP-only, lint repair uses `reqvire.lint` with `fix: true`, and ordinary successful writes already normalize affected documents. Known migrations remain CLI preview/application before validated MCP startup. Do not prescribe removed CLI authoring commands, CLI formatting or CLI lint repair.
+
 #### Metadata
   * type: specification
 
@@ -205,23 +182,19 @@ AI skills markdown artifacts define the assistant-facing files that implement th
 
 #### Details
 Artifact contract rules:
-- Codex skill artifacts live under `codex-skills/reqvire-syseng`.
-- Claude skill artifacts live under `claude-plugins/skills/syseng`.
-- Codex audit skill artifacts live under `codex-skills/reqvire-audit`.
-- Claude audit skill artifacts live under `claude-plugins/skills/audit`.
-- Codex ontology-authoring skill artifacts live under `codex-skills/reqvire-ontology-authoring`.
-- Claude ontology-authoring skill artifacts live under `claude-plugins/skills/ontology-authoring`.
-- Codex concept-authoring skill artifacts live under `codex-skills/reqvire-concept-authoring`.
-- Claude concept-authoring skill artifacts live under `claude-plugins/skills/concept-authoring`.
-- Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
+- All assistant-neutral skill artifacts live under the repository-root `skills/` directory, with package directories matching their stable `reqvire-*` skill names.
+- Supporting references use the shared `references/` layout. Local and cross-skill links resolve within the delivered collection. Assistant-specific metadata may accompany a package without creating a second guidance tree.
+- Skill invocation guidance uses the shared skill names rather than retired marketplace namespaces or slash commands.
 - Authoring, refactoring, collection, search, and audit references MUST describe both contract dependency kinds consistently. Reference examples MUST use requirement-owned contract elements, retain change-impact visibility, and exclude references from implementation fulfillment and evidence.
-- Mutation examples MUST cover `referenceContract`, removal through `unlink`, and rejected mixed-section edits. Search examples MUST use the dedicated binding/reference filters with normalized target identifier globs.
+- MCP mutation examples MUST cover `relation_type: "referenceContract"`, removal through the typed unlink tool, and rejected mixed-section edits. Search examples MUST use the dedicated binding/reference filters with normalized target identifier globs.
 - CLI command references shall match supported report output modes. JSON-only `model`, `containment`, `resources`, and `traces` commands emit JSON to stdout without `--json` and accept `--output <file>` directly. Shared flag guidance shall distinguish these commands from commands whose file output requires `--json`.
 - Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
 - Ontology-authoring guidance should distinguish generic labels/descriptions from ontology slots: `rdfs:label` and `rdfs:comment` are appropriate for optional presentation metadata, while true domain concepts, canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable domain meanings remain declared ontology properties even when their local names end with `Name` or `Meaning`.
 - Ontology-authoring guidance should use canonical Reqvire ontology identity: the top parent ontology element in an ontology subgraph defines `ontology_base` and `ontology_prefix` metadata, authored Turtle uses the corresponding hash namespace for terms such as classes/properties/individuals, and export emits one generated `owl:Ontology` document declaration per resolved `ontology_base`. Guidance should state that child ontology elements with the same inherited base contribute vocabulary to that same ontology document, that cross-base ontology hierarchy can become `owl:imports`, that authored Turtle using the inherited prefix must explicitly declare it to `<ontology_base>#`, and that missing or conflicting declarations are invalid.
 - Ontology-authoring guidance should preserve the OWL/SHACL block split: OWL `#### Ontology` blocks declare `owl:DatatypeProperty` and `owl:ObjectProperty` terms with stable `rdfs:domain`/`rdfs:range` values, including XSD ranges for datatype properties; SHACL `#### Shapes` blocks declare `sh:NodeShape` profiles using `sh:targetClass` and `sh:path` over reachable ontology terms and carry operational validation facets such as closed-world cardinality, numeric bounds, patterns, enumerations, and messages.
 - Ontology-authoring skills should keep existing-ontology cleanup guidance in a separate refactoring reference document. The main skill should load that reference only when the task is to refactor, audit, clean up, or improve existing ontology content, not for greenfield ontology creation.
+
+All shared skills, installed copies and reference pages MUST use the supported interface boundary. CRUD examples use typed MCP tool names and arguments rather than removed CLI verbs; no shell/CLI wrapper substitutes for an MCP authoring tool. Preserve read/report CLI examples where supported, including their actual output controls. Show MCP formatting preview/application, gated lint repair, automatic canonical writes and the CLI migration exception. Installed copies and canonical package guidance must agree with the released boundary; updating this contract alone does not update those artifacts.
 
 #### Metadata
   * type: specification

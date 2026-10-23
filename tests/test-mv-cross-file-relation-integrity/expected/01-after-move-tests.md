@@ -31,4 +31,3 @@ Verify Capability B implementation.
   * derivedFrom: [Verification Objective](#verification-objective)
   * verify: [Capability B](../Requirements.md#capability-b)
 ---
-

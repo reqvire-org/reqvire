@@ -1,6 +1,6 @@
 PASS failed-requested-rebuild
-PASS missing-npm-requested-rebuild
-PASS prebuilt-without-npm
+PASS missing-bun-requested-rebuild
+PASS prebuilt-without-bun
 PASS identical-outputs-untouched
 PASS changed-and-removed-assets
 PASS missing-bundle

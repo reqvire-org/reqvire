@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
+import { type ComponentChildren } from "preact";
+import { createPortal } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { useLatestRef } from "../../hooks/useLatestRef";
 
@@ -7,7 +8,7 @@ export interface ExpandableViewportProps {
   expanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
   label: string;
-  children: ReactNode;
+  children: ComponentChildren;
 }
 
 const slotUX = css`

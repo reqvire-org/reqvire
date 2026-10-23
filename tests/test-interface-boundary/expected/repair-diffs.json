@@ -1,0 +1,67 @@
+[
+  {
+    "file_path": "Repair.md",
+    "lines": [
+      {
+        "color": "context",
+        "content": "    # Elements",
+        "prefix": "01"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "02"
+      },
+      {
+        "color": "context",
+        "content": "    ### Repair Capability",
+        "prefix": "03"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      },
+      {
+        "color": "context",
+        "content": "      * type: requirement",
+        "prefix": "40"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "41"
+      },
+      {
+        "color": "context",
+        "content": "    #### Relations",
+        "prefix": "42"
+      },
+      {
+        "color": "red",
+        "content": "-     * derivedFrom: [Repair Root](#repair-root)",
+        "prefix": "43"
+      },
+      {
+        "color": "context",
+        "content": "      * derivedFrom: [Repair Left](#repair-left)",
+        "prefix": "43"
+      },
+      {
+        "color": "context",
+        "content": "    ---",
+        "prefix": "44"
+      },
+      {
+        "color": "context",
+        "content": "",
+        "prefix": "45"
+      },
+      {
+        "color": "separator",
+        "content": "",
+        "prefix": ""
+      }
+    ]
+  }
+]

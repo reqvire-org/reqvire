@@ -74,13 +74,14 @@ pub fn dispatch_tool(
         "reqvire.semantic.sparql" => {
             sparql_tool(args, excluded_filename_patterns, with_size_estimates)
         }
-        "reqvire.lint" => lint_tool(args, excluded_filename_patterns),
+        "reqvire.lint" => lint_tool(args, enable_mutations, excluded_filename_patterns),
         "reqvire.coverage" => coverage_tool(args, excluded_filename_patterns),
         "reqvire.traces" => traces_tool(args, excluded_filename_patterns),
         "reqvire.resources" => resources_tool(excluded_filename_patterns),
         "reqvire.change_impact" => change_impact_tool(args, excluded_filename_patterns),
         "reqvire.format" => format_tool(args, enable_mutations, excluded_filename_patterns),
         "reqvire.add_element" => add_element_tool(args, excluded_filename_patterns),
+        "reqvire.update_element" => update_element_tool(args, excluded_filename_patterns),
         "reqvire.remove_element" => remove_element_tool(args, excluded_filename_patterns),
         "reqvire.move_element" => move_element_tool(args, excluded_filename_patterns),
         "reqvire.rename_element" => rename_element_tool(args, excluded_filename_patterns),

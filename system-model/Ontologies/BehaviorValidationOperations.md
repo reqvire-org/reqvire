@@ -286,16 +286,16 @@ reqvire:lintRepairMode a owl:DatatypeProperty ;
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
   reqvire:lintScope "capability-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned contract contract_bindings would preserve ownership more clearly." ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where a specify relation, concept reference, semantic-contract relation, or requirement-owned Contract Binding or Contract Reference would preserve ownership more clearly, according to implementation responsibility or review dependency." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
 reqvire:redundantRelationLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "redundant-relation" ;
-  reqvire:lintScope "relations and contract_bindings" ;
-  reqvire:lintCondition "A relation or contract_bindings duplicates an already implied or repeated model edge." ;
+  reqvire:lintScope "hierarchical and verification relations" ;
+  reqvire:lintCondition "A direct relation is redundant under its hierarchical or verification reachability policy." ;
   reqvire:lintFindingKind "redundant-relation" ;
-  reqvire:lintRepairMode "explicit-fix-or-format-when-lossless" .
+  reqvire:lintRepairMode "mutation-enabled-safe-lint-repair" .
 
 ```
 
@@ -304,6 +304,93 @@ reqvire:redundantRelationLintRule a reqvire:LintingRule ;
 
 #### Relations
   * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
+---
+
+### Reqvire Model Mutation Ontology
+
+Defines model mutations, identity-preserving definition replacement, deletion, and the relationships retained across a replacement.
+
+The vocabulary distinguishes complete-definition replacement from an edit confined to one content region, identifies that region's owning definition, and distinguishes opening text from a named subsection.
+
+#### Ontology
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix concept: <https://www.reqvire.org/concepts#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+reqvire:ModelMutation a owl:Class ;
+  reqvire:mapsToConcept concept:ModelMutation ;
+  rdfs:comment "Change to the authored definitions or structure of an accepted system model." .
+reqvire:AtomicModelMutation a owl:Class ;
+  rdfs:subClassOf reqvire:ModelMutation ;
+  reqvire:mapsToConcept concept:AtomicModelMutation ;
+  rdfs:comment "Model mutation with one indivisible accepted-state transition." .
+reqvire:ElementOverride a owl:Class ;
+  rdfs:subClassOf reqvire:AtomicModelMutation ;
+  reqvire:mapsToConcept concept:ElementOverride ;
+  owl:disjointWith reqvire:ElementDeletion ;
+  rdfs:comment "Replacement of an existing element's authored definition that retains its identity and externally authored incoming relationships." .
+reqvire:ElementDeletion a owl:Class ;
+  rdfs:subClassOf reqvire:AtomicModelMutation ;
+  reqvire:mapsToConcept concept:ElementDeletion ;
+  rdfs:comment "Removal of an element from the resulting accepted model." .
+reqvire:AuthoredElementDefinition a owl:Class ;
+  reqvire:mapsToConcept concept:AuthoredElementDefinition ;
+  rdfs:comment "Author-supplied content, metadata, and declarations for one element, excluding generated inverses and declarations authored on other elements." .
+
+reqvire:FocusedElementEdit a owl:Class ;
+  rdfs:subClassOf reqvire:AtomicModelMutation ;
+  reqvire:mapsToConcept concept:FocusedElementEdit ;
+  rdfs:comment "Mutation confined to selected content of one element while retaining identity and declarations outside the selection." .
+reqvire:EditTarget a owl:Class ;
+  reqvire:mapsToConcept concept:EditTarget ;
+  rdfs:comment "Bounded region selected within an authored element definition." .
+reqvire:ElementText a owl:Class ;
+  rdfs:subClassOf reqvire:EditTarget ;
+  reqvire:mapsToConcept concept:ElementText ;
+  rdfs:comment "Opening human-readable element content preceding its first subsection boundary." .
+reqvire:ElementSubsection a owl:Class ;
+  rdfs:subClassOf reqvire:EditTarget ;
+  reqvire:mapsToConcept concept:ElementSubsection ;
+  rdfs:comment "Named region of an authored element definition with type-dependent content semantics." .
+reqvire:editTarget a owl:ObjectProperty ;
+  rdfs:domain reqvire:FocusedElementEdit ;
+  rdfs:range reqvire:EditTarget ;
+  rdfs:comment "Region to which the intended authored-content change is confined." .
+reqvire:targetDefinition a owl:ObjectProperty ;
+  rdfs:domain reqvire:EditTarget ;
+  rdfs:range reqvire:AuthoredElementDefinition ;
+  rdfs:comment "Authored element definition containing the selected region." .
+
+reqvire:mutationSubject a owl:ObjectProperty ;
+  rdfs:domain reqvire:ModelMutation ;
+  rdfs:range reqvire:Element ;
+  rdfs:comment "Element whose authored definition or presence is the subject of a model mutation." .
+reqvire:replacementDefinition a owl:ObjectProperty ;
+  rdfs:domain reqvire:ElementOverride ;
+  rdfs:range reqvire:AuthoredElementDefinition ;
+  rdfs:comment "Complete authored definition supplied for an element override." .
+reqvire:preservedElementIdentity a owl:ObjectProperty ;
+  rdfs:domain reqvire:ElementOverride ;
+  rdfs:range reqvire:ElementIdentity ;
+  rdfs:comment "Element identity retained across the replacement of an authored definition." .
+reqvire:retainedIncomingRelation a owl:ObjectProperty ;
+  rdfs:domain reqvire:ElementOverride ;
+  rdfs:range reqvire:ModelRelation ;
+  reqvire:mapsToConcept concept:IncomingRelation ;
+  rdfs:comment "Externally authored model relation retained with the overridden element as its target." .
+reqvire:retainedDependencyConsumer a owl:ObjectProperty ;
+  rdfs:domain reqvire:ElementOverride ;
+  rdfs:range reqvire:Element ;
+  rdfs:comment "Element whose externally authored contract or terminology dependency continues to target the overridden element." .
+```
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
 ### Reqvire Validation Ontology
@@ -460,7 +547,7 @@ reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationSeverity "warning" ;
   reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
   reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with contract_bindings/trace or remodel hierarchy under one capability root." .
+  reqvire:validationRepair "Remove the cross-boundary hierarchy edge and declare the intended compatible dependency: a Contract Binding for a shared implementation obligation, a Contract Reference for change-impact review, a Concept Reference for native terminology, or semantic-contract use/constrain relations. Keep contract dependencies on responsible requirements; retain hierarchy only for genuine ownership within one capability root." .
 
 reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
@@ -474,9 +561,9 @@ reqvire:redundantVerifyLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-verify-relation" ;
   reqvire:validationScope "lint" ;
   reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A verification directly verifies both a requirement and an ancestor covered by that requirement's verification path." ;
-  reqvire:validationOutcome "Report as manual review or auto-fixable depending on whether removing the ancestor verify relation preserves intended evidence scope." ;
-  reqvire:validationRepair "Keep verification at the most precise requirement scope, or document why broader requirement verification is intended." .
+  reqvire:validationCondition "A direct verification target is redundant under the verification relation redundancy policy." ;
+  reqvire:validationOutcome "Report eligible redundant direct ancestor targets as auto-fixable. Coverage roll-up alone does not make a separately scoped parent verification redundant." ;
+  reqvire:validationRepair "Remove only direct verify edges classified as redundant by the shared reachability policy; review independent parent integration intent separately." .
 
 reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-multi-branch-convergence" ;

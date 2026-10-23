@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@/test/render";
 import { describe, expect, it, vi } from "vitest";
 import {
   MarkdownContent,
@@ -37,7 +37,7 @@ describe("MarkdownContent", () => {
         markdown={[
           "```mermaid",
           "graph TD",
-          "  classDef capability fill:var(--capability),stroke:var(--capability-ink),stroke-width:2.5px;",
+          "  classDef capability fill:var(--color-role-capability),stroke:var(--color-role-capability-ink),stroke-width:2.5px;",
           "  A[Capability]:::capability",
           "```",
         ].join("\n")}
@@ -68,6 +68,42 @@ describe("MarkdownContent", () => {
 
     expect(await screen.findByTestId("mermaid-svg")).toBeTruthy();
     expect(screen.queryByText("Unable to render Mermaid diagram.")).toBeNull();
+  });
+
+  it("ends Mermaid panning when pointer capture is lost and detaches listeners on unmount", async () => {
+    let captured = false;
+    const releasePointerCapture = vi.fn(() => { captured = false; });
+    window.mermaid = {
+      render: vi.fn().mockResolvedValue({
+        svg: '<svg data-testid="mermaid-svg"></svg>',
+        bindFunctions: (container: HTMLElement) => Object.assign(container.querySelector("svg")!, {
+          getBBox: () => ({ x: 0, y: 0, width: 100, height: 100 }),
+          setPointerCapture: () => { captured = true; },
+          hasPointerCapture: () => captured,
+          releasePointerCapture,
+        }),
+      }),
+    } as unknown as typeof window.mermaid;
+    const view = render(<MarkdownContent markdown={["```mermaid", "graph TD", "  A-->B", "```"].join("\n")} sourceFilePath="model.md" />);
+    const svg = await screen.findByTestId("mermaid-svg");
+    const container = svg.parentElement!;
+    const pointer = (type: string) => Object.assign(new Event(type, { bubbles: true }), { button: 0, pointerId: 1, clientX: 10, clientY: 20 });
+
+    fireEvent(svg, pointer("pointerdown"));
+    expect(container.classList.contains("is-panning")).toBe(true);
+    captured = false;
+    fireEvent(svg, pointer("lostpointercapture"));
+    expect(container.classList.contains("is-panning")).toBe(false);
+    expect(releasePointerCapture).not.toHaveBeenCalled();
+
+    fireEvent(svg, pointer("pointerdown"));
+    expect(container.classList.contains("is-panning")).toBe(true);
+    fireEvent(svg, pointer("pointercancel"));
+    expect(container.classList.contains("is-panning")).toBe(false);
+    expect(releasePointerCapture).toHaveBeenCalledWith(1);
+    view.unmount();
+    fireEvent(svg, pointer("pointerdown"));
+    expect(container.classList.contains("is-panning")).toBe(false);
   });
 
   it("renders element markdown as safe React output", () => {

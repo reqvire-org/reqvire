@@ -1,5 +1,7 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { useEffect, useState } from "react";
+import type { VNode } from "preact";
+import { runForceAtlasLayout } from "@ds";
+import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
+import { useEffect, useState } from "preact/hooks";
 import type Graph from "graphology";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
@@ -26,9 +28,8 @@ const mockForceAtlasEngine = vi.hoisted(() => vi.fn());
 const mockCameraAnimate = vi.hoisted(() => vi.fn());
 const mockCameraReset = vi.hoisted(() => vi.fn());
 
-vi.mock("../workers/forceAtlasLayoutEngine", async importOriginal => {
+vi.mock("../../design-system/patterns/graphs/forceAtlasLayoutEngine", async importOriginal => {
   const original = await importOriginal<typeof import("../workers/forceAtlasLayoutEngine")>();
-  const { runForceAtlasLayout } = await import("../lib/forceAtlasLayout");
   mockForceAtlasEngine.mockImplementation(input => ({ result: Promise.resolve(runForceAtlasLayout(input)), cancel: vi.fn() }));
   return { ...original, forceAtlasLayoutEngine: mockForceAtlasEngine };
 });
@@ -81,7 +82,7 @@ vi.mock("sigma/utils", () => ({
   animateNodes: mockAnimateNodes,
 }));
 
-function renderWithStore(view: React.ReactElement, store = devFixture) {
+function renderWithStore(view: VNode, store = devFixture) {
   return render(
     <StoreProvider store={store} schemaMismatch={null}>
       <ExplorerUiStateProvider>{view}</ExplorerUiStateProvider>
@@ -223,8 +224,8 @@ describe("native visualization parity views", () => {
 
   it("resolves construction colors once per distinct token even for large graphs and unknown role names", async () => {
     const tokenRead = vi.fn((token: string) => ({
-      "--requirement": "#112233", "--contract": "#223344", "--other": "#334455",
-      "--edge-derive": "#445566", "--edge-satisfy": "#556677",
+      "--color-role-requirement": "#112233", "--color-role-contract": "#223344", "--color-role-other": "#334455",
+      "--color-role-edge-derive": "#445566", "--color-role-edge-satisfy": "#556677",
     })[token] ?? "");
     const originalStyle = window.getComputedStyle.bind(window);
     const computedStyle = vi.spyOn(window, "getComputedStyle").mockImplementation(element => element === document.documentElement
@@ -239,7 +240,7 @@ describe("native visualization parity views", () => {
     try {
       await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledOnce());
       const graph = mockSigmaConstruct.mock.calls[0][0] as Graph;
-      for (const token of ["--requirement", "--contract", "--other", "--edge-derive", "--edge-satisfy"]) {
+      for (const token of ["--color-role-requirement", "--color-role-contract", "--color-role-other", "--color-role-edge-derive", "--color-role-edge-satisfy"]) {
         expect(tokenRead.mock.calls.filter(([name]) => name === token)).toHaveLength(1);
       }
       expect(graph.getNodeAttribute("n0", "color")).toBe("#112233");
@@ -252,7 +253,7 @@ describe("native visualization parity views", () => {
 
   it("reads a new construction palette on context replacement and keeps live focus-edge resolution", async () => {
     let requirement = "#112233", derive = "#445566";
-    const tokenRead = vi.fn((token: string) => token === "--requirement" ? requirement : token === "--edge-derive" ? derive : "");
+    const tokenRead = vi.fn((token: string) => token === "--color-role-requirement" ? requirement : token === "--color-role-edge-derive" ? derive : "");
     const originalStyle = window.getComputedStyle.bind(window);
     const computedStyle = vi.spyOn(window, "getComputedStyle").mockImplementation(element => element === document.documentElement
       ? { getPropertyValue: tokenRead } as unknown as CSSStyleDeclaration : originalStyle(element));
@@ -276,7 +277,7 @@ describe("native visualization parity views", () => {
       view.rerender(<StoreProvider store={next} schemaMismatch={null}><ExplorerUiStateProvider><KnowledgeGraphView frameTestId="model-graph" /></ExplorerUiStateProvider></StoreProvider>);
       await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledTimes(2));
       expect((mockSigmaConstruct.mock.calls[1][0] as Graph).getNodeAttribute("a", "color")).toBe(requirement);
-      expect(tokenRead.mock.calls.filter(([name]) => name === "--requirement")).toHaveLength(2);
+      expect(tokenRead.mock.calls.filter(([name]) => name === "--color-role-requirement")).toHaveLength(2);
     } finally { view.unmount(); computedStyle.mockRestore(); canvasContext.mockRestore(); }
   });
 
@@ -592,7 +593,7 @@ describe("native visualization parity views", () => {
     expect(within(tree).getAllByText("system-model").length).toBeGreaterThanOrEqual(1);
 
     const search = screen.getByRole("searchbox", { name: "Filter project tree" });
-    fireEvent.change(search, { target: { value: "api-smoke" } });
+    fireEvent.input(search, { target: { value: "api-smoke" } });
 
     expect(within(tree).getByText("reqvire")).toBeTruthy();
     expect(within(tree).getByText("Evidence")).toBeTruthy();
@@ -707,7 +708,7 @@ describe("native visualization parity views", () => {
     expect(search.getAttribute("id")).toBe("ontology-graph-search");
     expect(container.querySelector("#ontology-graph-results")).toBeTruthy();
 
-    fireEvent.change(search, { target: { value: "shape" } });
+    fireEvent.input(search, { target: { value: "shape" } });
 
     expect(filterOntologyGraph).toHaveBeenCalledWith("shape");
     delete window.filterOntologyGraph;

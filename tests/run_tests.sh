@@ -2,7 +2,7 @@
 set +e
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/debug/reqvire}"
+SOURCE_REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/release/reqvire}"
 REQVIRE_BIN="$ROOT_DIR/reqvire_timing_wrapper.sh"
 
 now_ms() {
@@ -149,6 +149,8 @@ run_test_case() {
 
     # Bash job control gives this asynchronous suite a private process group on
     # Linux and macOS. Disable it again immediately to keep the runner quiet.
+    # Suites are noninteractive: inheriting the controlling terminal would let
+    # a dependency's stdin access suspend this background group via job control.
     set -m
     (
         trap - EXIT TERM INT HUP
@@ -156,6 +158,7 @@ run_test_case() {
             TEST_DIR="$TEST_DIR" \
                 REQVIRE_BIN="$REQVIRE_BIN" \
                 REAL_REQVIRE_BIN="$REAL_REQVIRE_BIN" \
+                MCP_OPERATION_BIN="$ROOT_DIR/mcp_fixture_operations.py" \
                 REQVIRE_BENCHMARK_INVOCATIONS="$BENCHMARK_INVOCATIONS_FILE" \
                 REQVIRE_BENCHMARK_TEST="$test_name" \
                 bash "$test_folder/test.sh"
@@ -164,7 +167,7 @@ run_test_case() {
             echo "FAILED: fixture setup for $test_name (exit $status)" >&2
             exit "$status"
         fi
-    ) <&0 > "$log_file" 2>&1 &
+    ) </dev/null > "$log_file" 2>&1 &
     ACTIVE_TEST_PID=$!
     set +m
     wait "$ACTIVE_TEST_PID"

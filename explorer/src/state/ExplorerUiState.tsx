@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, type ComponentChildren } from "preact";
+import { useContext, useMemo, useState } from "preact/hooks";
 import { useSelectionNavigation } from "./useSelectionNavigation";
 import { useStore } from "../store/StoreContext";
 import { SEARCH_KINDS, type SearchKind } from "../search/searchKinds";
@@ -27,58 +28,8 @@ export const ONTOLOGY_NODE_ROLES = [
 
 export const ONTOLOGY_SHOW_FILTERS = [] as const;
 
-export const ONTOLOGY_CONSTRUCT_FILTERS = [
-  ["domain-range", "Domain/range", "D/R"],
-  ["subclass", "Subclass", "⊆"],
-  ["membership", "Membership", "∈"],
-  ["disjoint", "Disjoint", "⟂"],
-  ["equivalence", "Equivalence", "⇔"],
-  ["inverse", "Inverse", "⟲"],
-  ["property-chain", "Property chain", "∘"],
-  ["property-characteristic", "Property char.", "→"],
-  ["restriction", "Restriction", "∀"],
-  ["class-expression", "Class expr.", "∩"],
-  ["shape-overlay", "SHACL overlay", "SH"],
-] as const;
-
-export const ONTOLOGY_ORIGIN_FILTERS = [
-  ["authored", "Defined", "authored"],
-  ["registry", "Registry", "registry"],
-  ["construct", "Constructs", "construct"],
-] as const;
-
-export const ONTOLOGY_LAYER_FILTERS = [
-  ["layer-authored", "Ontologies", "authored"],
-  ["layer-concepts", "Concepts", "concepts"],
-  ["layer-reqvire-context", "Semantic Context", "semantic"],
-  ["layer-external-source", "External Sources", "external"],
-] as const;
-
-export const ONTOLOGY_DEFAULT_FILTERS = [
-  "semantic-query",
-  "layer-authored",
-  "layer-concepts",
-  "ontology-term",
-  "shacl-shape",
-  "resource",
-  "external-reference",
-  "class-membership",
-  "class-disjointness",
-  "class-expressions",
-  "domain-range",
-  "subclass",
-  "membership",
-  "disjoint",
-  "equivalence",
-  "inverse",
-  "property-chain",
-  "property-characteristic",
-  "class-expression",
-  "shape-overlay",
-  "authored",
-  "registry",
-  "construct",
-] as const;
+import { ONTOLOGY_DEFAULT_FILTERS } from "@ds";
+export { ONTOLOGY_CONSTRUCT_FILTERS, ONTOLOGY_ORIGIN_FILTERS, ONTOLOGY_LAYER_FILTERS, ONTOLOGY_DEFAULT_FILTERS } from "@ds";
 
 interface ExplorerUiState {
   navigationNotice: string | null;
@@ -130,7 +81,7 @@ interface ExplorerUiState {
 
 const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
 
-export function ExplorerUiStateProvider({ children, worktreeRouting = false }: { children: ReactNode; worktreeRouting?: boolean }) {
+export function ExplorerUiStateProvider({ children, worktreeRouting = false }: { children: ComponentChildren; worktreeRouting?: boolean }) {
   const { store } = useStore();
   const coverageState = useCoverageNavigation(store, worktreeRouting);
   const selectionState = useSelectionNavigation(worktreeRouting);

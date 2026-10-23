@@ -89,4 +89,3 @@ Other contract content.
 #### Metadata
   * type: specification
 ---
-

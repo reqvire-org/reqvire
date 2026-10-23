@@ -1,3 +1,5 @@
+# Generated local artifacts
+/output/
 tests/**/output/
 *Plan.md
 tmpspec
@@ -82,3 +84,9 @@ npm/reqvire/*.tgz
 .index
 .env
 .playwright-cli
+
+# Hermit per-checkout state
+/.hermit/
+
+# Website uses package-lock.json; Bun can generate this on import
+/website/bun.lock

@@ -1,0 +1,3 @@
+import type { UnitContract } from "@reqvire-org/ads/contracts";
+import { ThesaurusExplorer } from "./ThesaurusExplorer";
+export default { schemaVersion:1, behavior:{subjects:{flow:{api:ThesaurusExplorer}}, guarantees:[{id:"canvas-interaction",description:"Custom concept canvases preserve node geometry, pointer targeting, viewport panning and wheel zoom.",subjects:["flow"],checks:["thesaurus-flow-interaction"]}],checks:{"thesaurus-flow-interaction":{file:"./ThesaurusExplorer.ads.behavior.spec.ts",case:"thesaurus-flow-interaction",scenario:"patterns/thesaurus/ThesaurusExplorer",profile:"widget"}}}} satisfies UnitContract;

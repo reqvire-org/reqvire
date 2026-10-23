@@ -27,9 +27,8 @@ export default function UserGuide() {
           option applies to normal CLI commands and the MCP server. A workspace
           must contain at least one eligible Git worktree; files in non-Git
           workspace folders are ignored, and model paths remain relative to the
-          workspace root. Mutating commands may operate across eligible
-          worktrees in the same workspace, but they reject targets in non-Git
-          workspace folders.
+          workspace root. For a model spanning repositories, use a Central Git
+          worktree with a versioned Repo manifest as described below.
         </p>
         <CodeBlock>{`reqvire --workspace /path/to/workspace validate
 reqvire --workspace /path/to/workspace search --filter-type requirement
@@ -40,14 +39,53 @@ reqvire --workspace /path/to/workspace mcp`}</CodeBlock>
         <CodeBlock>{`npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace validate
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace search --filter-type requirement
 npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          For a client-managed project process, add <code>--transport stdio</code>
+          to MCP startup. Use an absolute workspace path in a client&apos;s command
+          and arguments. HTTP remains the default transport; mutation startup
+          retains validation and clean-worktree ownership checks.
+        </p>
+      </Section>
+
+      <Section title="Multi-repository Models">
+        <p className="text-zinc-600 mb-4">
+          Keep the model&apos;s composition in a versioned Google Repo manifest in
+          a Central Git repository. Central is the workspace root; declared
+          component checkouts contribute to the same model. Element paths stay
+          relative to Central, even when an element belongs to a component.
+        </p>
+        <BulletList items={[
+          "Install Git, Python 3, and Google Repo. Initialize the Repo client beside Central's Git checkout, then explicitly sync the component repositories before using Reqvire.",
+          "Track the selected manifest and all its includes in Central. Declare unique, non-overlapping project paths inside Central and revisions available in the local checkouts. Each checkout must match the declared repository identity and selected revision.",
+          "Exclude .repo/ and component checkout directories from Central's Git tracking. Declared component Git inputs remain visible to Reqvire even when Central ignores their directories.",
+          "An initialized .repo/ selects manifest mode automatically. Use --manifest for an explicit Central-relative manifest selection. A selected manifest that cannot resolve fails; Reqvire never silently falls back or fetches missing commits.",
+          "CLI, MCP and Explorer use the same combined source scope. Workspace .reqvireignore rules apply globally; each repository's Git ignores apply within its ownership boundary. Undeclared repositories and Repo metadata are excluded. Repo submanifests are not supported.",
+        ]} />
+        <CodeBlock>{`# The Central repository already tracks default.xml and its includes
+# and ignores /.repo/ and /repositories/.
+git clone https://github.com/example/central.git central
+cd central
+repo init -u https://github.com/example/central.git -b main -m default.xml
+repo sync
+
+# Initialization selects the manifest automatically
+reqvire validate
+# Or select another versioned manifest explicitly
+reqvire --manifest default.xml search --json
+reqvire --manifest default.xml serve --enable-mcp --enable-mutations`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Inspection does not require clean content. Mutation startup requires
+          clean committed Central and component checkouts and Git author identity.
+          Branch selection chooses Central&apos;s branch and its manifest; it does
+          not require identically named component branches. See the MCP Server
+          guide for private branch checkouts and component-first commits.
+        </p>
       </Section>
 
       <Section title="Core Commands">
         <CommandList
           items={[
             { cmd: "reqvire validate", desc: "Parse and validate model structure, relations, Contract Bindings, Contract References, ontology, and semantic contracts." },
-            { cmd: "reqvire format", desc: "Preview canonical formatting, ordering, and relation layout." },
-            { cmd: "reqvire format --fix", desc: "Apply formatting fixes." },
             { cmd: "reqvire lint", desc: "Find model quality issues such as redundant relations and cross-boundary hierarchy problems." },
             { cmd: "reqvire lint --auditable", desc: "Report remediation-ready structural findings." },
             { cmd: "reqvire search", desc: "Filter the model by type, file, name, content, relations, and governance metadata." },
@@ -101,100 +139,109 @@ reqvire semantic export --layer queries --output queries.ttl`}</CodeBlock>
         </p>
       </Section>
 
-      <Section title="Working with Elements">
-        <CommandList
-          items={[
-            { cmd: "reqvire add <file>", desc: "Append a new Markdown element from inline content, stdin, or a file." },
-            { cmd: "reqvire add <file> --dry-run", desc: "Preview a new or overridden element without writing." },
-            { cmd: "reqvire rm <element>", desc: "Remove an element and validate remaining links." },
-            { cmd: "reqvire mv <element> <file>", desc: "Move an element to another Markdown file while preserving references." },
-            { cmd: "reqvire rename <old> <new>", desc: "Rename an element and update links." },
-            { cmd: "reqvire merge <target> <source>", desc: "Merge source element content and relations into a target." },
-            { cmd: "reqvire mv-file <old> <new>", desc: "Move or rename a model file while updating model references." },
-            { cmd: "reqvire mv-file <old> <new> --squash", desc: "Merge all elements from one file into another file." },
-            { cmd: "reqvire mv-folder <old> <new>", desc: "Move or rename a model folder while updating model references and local evidence paths." },
-            { cmd: "reqvire mv-asset <old> <new>", desc: "Move a referenced non-model file and update references." },
-            { cmd: "reqvire rm-asset <path>", desc: "Remove a referenced asset from the model." },
-          ]}
-        />
-        <p className="text-zinc-600 mt-4">
-          Element, file, folder, and asset paths are workspace-root-relative.
-          In a parent workspace, move and add commands can target any eligible
-          Git worktree under that root while rejecting non-Git workspace
-          folders.
+      <Section title="Authoring through MCP">
+        <p className="text-zinc-600 mb-4">
+          Start MCP with mutations enabled to create, replace, remove, move,
+          rename, and merge elements or move files, folders, and assets.
+          Typed authoring previews also require mutation enablement. Paths are
+          relative to the selected worktree context's workspace root.
         </p>
-        <div className="mt-5">
-          <CodeBlock>{`reqvire add system-model/Auth.md --content '### Token Expiry Requirement
+        <CodeBlock>{`reqvire mcp --enable-mutations
 
-The system shall reject expired access tokens.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [API Authentication](Auth.md#api-authentication)'
-
-reqvire add system-model/Auth.md --dry-run < new-requirement.md
-reqvire add system-model/Auth.md --override < cleaned-merged-requirement.md
-
-reqvire rm "Obsolete Requirement" --dry-run
-reqvire rm "Obsolete Requirement"
-
-reqvire mv "Token Expiry Requirement" system-model/Identity/AuthRequirements.md
-reqvire rename "Token Expiry Requirement" "Access Token Expiry Requirement"
-reqvire merge "Access Token Validation" "Legacy Token Validation" --dry-run
-
-reqvire mv-file system-model/OldAuth.md system-model/Identity/Auth.md
-reqvire mv-file system-model/AuthDrafts.md system-model/Identity/Auth.md --squash
-reqvire mv-folder system-model/IdentityDrafts system-model/Identity
-reqvire mv-asset docs/auth-flow.pdf docs/identity/auth-flow.pdf
-reqvire rm-asset docs/obsolete-auth-flow.pdf --dry-run`}</CodeBlock>
-        </div>
+// MCP tool calls
+reqvire.add_element({file: "system-model/Auth.md", content: "<complete element Markdown>", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", expected_model_revision: "<base_model_revision from preview>"})
+reqvire.add_element({file: "system-model/Auth.md", content: "<replacement Markdown>", override_existing: true})
+reqvire.remove_element({element_name: "Obsolete Requirement", dry_run: true})
+reqvire.move_element({element_name: "Token Expiry Requirement", file: "system-model/Identity/Auth.md"})
+reqvire.rename_element({element_name: "Token Expiry Requirement", new_name: "Access Token Expiry Requirement"})
+reqvire.merge_elements({target: "Access Token Validation", sources: ["Legacy Token Validation"], dry_run: true})
+reqvire.move_file({source_file: "system-model/AuthDrafts.md", target_file: "system-model/Identity/Auth.md", squash: true})
+reqvire.move_folder({source_folder: "system-model/IdentityDrafts", target_folder: "system-model/Identity"})
+reqvire.move_asset({old_path: "docs/auth-flow.pdf", new_path: "docs/identity/auth-flow.pdf"})
+reqvire.remove_asset({file_path: "docs/obsolete-auth-flow.pdf", dry_run: true})`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Each accepted mutation validates the complete candidate and persists
+          canonical formatting in affected model documents. CLI authoring
+          commands and their previews have been removed.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          For small edits, target <code>Element Text</code> or an exact subsection
+          name with <code>reqvire.update_element</code>. Append/replace take
+          <code> content</code>; replace_text takes exactly one literal
+          <code> old_text</code> match and <code>new_text</code>. Optional prose
+          subsections support explicit create/delete. Preview, review the diff,
+          then apply with the preview's <code>base_model_revision</code> as
+          <code> expected_model_revision</code> in the same worktree context.
+          Protected declarations stay attached; Ontology/Shapes/Query support
+          only replace and replace_text with complete fenced Markdown payloads.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          For a full definition change, read the current definition and submit
+          complete replacement Markdown with <code>override_existing: true</code>.
+          Its authored prose, metadata, relations, and dependency sections are
+          replaced; include every outgoing declaration still intended. Children
+          and incoming contract or concept references authored on other elements
+          remain attached when the complete candidate is valid. Preview with
+          <code> dry_run: true</code>, then apply the reviewed definition with
+          <code> dry_run: false</code>. A cross-file replacement rewrites incoming
+          destinations. Actual deletion still protects children from becoming
+          orphaned.
+        </p>
       </Section>
 
       <Section title="Linking and Contract Dependencies">
         <p className="text-zinc-600 mb-4">
-          The link and unlink commands manage relations, Contract Bindings,
+          The typed MCP link and unlink tools manage relations, Contract Bindings,
           and Contract References. Use the dependency form that matches the
           consuming requirement's responsibility.
         </p>
-        <CodeBlock>{`reqvire link "Authentication" "specifiedBy" "Authentication Requirement"
-reqvire link "Authentication Requirement" "verifiedBy" "Auth Test Case"
-reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
-reqvire link "Performance Requirement" bindContract "#rate-limiting-constraint"
-reqvire link "API Documentation" referenceContract "Error Response Specification"
-
-reqvire unlink "Authentication Requirement" "Auth Test Case"
-reqvire unlink "Performance Requirement" "#rate-limiting-constraint"
-reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent"
-
-reqvire link "Password Login Requirement" "derivedFrom" "Authentication Requirement" --dry-run
-reqvire relink "Child Requirement" "derivedFrom" "Old Parent" "New Parent" --json`}</CodeBlock>
+        <CodeBlock>{`// MCP tool calls
+reqvire.link({source: "Authentication Requirement", relation_type: "verifiedBy", target: "Auth Test Case"})
+reqvire.link({source: "System Requirement", relation_type: "satisfiedBy", target: "src/auth/login.rs"})
+reqvire.link({source: "Performance Requirement", relation_type: "bindContract", target: "Rate Limiting Constraint"})
+reqvire.link({source: "API Documentation", relation_type: "referenceContract", target: "Error Response Specification"})
+reqvire.unlink({source: "Authentication Requirement", target: "Auth Test Case"})
+reqvire.relink({source: "Child Requirement", relation_type: "derivedFrom", from_target: "Old Parent", to_target: "New Parent", dry_run: true})`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           Use <code>bindContract</code> for an implementation obligation and
           <code> referenceContract</code> for a content dependency that should
           propagate change impact. A requirement cannot contain both dependency
-          sections. The unlink command detects either kind by its target.
+          sections. The unlink tool detects either kind by its target.
         </p>
       </Section>
 
       <Section title="Validation, Formatting, and Linting">
         <p className="text-zinc-600 mb-4">
-          Mutating commands validate before they write. Run validation and
+          MCP mutations validate before they write. Formatting application and safe lint repair require mutation enablement. Run validation and
           hygiene commands explicitly in pull requests and before publishing
           generated reports.
         </p>
         <CodeBlock>{`reqvire validate
 reqvire validate --json --output reports/validate.json
 
-reqvire format
-reqvire format --fix
-reqvire format --fix --with-full-relations
+// MCP tool calls: previews/inspection work in read-only mode
+reqvire.format({fix: false})
+reqvire.format({fix: true})
+reqvire.format({fix: true, with_full_relations: true})
+reqvire.lint({fix: true})
 
 reqvire lint
 reqvire lint --fixable
 reqvire lint --auditable
 reqvire lint --json --output reports/lint.json`}</CodeBlock>
+      </Section>
+
+      <Section title="Migrating Existing Models">
+        <p className="text-zinc-600 mb-4">
+          Migration remains CLI-only. MCP validates the model before starting,
+          so migrate incompatible source before launching an MCP server.
+          The migrate command previews changes by default; add --fix to apply them.
+        </p>
+        <CodeBlock>{`reqvire migrate
+reqvire migrate --fix
+reqvire validate`}</CodeBlock>
       </Section>
 
       <Section title="Search and Collection">
@@ -305,6 +352,16 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           explorer output.
         </p>
         <p className="text-zinc-600 mb-4">
+          Model Flow supports directional model browsing. Select an element,
+          file, or folder, then use Downstream to follow its realization chains
+          or Upstream to inspect its ancestors. Page selections merge the chains
+          of their elements and show shared nodes once. Upstream uses the
+          model's inverse relation names and arrows toward ancestors. The
+          separate layout control chooses horizontal or vertical placement;
+          hover either icon group for its text tooltips. Both horizons are
+          available in served and exported Explorer.
+        </p>
+        <p className="text-zinc-600 mb-4">
           In Traces, select a verification to open its interactive flow from
           directly verified requirements through their ancestors and owning
           capabilities. Switch between left-to-right and top-to-bottom layouts,
@@ -332,7 +389,8 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           the model; successful MCP mutations rebuild the published snapshot.
           Updates preserve navigation without restarting the server or
           interrupting MCP access. Failed updates keep the last valid view and
-          retry automatically. External file edits require a server restart.
+          retry automatically. Committed external artifact edits can be adopted
+          through Refresh HEAD; changed model inputs require full validated admission.
         </p>
         <p className="text-zinc-600 mb-4">
           If a commit times out, MCP checks local Git automatically. A verified
@@ -366,6 +424,44 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           uncommitted changes. Unchanged data stays cached across switches, and
           prepared worktrees survive shutdown. Exported pages contain only their
           exported snapshot.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          In mutation-enabled serving, branch selection defaults to HEAD mode:
+          selecting an admitted context checks and adopts an eligible external
+          branch tip without replacing its worker. Use Refresh HEAD to do the same
+          for the displayed context, or call <code>reqvire.worktree.refresh_head</code>
+          with its exact local <code>branch</code>. Apply is the default; use
+          <code> dry_run: true</code> for a check-only preview. Clean implementation
+          commits and same-branch amendments retain model semantics while updating
+          Git provenance and resource text. The tool makes no commit and works
+          with automatic commits disabled.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Branch-selected MCP calls use tool contract version 3. Open or create the branch
+          first, then use <code>branch</code> on model reads, edits, commits,
+          refresh and publication. Use <code>from_branch</code> to resolve a
+          relative creation base. With multiple open contexts, explicitly select
+          the branch on each request; there is no client-global branch switch.
+          Prompts use the same selector and MCP resource URIs encode it as
+          <code> ?branch=model%2Freview</code>. Branch names are the public interface in MCP results and inventory as well as Explorer’s picker, browser URLs and HTTP routes;
+          opaque IDs remain private to runtime and cache handling. Clients on the same branch share the existing
+          mutation serialization and revision checks.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Changes to currently eligible model documents, consumed ontology sources
+          and resolution dependencies block refresh; dependency protection follows
+          currently eligible declaring owners. Changes to root ignore files are
+          allowed, and their current rules govern classification and normal
+          loading. Successful refresh also adopts those rules for later tools;
+          preview and rejection keep the accepted rules. Policy-only changes may
+          change model membership and revision. Ordinary evidence content may
+          change while referenced targets must remain valid. Pending
+          model edits, a dirty checkout, branch changes and unresolved Git/recovery
+          operations also block it. Explorer keeps the accepted view and commit
+          label, shows the affected paths and observed commit, and disables writes
+          for an external HEAD mismatch. Resolve the diagnostic or explicitly
+          readmit changed model inputs through <code>reqvire.worktree.open</code>.
+          Polling observes staleness without automatically adopting external commits.
         </p>
       </Section>
 

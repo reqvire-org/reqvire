@@ -1,7 +1,7 @@
-import type { HTMLAttributes } from "react";
+import { type HTMLAttributes } from "preact";
 import { css, cx } from "@linaria/atomic";
 
-export interface SpinnerProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
+export interface SpinnerProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
   size?: "sm" | "md";
   label?: string;
 }
@@ -24,11 +24,13 @@ const baseUX = css`
       transform: rotate(1turn);
     }
   }
+  @media (prefers-reduced-motion: reduce) { animation: none; }
 `;
 
 const skinX = css`
-  border: var(--border-w) solid var(--border-default);
-  border-top-color: var(--accent);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--accent) var(--border-default) var(--border-default);
   color: var(--accent);
 `;
 

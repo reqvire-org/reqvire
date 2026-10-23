@@ -101,6 +101,8 @@ fn read_status(observed: Result<GitCheckout, ReqvireError>) -> Value {
 #[derive(Serialize, Deserialize)]
 pub struct WorkerOptions {
     pub worktree_id: String,
+    #[serde(default)]
+    pub manifest: Option<PathBuf>,
     pub enable_commits: bool,
     pub with_size_estimates: bool,
     pub explorer: bool,
@@ -117,7 +119,12 @@ pub fn available_parallelism() -> usize {
 pub fn parallel_read(method: &str, params: &Value) -> bool {
     match method {
         "tools/call" => params["name"].as_str().is_some_and(|name| {
-            name != "reqvire.tool_contract" && crate::mcp_session::snapshot_read(name)
+            name != "reqvire.tool_contract"
+                && crate::mcp_session::snapshot_read(name)
+                && !reqvire::tool_interface::request_requires_write_tool(
+                    name,
+                    params.get("arguments"),
+                )
         }),
         "resources/read" | "prompts/get" => true,
         _ => false,
@@ -184,7 +191,8 @@ pub fn run() -> Result<(), ReqvireError> {
             .next()
             .ok_or_else(|| error("Missing worker initialization"))??,
     )?;
-    let exclusions = crate::config::get_excluded_filename_patterns_glob_set();
+    reqvire::repo_workspace::set_manifest_selection(options.manifest.clone())?;
+    let mut exclusions = crate::config::get_excluded_filename_patterns_glob_set();
     if options.read_only {
         let root = std::env::current_dir()?;
         let branch = GitCheckout::read(&root)?.branch_name().to_owned();
@@ -337,14 +345,27 @@ pub fn run() -> Result<(), ReqvireError> {
         let mut session = session.blocking_write();
         let mut response = match operation {
             "status" => json!({}),
+            "refresh_head" => {
+                match session.refresh_head(request["dry_run"].as_bool().unwrap_or(false)) {
+                    Ok(value) => {
+                        let refreshed = value["outcome"] == "refreshed";
+                        if refreshed {
+                            exclusions = session.exclusions().clone();
+                        }
+                        let mut response = json!({"result":value});
+                        if refreshed {
+                            runtime_result(&session, &options, &mut response);
+                        }
+                        response
+                    }
+                    Err(failure) => json!({"error":failure.to_string()}),
+                }
+            }
             "check_writable" => match session.check_head() {
                 Ok(()) => json!({}),
                 Err(failure) => json!({"error":failure.to_string()}),
             },
-            "check_clean" => match session
-                .check_head()
-                .and_then(|_| crate::mcp_session::require_clean(&std::env::current_dir()?))
-            {
+            "check_clean" => match session.check_clean() {
                 Ok(()) => json!({}),
                 Err(failure) => json!({"error":failure.to_string()}),
             },

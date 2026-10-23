@@ -34,7 +34,7 @@ assert_file_matches() {
 # =============================================================================
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-relation-input.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-relation-input.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -55,7 +55,7 @@ fi
 # =============================================================================
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-contract-bindings-input.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" add "specifications/Requirements.md" < "${TEST_SCRIPT_DIR}/duplicate-contract-bindings-input.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -123,7 +123,7 @@ fi
 # Actually, format loads the model first which will fail on duplicates
 # So we need to see if format handles this gracefully
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --fix 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --fix 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -199,7 +199,7 @@ fi
 
 # Add a contract binding to Base Requirement
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" bindContract "#contract-element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Base Requirement" bindContract "#contract-element" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -211,7 +211,7 @@ fi
 
 # Now try to add a relation to the same target - should fail
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" satisfiedBy "Contract Element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" link "Base Requirement" satisfiedBy "Contract Element" 2>&1)
 EXIT_CODE=$?
 set -e
 

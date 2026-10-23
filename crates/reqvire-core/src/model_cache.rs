@@ -25,6 +25,7 @@ struct CacheKey {
     options: ModelBuildOptions,
     workspace_root: PathBuf,
     git_worktrees: Vec<GitWorktreeFingerprint>,
+    repo: Option<std::sync::Arc<crate::repo_workspace::RepoWorkspace>>,
     excluded_patterns: Vec<(String, String)>,
     reqvire_version: &'static str,
     tool_contract_version: &'static str,
@@ -98,6 +99,7 @@ fn capture(
         options,
         workspace_root: scope.root.clone(),
         git_worktrees: git_worktree_fingerprints(&scope),
+        repo: scope.repo.clone(),
         excluded_patterns: exclusions.identity(),
         reqvire_version: env!("CARGO_PKG_VERSION"),
         tool_contract_version: tool_interface::TOOL_CONTRACT_VERSION,
@@ -288,6 +290,7 @@ fn git_output_in_dir<const N: usize>(
     args: [&str; N],
 ) -> Option<String> {
     let output = Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
         .args(args)
         .current_dir(directory)
         .output()

@@ -2,33 +2,40 @@ Merged element: Merged 1 element(s) into 'CLI Interface Structure' (specificatio
 
 📄 specifications/CLI.md
   01     # Elements
-  02
-  03     ### Test Capability Test Merge Bugfix Specifications Cli Md
+  02 -   ␤
+  02     ### Test Capability Test Merge Bugfix Specifications Cli Md
+  03
+  04     Test capability root for migrated requirement fixtures.
 
-  17
-  18     #### Relations
-  19       * derive: [CLI Interface Structure](#cli-interface-structure)
-  20 -     * derive: [CLI Search Command](#cli-search-command)
-  20       * specify: [Test Capability Test Merge Bugfix Specifications Cli Md](#test-capability-test-merge-bugfix-specifications-cli-md)
-  21     ---
-  22
+  13
+  14     #### Metadata
+  15       * type: requirement
+  16 +   ␤
+  17     #### Relations
+  18 -     * specify: [Test Capability](#test-capability-test-merge-bugfix-specifications-cli-md)
+  18       * derive: [CLI Interface Structure](#cli-interface-structure)
+  19 -     * derive: [CLI Search Command](#cli-search-command)
+  19 +     * specify: [Test Capability Test Merge Bugfix Specifications Cli Md](#test-capability-test-merge-bugfix-specifications-cli-md)
+  20     ---
+  21
+  22     ### CLI Interface Structure
 
-  40       -h, --help               Print help
-  41       -V, --version            Print version
-  42     ```
-  43 -   ␤
-  43 -   #### Metadata
-  43 -     * type: requirement
-  43 -   ␤
-  43 -   #### Relations
-  43 -     * derivedFrom: [Test Parent](#test-parent)
-  43 -   ---
-  43 -   ␤
-  43 -   ### CLI Search Command
-  43 -   ␤
-  43     The system shall provide a `search` command to query and filter model elements with flexible output formats.
-  44 -   #### Details
-  44 +   #### Merged Details (CLI Search Command)
-  45     The `search` command shall:
-  46     - Support searching by element name, type, content, or relationships
-  47     - Support `--filter-name`, `--filter-type`, `--filter-content` options
+  39       -h, --help               Print help
+  40       -V, --version            Print version
+  41     ```
+  42 -   ␤
+  42 -   #### Metadata
+  42 -     * type: requirement
+  42 -   ␤
+  42 -   #### Relations
+  42 -     * derivedFrom: [Test Parent](#test-parent)
+  42 -   ---
+  42 -   ␤
+  42 -   ### CLI Search Command
+  42 -   ␤
+  42     The system shall provide a `search` command to query and filter model elements with flexible output formats.
+  43 -   #### Details
+  43 +   #### Merged Details (CLI Search Command)
+  44     The `search` command shall:
+  45     - Support searching by element name, type, content, or relationships
+  46     - Support `--filter-name`, `--filter-type`, `--filter-content` options

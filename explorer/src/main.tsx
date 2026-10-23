@@ -1,6 +1,6 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { render } from "preact";
 import { App } from "./App";
+import { documentClasses } from "@ds";
 import "../design-system/styles.css";
 
 type MermaidApi = typeof import("mermaid").default;
@@ -51,8 +51,8 @@ function loadProjectStoreSeed() {
 function projectStoreSeedCandidates() {
   if (window.reqvireWorktreeRouting) {
     const seed = new URL("/assets/project-store.js", window.location.href);
-    const id = new URL(window.location.href).searchParams.get("worktree_id");
-    if (id !== null) seed.searchParams.set("worktree_id", id);
+    const branch = new URL(window.location.href).searchParams.get("branch");
+    if (branch !== null) seed.searchParams.set("branch", branch);
     return [seed.toString()];
   }
   const candidates = new Set<string>();
@@ -70,9 +70,6 @@ function projectStoreSeedCandidates() {
 }
 
 loadProjectStoreSeed().then(() => {
-  createRoot(container).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  );
+  document.body.classList.add(...documentClasses().split(" "));
+  render(<App />, container);
 });

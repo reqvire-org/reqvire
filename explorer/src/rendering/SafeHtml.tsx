@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import { type HTMLAttributes } from "preact";
 
 /*
  * Deliberate HTML boundary for trusted renderer output.
@@ -11,7 +11,7 @@ export function SafeHtml({
   html,
   className = "",
   ...props
-}: HTMLAttributes<HTMLDivElement> & { html: string }) {
+}: (HTMLAttributes<HTMLDivElement> & { className?: string }) & { html: string }) {
   return (
     <div
       className={className}

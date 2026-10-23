@@ -273,58 +273,31 @@ impl LintReport {
     pub fn apply_fixes(&self, registry: &mut GraphRegistry) -> Result<usize, ReqvireError> {
         let mut relations_removed = 0;
 
-        // Process all auto-fixable issues
         for issue in &self.auto_fixable {
-            match issue {
+            let (source, redundant) = match issue {
                 AutoFixableIssue::RedundantVerifyRelations {
                     verification,
                     redundant_relations,
-                    rationale: _,
-                } => {
-                    // Remove each redundant verify relation
-                    for rel in redundant_relations {
-                        match registry.remove_element_relation(
-                            &verification.identifier,
-                            &rel.target,
-                            &rel.relation_type,
-                        ) {
-                            Ok(()) => {
-                                relations_removed += 1;
-                            }
-                            Err(e) => {
-                                // Log error but continue with other relations
-                                eprintln!(
-                                    "Warning: Failed to remove relation '{}' from '{}' to '{}': {}",
-                                    rel.relation_type, verification.identifier, rel.target, e
-                                );
-                            }
-                        }
-                    }
-                }
+                    ..
+                } => (&verification.identifier, redundant_relations),
                 AutoFixableIssue::SafeRedundantHierarchicalRelations {
                     element,
                     redundant_relations,
-                    rationale: _,
-                } => {
-                    // Remove each safe redundant hierarchical relation
-                    for rel in redundant_relations {
-                        match registry.remove_element_relation(
-                            &element.identifier,
-                            &rel.target,
-                            &rel.relation_type,
-                        ) {
-                            Ok(()) => {
-                                relations_removed += 1;
-                            }
-                            Err(e) => {
-                                // Log error but continue with other relations
-                                eprintln!(
-                                    "Warning: Failed to remove relation '{}' from '{}' to '{}': {}",
-                                    rel.relation_type, element.identifier, rel.target, e
-                                );
-                            }
-                        }
+                    ..
+                } => (&element.identifier, redundant_relations),
+            };
+            for relation in redundant {
+                // The ordinary removal primitive maintains inverses and marks
+                // only authored source/target documents for canonical writing.
+                if let Some((_, kind, _)) =
+                    registry.remove_element_relation_full(source, &relation.target)?
+                {
+                    if kind != relation.relation_type {
+                        return Err(ReqvireError::InvalidOperation(
+                            "Lint repair selected a different relation".into(),
+                        ));
                     }
+                    relations_removed += 1;
                 }
             }
         }
@@ -495,7 +468,9 @@ fn detect_cross_submodel_hierarchical_relations(
                 rationale: format!(
                     "Hierarchical relation '{}' from '{}' crosses from submodel '{}' to '{}'. \
                     Hierarchical structure should remain internal to a single ownership boundary. \
-                    Replace this relation with an explicit contract_bindings contract.",
+                    Review the intended ownership and use a relation compatible with the source and target types. \
+                    Requirements may use Contract References for review context or Contract Bindings for independent \
+                    implementation obligations to uniquely requirement-owned contracts.",
                     relation.relation_type.name,
                     source_elem.identifier,
                     source_root_id,

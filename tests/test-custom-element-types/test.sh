@@ -303,7 +303,7 @@ fi
 echo "Test 7: Verifying custom type metadata survives mv write-back" >> "${TEST_DIR}/test_results.log"
 
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Use Case Element 1" specifications/MovedCustomTypes.md 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Use Case Element 1" specifications/MovedCustomTypes.md 2>&1)
 EXIT_CODE=$?
 set -e
 

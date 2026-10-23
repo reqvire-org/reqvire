@@ -33,7 +33,7 @@ mkdir -p "$TEST_DIR/output"
 
 # Test 1: dry-run should show deterministic summary and keep files unchanged
 set +e
-DRY_RUN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" relink "Child Requirement" derivedFrom "Old Parent" "New Parent" --dry-run 2>&1)
+DRY_RUN_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" relink "Child Requirement" derivedFrom "Old Parent" "New Parent" --dry-run 2>&1)
 DRY_RUN_EXIT=$?
 set -e
 
@@ -59,7 +59,7 @@ assert_file_matches \
   "Dry-run should not modify model file"
 
 # Test 2: apply relink should update relation target
-cd "$TEST_DIR" && "$REQVIRE_BIN" relink "Child Requirement" derivedFrom "Old Parent" "New Parent" > /dev/null 2>&1
+cd "$TEST_DIR" && "$MCP_OPERATION_BIN" relink "Child Requirement" derivedFrom "Old Parent" "New Parent" > /dev/null 2>&1
 
 assert_file_matches \
   "$TEST_SCRIPT_DIR/expected/02-after-relink.md" \
@@ -68,7 +68,7 @@ assert_file_matches \
 
 # Test 3: relation-type mismatch must fail with deterministic error
 set +e
-MISMATCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" relink "Child Requirement" verify "New Parent" "Old Parent" 2>&1)
+MISMATCH_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" relink "Child Requirement" verify "New Parent" "Old Parent" 2>&1)
 MISMATCH_EXIT=$?
 set -e
 
@@ -148,7 +148,7 @@ BEFORE_MULTIROOT="$(mktemp /tmp/reqvire-relink-before4-XXXXXX.md)"
 cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_MULTIROOT"
 
 set +e
-MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" relink "Child" derivedFrom "Parent A2" "Parent B" 2>&1)
+MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" relink "Child" derivedFrom "Parent A2" "Parent B" 2>&1)
 MULTIROOT_EXIT=$?
 set -e
 

@@ -59,4 +59,3 @@ Added element: Capability D (specifications/Requirements.md#capability-d)
   [32m85 +     * type: capability[0m
   [32m86 +   ---[0m
   [32m87 +   ␤[0m
-  [32m88 +   ␤[0m

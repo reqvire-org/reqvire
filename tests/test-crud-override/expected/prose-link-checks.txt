@@ -1,0 +1,3 @@
+PASS crud-create-atomic-rejection
+PASS crud-override-dry-run-rejection
+PASS crud-untouched-prose-candidate

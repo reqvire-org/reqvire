@@ -1,0 +1,13 @@
+# Elements
+
+### Prose Source
+
+Future delivery: [delivery contract](Targets.md#future-delivery).
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Authoring Capability](Targets.md#authoring-capability)
+
+---

@@ -66,7 +66,7 @@ class Workspace:
         self.git('commit', '-qm', 'Fixture')
 
     def run(self, *args, ok=True, input=None):
-        result = subprocess.run([BINARY, *args], cwd=self.root, text=True, input=input, capture_output=True, timeout=40)
+        result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else BINARY, *args], cwd=self.root, text=True, input=input, capture_output=True, timeout=40)
         if ok:
             require(result.returncode == 0, f'{args} failed: {result.stdout}\n{result.stderr}')
         else:
@@ -329,6 +329,29 @@ def rename_move(w):
     equal(w.refs(), ['specifications/Shared.md#error-schema'], 'File move lost reference')
     w.run('mv-folder', 'specifications', 'model')
     equal(w.refs(), ['model/Shared.md#error-schema'], 'Folder move lost reference')
+    w.run('validate')
+
+    # A root target must not be shadowed by the consumer's same-named file.
+    for name in ('Model.md', 'nested/Model.md'):
+        destination = w.root / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(FIXTURE / 'fixtures/same-basename' / name, destination)
+    w.run('validate')
+    before = w.snapshot()
+    preview = json.loads(w.run('rename', 'Collision Specification', 'Renamed Collision Specification',
+                               '--dry-run', '--json'))
+    require('../Model.md#renamed-collision-specification' in json.dumps(preview),
+            'Preview lost the root contract path')
+    equal(w.snapshot(), before, 'Same-basename rename preview changed files')
+    w.run('rename', 'Collision Specification', 'Renamed Collision Specification')
+    for name in ('Model.md', 'nested/Model.md'):
+        expected = (FIXTURE / 'expected/same-basename' / name).read_text()
+        actual = (w.root / name).read_text()
+        require(actual == expected, ''.join(difflib.unified_diff(
+            expected.splitlines(True), actual.splitlines(True),
+            'expected/same-basename/' + name, name)))
+    equal(w.refs('Collision Reference Consumer'), ['Model.md#renamed-collision-specification'],
+          'Rename retargeted the reference to the nested file')
     w.run('validate')
 
 

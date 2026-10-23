@@ -5,19 +5,17 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test: Verification Coverage Report
 # --------------------------------------
-# Satisfies: specifications/Verifications/ReportsTests.md#verification-coverage-report-test
+# Evidence: system-model/Verifications/Reports/ModelReports/ReportingVerifications.md#verification-coverage-report-test
 #
 # Acceptance Criteria:
 # - System shall provide a CLI command `coverage` that generates coverage reports focusing on leaf requirements
-# - Legacy command `coverage-report` is also supported (deprecated)
 # - Command shall support `--json` flag for JSON output format
 # - Coverage report shall include summary section with total counts and percentages for leaf requirements
 # - Coverage report shall show breakdown by verification type (test, formal-proof, analysis, inspection, demonstration)
-# - Coverage report shall list verified leaf requirements grouped by file and section
+# - Coverage report shall list verified leaf requirements grouped by source file
 # - Coverage report shall list unverified leaf requirements with details
-# - Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
-# - Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)
-# - Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default
+# - Coverage report shall list satisfied and unsatisfied evidence-backed test/formal-proof verifications
+# - Analysis, inspection, and demonstration verifications do not require satisfiedBy evidence
 # - JSON output shall be valid and machine-readable
 # - Text output shall be human-readable with clear formatting
 #

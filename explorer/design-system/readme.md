@@ -24,17 +24,108 @@ shell. Coverage starts its pane with the Model-style quick filter above the Whol
 Model tree, without a separate Capabilities heading. Coverage issue rows show
 their type badge on the right without a duplicate leading element icon.
 
-Patterns includes a Worktree Loading and Errors section using the exported
+Patterns includes a Worktree Loading and Errors scenario using the exported
 Explorer dialog. Preview loading, connection failures, long validation diagnostics
 and automatic-refresh errors. The compact dialog left-aligns its heading and
 labelled branch context, separates recovery guidance from selectable diagnostic
 details, and keeps Close visible when lengthy details scroll.
 
+## Components and patterns
+
+Shared foundation tokens are the only design-value catalogue. Components and
+patterns map those values into their `--ds-*` and `--ux-*` variables; they do not
+define independent token namespaces or value sheets. Reuse the project's font,
+text and spacing roles when adapting upstream UI. Measured rendering geometry
+comes from those styles rather than a second set of JavaScript design constants.
+
+Role tokens retain their public names and remain independently overridable. Their
+initial values explicitly map to the shared dimension, type, color and motion
+scales. Large layout dimensions live in the same numeric dimension scale rather
+than coupling one screen's width to another screen's role. Status and RDF shape
+colors share a primitive red paint; SHACL uses the semantic-contract paint.
+
+Components provide one cohesive UI capability, including the branch/worktree
+selector and renderer notices. Patterns arrange components and content slots into
+reusable structures and workflows: the Explorer workspace, search, report screens,
+and document frames. Components can reuse components; their count does not decide
+the layer. Application adapters own store access, route state and navigation
+callbacks. Scenarios can compose several controls to demonstrate one capability.
+
+`WorktreeSelector` is reviewed at `?scenario=components/controls/WorktreeSelector`;
+`RendererNotice` at `?scenario=components/core/RendererNotice`. Public imports remain
+available through `@ds`.
+
+## Toast notifications
+
+Use the local `Toaster` and `toast` exports for transient feedback.
+See the [component guide](components/core/toast/README.md) for usage, stacking,
+motion, validation, Sonner references, and the retained MIT notice. The app and
+showcase mount the same project-owned implementation.
+
 ## Sources
 
 - **Product site:** https://www.reqvire.org/
 - **Reference UI:** Explorer screenshots provided by the project owner (`uploads/explorer-*.png`) — Model browser, element modal, Graph, Ontologies, Search, and Traces. These are the source of truth for layout and the element-type semantics.
-- The canonical implementation lives in this repository under `explorer/design-system/` and is documented in `../DS.md`.
+- The canonical implementation lives in this repository under `explorer/design-system/`; its public API is [index.ts](index.ts).
+
+## Source and tooling
+
+Use ADS skills for implementation workflows: `ads-designer` for UI changes,
+`ads-port` for a library reference, `ads-import` for another project's DS,
+`ads-motion` for animation, and `ads-break-ui` for difficult content and states.
+They can be installed or read through the configured ADS MCP server. This guide
+records Reqvire-specific conventions; shared architecture belongs to the
+[ADS tooling contract](https://github.com/reqvire-org/ads/blob/main/docs/ADS.md).
+
+[ds.config.json](../ds.config.json) identifies this directory and the public
+`@ds` alias. It registers Toast usage rules and the Sonner import restriction,
+measured-renderer file/property boundaries, and documented non-state component
+variables. Changes to those exceptions belong in that configuration.
+See [Explorer build and commands](../README.md#build--embed-flow) for validation
+and running the showcase.
+
+- [index.ts](index.ts) exposes components, patterns, palette helpers and types.
+- [styles.css](styles.css) is the foundation entry, imported by `src/main.tsx`.
+  Token values and theme definitions live in [tokens/](tokens/).
+- [palette.ts](palette.ts) maps model element types to semantic roles and colors.
+- [patterns/readme.md](patterns/readme.md) identifies the product layers; the
+  shell, graph, report and feedback folders have their own behavior guides.
+- [showcase/](showcase/) demonstrates public UI with local fixtures and state.
+  Full-application integration harnesses live in `src/test/fixtures/`.
+
+For element coloring, use `elementRole(type, family)`, `roleColorToken(role,
+channel)` or `roleColorValue(role, channel)` from `@ds`, rather than copying the
+type-to-color mapping. `ElementIcon` and `TypeBadge` use this same palette.
+`cssVar()` and `getMermaidClassDefs()` need a mounted browser document with the
+foundation CSS loaded to resolve actual colors; `cssVar()` returns a `var(...)`
+fallback outside the browser. `replaceCssVarsForMermaid()` resolves references
+to hex values because Mermaid's parser does not accept CSS variables.
+
+The application and showcase HTML entries contain document mount mechanics
+only: full-height `html`, `body` and `#root`, plus body overflow. Foundation
+defaults, colors and resets live in `tokens/base.css`. Scoped document styling,
+including scrollbars, lives in `patterns/shell/DocumentSkin.ts` and its public
+`documentClasses()` helper; both browser mounts apply it to the body.
+DOM tests load the real `styles.css?inline` through Vite; the
+[test setup](../src/test/setupCssTokens.ts) unwraps its base cascade layer for
+jsdom without synthesizing token values. Browser/build checks inspect the real
+CSS and Linaria output.
+
+`Modal` owns its body portal and close lifecycle; `ModalContent` owns the dialog's
+DOM and class composition. `Button` expresses full-width layout through its owned
+`data-block` state, keeping size/tone composition small enough for complete source
+inspection. These structures keep modal style forwarding and button variants
+traceable without disabling ADS diagnostics.
+
+Atomic styles use matching property names across composed bases and variants.
+Separate border width/style/color, use paired logical padding sides for tree
+indentation, keep side-pane margins/padding/overflow in consistent longhands,
+and avoid resetting `font` or `gap` alongside their individual overrides.
+The SearchInput padding hook replaces the complete padding in either size;
+the large size supplies its wider icon inset as the default. ToggleRow combines
+its disabled label decoration, color and thickness into one declaration.
+Review actual computed styles in built component and composition scenarios,
+including hover, selected/disabled states, themes and RTL tree indentation.
 
 ---
 
@@ -98,19 +189,19 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 - `SKILL.md` — Agent-Skill manifest for downloading this system into Claude Code.
 
 **Components** (`components/<group>/` — TSX source exported via `index.ts`)
-- `core/` — **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
+- `core/` — **Toast**, **Toaster**, **toast**, **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
 - `data/` — **CodeRef**, **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
 - `controls/` — **ToggleRow**, **SegmentedControl**, **SearchInput**, **Tabs**
 - `navigation/` — **TreeItem**, **Breadcrumb**, **SidebarSection**
 
-**Product patterns** (`product-patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
+**Product patterns** (`patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
 - `shell/` — **AppShell**, **ShellPane**, **PaneResizer**, **ShellMain**, **RouteFrame**, **RouteLayout**, **RoutePanel**
 - `chrome/`, `files/`, `resources/`, `search/`, `reports/`, `side-pane/`, `detail/`, `content/`, `feedback/` — reusable UX/product visual patterns
 
 **Ownership**
 - `ds-*` classes and `--ds-*` component variables are design-system-only.
 - `ux-*` classes and `--ux-*` variables are owned by the UX/product-pattern layer,
-  under `design-system/product-patterns/`.
+  under `design-system/patterns/`.
 - Consumers import primitives, product patterns, and palette symbols from `@ds` only.
 - Consumers do not target design-system internals; customization happens through documented props or `--ds-*` variables.
 
@@ -125,5 +216,41 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 ## Caveats
 
 1. **Fonts** are Geist and Geist Mono, vendored in `assets/fonts/*.woff2` and referenced relatively from `tokens/fonts.css`, so the kit and standalone artifacts work offline with no app server.
-2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `npm run generate:icons`.
+2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `bun run generate:icons`.
 3. **Canonical source.** This directory is source, not an exported artifact. Generated bundles, generated CSS, generated browser icons, and showcase dist output must be rebuilt, not edited.
+
+## Scenarios and MCP showcase
+
+Run `bun run dev:showcase` from `explorer/`, or open the MCP-reported showcase
+URL. ADS owns the neutral host and its Tokens, Components, Patterns and Composition
+navigation. This project owns the compiled Preact views inside its preview App.
+
+Each demonstrated owner has a colocated `<Name>.ads.scenario.tsx` and
+`<Name>.ads.fixture.ts` (or `.tsx`). Development adapters use `.ads.helpers.ts[x]`
+and colocated tests use `.ads.test.ts[x]`; none enter the production public entry.
+Optional `<Owner>.ads.contract.ts` files register actual owner token, paint or
+behavior contracts. This project has no legacy JSON owner manifests to convert;
+shared token definitions stay in CSS. `ds.config.json` remains tooling
+configuration, and `.ads.fixture.json` remains ordinary example data.
+Token fixtures declare literal `{ token, property, probe }` bindings for all real
+foundation names and use the project-owned `TokenSamples` review renderer. The App checks
+the rendered effects against those probes; computed CSS supplies values. `composition/Workspace/`
+contains `Workspace.ads.scenario.tsx`, its fixtures and `Workspace.ads.helpers.tsx`
+for the larger fixture workspace and reusable local state/callback adapter.
+Focused screen/navigation entries supply their own view/mode through local fixtures.
+The compiler adapter is `showcase/mcp/main.tsx`; it unmounts the native root on
+switch/rebuild. `scripts/build-mcp-previews.mjs` reuses production Vite, Linaria,
+framework aliases and runtime guards, while keeping renderers/workers lazy.
+
+Every public renderable export and declared token must have reachable scenario
+coverage. Preview metadata does not establish behavior: inspect standalone views,
+interactions, dark/light themes, cleanup and constrained sizes in the real host.
+Full application providers, routes and network/store tests belong under `src/test/`.
+
+## Development review UI
+
+Demo framing and token renderers live in `review/`, imported through `@ds/review`.
+They are absent from the production public entry and product catalogue. Scenarios
+render the actual components/patterns with fixture inputs. Application code must
+not import review implementations, types or styles. Preview mounting stays inside
+the MCP App; the host shell contains no project runtime or styling.

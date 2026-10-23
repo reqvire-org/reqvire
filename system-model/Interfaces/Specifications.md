@@ -1,5 +1,22 @@
 # Elements
 
+### Diff Output Format Specification
+
+Shared change evidence for operation previews and applied results.
+
+#### Details
+- Identify workspace-relative changed files and deterministic before/after line hunks, including additions, removals and readable context. Retain the existing shared diff result structure.
+- MCP tools carry this evidence in structured results for authoring, formatting and lint repair. CLI migration and retained change-impact reports may render the same evidence through their supported output contracts.
+- Terminal color and presentation are renderer concerns; MCP does not require ANSI colors or CLI output-path flags.
+- Preview evidence must describe the same validated operation candidate as application while leaving files and accepted state unchanged.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Shared Operation Diff Evidence](InterfacesRequirements.md#shared-operation-diff-evidence)
+---
+
 ### MCP Interface Boundary Specification
 
 The MCP interface is expected to be a protocol adapter over Reqvire core and shared tool contracts.
@@ -21,21 +38,56 @@ Boundary rules:
   * define: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
 
-### Shared Core Operation Layer Specification
+### Model Interface Operation Boundary Specification
 
-Reqvire operation semantics are expected to be owned by core request/result APIs that can be called by more than one external adapter.
+The supported operation surface separates inspection, authored-model changes, and source upgrades.
 
 #### Details
-Existing-element arguments MUST use the bound Existing Element Selection Specification before operation-specific type checks or side effects. CLI and MCP adapters retain their public argument names and wrap the same missing, ambiguous, wrong-type and contradictory-selection failures without reimplementing lookup.
+Command-line operations:
+- Validation: `validate`, `concepts validate`.
+- Quality inspection: `lint`, `coverage`. `lint` accepts report filters and output controls but never `--fix`.
+- Discovery and context: `search`, `collect`, `submodels`.
+- Structure and reports: `model`, `traces`, `containment`, `resources`, `change-impact`.
+- Artifact generation: static Explorer `export`, `semantic export`, `concepts export`, and the existing `ontologies` compatibility alias.
+- Managed-query inspection: `semantic query list`, `validate`, `export`, and `check`.
+- Interface startup: `mcp`, `serve`; retain workspace selection, help, version, supported filtering and output controls.
+- Source upgrade: `migrate` previews known deterministic migrations; only `migrate --fix` applies those rewrites. Migration is available before a model passes current validation and is not a generic authoring escape hatch.
 
-Contract rules:
-- A shared operation owns model-loading decisions where applicable, validation gates, report construction, mutation preview/application behavior where applicable, and result evidence for its operation scope.
-- CLI and MCP adapters may add transport-specific parsing, output rendering, protocol metadata, and error wrapping, but must not fork the underlying operation behavior.
-- Stable operation outputs shall be represented as structured Rust result types before CLI JSON serialization or MCP `structuredContent` wrapping.
-- Shared operations shall cover element lookup, search, model, collect, submodels, resources, coverage, traces, containment, lint, format, and change-impact behavior before broader mutation operations are migrated.
-- Semantic read/query helpers remain a separate semantic-tool adapter scope until they are explicitly migrated into the shared operation layer.
-- Mutation operation sharing shall include explicit dry-run, diff, persistence, post-mutation validation, and cache invalidation semantics before adapters are converted.
-- Adapter tests should cover at least one representative operation through CLI and MCP-facing paths when an operation is migrated.
+Unsupported command-line operations:
+- Remove `add`, `rm`, `mv`, `rename`, `merge`, `mv-file`, `mv-folder`, `link`, `unlink`, `relink`, `mv-asset`, `rm-asset`, and `format`, including their preview and dry-run forms.
+- Reject `lint --fix`. Do not retain hidden aliases, compatibility wrappers, or CLI-to-MCP authoring proxies for removed operations.
+- Reject removed commands and options during argument dispatch before model loading or source writes, with guidance naming the supported MCP operation and its mutation enablement where appropriate.
+- Report/export destinations are generated artifacts; retaining output options does not authorize rewriting authored model sources as a model operation.
+
+Protocol operations:
+- Existing read, query, report, semantic export, workspace, and publication contracts remain available under their established permissions.
+- Typed element creation and replacement, removal, relocation, renaming, merging, file/folder moves, relation and contract-dependency changes, and asset moves/removal are MCP-only authoring operations. Their previews remain in their MCP tool contracts.
+- `reqvire.format` is MCP-only for preview and application. Preview is available without mutation enablement; `fix: true` requires it.
+- `reqvire.lint` reports findings by default. Its new `fix: true` mode requires mutation enablement; reporting remains available without it.
+- MCP authored-model mutations persist canonical model formatting automatically through the shared core writer.
+- Do not expose an MCP migration tool or a pre-validation migration service mode. Standalone and embedded MCP endpoints become available only after normal startup model validation succeeds. Migration of an incompatible model precedes MCP startup through CLI.
+
+This is an intentional breaking operation-surface change. The core remains authoritative for model semantics; removing a CLI adapter does not remove shared core operations, weaken validation, or prohibit ordinary Git and file-editor workflows outside Reqvire's supported authoring interface.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Model Interface Operation Boundary](InterfacesRequirements.md#model-interface-operation-boundary)
+---
+
+### Shared Core Operation Layer Specification
+
+Reqvire core owns operation request/result APIs independently of external transport availability.
+
+#### Details
+- Shared operations own parsing, selection, validation, report construction, mutation preview and application, canonical persistence, diagnostics, and cache invalidation for their operation scope.
+- CLI adapters expose only supported inspections, artifact generation, server launch, and deterministic migrations. Removing authoring and formatting commands does not remove their core operations.
+- MCP adapters invoke shared core authoring and maintenance operations through typed tools and enforce startup permissions, ownership, accepted-state publication, and protocol wrapping.
+- Read operations supported by both adapters preserve the same structured semantic results; CLI adds argument/output rendering and MCP adds typed schemas and envelopes.
+- Core authoring and maintenance APIs are not CLI command handlers. MCP must not shell out to removed CLI commands or introduce a second model engine.
+- Existing-element selection remains shared. Semantic read/query helpers continue to use the native semantic index and tool contracts.
+- Cross-interface tests compare retained read operations. Authoring, formatting, and lint-fix tests exercise core and MCP paths; migrations exercise CLI.
 
 #### Metadata
   * type: specification

@@ -1,5 +1,5 @@
-import { act, cleanup, renderHook } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { act, cleanup, renderHook } from "@/test/render";
+import { type ComponentChildren } from "preact";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
@@ -46,13 +46,15 @@ function fixture(): ExplorerProjectStore {
   };
 }
 
-function mount(initial = fixture(), strict = false) {
+function mount(initial = fixture(), replay = false) {
   let store = initial;
-  const hook = renderHook(useSearchIndex, { reactStrictMode: strict, wrapper: ({ children }: { children: ReactNode }) => {
+  const options = { wrapper: ({ children }: { children: ComponentChildren }) => {
     return <StoreProvider store={store} schemaMismatch={null}>
       <SearchIndexProvider>{children}</SearchIndexProvider>
     </StoreProvider>;
-  } });
+  } };
+  if (replay) renderHook(useSearchIndex, options).unmount();
+  const hook = renderHook(useSearchIndex, options);
   return { ...hook, update(next: ExplorerProjectStore) { store = next; hook.rerender(); } };
 }
 const allKinds = new Set<SearchKind>(SEARCH_KINDS);
@@ -280,7 +282,7 @@ describe("search index input and worker ownership", () => {
     expect(await result.current.search("needle", allKinds, new Set())).toEqual(initial.search);
   });
 
-  it("survives StrictMode replay and rejects pending searches on unmount", async () => {
+  it("survives an unmount/remount and rejects pending searches on unmount", async () => {
     const { result, unmount } = mount(fixture(), true);
     await build();
     const [retired, current] = SearchWorker.instances;

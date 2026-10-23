@@ -1,43 +1,46 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import { loadStore } from "./loadStore";
 import { devFixture } from "./devFixture";
 import { ManifestStoreClient } from "./manifestRefresh";
 import { worktreeUrl } from "../router/routes";
 import { useExplorerLocation, writeExplorerUrl } from "../router/location";
+import { refreshWorktreeHead } from "./headRefresh";
 
 const REFRESH_INTERVAL_MS = 5000;
 export interface WorktreeChoice {
-  worktree_id: string;
   branch: string;
   workspace_root: string;
   available: boolean;
   explorer_available: boolean;
   owned?: boolean;
+  accepted_head?: string;
+  observed_head?: string;
+  head_stale?: boolean;
   explorer_diagnostic?: string | null;
 }
-function requestedWorktree() { return new URL(window.location.href).searchParams.get("worktree_id") ?? undefined; }
+function requestedWorktree() { return new URL(window.location.href).searchParams.get("branch") ?? undefined; }
 
 
 export function useLiveStore() {
   const location = useExplorerLocation();
   const [result, setResult] = useState(() => loadStore(window.reqvireWorktreeRouting ? undefined : devFixture));
-  const displayedRef = useRef(result.ok ? result.store.project.worktree_id : undefined);
-  displayedRef.current = result.ok ? result.store.project.worktree_id : undefined;
+  const displayedRef = useRef(result.ok ? result.store.project.branch ?? undefined : undefined);
+  displayedRef.current = result.ok ? result.store.project.branch ?? undefined : undefined;
   const retainedLocation = useRef(location);
   if (result.ok && (!requestedWorktree() || requestedWorktree() === displayedRef.current)) retainedLocation.current = location;
   const failedSelection = useRef<string | null>(null);
   const [live] = useState(() => window.reqvireLiveRefresh);
   const [worktreeRouting] = useState(() => Boolean(window.reqvireWorktreeRouting));
   const [selectedWorktree, setSelectedWorktree] = useState(() => worktreeRouting
-    ? requestedWorktree() ?? (result.ok ? result.store.project.worktree_id : undefined) : undefined);
+    ? requestedWorktree() ?? (result.ok ? result.store.project.branch ?? undefined : undefined) : undefined);
   const [selectionVersion, setSelectionVersion] = useState(0);
   const selectedWorktreeRef = useRef(selectedWorktree);
   selectedWorktreeRef.current = selectedWorktree;
   const [worktrees, setWorktrees] = useState<WorktreeChoice[]>([]);
   const [inventoryError, setInventoryError] = useState<string | null>(null);
   const [clients] = useState(() => new Map<string | undefined, ManifestStoreClient>([
-    [result.ok ? result.store.project.worktree_id : undefined,
-      new ManifestStoreClient(result.ok ? result.store : undefined, live, result.ok ? result.store.project.worktree_id : undefined)],
+    [worktreeRouting && result.ok ? result.store.project.branch ?? undefined : undefined,
+      new ManifestStoreClient(result.ok ? result.store : undefined, live, worktreeRouting && result.ok ? result.store.project.branch ?? undefined : undefined)],
   ]));
   const client = useMemo(() => {
     let found = clients.get(selectedWorktree);
@@ -45,6 +48,8 @@ export function useLiveStore() {
     return found;
   }, [clients, selectedWorktree]);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [headError, setHeadError] = useState<string | null>(null);
+  const [refreshingHead, setRefreshingHead] = useState(false);
   const [recovery, setRecovery] = useState<{ context?: string; required: boolean }>({ required: false });
   const requestRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(false);
@@ -67,13 +72,12 @@ export function useLiveStore() {
         throw new Error(typeof data.error === "string" ? data.error : "Branch choices are unavailable.");
       }
       if (typeof data !== "object" || data === null || !("worktrees" in data) || !Array.isArray(data.worktrees)
-        || !("original_worktree_id" in data) || typeof data.original_worktree_id !== "string" || !data.original_worktree_id
+        || !("original_branch" in data) || typeof data.original_branch !== "string" || !data.original_branch
         || !data.worktrees.every((item: unknown) => typeof item === "object" && item !== null
-          && "worktree_id" in item && typeof item.worktree_id === "string" && item.worktree_id
-          && "branch" in item && typeof item.branch === "string")) {
+          && "branch" in item && typeof item.branch === "string" && item.branch)) {
         throw new Error("Invalid branch inventory.");
       }
-      const ids = new Set((data.worktrees as WorktreeChoice[]).map(item => item.worktree_id));
+      const ids = new Set((data.worktrees as WorktreeChoice[]).map(item => item.branch));
       if (ids.size !== data.worktrees.length) throw new Error("Invalid branch inventory.");
       if (!mountedRef.current || controller.signal.aborted) return;
       inventoryRef.current = { ids, observedClients };
@@ -88,6 +92,7 @@ export function useLiveStore() {
     failedSelection.current = null;
     writeExplorerUrl(worktreeUrl(window.location.href, id));
     setRefreshError(null);
+    setHeadError(null); setRefreshingHead(false);
     setSelectedWorktree(id);
     setSelectionVersion(version => version + 1);
   }, [worktreeRouting]);
@@ -98,7 +103,7 @@ export function useLiveStore() {
     requestRef.current?.abort(); requestRef.current = null;
     failedSelection.current = null;
     const url = new URL(retainedLocation.current);
-    url.searchParams.set("worktree_id", retained);
+    url.searchParams.set("branch", retained);
     writeExplorerUrl(url, true);
     setSelectedWorktree(retained);
     setRefreshError(null);
@@ -106,16 +111,18 @@ export function useLiveStore() {
   }, []);
 
 
-  const refresh = useCallback(async (loadSelected = false): Promise<void> => {
+  const refresh = useCallback(async (loadSelected = false, adoptHead = false): Promise<void> => {
     if ((!live && !worktreeRouting) || requestRef.current || !mountedRef.current) return;
     if (selectedWorktree && failedSelection.current === selectedWorktree) return;
     const controller = new AbortController();
     requestRef.current = controller;
+    if (adoptHead) setRefreshingHead(true);
     try {
       const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]);
+      if (adoptHead && selectedWorktree) await refreshWorktreeHead(selectedWorktree, signal);
       if (loadSelected && worktreeRouting && selectedWorktree) {
         const response = await fetch("/api/worktrees/load", { method: "POST", cache: "no-store", signal,
-          headers: { "Content-Type": "application/json" }, body: JSON.stringify({ worktree_id: selectedWorktree }) });
+          headers: { "Content-Type": "application/json" }, body: JSON.stringify({ branch: selectedWorktree }) });
         if (!response.ok) {
           const failure = await response.json().catch(() => null);
           throw new Error(failure?.error ?? "Selected branch could not be loaded.");
@@ -128,31 +135,45 @@ export function useLiveStore() {
         window.reqvireProjectStore = next.result.store;
         if (live) window.reqvireLiveRefresh = { revision: next.revision, manifest: next.manifest };
         setResult(next.result);
-        if (worktreeRouting && !selectedWorktree) setSelectedWorktree(next.result.store.project.worktree_id);
+        if (worktreeRouting && !selectedWorktree) setSelectedWorktree(next.result.store.project.branch ?? undefined);
       }
-      setRecovery({ context: next?.result.store.project.worktree_id ?? selectedWorktree ?? displayedRef.current,
+      setRecovery({ context: next?.result.store.project.branch ?? selectedWorktree ?? displayedRef.current,
         required: client.recoveryRequired });
       setRefreshError(null);
+      if (adoptHead) { setHeadError(null); void refreshWorktrees(); }
     } catch (error: unknown) {
       if (mountedRef.current && !controller.signal.aborted) {
         if (selectedWorktree && selectedWorktree !== displayedRef.current) failedSelection.current = selectedWorktree;
-        setRefreshError(error instanceof Error && error.name === "TimeoutError"
+        const message = error instanceof Error && error.name === "TimeoutError"
           ? "The server did not respond within 15 seconds."
-          : error instanceof Error ? error.message : String(error));
+          : error instanceof Error ? error.message : String(error);
+        if (adoptHead) setHeadError(message); else setRefreshError(message);
         void refreshWorktrees();
       }
     } finally {
       if (requestRef.current === controller) {
         requestRef.current = null;
+        setRefreshingHead(false);
       }
     }
   }, [live, client, worktreeRouting, refreshWorktrees, selectedWorktree]);
+
+  const refreshHead = useCallback(() => {
+    requestRef.current?.abort(); requestRef.current = null;
+    failedSelection.current = null;
+    setRefreshError(null); setHeadError(null);
+    void refresh(false, true);
+  }, [refresh]);
 
   useEffect(() => {
     mountedRef.current = true;
     if (!live && !worktreeRouting) return () => { mountedRef.current = false; };
     const checkVisible = () => {
-      if (document.visibilityState === "visible") void refresh(worktreeRouting && selectedWorktree !== displayedRef.current);
+      if (selectedWorktree && failedSelection.current === selectedWorktree) return;
+      if (document.visibilityState === "visible") {
+        void refresh(worktreeRouting && selectedWorktree !== displayedRef.current);
+        if (live && worktreeRouting) void refreshWorktrees();
+      }
       else {
         requestRef.current?.abort();
         requestRef.current = null;
@@ -173,16 +194,22 @@ export function useLiveStore() {
   useEffect(() => {
     if (!worktreeRouting) return;
     void refreshWorktrees();
+    return () => { inventoryRequestRef.current?.abort(); };
+  }, [worktreeRouting, refreshWorktrees]);
+
+  useLayoutEffect(() => {
+    if (!worktreeRouting) return;
     const onPopState = () => {
       if (requestedWorktree() === selectedWorktreeRef.current) return;
       requestRef.current?.abort(); requestRef.current = null;
       failedSelection.current = null;
       setRefreshError(null);
+      setHeadError(null); setRefreshingHead(false);
       setSelectedWorktree(requestedWorktree());
     };
     window.addEventListener("popstate", onPopState);
-    return () => { window.removeEventListener("popstate", onPopState); inventoryRequestRef.current?.abort(); };
-  }, [worktreeRouting, refreshWorktrees]);
+    return () => { window.removeEventListener("popstate", onPopState); };
+  }, [worktreeRouting]);
 
   useEffect(() => {
     const inventory = inventoryRef.current;
@@ -195,13 +222,16 @@ export function useLiveStore() {
     }
   }, [clients, result, selectedWorktree, worktrees]);
 
-  return { result, automaticRefresh: Boolean(live), refreshError: refreshError ?? inventoryError, worktreeRouting, worktrees,
+  const displayedChoice = worktrees.find(choice => choice.branch === displayedRef.current);
+  const headWarning = displayedChoice?.head_stale
+    ? `HEAD changed: showing accepted commit ${displayedChoice.accepted_head}; observed ${displayedChoice.observed_head}. Use Refresh HEAD to check adoption. Ordinary writes are disabled.` : null;
+  return { result, automaticRefresh: Boolean(live), refreshError: headError ?? refreshError ?? inventoryError, worktreeRouting, worktrees,
     recoveryWarning: recovery.required && recovery.context === displayedRef.current
       ? "MCP recovery required: showing the last accepted model; writes are disabled. Local file downloads are unavailable until the worktree is repaired and the server restarted."
-      : null,
-    selectedWorktree, selectWorktree, refreshWorktrees,
+      : headWarning,
+    selectedWorktree, selectWorktree, refreshWorktrees, refreshHead: live ? refreshHead : undefined, refreshingHead,
     dismissWorktreeError,
     worktreeSelectionError: worktreeRouting && selectedWorktree !== undefined && selectedWorktree !== displayedRef.current ? refreshError : null,
-    switching: !refreshError && worktreeRouting && selectedWorktree !== undefined && (!result.ok || selectedWorktree !== result.store.project.worktree_id),
+    switching: !refreshError && worktreeRouting && selectedWorktree !== undefined && (!result.ok || selectedWorktree !== result.store.project.branch),
   };
 }

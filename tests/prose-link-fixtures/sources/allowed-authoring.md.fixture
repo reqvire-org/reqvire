@@ -1,0 +1,30 @@
+# Elements
+
+### Prose Source
+
+The system SHALL use the shared delivery contract and delivery term.
+
+Literal inline example: `[delivery contract](Targets.md#target-specification)`.
+Escaped example: \[delivery contract](Targets.md#target-specification).
+
+```markdown
+[delivery contract](Targets.md#target-specification)
+```
+
+    [delivery contract](Targets.md#target-specification)
+
+Supporting [external documentation](https://example.test/model/Targets.md#target-specification),
+[evidence](../evidence.txt), [notes](../Notes.md), and a [document heading](Targets.md#elements).
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Target Specification](Targets.md#target-specification)
+
+#### Concept References
+  * [Target Concept](Targets.md#target-concept)
+
+#### Relations
+  * specify: [Authoring Capability](Targets.md#authoring-capability)
+---

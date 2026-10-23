@@ -3,13 +3,40 @@
 Run the shell suites from the repository root using the locally built CLI:
 
 ```bash
-cargo build --bin reqvire
+cargo build --release --locked --bin reqvire
 ./tests/run_all.sh
 ./tests/run_all.sh test-serve-command
 ```
 
+The runner uses `target/release/reqvire` by default. To select a different build,
+set `REQVIRE_BIN` explicitly, for example for debugging:
+
+```bash
+cargo build --locked --bin reqvire
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_all.sh
+```
+
+Optimized builds reduce CPU time in parsing, validation, and query checks. Suites
+exercising timeouts still include those waits. The runner captures the selected
+executable for the entire run and fails startup if it is missing.
+
 Install ripgrep (`rg`) before running the suites; ontology hygiene checks use it.
 The pull-request workflow installs it explicitly.
+
+The multi-repository suite requires Google Repo, Python 3, Bun and a **local
+Git checkout** of Google's `git-repo`. The optional repository Hermit environment
+provides them, including `REQVIRE_TEST_REPO_SOURCE`:
+
+```bash
+source bin/activate-hermit
+hermit install
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh test-mcp-repo-workspaces
+```
+
+With your own tools, export `REQVIRE_TEST_REPO_SOURCE=/path/to/git-repo` instead.
+The suite creates local Git remotes and real Repo clients; it neither downloads
+test repositories nor skips missing production support. Its 15 cases reuse
+seven MCP/Explorer server starts and retain failures under the normal runner.
 
 The runner copies each suite into a temporary Git workspace. Keep fixtures and
 expected output in the suite directory, and link its `test.sh` from the owning
@@ -24,6 +51,9 @@ milliseconds, invocation count, exit status, and suite name, in that order.
 The summary reports wall time separately from accumulated process time.
 Interrupting the runner stops its active test processes and removes their
 interrupted fixture while retaining completed failure evidence and logs.
+Suites run noninteractively with stdin connected to `/dev/null`, so dependencies
+cannot suspend a background suite by reading the launching terminal. Tests that
+exercise stdin protocols must supply their own input pipes or files.
 
 Run `./tests/run_all.sh test-model-revision-hashing` for the canonical model
 revision contract. It uses Python 3's standard library to call the real HTTP MCP
@@ -31,6 +61,12 @@ server, compares fixed canonical byte/digest fixtures, and checks field changes,
 ordering, excluded inputs, and agreement across fingerprint-bearing tools.
 On failure, responses and server logs are retained in the test workspace's `output` directory.
 Explorer wire hashes and live refresh remain covered by the existing serve suite.
+
+Run `./tests/run_all.sh test-ai-skill-installers` for shared skill package checks.
+It requires Node/npm and uses the pinned `skills@1.7.2` CLI through npx to check
+discovery and project-scoped installs for Codex and Claude Code. Package manifests,
+installation bytes, selected skills, and CLI trace output use fixture comparisons
+with unified diffs; npm downloads the pinned installer on its first run.
 
 The serve suite runs the compiled Explorer in headless Chrome or Chromium. It
 requires Node.js 24 and a browser executable. Set `REQVIRE_TEST_BROWSER` to that

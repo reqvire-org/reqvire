@@ -1,8 +1,8 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
-export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
-  children?: ReactNode;
+export interface AlertProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
   variant?: "default" | "danger" | "warning" | "success" | "info";
 }
 
@@ -11,7 +11,9 @@ const baseUX = css`
   align-items: flex-start;
   gap: var(--space-5);
   padding: var(--space-7) var(--space-8);
-  border: var(--border-w) solid var(--border-subtle);
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: var(--border-subtle);
   border-radius: var(--radius-md);
 
   svg {

@@ -151,7 +151,11 @@ export function assetMergePlugin(options: AssetMergePluginOptions): Plugin {
     name: "reqvire-asset-merge",
     configResolved(resolved) {
       config = resolved;
-      assertAssetContract(options);
+      // Resource previews contain imported artwork/fonts, not web-app favicons.
+      // Source collisions and forbidden assets still apply in both build modes.
+      assertAssetContract(config.command === "build" && config.build.write === false
+        ? { ...options, generatedAssetsDir: undefined }
+        : options);
     },
     configureServer(server) {
       server.middlewares.use((request, response, next) => {
@@ -179,7 +183,8 @@ export function assetMergePlugin(options: AssetMergePluginOptions): Plugin {
       });
     },
     closeBundle() {
-      if (config.command !== "build") return;
+      // MCP compiles resources in memory; it must never copy into production dist.
+      if (config.command !== "build" || config.build.write === false) return;
       const outDir = path.resolve(config.root, config.build.outDir);
       copyAssetsToDist(options.dsAssetsDir, outDir);
       if (options.generatedAssetsDir) {
