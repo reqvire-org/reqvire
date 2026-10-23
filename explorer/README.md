@@ -154,7 +154,8 @@ part of the source build. Failure evidence is saved in `.ds/verification/`.
 for the installed ADS helper without relaxing production TypeScript checks.
 
 `build:app` and the MCP preview compiler remain compilation commands; the preview
-compiler runs native ADS gates and the configured `lint:style`/`typecheck` checks.
+compiler runs native ADS architecture gates. The checked build and acceptance
+policy run the separately configured project scripts.
 This keeps verification from recursively invoking itself. PR/release workflows
 use the checked build, and PR CI retains the application browser suite after
 building the Rust CLI. The bundle-only commands are for those internal stages.
