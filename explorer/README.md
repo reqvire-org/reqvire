@@ -26,7 +26,7 @@ prebuild: lint:ds + assets:ds
 build:   lint:style + typecheck + test + build:app + test:ads
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.40` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.41` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
 Bun 1.4.1+ manages dependencies and runs MCP and ADS compilation.
 Node 24 runs Vitest with a 1,200 MiB heap ceiling and at most two workers, and the
