@@ -115,16 +115,10 @@ native_pin_mutation() {
 }
 
 native_repo_pin_checkpoint() {
-    native_fixture pin-checkpoint
-    mkdir -p "$central/.repo/manifests/parts" "$central/.repo/local_manifests"
-    mv "$native" "$central/.repo/manifests/parts/projects.xml"
-    printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$native"
-    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' \
-        "$alpha" > "$central/.repo/local_manifests/pins.xml"
     cp "$central/.repo/manifest.xml" "$native_case/expected-wrapper.xml"
     cp "$native" "$native_case/expected-includes.xml"
     central_head=$(git -C "$central" rev-parse HEAD)
-    native_server_names mcp native_pin_mutation
+    native_pin_mutation
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
     jq -e --arg saved "$saved" '.result.structuredContent.context.projects[] | select(.name == "component") | .revision == $saved' \
         "$native_case/commit-result.json" >/dev/null
@@ -172,13 +166,21 @@ native_worktree_mutation() {
     test ! -e "$central/default.xml"
 }
 
-native_repo_worktree() {
-    native_fixture worktree
-    cp "$native" "$native_case/download.xml"
-    (cd "$central" && repo init -q -u "file://$native_case/download.xml" \
-        --standalone-manifest --no-clone-bundle)
-    mv "$native_case/download.xml" "$native_case/source.xml"
-    native_server_names mcp native_worktree_mutation
+native_pass() {
+    printf 'PASS %s\n' "$1" >> "$TEST_DIR/output/native-checks.txt"
+}
+
+active_repo_session() {
+    # native_server_names has checked the initial snapshot on this session.
+    native_pass cli/active-repo-manifest-selection
+    native_repo_pin_checkpoint
+    native_pass mcp/native-repo-pin-checkpoint
+}
+
+standalone_repo_session() {
+    native_pass cli/standalone-repo-manifest-selection
+    native_worktree_mutation
+    native_pass mcp/native-repo-worktree
 }
 
 active_repo_manifest() {
@@ -202,8 +204,10 @@ active_repo_manifest() {
     mv "$central/.repo/manifest.xml" "$native_case/generated-wrapper.xml"
     ln -s manifests/default.xml "$central/.repo/manifest.xml"
     native_cli_names
-    native_server_names mcp
     native_server_names serve
+    # The CLI and embedded server cover the legacy symlink. Use the generated
+    # entry for the shared MCP loading/pin-save sequence below.
+    mv "$native_case/generated-wrapper.xml" "$central/.repo/manifest.xml"
     # An override changes the file location, including within Repo's own Git
     # manifest checkout; it must not require a tracked Central copy.
     sed "s/$omega/$alpha/" "$central/.repo/manifests/parts/projects.xml" \
@@ -223,6 +227,8 @@ active_repo_manifest() {
     grep -Eq '\.repo/.*repositories/component|repositories/component.*\.repo/' "$native_case/mismatch.log"
     test ! -e "$central/default.xml"
     test -z "$(git -C "$central" status --porcelain)"
+    git -C "$central/repositories/component" checkout -q --detach "$alpha"
+    native_server_names mcp active_repo_session
 }
 
 standalone_repo_manifest() {
@@ -234,53 +240,38 @@ standalone_repo_manifest() {
     mv "$native_case/download.xml" "$native_case/expected-manifest.xml"
     (cd "$central" && repo manifest -o "$native_case/repo-manifest.xml")
     native_cli_names
-    native_server_names mcp
     native_server_names serve
     diff -u "$native_case/expected-manifest.xml" "$native"
     test ! -e "$central/default.xml"
     test -z "$(git -C "$central" status --porcelain)"
+    native_server_names mcp standalone_repo_session
 }
 
 run_native_repo_cases() {
     local name result
+    : > "$TEST_DIR/output/native-checks.txt"
     for name in active standalone; do
         result=0
         bash "$TEST_SCRIPT_DIR/check_native_repo.sh" "$name" > "$TEST_DIR/output/native-$name.log" 2>&1 || result=$?
-        if [[ "$result" == 0 ]]; then
-            echo "PASS cli/$name-repo-manifest-selection" >> "$TEST_DIR/output/checks.txt"
-        else
-            echo "FAIL cli/$name-repo-manifest-selection" >> "$TEST_DIR/output/checks.txt"
+        if [[ "$result" != 0 ]]; then
             cat "$TEST_DIR/output/native-$name.log" >&2
             status=1
         fi
     done
-    result=0
-    bash "$TEST_SCRIPT_DIR/check_native_repo.sh" native-pin > "$TEST_DIR/output/native-pin.log" 2>&1 || result=$?
-    if [[ "$result" == 0 ]]; then
-        echo 'PASS mcp/native-repo-pin-checkpoint' >> "$TEST_DIR/output/checks.txt"
-    else
-        echo 'FAIL mcp/native-repo-pin-checkpoint' >> "$TEST_DIR/output/checks.txt"
-        cat "$TEST_DIR/output/native-pin.log" >&2
-        status=1
-    fi
-    result=0
-    bash "$TEST_SCRIPT_DIR/check_native_repo.sh" native-worktree > "$TEST_DIR/output/native-worktree.log" 2>&1 || result=$?
-    if [[ "$result" == 0 ]]; then
-        echo 'PASS mcp/native-repo-worktree' >> "$TEST_DIR/output/checks.txt"
-    else
-        echo 'FAIL mcp/native-repo-worktree' >> "$TEST_DIR/output/checks.txt"
-        cat "$TEST_DIR/output/native-worktree.log" >&2
-        status=1
-    fi
+    # Keep independent outcomes in the golden order even though related checks
+    # now share one fixture and MCP session. An unrun dependent check must fail.
+    for name in cli/active-repo-manifest-selection cli/standalone-repo-manifest-selection \
+        mcp/native-repo-pin-checkpoint mcp/native-repo-worktree; do
+        if grep -Fxq "PASS $name" "$TEST_DIR/output/native-checks.txt"; then
+            printf 'PASS %s\n' "$name" >> "$TEST_DIR/output/checks.txt"
+        else
+            printf 'FAIL %s\n' "$name" >> "$TEST_DIR/output/checks.txt"
+            status=1
+        fi
+    done
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     set -euo pipefail
-    if [[ "$1" == native-pin ]]; then
-        native_repo_pin_checkpoint
-    elif [[ "$1" == native-worktree ]]; then
-        native_repo_worktree
-    else
-        "${1}_repo_manifest"
-    fi
+    "${1}_repo_manifest"
 fi
