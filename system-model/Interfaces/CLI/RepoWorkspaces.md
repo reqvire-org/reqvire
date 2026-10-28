@@ -18,9 +18,9 @@ When a caller explicitly selects a Repo manifest or starts at an initialized Rep
 
 ### CLI Repo Manifest Selection Specification
 
-Provide optional global --manifest <workspace-relative-file> selection for inspection commands, standalone MCP and embedded Explorer serving. Apply --workspace first, then resolve --manifest relative to the selected workspace. Report a missing/invalid explicit manifest before command execution with the selected path. An initialized Repo client at that root selects Repo mode without requiring the flag. A manifest-looking filename alone does not change an ordinary Git workspace's mode.
+Provide optional global --manifest <file> to override the Repo manifest location for inspection commands, MCP and embedded Explorer serving. Apply --workspace first and normalize the chosen path relative to that workspace. Without the flag, use the initialized client's .repo/manifest.xml. Resolve Repo-managed includes from its manifest checkout, including standalone manifests and local overlays; do not reinterpret an include name as a Central-root filename or require a duplicate root manifest. An explicit path selects the same Repo manifest format at another location, including a file inside .repo/manifests/. The flag changes location, not Git ownership or versioning. Report a missing or invalid selection with its path before command execution. A manifest-looking filename alone does not change ordinary Git workspace mode.
 
-Delegate source resolution and eligibility to the bound source-scope contract. Server consumers receive the selected manifest/mode without adding project arguments to individual model tools. Command help advertises the option; the existing command names and ordinary Git invocation retain their semantics. Inspection does not silently initialize, sync, fetch or switch project checkouts; writable-context preparation remains an explicit worktree operation under its existing network policy.
+Delegate composition, source eligibility and repository ownership to the shared source-scope contract. Server consumers receive the selected location without additional project selectors. Inspection does not silently initialize, sync, fetch or switch checkouts.
 
 #### Metadata
   * type: specification

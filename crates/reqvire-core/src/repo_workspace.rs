@@ -1,7 +1,7 @@
 //! Manifest selection and repository provenance shared by every model consumer.
 //!
-//! Repo owns manifest composition; this module supplies Central's versioned inputs
-//! and validates the resulting local checkout inventory. It never syncs or fetches.
+//! Repo owns manifest composition. The default entry or an alternate file
+//! location selects the inputs. This boundary never syncs or fetches.
 use crate::{error::ReqvireError, model_inputs};
 use quick_xml::{
     events::{BytesStart, Event},
@@ -59,6 +59,7 @@ pub struct RepoProject {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepoWorkspace {
+    pub selection: PathBuf,
     pub manifest: PathBuf,
     pub projects: Vec<RepoProject>,
     pub resolved_xml: String,
@@ -66,7 +67,17 @@ pub struct RepoWorkspace {
 }
 
 pub fn selected_manifest(root: &Path) -> Result<Option<PathBuf>, ReqvireError> {
-    if let Some(Some(path)) = MANIFEST.get() {
+    selected_manifest_at(
+        root,
+        MANIFEST.get().and_then(|selection| selection.as_deref()),
+    )
+}
+
+fn selected_manifest_at(
+    root: &Path,
+    selection: Option<&Path>,
+) -> Result<Option<PathBuf>, ReqvireError> {
+    if let Some(path) = selection {
         return Ok(Some(relative_path(root, path)?));
     }
     let entry = root.join(".repo/manifest.xml");
@@ -79,22 +90,7 @@ pub fn selected_manifest(root: &Path) -> Result<Option<PathBuf>, ReqvireError> {
         }
         return Ok(None);
     }
-    let text = std::fs::read_to_string(&entry)?;
-    let tags = tags(&text)?;
-    let includes: Vec<_> = tags.iter().filter(|(name, _)| name == "include").collect();
-    if includes.len() == 1 {
-        let name = attr(&includes[0].1, "name")?;
-        return Ok(Some(relative_path(root, Path::new(name))?));
-    }
-    if let Ok(target) = std::fs::read_link(&entry) {
-        if let Some(name) = target.file_name() {
-            return Ok(Some(PathBuf::from(name)));
-        }
-    }
-    Err(failure(format!(
-        "Cannot identify Central's versioned manifest from {}",
-        entry.display()
-    )))
+    Ok(Some(PathBuf::from(".repo/manifest.xml")))
 }
 
 fn relative_path(root: &Path, path: &Path) -> Result<PathBuf, ReqvireError> {
@@ -172,17 +168,6 @@ fn stage_manifest(
             source.display()
         )));
     }
-    git_text(
-        root,
-        &[
-            "ls-files",
-            "--error-unmatch",
-            "--",
-            relative
-                .to_str()
-                .ok_or_else(|| failure("Non-UTF8 manifest path"))?,
-        ],
-    )?;
     let text = model_inputs::read_to_string(&source)?;
     inputs.insert(relative.clone(), text.as_bytes().to_vec());
     visiting.push(relative.clone());
@@ -227,6 +212,10 @@ fn stage_manifest(
 }
 
 impl RepoWorkspace {
+    pub fn uses_repo_managed_inputs(&self) -> bool {
+        self.selection.starts_with(".repo")
+    }
+
     pub fn resolve(root: &Path, manifest: PathBuf) -> Result<Self, ReqvireError> {
         let load = || {
             if !root.join(".repo/repo/main.py").is_file() {
@@ -234,13 +223,18 @@ impl RepoWorkspace {
             }
             let temporary = tempfile::tempdir()?;
             let mut inputs = BTreeMap::new();
-            let selected = stage_manifest(
-                root,
-                &manifest,
-                temporary.path(),
-                &mut inputs,
-                &mut Vec::new(),
-            )?;
+            let native = manifest.starts_with(".repo");
+            let selected = if native {
+                PathBuf::from("--active-repo-manifest")
+            } else {
+                stage_manifest(
+                    root,
+                    &manifest,
+                    temporary.path(),
+                    &mut inputs,
+                    &mut Vec::new(),
+                )?
+            };
             // Use the initialized Repo client's resolved Project objects, rather
             // than reimplementing URL joins, aliases or revision precedence.
             let out = Command::new("python3")
@@ -250,6 +244,7 @@ impl RepoWorkspace {
                 .args(["-c", REPO_RESOLUTION])
                 .arg(root.join(".repo"))
                 .arg(&selected)
+                .arg(root.join(&manifest))
                 .output()?;
             if !out.status.success() {
                 return Err(failure(format!(
@@ -259,6 +254,23 @@ impl RepoWorkspace {
             }
             let output: ResolvedManifest = serde_json::from_slice(&out.stdout)
                 .map_err(|e| failure(format!("Invalid Repo resolution: {e}")))?;
+            for (path, bytes) in output.inputs {
+                let path = relative_path(root, &path)?;
+                let source = root.join(&path);
+                if source.canonicalize()?.strip_prefix(root).is_err() {
+                    return Err(failure(format!(
+                        "Repo manifest escapes workspace: {}",
+                        path.display()
+                    )));
+                }
+                if model_inputs::read_to_string(&source)?.as_bytes() != bytes {
+                    return Err(failure(format!(
+                        "Repo manifest changed during resolution: {}",
+                        path.display()
+                    )));
+                }
+                inputs.insert(path, bytes);
+            }
             let resolved_xml = output.xml;
             if tags(&resolved_xml)?
                 .iter()
@@ -289,7 +301,8 @@ impl RepoWorkspace {
             }
             projects.sort_by(|a, b| a.path.cmp(&b.path));
             Ok(Self {
-                manifest: manifest.clone(),
+                selection: manifest.clone(),
+                manifest: output.manifest.unwrap_or_else(|| manifest.clone()),
                 projects,
                 resolved_xml,
                 inputs,
@@ -362,6 +375,85 @@ impl RepoWorkspace {
             }
         }
         Ok(writer.into_inner())
+    }
+
+    /// Update native project and revision-overlay declarations in place, keeping
+    /// Repo's include and local-manifest composition instead of flattening it.
+    pub fn pinned_inputs(&self) -> Result<BTreeMap<PathBuf, Vec<u8>>, ReqvireError> {
+        if !self.uses_repo_managed_inputs() {
+            return Ok(BTreeMap::from([(
+                self.manifest.clone(),
+                self.pinned_xml()?,
+            )]));
+        }
+        let mut changed = BTreeMap::new();
+        for (path, bytes) in &self.inputs {
+            if path.starts_with(".repo/manifests.git") {
+                continue;
+            }
+            let mut reader = Reader::from_reader(bytes.as_slice());
+            let mut writer = Writer::new(Vec::new());
+            loop {
+                let event = reader.read_event().map_err(|e| failure(e.to_string()))?;
+                if matches!(event, Event::Eof) {
+                    break;
+                }
+                let event = match &event {
+                    Event::Start(tag) | Event::Empty(tag)
+                        if matches!(tag.name().as_ref(), b"project" | b"extend-project") =>
+                    {
+                        let mut attrs = attributes(tag)?;
+                        let name = attr(&attrs, "name")?;
+                        let candidates: Vec<_> =
+                            self.projects.iter().filter(|p| p.name == name).collect();
+                        let selected = attrs.get("dest-path").or_else(|| attrs.get("path"));
+                        let project = match candidates.as_slice() {
+                            [] => None, // A later remove-project can remove this declaration.
+                            [project] => Some(*project),
+                            _ => selected.and_then(|path| {
+                                candidates
+                                    .iter()
+                                    .copied()
+                                    .find(|p| p.path == Path::new(path))
+                            }),
+                        };
+                        if !candidates.is_empty() && project.is_none() {
+                            return Err(failure(format!(
+                                "Cannot identify project pin in {}: {name}",
+                                path.display()
+                            )));
+                        }
+                        if let Some(project) = project.filter(|_| {
+                            tag.name().as_ref() == b"project" || attrs.contains_key("revision")
+                        }) {
+                            attrs.insert("revision".into(), project.commit.clone());
+                            let tag_name =
+                                String::from_utf8_lossy(tag.name().as_ref()).into_owned();
+                            let mut replacement = BytesStart::new(tag_name);
+                            for (key, value) in &attrs {
+                                replacement.push_attribute((key.as_str(), value.as_str()));
+                            }
+                            if matches!(event, Event::Empty(_)) {
+                                Event::Empty(replacement)
+                            } else {
+                                Event::Start(replacement)
+                            }
+                        } else {
+                            event
+                        }
+                    }
+                    _ => event,
+                };
+                writer
+                    .write_event(event)
+                    .map_err(|e| failure(e.to_string()))?;
+            }
+            let updated = writer.into_inner();
+            if updated != *bytes {
+                changed.insert(path.clone(), updated);
+            }
+        }
+        Ok(changed)
     }
 }
 
@@ -446,20 +538,111 @@ fn matching_remote(checkout: &Path, project: &RepoProject) -> Result<String, Req
 struct ResolvedManifest {
     xml: String,
     projects: Vec<RepoProject>,
+    #[serde(default)]
+    inputs: BTreeMap<PathBuf, Vec<u8>>,
+    #[serde(default)]
+    manifest: Option<PathBuf>,
 }
 
 // Repo supplies both the composed manifest and effective per-project metadata.
-// Only Central-owned staged inputs are loaded. No sync/fetch command is issued.
+// Resolve the selected input files without any sync/fetch operation.
 const REPO_RESOLUTION: &str = r#"
 import json, os, sys
+from xml.dom import minidom
 sys.path.insert(0, os.path.join(sys.argv[1], 'repo'))
 from manifest_xml import RepoClient
 client = RepoClient(sys.argv[1])
-client.Override(sys.argv[2], load_local_manifests=False)
+native = sys.argv[2] == '--active-repo-manifest'
+inputs = {}
+manifest = None
+root = os.path.realpath(os.path.dirname(sys.argv[1]))
+def capture(path):
+    source = os.path.realpath(path)
+    if os.path.commonpath([root, source]) != root:
+        raise ValueError('Repo manifest input escapes workspace: ' + source)
+    with open(source, 'rb') as stream:
+        inputs[os.path.relpath(source, root)] = list(stream.read())
+    return source
+if native:
+    parse = client._ParseManifestXml
+    def parse_with_inputs(path, *args, **kwargs):
+        capture(path)
+        return parse(path, *args, **kwargs)
+    client._ParseManifestXml = parse_with_inputs
+    selected = sys.argv[3]
+    entry = capture(selected)
+    document = minidom.parse(selected)
+    nodes = [n for n in document.documentElement.childNodes if n.nodeType == n.ELEMENT_NODE]
+    if len(nodes) == 1 and nodes[0].tagName == 'include':
+        entry = capture(os.path.join(client.manifestProject.worktree, nodes[0].getAttribute('name')))
+    manifest = os.path.relpath(entry, root)
+    config = os.path.join(sys.argv[1], 'manifests.git', 'config')
+    if os.path.isfile(config):
+        capture(config)
+    if os.path.abspath(selected) != os.path.abspath(client.manifestFile):
+        client.Override(selected, load_local_manifests=True)
+else:
+    client.Override(sys.argv[2], load_local_manifests=False)
+xml = client.ToXml(filter_groups='all').toxml()
 print(json.dumps({
-    'xml': client.ToXml(filter_groups='all').toxml(),
+    'xml': xml, 'inputs': inputs, 'manifest': manifest,
     'projects': [dict(name=p.name, path=p.relpath, revision=p.revisionExpr,
                       remote=p.remote.name, fetch_url=p.remote.url)
                  for p in client.projects],
 }))
 "#;
+
+#[cfg(test)]
+mod tests {
+    use super::{selected_manifest, selected_manifest_at};
+
+    #[test]
+    fn default_selection_loads_repo_entry_without_a_root_manifest() {
+        let temporary = tempfile::tempdir().unwrap();
+        let root = temporary.path();
+        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        let entry = "<manifest><include name=\"default.xml\"/></manifest>\n";
+        std::fs::write(root.join(".repo/manifest.xml"), entry).unwrap();
+        std::fs::write(root.join(".repo/manifests/default.xml"), "<manifest/>\n").unwrap();
+
+        let selected = selected_manifest(root).unwrap().unwrap();
+        let loaded = std::fs::read_to_string(root.join(selected)).unwrap();
+        assert_eq!(loaded, entry);
+    }
+
+    #[test]
+    fn override_selects_an_alternate_repo_manifest_location() {
+        let temporary = tempfile::tempdir().unwrap();
+        let root = temporary.path();
+        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        let alternate = std::path::Path::new(".repo/manifests/alternate.xml");
+        let manifest = "<manifest/>\n";
+        std::fs::write(root.join(alternate), manifest).unwrap();
+
+        let selected = selected_manifest_at(root, Some(alternate))
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            std::fs::read_to_string(root.join(selected)).unwrap(),
+            manifest
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn default_selection_loads_the_legacy_repo_entry_symlink() {
+        let temporary = tempfile::tempdir().unwrap();
+        let root = temporary.path();
+        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        let manifest = "<manifest/>\n";
+        std::fs::write(root.join(".repo/manifests/default.xml"), manifest).unwrap();
+        std::os::unix::fs::symlink("manifests/default.xml", root.join(".repo/manifest.xml"))
+            .unwrap();
+
+        let selected = selected_manifest(root).unwrap().unwrap();
+        assert_eq!(
+            std::fs::read_to_string(root.join(selected)).unwrap(),
+            manifest
+        );
+    }
+}

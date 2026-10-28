@@ -29,7 +29,7 @@ Commands:
 
 Options:
   --workspace <DIR>         Workspace directory to operate on
-  --manifest <FILE>         Versioned Central Repo manifest (initialized Repo clients select it automatically)
+  --manifest <FILE>         Override Repo manifest location (default: .repo/manifest.xml)
   -h, --help               Print help
   -V, --version            Print version
 

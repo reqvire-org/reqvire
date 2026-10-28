@@ -116,6 +116,12 @@ impl MutationSession {
         message: &str,
     ) -> Result<Value, ReqvireError> {
         repo.check(&self.root)?;
+        let original_commits: Vec<_> = repo
+            .workspace
+            .projects
+            .iter()
+            .map(|p| p.commit.clone())
+            .collect();
         repo.outcomes.clear();
         for project in &mut repo.workspace.projects {
             let owner = self.root.join(&project.path);
@@ -196,21 +202,40 @@ impl MutationSession {
             )?;
         }
         repo.check(&self.root)?;
-        // The saved manifest is an ordinary accepted Central input. Never add
-        // component paths to Central's tree, even when Central ignores them.
-        let manifest = self.root.join(&repo.workspace.manifest);
-        let bytes = Arc::new(repo.workspace.pinned_xml()?);
-        if self.files.files.get(&manifest) != Some(&bytes) {
-            ensure_regular_destination(&self.root, &manifest)?;
-            persist(&manifest, Some(bytes.as_slice()))?;
-            Arc::make_mut(&mut self.files.files).insert(manifest.clone(), Arc::clone(&bytes));
-            self.pending_paths.insert(manifest);
+        let native = repo.workspace.uses_repo_managed_inputs();
+        let components_changed = repo
+            .workspace
+            .projects
+            .iter()
+            .zip(original_commits)
+            .any(|(p, old)| p.commit != old);
+        let pins = if !native || components_changed {
+            repo.workspace.pinned_inputs()?
+        } else {
+            BTreeMap::new()
+        };
+        for (relative, bytes) in pins {
+            let manifest = self.root.join(&relative);
+            let bytes = Arc::new(bytes);
+            if self.files.files.get(&manifest) != Some(&bytes) {
+                ensure_regular_destination(&self.root, &manifest)?;
+                persist(&manifest, Some(bytes.as_slice()))?;
+                Arc::make_mut(&mut self.files.files).insert(manifest.clone(), Arc::clone(&bytes));
+                if !native {
+                    self.pending_paths.insert(manifest);
+                }
+            }
+            repo.workspace
+                .inputs
+                .insert(relative, bytes.as_ref().clone());
         }
-        repo.workspace.resolved_xml =
-            String::from_utf8(bytes.as_ref().clone()).map_err(|e| error(e.to_string()))?;
-        repo.workspace
-            .inputs
-            .insert(repo.workspace.manifest.clone(), bytes.as_ref().clone());
+        if !native || components_changed {
+            for project in &mut repo.workspace.projects {
+                project.revision.clone_from(&project.commit);
+            }
+        }
+        let bytes = repo.workspace.pinned_xml()?;
+        repo.workspace.resolved_xml = String::from_utf8(bytes).map_err(|e| error(e.to_string()))?;
         let mut scope = self
             .files
             .workspace
@@ -232,12 +257,22 @@ impl MutationSession {
             })
             .cloned()
             .collect();
-        let result = self.commit_central(&files, &central, message);
+        let result = if native && central.is_empty() {
+            self.committed_files = files.clone();
+            self.pending_paths.clear();
+            Ok(json!({"outcome":"completed", "commit":self.head, "head":self.head}))
+        } else {
+            self.commit_central(&files, &central, message)
+        };
         match result {
             Ok(mut value) => {
                 repo.outcomes
-                    .push(json!({"name":"central","commit":self.head,"outcome":"completed"}));
+                    .push(json!({"name":"central","commit":self.head,
+                    "outcome":if native && central.is_empty() {"no_op"} else {"completed"}}));
                 value["projects"] = json!(repo.outcomes);
+                if native {
+                    value["manifest"] = json!({"path":repo.workspace.manifest, "outcome":"saved", "versioned_in_central":false});
+                }
                 value["changed_files"] = json!(all_changed
                     .iter()
                     .filter_map(|p| p.strip_prefix(&self.root).ok())

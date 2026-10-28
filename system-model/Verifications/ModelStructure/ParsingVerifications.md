@@ -423,15 +423,25 @@ Verify the manifest-defined source boundary through real initialized Repo client
 #### Details
 - Run `mcp/complete-declared-snapshot` and `serve/complete-declared-snapshot`: CLI and mutation-enabled MCP return the same Central and declared component elements, including a Central requirement's component contract reference and the workspace-relative component identifier.
 - Run the CLI manifest cases: explicit `--manifest default.xml` selects the same complete model; an invalid or missing selected manifest is rejected with its path. The explicit case also resolves a Central-only include and extend-project selection without substituting the separate manifest checkout, accepts a different checkout remote alias and verifies relative fetch and equivalent SSH URL identities. Initialized Repo discovery rejects duplicate, overlapping or escaping project paths, unavailable commits, missing checkouts, symlink escapes and foreign remote identities without changing inputs or Git state. A nested Git repository absent from the manifest does not contribute model elements.
-- The suite requires the real Repo launcher and a local git-repo source checkout through `REQVIRE_TEST_REPO_SOURCE`. Repo initialization/synchronization uses only local fixture remotes. The optional Hermit development environment supplies the launcher and pinned source with a local bootstrap ref. Missing dependencies fail fixture preparation; they do not count as successful feature rejection.
+- The server/commit suite prepares its pinned Repo tool in the runner's temporary directory without a manually supplied source path or a dependency on another project checkout. Its feature checks use local fixture remotes. The file-selection regression uses only temporary .repo/manifest.xml and .repo/manifests/default.xml files, including the legacy entry symlink; it needs no Git initialization, Repo tool checkout, server or network. Setup failures remain failures, never successful feature rejections.
 - Compare the committed expected outcome file with the accumulated case outcomes. Every expected outcome is PASS; a failed source admission or a missing selector remains a failing acceptance case.
 - Within the existing explicit-manifest case, count real Python Repo-resolver launches for CLI validation with one and then 64 distinct file evidence references. Require a nonzero and identical count of Repo manifest-resolution processes, and successful target validation in both runs. Each subsequent invocation still rejects a missing selected manifest or invalid project selection; reuse does not outlive the validation pass.
+
+- Run `cli/active-repo-manifest-selection` and `cli/standalone-repo-manifest-selection`: remove Central's duplicate manifest and require the default CLI to match real `repo manifest` project revisions. Cover nested includes relative to Repo's manifest checkout, the legacy entry symlink, and a standalone source outside Central. An explicit alternate file location overrides the default selection, including a versioned file within Repo’s manifest checkout while the default entry is invalid; no tracked Central copy is required. Reads preserve manifest bytes, project HEADs and Git indexes.
+- Default MCP and embedded Explorer loading must admit the same complete native Repo scope without a Central manifest copy. Component checkout mismatches and invalid active manifests must fail against the native manifest path rather than falling back to a same-named Central file.
+
+- Run `mcp/native-repo-pin-checkpoint` through the Bash e2e entry point: accept and commit a component addition with no Central manifest, require the active Repo declaration to contain the new component commit, preserve the generated entry wrapper and include/local-overlay composition, and require fresh default CLI loading to succeed. Repo administration must remain absent from Central's Git index.
+
+- Run `mcp/native-repo-worktree`: create an isolated branch from a standalone Repo scope without a Central manifest, commit a component change into that context's native pins, remove and reopen the context, and require its saved pins and locally retained component commit to survive while the original checkout remains unchanged.
+
+- Run the manifest-only loader regressions in repo_workspace.rs: selecting the default generated entry and the legacy symlink must load the existing Repo file while no same-named root manifest exists. Both cases must work in a fresh temporary directory without a Git repository or Repo runtime.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [repo_workspace.rs](../../../crates/reqvire-core/src/repo_workspace.rs)
   * satisfiedBy: [check_repo_workspaces.py](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
   * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
   * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)

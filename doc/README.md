@@ -31,9 +31,9 @@ prerequisites. Browser checks also need Chromium and its system libraries.
 
 The optional [Hermit](https://cashapp.github.io/hermit/usage/get-started/)
 environment pins Rust/Cargo 1.92.0, Node.js 24.22.1, Bun 1.4.2, Python 3.12.3,
-ripgrep 15.2.0 and Google Repo 2.70. The Repo source is pinned to an exact Git
-commit and exposed as `REQVIRE_TEST_REPO_SOURCE`, so the multi-repository tests
-create real Repo clients entirely from local objects.
+ripgrep 15.2.0 and Google Repo 2.70. These are optional development tools;
+the multi-repository server suite prepares its own pinned Repo runtime under
+the test runner's temporary directory.
 
 ```bash
 git clone https://github.com/reqvire-org/reqvire.git
@@ -46,8 +46,8 @@ hermit install
 Activation affects the current shell. The first installation downloads tools;
 subsequent runs reuse the Hermit cache. It does not install OS libraries, model
 repositories, Cargo dependencies, frontend packages or browser binaries. To use
-an existing toolchain instead, install the listed tools yourself and set
-`REQVIRE_TEST_REPO_SOURCE` to a local Git checkout of Google's `git-repo`.
+an existing toolchain instead, install the listed tools yourself. No manually
+configured Repo source path or another project checkout is needed for tests.
 Hermit is a development convenience, not a prerequisite for installed Reqvire.
 
 ### Building and testing
@@ -60,8 +60,10 @@ cargo test --locked
 REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh test-mcp-repo-workspaces
 ```
 
-The first Repo test setup uses the Hermit-provided local Repo source; the suite
-itself performs no network fetch. Full browser coverage needs a browser:
+The manifest-selection regressions use only temporary XML files, with no Git
+repository or Repo runtime. The separate Repo server suite bootstraps its pinned
+tool in a temporary directory; its actual feature checks use local fixture
+remotes. Full browser coverage needs a browser:
 
 ```bash
 cd explorer

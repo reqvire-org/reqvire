@@ -564,22 +564,27 @@ reqvire serve --enable-mcp --enable-mutations
 
       <Section title="Repo Workspaces">
         <p className="text-zinc-600 mb-4">
-          A versioned Repo manifest makes Central and its declared components one
+          Repo&apos;s active manifest makes Central and its declared components one
           model. Install Git, Python 3 and Google Repo, initialize and sync the
           client, then start from Central. The User Guide covers preparation.
-          An initialized <code>.repo/</code> selects manifest mode; an explicit
-          <code> --manifest</code> selects a tracked Central manifest.
+          An initialized <code>.repo/manifest.xml</code> selects the native manifest,
+          including its includes and local overlays. No root copy is needed. An explicit
+          <code> --manifest</code> selects another manifest file location,
+          preserving the same format and Git versioning.
         </p>
-        <CodeBlock>{`reqvire --manifest default.xml mcp --enable-mutations
+        <CodeBlock>{`reqvire mcp --enable-mutations
 
 # Or expose Explorer and MCP together
-reqvire --manifest default.xml serve --enable-mcp --enable-mutations`}</CodeBlock>
+reqvire serve --enable-mcp --enable-mutations
+
+# Optional: use another manifest file location
+reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBlock>
         <BulletList items={[
-          "The existing branch argument selects a Central worktree. Its manifest selects component revisions. New contexts have private component checkouts and Repo metadata; preparation uses locally available objects without a network sync.",
+          "The branch argument selects a Central worktree. Repo-managed manifest inputs are copied privately and retained across removal and reopening. Files belonging to Central follow that worktree's Git history. Preparation uses local objects without a network sync.",
           "The same typed mutation tools edit Central-relative paths. Each file is saved in its owning repository. By default the edits remain pending and create no commits.",
-          "reqvire.git.commit saves changed components first, pins exact project commits in Central's manifest, then commits Central last. Unchanged components create no commit. --enable-commits uses the same ordering automatically.",
-          "If a later commit fails, confirmed component commits remain retained. The accepted model stays readable and pending changes remain until the final Central checkpoint. Inspect per-project outcomes before retrying; an unknown ref outcome blocks writes until reconciled.",
-          "With GitHub publication enabled, required component commits are pushed before Central. A dependency failure stops Central publication. Pull-request operations address Central; callers cannot substitute arbitrary repositories.",
+          "reqvire.git.commit saves changed components first and updates pins in the selected manifest declarations, preserving their composition. Repo-managed files retain their manifest project's Git workflow; Central-owned files are checkpointed with Central. Unchanged components create no commit; --enable-commits uses the same workflow automatically.",
+          "If a later save fails, confirmed component commits remain retained. The accepted model stays readable and pending changes remain until the selected checkpoint succeeds. Inspect per-project outcomes before retrying; an unknown ref outcome blocks writes until reconciled.",
+          "With GitHub publication enabled, required component commits are pushed before Central. Manifest Git commits and publication remain with their owning repository; --manifest does not change ownership. Pull-request operations address Central; callers cannot substitute arbitrary repositories.",
           "Changing the selected manifest or project HEAD externally requires full validated admission. Refresh HEAD does not silently replace the composition of an accepted model.",
         ]} />
         <CodeBlock>{`{

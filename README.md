@@ -104,20 +104,23 @@ the workspace but outside Git worktrees are ignored by model processing.
 
 ### Multi-repository models
 
-Use a Central Git worktree with a **versioned Google Repo manifest** to combine
-its own model with declared component repositories. Runtime prerequisites are
+Use an initialized Google Repo workspace to combine its own model with declared
+component repositories. Runtime prerequisites are
 Git, Python 3 and an initialized Google Repo client. Install the `repo` launcher
-and explicitly run `repo init` and `repo sync` before using Reqvire. Track the
-selected manifest and includes in Central; keep `.repo/` and component checkout
-directories ignored by Central Git. All declared projects must be local, inside
+and explicitly run `repo init` and `repo sync` before using Reqvire. By default,
+Reqvire follows Repo's active `.repo/manifest.xml`, its manifest checkout and
+local overlays, including standalone manifests. No duplicate root manifest is
+needed. Use `--manifest` only to select another manifest file location; its
+format, Git ownership and history stay the same. Keep `.repo/` and component
+checkout directories ignored by Central Git. All declared projects must be local, inside
 Central, at the selected revisions, and match their declared repository identity.
 Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
 
 ```bash
 # From an already initialized and synced Central checkout
-reqvire validate                         # auto-select .repo/manifest.xml
-reqvire --manifest default.xml validate  # explicit Central manifest
-reqvire --manifest default.xml serve --enable-mcp --enable-mutations
+reqvire validate                         # default: .repo/manifest.xml
+reqvire --manifest .repo/manifests/review.xml validate
+reqvire --manifest .repo/manifests/review.xml serve --enable-mcp --enable-mutations
 ```
 
 CLI, MCP and Explorer share the combined model and Central-relative identifiers.
@@ -125,10 +128,12 @@ Workspace `.reqvireignore` rules remain global; each repository's Git ignores
 apply to its own files. A selected manifest failure is an error, and Reqvire
 never fetches missing projects or revisions implicitly.
 
-MCP's existing `branch` argument selects Central's branch and manifest. Mutations
-save files in their owning repositories. Explicit commits save components first,
-pin their exact SHAs in Central's manifest, then commit Central. Optional GitHub
-publication pushes required component commits before Central. See the
+MCP's `branch` argument selects the owning worktree. Native Repo contexts keep
+private manifest inputs and component checkouts. Mutations save files in their
+owning repositories; component commits update the selected manifest's pins.
+Repo-managed inputs retain their manifest project's Git publication workflow;
+files belonging to Central are checkpointed with Central. Optional GitHub publication pushes required
+component commits before Central. See the
 [User Guide](https://www.reqvire.org/user-guide) and
 [MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.
 

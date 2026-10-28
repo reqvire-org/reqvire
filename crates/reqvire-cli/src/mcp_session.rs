@@ -455,6 +455,15 @@ fn load_snapshot(
             }
         }
     }
+    if let Some(repo) = files
+        .workspace
+        .as_ref()
+        .and_then(|scope| scope.repo.as_ref())
+    {
+        for (path, bytes) in &repo.inputs {
+            Arc::make_mut(&mut files.files).insert(root.join(path), Arc::new(bytes.clone()));
+        }
+    }
     let capture = files.enter(None);
     capture.capture_dependencies();
     let observed = reqvire::model_inputs::InputObservationGuard::start();

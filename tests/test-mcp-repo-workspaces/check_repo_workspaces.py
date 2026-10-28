@@ -26,7 +26,7 @@ OUTPUT.mkdir()
 spec = importlib.util.spec_from_file_location('cache_checks', SUITE.parent / 'test-cache-integration/check_correctness.py')
 helpers = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(helpers)
-REPO_SOURCE = Path(os.environ.get('REQVIRE_TEST_REPO_SOURCE', '/usr/share/git-repo'))
+REPO_SOURCE = Path(DESTINATION) / 'repo-tool'
 REPO = shutil.which('repo')
 ENV = {**os.environ, 'GIT_ALLOW_PROTOCOL': 'file', 'GIT_TERMINAL_PROMPT': '0',
        'GIT_CONFIG_COUNT': '2', 'GIT_CONFIG_KEY_0': 'user.name',
@@ -159,10 +159,11 @@ class Fixture:
             '  <default remote="local" revision="main"/>\n'
             + declarations + '</manifest>\n')
 
-    def server(self, mode='mcp', commits=False, extra_args=(), environment=None):
+    def server(self, mode='mcp', commits=False, extra_args=(), environment=None, native=False):
         SERVER_STARTS.append({'fixture': self.base.name, 'mode': mode, 'automatic_commits': commits})
-        return helpers.Server(BINARY, self.central, self.output, mode, 'server',
-                              mutations=True, commits=commits, extra_args=extra_args,
+        return helpers.Server(BINARY, self.central, self.output, mode, 'native-' + mode if native else 'server',
+                              mutations=True, commits=commits,
+                              extra_args=(*([] if native else ['--manifest', 'default.xml']), *extra_args),
                               environment={**ENV, **(environment or {})})
 
     def git_state(self):
@@ -202,7 +203,7 @@ class Fixture:
         expected_names = sorted(EXPECTED_NAMES + ['Updated Shared Specification', 'Secondary Capability',
                                                  'Secondary Requirement', 'Secondary Specification', 'Retained Capability'])
         assert names(server) == expected_names, 'Commit lost part of the accepted combined model'
-        cli = json.loads(command(self.central, BINARY, 'search', '--json').stdout)
+        cli = json.loads(command(self.central, BINARY, '--manifest', 'default.xml', 'search', '--json').stdout)
         assert sorted(e['name'] for data in cli['files'].values() for e in data['elements']) == expected_names
 
     def retained_state(self):
@@ -287,7 +288,7 @@ def explicit_manifest():
     ]:
         (f.central / 'default.xml').write_text(composed_text.replace(f.remotes.as_uri() + '/', fetch))
         git(f.component, 'remote', 'set-url', 'origin', checkout_url)
-        found = json.loads(command(f.central, BINARY, 'search', '--json').stdout)
+        found = json.loads(command(f.central, BINARY, '--manifest', 'default.xml', 'search', '--json').stdout)
         assert sorted(e['name'] for data in found['files'].values() for e in data['elements']) == EXPECTED_NAMES
     missing = command(f.central, BINARY, '--manifest', 'missing.xml', 'validate', check=False)
     assert missing.returncode != 0 and 'missing.xml' in missing.stderr + missing.stdout
@@ -297,10 +298,10 @@ def explicit_manifest():
 def invalid_manifest():
     f = Fixture('invalid-manifest')
     # Initialized Repo is the selector. No flag parsing can hide this rejection.
-    (f.central / 'default.xml').write_text('<manifest>')
+    (f.central / '.repo/manifests/default.xml').write_text('<manifest>')
     before = f.files(), f.git_state()
     result = command(f.central, BINARY, 'validate', '--json', check=False)
-    assert result.returncode != 0, 'Invalid selected Central manifest silently fell back to Git discovery'
+    assert result.returncode != 0, 'Invalid active Repo manifest silently fell back to Central'
     assert 'default.xml' in result.stdout + result.stderr, 'Rejection omitted the selected manifest path'
     assert (f.files(), f.git_state()) == before, 'Inspection changed rejected inputs'
 
@@ -323,7 +324,7 @@ def project_boundaries():
     for label, text in invalid.items():
         (f.central / 'default.xml').write_text(text)
         before = f.files(), f.git_state()
-        result = command(f.central, BINARY, 'validate', '--json', check=False)
+        result = command(f.central, BINARY, '--manifest', 'default.xml', 'validate', '--json', check=False)
         diagnostic = result.stdout + result.stderr
         (f.output / (label + '.log')).write_text(diagnostic)
         if result.returncode == 0 or 'default.xml' not in diagnostic:
@@ -600,7 +601,7 @@ def push(fail_component, shared):
 
 def main():
     if not REPO or not (REPO_SOURCE / 'main.py').is_file() or not (REPO_SOURCE / '.git').exists():
-        print('Fixture dependency missing: install repo and set REQVIRE_TEST_REPO_SOURCE to a local git-repo Git checkout.', file=sys.stderr)
+        print('Temporary Repo tool fixture is missing; run this suite through test.sh.', file=sys.stderr)
         return 2
     # Each group has one fixed startup policy and an intentional sequence:
     # reads before edits; isolated branch checks before editing main; denied

@@ -27,8 +27,8 @@ export default function UserGuide() {
           option applies to normal CLI commands and the MCP server. A workspace
           must contain at least one eligible Git worktree; files in non-Git
           workspace folders are ignored, and model paths remain relative to the
-          workspace root. For a model spanning repositories, use a Central Git
-          worktree with a versioned Repo manifest as described below.
+          workspace root. For a model spanning repositories, initialize Repo at
+          the owning Git worktree as described below.
         </p>
         <CodeBlock>{`reqvire --workspace /path/to/workspace validate
 reqvire --workspace /path/to/workspace search --filter-type requirement
@@ -49,35 +49,37 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
 
       <Section title="Multi-repository Models">
         <p className="text-zinc-600 mb-4">
-          Keep the model&apos;s composition in a versioned Google Repo manifest in
-          a Central Git repository. Central is the workspace root; declared
-          component checkouts contribute to the same model. Element paths stay
+          Google Repo&apos;s active manifest selects the component repositories
+          and revisions. Central is the workspace root; declared component
+          checkouts contribute to the same model. No duplicate manifest is
+          required in Central. Element paths stay
           relative to Central, even when an element belongs to a component.
         </p>
         <BulletList items={[
-          "Install Git, Python 3, and Google Repo. Initialize the Repo client beside Central's Git checkout, then explicitly sync the component repositories before using Reqvire.",
-          "Track the selected manifest and all its includes in Central. Declare unique, non-overlapping project paths inside Central and revisions available in the local checkouts. Each checkout must match the declared repository identity and selected revision.",
+          "Install Git, Python 3, and Google Repo. Initialize the Repo client at Central's Git worktree root, then explicitly sync the component repositories before using Reqvire.",
+          "Repo's .repo/manifest.xml, manifest checkout, includes and local overlays are the default source of project pins. Standalone manifests also work. Declare unique, non-overlapping project paths inside Central and locally available revisions; each checkout must match its declared identity and revision.",
           "Exclude .repo/ and component checkout directories from Central's Git tracking. Declared component Git inputs remain visible to Reqvire even when Central ignores their directories.",
-          "An initialized .repo/ selects manifest mode automatically. Use --manifest for an explicit Central-relative manifest selection. A selected manifest that cannot resolve fails; Reqvire never silently falls back or fetches missing commits.",
+          "Repo's manifest checkout keeps its existing Git versioning and commit history. Use --manifest only when the manifest file is at a different location. The flag changes neither the manifest format nor its Git ownership. Invalid selections fail; Reqvire never silently falls back or fetches missing commits.",
           "CLI, MCP and Explorer use the same combined source scope. Workspace .reqvireignore rules apply globally; each repository's Git ignores apply within its ownership boundary. Undeclared repositories and Repo metadata are excluded. Repo submanifests are not supported.",
         ]} />
-        <CodeBlock>{`# The Central repository already tracks default.xml and its includes
-# and ignores /.repo/ and /repositories/.
+        <CodeBlock>{`# Central ignores /.repo/ and /repositories/.
 git clone https://github.com/example/central.git central
 cd central
-repo init -u https://github.com/example/central.git -b main -m default.xml
+repo init -u https://github.com/example/manifests.git -b main -m default.xml
 repo sync
 
-# Initialization selects the manifest automatically
+# Follow Repo's active manifest
 reqvire validate
-# Or select another versioned manifest explicitly
-reqvire --manifest default.xml search --json
-reqvire --manifest default.xml serve --enable-mcp --enable-mutations`}</CodeBlock>
+reqvire serve --enable-mcp --enable-mutations
+
+# Optional: select another manifest file location
+reqvire --manifest .repo/manifests/review.xml search --json`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Inspection does not require clean content. Mutation startup requires
           clean committed Central and component checkouts and Git author identity.
-          Branch selection chooses Central&apos;s branch and its manifest; it does
-          not require identically named component branches. See the MCP Server
+          New branch contexts preserve the selected manifest inputs in private
+          Repo state or in their owning Git worktree.
+          Component branches need not share Central&apos;s branch name. See the MCP Server
           guide for private branch checkouts and component-first commits.
         </p>
       </Section>

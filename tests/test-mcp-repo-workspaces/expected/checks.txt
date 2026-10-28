@@ -13,3 +13,7 @@ PASS mcp/failed-central-checkpoint-retains-component
 PASS serve/combined-publication-and-branch-picker
 PASS mcp/failed-dependency-push-preserves-central
 PASS mcp/dependency-first-push
+PASS cli/active-repo-manifest-selection
+PASS cli/standalone-repo-manifest-selection
+PASS mcp/native-repo-pin-checkpoint
+PASS mcp/native-repo-worktree

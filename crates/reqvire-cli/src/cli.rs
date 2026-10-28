@@ -28,7 +28,7 @@ pub struct Args {
     #[clap(long, global = true, value_name = "DIR")]
     pub workspace: Option<PathBuf>,
 
-    /// Versioned Central Repo manifest (initialized Repo clients select it automatically)
+    /// Override Repo manifest location (default: .repo/manifest.xml)
     #[clap(long, global = true, value_name = "FILE")]
     pub manifest: Option<PathBuf>,
 
