@@ -9,7 +9,10 @@ root = Path(__file__).resolve().parents[2]
 output = Path(sys.argv[1]).resolve()
 output.mkdir(parents=True, exist_ok=True)
 build = output / "build-script"
-subprocess.run(["rustc", str(root / "crates/reqvire-core/build.rs"), "-o", str(build)], check=True)
+# Resolve the selected toolchain before fixtures override PATH. Hermit launchers
+# rebuild PATH when invoked and would hide the fixture's fake Bun from Cargo.
+rust_bin = Path(subprocess.check_output(["rustc", "--print", "sysroot"], text=True).strip()) / "bin"
+subprocess.run([str(rust_bin / "rustc"), str(root / "crates/reqvire-core/build.rs"), "-o", str(build)], check=True)
 checks = []
 
 def run_case(name, check):
@@ -134,6 +137,7 @@ def cargo_fresh(rebuild=False):
     bun.chmod(0o755)
     env["PATH"] += os.pathsep + os.environ["PATH"]
     env["CARGO_TARGET_DIR"] = str(repo / "target")
+    env["RUSTC"] = str(rust_bin / "rustc")
     if rebuild:
         env["REQVIRE_BUILD_EXPLORER"] = "1"
     cargo_runs = 0
@@ -141,7 +145,7 @@ def cargo_fresh(rebuild=False):
         nonlocal cargo_runs
         cargo_runs += 1
         # CI enables Cargo colors; keep the verbose output parsed below plain.
-        result = subprocess.run(["cargo", "check", "--offline", "--verbose", "--color", "never", "--manifest-path", str(manifest / "Cargo.toml")], env=env, text=True, capture_output=True)
+        result = subprocess.run([str(rust_bin / "cargo"), "check", "--offline", "--verbose", "--color", "never", "--manifest-path", str(manifest / "Cargo.toml")], env=env, text=True, capture_output=True)
         (repo / f"cargo-{cargo_runs}.log").write_text(result.stderr)
         require(result.returncode == 0, result.stderr)
         return result.stderr
