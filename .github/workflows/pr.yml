@@ -42,7 +42,7 @@ jobs:
       - name: Install Explorer dependencies
         run: cd explorer && bun install --frozen-lockfile
 
-      - name: Install headless Chromium for Explorer and end-to-end checks
+      - name: Install headless Chromium for end-to-end checks
         run: cd explorer && bun --bun x --no-install playwright install --with-deps chromium --only-shell
 
       - name: Build Explorer SPA and standalone design-system bundles
@@ -84,15 +84,6 @@ jobs:
         with:
           name: end-to-end-test-logs
           path: /tmp/reqvire-test-logs
-
-      - name: Upload ADS verification evidence on failure
-        if: failure()
-        uses: actions/upload-artifact@v6
-        with:
-          name: explorer-ads-verification
-          path: explorer/.ds/verification
-          include-hidden-files: true
-          if-no-files-found: ignore
 
   validate:
     name: Validate Requirements

@@ -1,5 +1,8 @@
 {
   "schemaVersion": 1,
+  "resources": {
+    "memoryLimitMb": 6144
+  },
   "sourceDir": "src",
   "dsDir": "design-system",
   "publicAlias": "@ds",

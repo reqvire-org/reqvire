@@ -31,7 +31,7 @@ explorer/node_modules/.reqvire-deps.stamp: explorer/package.json explorer/bun.lo
 	cd explorer && "$(EXPLORER_BUN)" install --frozen-lockfile
 	touch "$@"
 
-# Test and build the Preact/Vite Explorer SPA bundle, including ADS browser checks.
+# Run source/unit checks and build the Preact/Vite Explorer SPA bundle.
 # The served index.html is
 # this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.

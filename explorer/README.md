@@ -18,16 +18,20 @@ present.
 
 ## Build & embed flow
 
-`bun run build` runs source checks, unit/integration tests and registered ADS
-browser checks. Any failure stops the build:
+`bun run build` runs source checks, unit/integration tests and the SPA build.
+Any failure stops the build:
 
 ```
 prebuild: lint:ds + assets:ds
-build:   lint:style + typecheck + test + build:app + test:ads
+build:   lint:style + typecheck + test + build:app
 ```
 
-`@reqvire-org/ads` is pinned to `0.3.41` as a development dependency; project
+`@reqvire-org/ads` is pinned to `0.3.42` as a development dependency; project
 architecture and preview settings live in `ds.config.json`.
+ADS commands use an explicit 6 GiB process-tree budget configured there as
+`resources.memoryLimitMb: 6144`, while respecting lower inherited Linux limits.
+This keeps release, PR and Pages builds independent of ADS's automatic budget,
+which can fall to 128 MiB when a runner reports little free memory.
 Bun 1.4.1+ manages dependencies and runs MCP and ADS compilation.
 Node 24 runs Vitest with a 1,200 MiB heap ceiling and at most two workers, and the
 existing Vite app/kit builds with a 1,600 MiB heap ceiling. The 121-node flow
@@ -114,7 +118,7 @@ bun run dev        # local dev server (uses src/store/devFixture.ts)
 bun run typecheck  # tsc --noEmit
 bun run test           # Vitest application and colocated ADS unit tests
 bun run test:ads   # registered browser checks through ADS's isolated preview host
-bun run build      # source checks + unit/integration tests + SPA build + ADS browser checks
+bun run build      # source checks + unit/integration tests + SPA build
 bun run ads-mcp          # stdio MCP + showcase; guarded editing enabled
 bun run ads-read-mcp     # stdio MCP + showcase; read-only
 bun run dev:showcase    # MCP client showcase; open the printed URL
@@ -126,7 +130,10 @@ bun run build:mcp-previews -- --watch  # advanced: compiler without the managed 
 
 `playwright.ads.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
 The owners' `.ads.contract.ts` files register the checks with the `widget`
-profile in `ds.config.json`. `bun run test:ads` first validates and compiles the
+profile in `ds.config.json`. ADS MCP acceptance and validation policies enable
+these checks through `behaviorChecks: true`. GitHub Actions builds do not run
+ADS browser verification or compile MCP previews. For an explicit local run,
+`bun run test:ads` first validates and compiles the
 preview graph, then calls `ads verify .`, which starts
 and closes an isolated MCP preview host and supplies the selected cases to the
 project's `test:behavior` runner. No running MCP session or fixed port is needed.
@@ -146,10 +153,11 @@ application tests under `src/` and colocated ADS unit tests.
 
 Local browser checks use installed Google Chrome, matching MCP capture settings.
 Set `REQVIRE_TEST_BROWSER` (or `CHROME_BIN`) to an absolute browser executable
-path to use another Chrome/Chromium installation. CI installs the project's
-locked Playwright Chromium with `bun --bun x --no-install playwright install --with-deps
-chromium --only-shell` before building. Browser installation is explicit, never
-part of the source build. Failure evidence is saved in `.ds/verification/`.
+path to use another Chrome/Chromium installation. PR CI installs the project's
+locked Playwright Chromium for the separate application end-to-end suite;
+release and Pages workflows do not install a browser. Browser installation is
+explicit, never part of the source build. Local ADS failure evidence is saved
+in `.ds/verification/`.
 `types/ads-verification.d.ts` supplies the missing development-helper declaration
 for the installed ADS helper without relaxing production TypeScript checks.
 

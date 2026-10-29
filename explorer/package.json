@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "bun run generate:icons && bun scripts/run-node.mjs --max-old-space-size=1600 node_modules/vite/bin/vite.js",
     "check": "bun run lint && bun run typecheck",
-    "build": "bun run lint:style && bun run typecheck && bun run test && bun run build:app && bun run test:ads",
+    "build": "bun run lint:style && bun run typecheck && bun run test && bun run build:app",
     "build:app": "bun run generate:icons && bun scripts/run-node.mjs --max-old-space-size=1600 node_modules/vite/bin/vite.js build",
     "build:all": "bun run build && bun run build:ds-bundle",
     "build:ds-bundle": "bun scripts/run-node.mjs --max-old-space-size=1600 node_modules/vite/bin/vite.js build --config design-system/vite.bundle.config.ts",

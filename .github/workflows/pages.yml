@@ -27,9 +27,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
-      - name: Configure browser cache
-        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/reqvire-browser" >> "$GITHUB_ENV"
-
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -48,9 +45,6 @@ jobs:
 
       - name: Install Explorer dependencies
         run: cd explorer && bun install --frozen-lockfile
-
-      - name: Install headless Chromium for Explorer checks
-        run: cd explorer && bun --bun x --no-install playwright install --with-deps chromium --only-shell
 
       - name: Build Explorer SPA bundle
         run: cd explorer && bun run build

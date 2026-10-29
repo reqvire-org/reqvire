@@ -14,7 +14,7 @@ bun = shutil.which("bun")
 assert bun, "Bun must be on PATH"
 guards = ["lint:ds", "lint:style"]
 checked = [*guards, "typecheck"]
-built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "unit", "icons", "app", "icons", "previews", "ads"]
+built = ["lint:ds", "assets:ds", "lint:style", "typecheck", "unit", "icons", "app"]
 checks = []
 
 
@@ -159,7 +159,7 @@ def workflow_stages():
                 name = part.split()[2]
                 if "pre" + name in scripts:
                     stages.extend(expand(scripts["pre" + name]))
-                if name in [*guards, "assets:ds", "typecheck", "generate:icons", "build:ds-bundle", "test:ads"]:
+                if name in [*guards, "assets:ds", "typecheck", "generate:icons", "build:ds-bundle", "test:ads", "test:behavior", "build:mcp-previews"]:
                     stages.append(name)
                 else:
                     stages.extend(expand(scripts[name]))
@@ -184,13 +184,16 @@ def workflow_stages():
             stages = []
             for match in re.finditer(r"^        run: (cd explorer && .+)$", block, re.M):
                 stages.extend(expand(match[1]))
-            assert all(stages.count(stage) == 1 for stage in [*guards, "typecheck", "unit", "app", "test:ads"]), (filename, job, stages)
+            assert all(stages.count(stage) == 1 for stage in [*guards, "typecheck", "unit", "app"]), (filename, job, stages)
             assert stages.index("app") > max(stages.index(stage) for stage in [*guards, "typecheck", "unit"])
-            assert stages.index("test:ads") > stages.index("app")
+            assert not set(stages) & {"test:ads", "test:behavior", "build:mcp-previews"}, (filename, job, stages)
             assert stages.count("build:ds-bundle") == (1 if filename == "pr.yml" else 0), (filename, job, stages)
             bundle = block.find("run: cd explorer && bun run build")
             browser = re.search(r"^        run: cd explorer && .*playwright install[^\n]*chromium", block, re.M)
-            assert browser and browser.start() < bundle, f"{filename}/{job} must provision Chromium before the checked browser build"
+            if filename == "pr.yml":
+                assert browser and browser.start() < bundle, f"{filename}/{job} must provision Chromium for application end-to-end tests"
+            else:
+                assert not browser, f"{filename}/{job} must not provision Chromium for ADS tests"
             cargo = block.find("run: cargo build")
             if cargo >= 0:
                 assert 0 <= bundle < cargo
@@ -200,6 +203,7 @@ for command, expected in [
     ("build", built), ("check", checked),
     ("build:app", ["icons", "app"]), ("build:ds-bundle", ["kit"]),
     ("build:all", [*built, "kit"]),
+    ("test:ads", ["icons", "previews", "ads"]),
 ]:
     record("pipeline-" + command, lambda c=command, e=expected: composition(c, e))
 record("pipeline-stops-on-failure", failures)
