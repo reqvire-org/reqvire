@@ -43,8 +43,28 @@ Concept with intentionally unordered concept relations so format can canonicaliz
   * type: concept
 
 #### Relations
+  * closeMatch: [Format Close Concept](#format-close-concept)
+  * exactMatch: [Format Exact Concept](#format-exact-concept)
   * related: [Format Peer Concept](#format-peer-concept)
   * narrower: [Format Child Concept](#format-child-concept)
   * broader: [Format Parent Concept](#format-parent-concept)
+  * derivedFrom: [Format Concept Scheme](#format-concept-scheme)
+---
+
+### Format Exact Concept
+
+#### Metadata
+  * type: concept
+
+#### Relations
+  * derivedFrom: [Format Concept Scheme](#format-concept-scheme)
+---
+
+### Format Close Concept
+
+#### Metadata
+  * type: concept
+
+#### Relations
   * derivedFrom: [Format Concept Scheme](#format-concept-scheme)
 ---

@@ -87,13 +87,7 @@ function capabilityHierarchy<T extends CapabilityIdentity>(
   return result;
 }
 
-export const COVERAGE_SOURCE_LABELS: Record<string, string> = {
-  direct_satisfied: "Direct evidence",
-  requirement_rollup: "Requirement rollup",
-  contract_consumer_rollup: "Contract consumer rollup",
-  combined_rollup: "Combined rollup",
-  uncovered: "Uncovered",
-};
+export { COVERAGE_SOURCE_LABELS } from "@ds";
 
 function records<T>(section: unknown): T[] {
   return Object.values((section as { files?: Record<string, T[]> } | undefined)?.files ?? {}).flat();

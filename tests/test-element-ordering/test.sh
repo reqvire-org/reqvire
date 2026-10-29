@@ -25,7 +25,7 @@ assert_file_matches() {
 }
 
 # Run format command
-cd "${TEST_DIR}" && "${REQVIRE_BIN}" format --fix > /dev/null 2>&1
+cd "${TEST_DIR}" && "${MCP_OPERATION_BIN}" format --fix > /dev/null 2>&1
 
 # Compare with expected output
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/Unordered.md" \

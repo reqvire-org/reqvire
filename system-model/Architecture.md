@@ -109,7 +109,9 @@ classDiagram
         +MCPInterface
     }
     class CLI {
-        +InteractWithModelManagement()
+        +InspectValidateAndExport()
+        +MigrateKnownSourceContracts()
+        +LaunchMCPAndExplorer()
     }
     class WebInterface {
         +BrowseGeneratedDocumentation()
@@ -127,8 +129,9 @@ classDiagram
         +EvidenceMetadata()
     }
     class MutationSafety {
-        +RequireDryRun()
-        +FlushFilesystemWrites()
+        +ExposeOperationPreviews()
+        +ValidateCanonicalCandidate()
+        +FlushTransactionalWrites()
         +RefreshInternalGraph()
         +ReturnDiffs()
         +SyncGraphFromCoreMutation()
@@ -187,9 +190,9 @@ classDiagram
     UserInteraction --> CLI : "Interacts via CLI"
     UserInteraction --> WebInterface : "Browses Explorer"
     UserInteraction --> AI : "Reviews AI suggestions"
-    CLI --> ModelManagement
-    CLI --> ValidationAndReporting : "Triggers validation/fixing/reporting"
-    CLI --> Storage : "Reads/Writes Model Data"
+    CLI --> ModelManagement : "Reads and artifact generation"
+    CLI --> ValidationAndReporting : "Triggers validation and reporting"
+    CLI --> Storage : "Reads; known migration rewrites"
     WebInterface --> ValidationAndReporting : "Displays report projections"
     WebInterface --> Storage : "Reads Project Store data"
     MCPInterface --> SharedToolContracts : "Adapts MCP protocol"

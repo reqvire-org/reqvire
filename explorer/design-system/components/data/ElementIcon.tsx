@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import { type HTMLAttributes } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { ELEMENT_TYPES, elementRole, type ElementIconShape, type ElementType } from "../../palette";
 
@@ -70,8 +70,8 @@ const baseUX = css`
 
 const skinX = css`
   color: var(--slate-0);
-  background: var(--ds-elemicon-color, var(--other));
-  box-shadow: inset 0 0 0 var(--border-w) var(--element-icon-ring);
+  background: var(--ds-elemicon-color, var(--color-role-other));
+  box-shadow: inset 0 0 0 var(--border-w) var(--color-role-element-icon-ring);
 
   .ds-elemicon__glyph {
     color: var(--text-strong);
@@ -79,34 +79,34 @@ const skinX = css`
 
   &.ds-elemicon--hub {
     background: var(--slate-900);
-    box-shadow: inset 0 0 0 var(--border-w) var(--element-icon-ring-inverse);
+    box-shadow: inset 0 0 0 var(--border-w) var(--color-role-element-icon-ring-inverse);
   }
 
   &.ds-elemicon--hub .ds-elemicon__pip {
-    background: var(--ds-elemicon-color, var(--capability));
+    background: var(--ds-elemicon-color, var(--color-role-capability));
   }
 `;
 
 const roleSkinX = css`
-  &[data-element-role="capability"] { --ds-elemicon-color: var(--capability); }
-  &[data-element-role="requirement"] { --ds-elemicon-color: var(--requirement); }
+  &[data-element-role="capability"] { --ds-elemicon-color: var(--color-role-capability); }
+  &[data-element-role="requirement"] { --ds-elemicon-color: var(--color-role-requirement); }
   &[data-element-role="contract"],
   &[data-element-role="source"],
   &[data-element-role="constraint"],
   &[data-element-role="behavior"],
   &[data-element-role="state"],
   &[data-element-role="input-output"],
-  &[data-element-role="specification"] { --ds-elemicon-color: var(--contract); }
-  &[data-element-role="semantic-contract"] { --ds-elemicon-color: var(--semantic-contract); }
-  &[data-element-role="verification-objective"] { --ds-elemicon-color: var(--verification-objective); }
-  &[data-element-role="verification"] { --ds-elemicon-color: var(--verification); }
+  &[data-element-role="specification"] { --ds-elemicon-color: var(--color-role-contract); }
+  &[data-element-role="semantic-contract"] { --ds-elemicon-color: var(--color-role-semantic-contract); }
+  &[data-element-role="verification-objective"] { --ds-elemicon-color: var(--color-role-verification-objective); }
+  &[data-element-role="verification"] { --ds-elemicon-color: var(--color-role-verification); }
   &[data-element-role="semantic-query"],
-  &[data-element-role="ontology"] { --ds-elemicon-color: var(--ontology); }
-  &[data-element-role="concept"] { --ds-elemicon-color: var(--concept); }
-  &[data-element-role="concept-scheme"] { --ds-elemicon-color: var(--concept-scheme); }
-  &[data-element-role="concept-reference"] { --ds-elemicon-color: var(--concept-reference); }
-  &[data-element-role="resource"] { --ds-elemicon-color: var(--resource); }
-  &[data-element-role="other"] { --ds-elemicon-color: var(--other); }
+  &[data-element-role="ontology"] { --ds-elemicon-color: var(--color-role-ontology); }
+  &[data-element-role="concept"] { --ds-elemicon-color: var(--color-role-concept); }
+  &[data-element-role="concept-scheme"] { --ds-elemicon-color: var(--color-role-concept-scheme); }
+  &[data-element-role="concept-reference"] { --ds-elemicon-color: var(--color-role-concept-reference); }
+  &[data-element-role="resource"] { --ds-elemicon-color: var(--color-role-resource); }
+  &[data-element-role="other"] { --ds-elemicon-color: var(--color-role-other); }
 `;
 
 const DIAMOND_TYPES = new Set([
@@ -118,7 +118,7 @@ const DIAMOND_TYPES = new Set([
   "input-output",
 ]);
 
-export interface ElementIconProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
+export interface ElementIconProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
   type?: string | null;
   family?: string | null;
   size?: ElementIconSize;

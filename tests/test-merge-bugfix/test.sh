@@ -37,7 +37,7 @@ echo ""
 
 # Perform the merge and capture diff output
 echo "Running merge command: CLI Interface Structure <- CLI Search Command"
-MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "CLI Interface Structure" "CLI Search Command" 2>&1)
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" merge "CLI Interface Structure" "CLI Search Command" 2>&1)
 MERGE_EXIT=$?
 
 if [ $MERGE_EXIT -ne 0 ]; then

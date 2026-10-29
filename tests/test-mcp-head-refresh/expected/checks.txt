@@ -1,0 +1,6 @@
+PASS http-input-protection
+PASS http-git-state-guards
+PASS http-refresh-lifecycle
+PASS stdio-refresh
+PASS automatic-commit-refresh
+PASS explorer-head-selection-and-refresh

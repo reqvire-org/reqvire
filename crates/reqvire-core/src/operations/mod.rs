@@ -158,6 +158,38 @@ pub fn lint_report(registry: &GraphRegistry) -> LintReport {
     lint::analyze_model(registry)
 }
 
+/// Prepare only safe lint repairs through the ordinary canonical model writer.
+/// MCP's accepted-context transaction validates and publishes this candidate.
+pub fn lint_repair(
+    model: &mut ModelManager,
+    fixable: bool,
+    auditable: bool,
+) -> Result<Value, ReqvireError> {
+    model.graph_registry.clear_modified_files();
+    let report = lint_report(&model.graph_registry);
+    let relations_removed = report.apply_fixes(&mut model.graph_registry)?;
+    crate::crud::validate_model_after_mutation(model, None)?;
+    let mut files: Vec<_> = model
+        .graph_registry
+        .modified_files
+        .iter()
+        .cloned()
+        .collect();
+    files.sort();
+    let root = crate::workspace::workspace_root()?;
+    let diffs = crate::diff::generate_crud_diffs(&model.graph_registry, &files, &root)?;
+    model.graph_registry.flush_modified_files(&root)?;
+    let remaining = lint_report(&model.graph_registry);
+    let mut result: Value = serde_json::from_str(&remaining.to_json_string(fixable, auditable))?;
+    result["applied_fixes"] = serde_json::json!({
+        "relations_removed": relations_removed,
+        "changed_files": diffs.iter().map(|d| &d.file_path).collect::<Vec<_>>(),
+        "diffs": diffs,
+        "diagnostics": []
+    });
+    Ok(result)
+}
+
 pub fn format_report(
     registry: &GraphRegistry,
     fix: bool,

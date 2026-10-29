@@ -22,7 +22,7 @@ pub mod mcp_prompts;
 pub mod migrations;
 pub mod model;
 pub mod model_cache;
-mod model_inputs;
+pub mod model_inputs;
 pub(crate) mod model_revision;
 pub mod mutation_io;
 /// Canonical content revision shared by CLI sessions and model evidence adapters.
@@ -32,6 +32,7 @@ pub mod operations;
 pub mod parser;
 pub(crate) mod rdf_store;
 pub mod relation;
+pub mod repo_workspace;
 pub mod report;
 pub mod runtime_ontology;
 pub mod search;

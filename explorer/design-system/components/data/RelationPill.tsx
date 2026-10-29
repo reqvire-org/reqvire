@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
+import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { ElementIcon } from "./ElementIcon";
 
@@ -79,14 +79,14 @@ const skinX = css`
 `;
 
 export type RelationPillProps = {
-  kind?: ReactNode;
-  label: ReactNode;
+  kind?: ComponentChildren;
+  label: ComponentChildren;
   className?: string;
   targetType?: string | null;
   targetFamily?: string | null;
 } & (
-  | ({ href: string } & AnchorHTMLAttributes<HTMLAnchorElement>)
-  | ({ href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>)
+  | ({ href: string } & Omit<(AnchorHTMLAttributes<HTMLAnchorElement> & { className?: string }), "style">)
+  | ({ href?: undefined } & Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style">)
 );
 
 export function RelationPill({
@@ -114,13 +114,13 @@ export function RelationPill({
     return (
       <span className={cx("ds-relation", baseUX, skinX, className)}>
         {kind ? <span className="ds-relation__kind">{kind}</span> : null}
-        <a className="ds-relation__target" {...props}>
+        <a className="ds-relation__target" {...props} role="link">
           {content}
         </a>
       </span>
     );
   }
-  const buttonProps = props as ButtonHTMLAttributes<HTMLButtonElement>;
+  const buttonProps = props as Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style">;
   return (
     <span className={cx("ds-relation", baseUX, skinX, className)}>
       {kind ? <span className="ds-relation__kind">{kind}</span> : null}

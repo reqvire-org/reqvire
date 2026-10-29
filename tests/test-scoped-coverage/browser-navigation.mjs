@@ -42,7 +42,7 @@ for (const [kind, base] of [["served", servedUrl], ["exported", exportedUrl]]) {
     async function scope(name, worktree, report = reports[name || "whole"]) {
       await waitFor((report, expectedHash, worktree) => {
         const view = document.querySelector('[data-view="coverage"]');
-        return location.hash === expectedHash && (!worktree || new URL(location.href).searchParams.get("worktree_id") === worktree)
+        return location.hash === expectedHash && (!worktree || new URL(location.href).searchParams.get("branch") === worktree)
           && view?.querySelector("h1")?.textContent === (report.scope?.capability_name ?? "Whole Model")
           && view.textContent.includes(`${report.summary.covered_terminal_requirements} / ${report.summary.total_terminal_requirements} terminal requirements covered`)
           && view.textContent.includes(`${report.summary.verified_leaf_requirements} / ${report.summary.total_leaf_requirements} verified`);
@@ -172,7 +172,7 @@ for (const [kind, base] of [["served", servedUrl], ["exported", exportedUrl]]) {
     });
     if (kind === "exported") return;
     await run("served worktree scopes are isolated and traversable", async () => {
-      await open(`${servedUrl}/?worktree_id=${contexts.original}${hash("Alpha Root")}`); await scope("Alpha Root", contexts.original);
+      await open(`${servedUrl}/?branch=${encodeURIComponent(contexts.original)}${hash("Alpha Root")}`); await scope("Alpha Root", contexts.original);
       async function branch(id) {
         await click("Branch"); await evaluate(root => {
           const choice = [...document.querySelectorAll('[role="option"]')].find(option => option.querySelector("small")?.textContent === root);
@@ -188,7 +188,7 @@ for (const [kind, base] of [["served", servedUrl], ["exported", exportedUrl]]) {
       await select("Empty Branch");
       const response = await fetch(`${servedUrl}/mcp`, { signal: AbortSignal.timeout(15000), method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream", "Mcp-Protocol-Version": "2025-11-25" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "reqvire.remove_element", arguments: { element_name: "Empty Branch", dry_run: false, worktree_id: contexts.original } } }),
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name: "reqvire.remove_element", arguments: { element_name: "Empty Branch", dry_run: false, branch: contexts.original } } }),
       });
       const body = await response.json(); assert.ok(response.ok && !body.error && !body.result?.isError, JSON.stringify(body));
       await waitFor(() => document.body.textContent.includes("selected capability is no longer available") && location.hash === "#/coverage?scope=");

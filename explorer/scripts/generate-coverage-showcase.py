@@ -1,4 +1,4 @@
-"""Regenerate the showcase store with the real Reqvire exporter and E2E model."""
+"""Regenerate the local store and expectation snapshots from the real E2E model."""
 import json
 from pathlib import Path
 import shutil
@@ -9,6 +9,13 @@ import tempfile
 root = Path(__file__).resolve().parents[2]
 fixture = root / "tests/test-scoped-coverage"
 destination = root / "explorer/src/store/fixtures/scopedCoverage.json"
+
+# Keep Explorer checks self-contained when MCP validates an isolated project copy.
+# These snapshots retain the exact E2E expectations; no browser test reads outside
+# the Explorer workspace at typecheck/runtime.
+for source, target in [("whole-model.json", "wholeCoverage.fixture.json"),
+                       ("scopes.json", "coverageScopes.fixture.json")]:
+    shutil.copy(fixture / "expected" / source, destination.parent / target)
 
 with tempfile.TemporaryDirectory(prefix="reqvire-coverage-showcase-") as directory:
     workspace = Path(directory)

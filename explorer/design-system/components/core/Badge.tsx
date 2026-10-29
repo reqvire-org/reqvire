@@ -1,8 +1,8 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
-export interface BadgeProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
-  children?: ReactNode;
+export interface BadgeProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
   variant?: "default" | "accent" | "solid" | "dot";
 }
 

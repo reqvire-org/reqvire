@@ -6,12 +6,12 @@ const integrationPages = [
   {
     name: "MCP Server",
     href: "/mcp-server",
-    desc: "Streamable HTTP MCP server, tool discovery, read/report tools, mutation mode, and semantic evidence.",
+    desc: "Streamable HTTP and per-project stdio startup, tool discovery, mutation mode, and semantic evidence.",
   },
   {
     name: "Coding Assistants",
     href: "/coding-assistants",
-    desc: "Claude Code plugin, Codex skills, MCP workflows, assistant prompts, and AI-native Reqvire use cases.",
+    desc: "Shared agent skills, MCP workflows, assistant prompts, and AI-native Reqvire use cases.",
   },
 ];
 
@@ -54,11 +54,11 @@ export default function Integrations() {
             },
             {
               name: "MCP",
-              desc: "Run reqvire mcp for Streamable HTTP tools that MCP-capable assistants can discover and call; npx is available as a no-install convenience.",
+              desc: "Run reqvire mcp for Streamable HTTP tools, or add --transport stdio for a client-managed process per project. npx is available as a no-install convenience.",
             },
             {
               name: "Assistant packages",
-              desc: "Install Claude Code plugins or Codex skills when the assistant environment supports native commands or skill files.",
+              desc: "Install the shared Reqvire skills for Claude Code, Codex, or another supported agent with the skills CLI.",
             },
             {
               name: "GitHub",

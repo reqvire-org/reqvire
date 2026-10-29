@@ -6,16 +6,16 @@
 This document describes how the Ontologies Explorer turns authored RDF/Turtle, SHACL, and generated Reqvire ontology projection facts into the rendered graph.
 
 The renderer is intentionally not a raw RDF triple viewer. It is an ontology-diagram projection:
-- Classes, named individuals, SHACL shapes, restrictions, class expressions, and generic RDF resources are graph nodes when they carry meaningful ontology semantics.
-- Object, datatype, and RDF properties are not graph boxes. They are projected into labeled relationship semantics, modal evidence, domain/range rows, SHACL slot rows, badges, and search text.
+- Classes, named individuals, SHACL shapes, restrictions, class expressions, and generic RDF resources are graph nodes when they carry meaningful ontology semantics. Managed semantic queries are graph nodes with source provenance and vocabulary/output connections.
+- Object, datatype, and RDF properties ordinarily project into labeled relationships, modal evidence, domain/range rows, SHACL slot rows, badges, and search text. Query-referenced properties are also retained as graph nodes so query vocabulary and output connections have visible targets.
 - Literal values and datatype constraints remain evidence. They do not become primary graph nodes.
 - Built-in vocabulary terms such as `xsd:string`, `owl:Class`, and SHACL/RDF/RDFS metamodel resources remain supporting evidence unless explicitly enabled as external references.
 
 #### Data Flow
 Rendering starts from the `SemanticIndex`:
-1. Authored ontology and SHACL blocks provide parsed RDF quads.
+1. Authored ontology and SHACL blocks provide parsed RDF quads; managed semantic-query elements provide query identity, vocabulary context, and declared outputs.
 2. The semantic contract projection materializes direct OWL/RDFS/SHACL constructs such as domain/range, subclass, membership, equivalence, inverse properties, property chains, property characteristics, restrictions, class expressions, and SHACL overlays.
-3. `build_graph_data` builds an `ontologyGraphData` JSON model containing semantic nodes, construct edges, property metadata, SHACL slot/facet records, badges, source links, ontology-node detail evidence, and explicit graph layer/source-kind metadata.
+3. `build_graph_data` builds an `ontologyGraphData` JSON model containing semantic nodes, construct edges, property metadata, SHACL slot/facet records, managed query nodes and vocabulary/output connections, badges, source links, ontology-node detail evidence, and explicit graph layer/source-kind metadata.
 4. The browser module imports Graphology, Sigma, ForceAtlas2, `@sigma/edge-curve`, and `@sigma/node-image`.
 5. The browser creates a Sigma graph from the projected nodes and rendered links, applies layout, and declares typed Sigma node/edge programs for construct glyphs and ontology connectors.
 
@@ -23,18 +23,18 @@ The generated `ontologyGraphData` is the contract between Rust projection logic 
 
 #### Graph Layers
 Ontology graph data uses explicit layers:
-- `authored` contains authored structural ontology and SHACL semantics plus projection facts derived from that authored content.
+- `authored` contains authored structural ontology and SHACL semantics, their projection facts, and managed semantic-query nodes with vocabulary/output connections.
 - `concepts` contains exported SKOS concept nodes, SKOS taxonomy edges, and concept bridge edges from the semantic store contract.
 - `reqvire-context` contains generated semantic context for model-to-term provenance only: model elements that `declaresTerm` or `referencesTerm` ontology terms.
 - `external-source` is reserved for imported external ontology vocabulary triples in the used external subset.
 
-The Ontologies view exposes `authored` as the Core layer because curated concepts can be inspected independently from structural ontology content. The left pane renders Core, Concepts, Semantic Context, and External Sources as layer controls. Core and Concepts are enabled by default so the route opens with both structural ontology and conceptual taxonomy visible, while Semantic Context and External Sources remain opt-in overlays.
+The Ontologies view exposes `authored` as the Ontologies layer because curated concepts can be inspected independently from structural ontology content. The left pane renders Ontologies, Concepts, Semantic Context, and External Sources as layer controls. Ontologies and Concepts are enabled by default so the route opens with both structural ontology and conceptual taxonomy visible, while Semantic Context and External Sources remain opt-in overlays.
 
-The Concepts layer is a conceptual overlay from the exported store, but it is still separated from the Core structural layer. Nodes typed as `skos:Concept` must use semantic type `skos-concept`, layer `concepts`, and the `--rdf-concept` color token. Nodes typed as `skos:ConceptScheme` must use semantic type `skos-concept-scheme`, layer `concepts`, and the `--rdf-concept-scheme` color token. Concept nodes must carry canonical `scheme_iri` and `scheme_label` fields derived from generated SKOS scheme facts such as `skos:inScheme`, `skos:topConceptOf`, or scheme-owned `skos:hasTopConcept`; consumers must not infer concept scheme grouping from source element names, ontology document IRIs, namespaces, filesystem paths, or fallback element hierarchy. SKOS concept relationship predicates such as `skos:inScheme`, `skos:hasTopConcept`, `skos:broader`, `skos:narrower`, `skos:related`, and SKOS mapping predicates must render as Concepts-layer edges so selected concept nodes reveal their concept neighborhood. Directional SKOS predicates remain directional in `ontology.graph_data.edges[]`; symmetric concept associations such as `skos:related`, `skos:exactMatch`, `skos:closeMatch`, and `skos:relatedMatch` must be canonicalized to one conceptual graph edge even when the RDF contains reciprocal triples. A `reqvire:mapsToConcept` annotation from a structural resource to a SKOS concept must render as one `mapsToConcept` edge in the Concepts layer. The viewer must not add a generated inverse `mappedFrom` edge because it duplicates the same bridge visually.
+The Concepts layer is a conceptual overlay from the exported store, but it is still separated from the Ontologies structural layer. Nodes typed as `skos:Concept` must use semantic type `skos-concept`, layer `concepts`, and the `--rdf-concept` color token. Nodes typed as `skos:ConceptScheme` must use semantic type `skos-concept-scheme`, layer `concepts`, and the `--rdf-concept-scheme` color token. Concept nodes must carry canonical `scheme_iri` and `scheme_label` fields derived from generated SKOS scheme facts such as `skos:inScheme`, `skos:topConceptOf`, or scheme-owned `skos:hasTopConcept`; consumers must not infer concept scheme grouping from source element names, ontology document IRIs, namespaces, filesystem paths, or fallback element hierarchy. SKOS concept relationship predicates such as `skos:inScheme`, `skos:hasTopConcept`, `skos:broader`, `skos:narrower`, `skos:related`, and SKOS mapping predicates must render as Concepts-layer edges so selected concept nodes reveal their concept neighborhood. Directional SKOS predicates remain directional in `ontology.graph_data.edges[]`; symmetric concept associations such as `skos:related`, `skos:exactMatch`, `skos:closeMatch`, and `skos:relatedMatch` must be canonicalized to one conceptual graph edge even when the RDF contains reciprocal triples. A `reqvire:mapsToConcept` annotation from a structural resource to a SKOS concept must render as one `mapsToConcept` edge in the Concepts layer. The viewer must not add a generated inverse `mappedFrom` edge because it duplicates the same bridge visually.
 
 #### Semantic Projection
 The graph projection applies these rules before Sigma sees the graph:
-- Property nodes are filtered out of the primary rendered node set.
+- Property terms ordinarily render as relationship semantics; retain query-referenced properties as nodes for vocabulary and output connections.
 - Property domain/range facts are re-routed into property edges between rendered domain/range terms.
 - Duplicate rendered links are deduplicated by source, target, label, rendered kind, and property identity.
 - Literal nodes are suppressed.
@@ -74,9 +74,13 @@ Rendered node roles are:
 - `class-expression`: OWL anonymous set/operator expressions such as union, intersection, and complement.
 - `node-shape`: SHACL node shapes.
 - `property-shape`: SHACL property shapes when they are meaningful standalone shapes.
+- `semantic-query`: managed query artifacts with a circular Q marker, source provenance, and vocabulary/output connections.
+- Property semantic kinds: query-referenced property targets retained for managed query connections.
 - `resource`: generic RDF resources that are not otherwise classified.
 
-Property semantic kinds are still visible, but through edge label palettes and modal badges rather than node fill colors.
+Property semantics remain visible in edge label palettes and modal badges, and on retained query-referenced property nodes.
+
+Managed queries belong to the authored Ontologies layer. The Semantic query type filter is enabled by default. Query detail exposes exact SPARQL text, form, used ontologies, declared outputs, and source navigation. Query hover or selection reveals `uses vocabulary` and `declares output` connectors with eligible related nodes. Query and endpoint layer filters control visibility and restore eligible focused connections when re-enabled; RDF literals and list plumbing remain suppressed.
 
 #### Rendered Edge Kinds
 Rendered edge categories are derived from construct evidence:
@@ -141,7 +145,7 @@ The `Show` controls expose canvas visibility toggles in one button group:
 
 Ontology terms and class-membership context are always available because hiding them removes the meaningful ontology graph backbone. Checked means shown. The default state shows the remaining visibility controls so the ontology map opens as a complete authored graph; relationship density is managed through hover/selection focus rather than by hiding the core graph by default.
 
-The `Overlays` controls expose graph layers. Core is the authored structural ontology layer. Concepts is the exported SKOS taxonomy and concept-bridge layer. Semantic Context and External Sources are optional overlays. Core and Concepts are shown by default; users may hide Core when they want to inspect the thesaurus independently, or hide Concepts when they need a structural-only ontology view. Semantic Context must not appear in the `Types` legend because it is provenance for model-to-term declaration/reference facts, not an ontology semantic node kind.
+The `Overlays` controls expose graph layers. Ontologies is the authored structural ontology layer. Concepts is the exported SKOS taxonomy and concept-bridge layer. Semantic Context and External Sources are optional overlays. Ontologies and Concepts are shown by default; users may hide Ontologies when they want to inspect the thesaurus independently, or hide Concepts when they need a structural-only ontology view. Semantic Context must not appear in the `Types` legend because it is provenance for model-to-term declaration/reference facts, not an ontology semantic node kind.
 
 The single `SHACL shapes` role filter controls both SHACL shape nodes and their SHACL overlay relations. The renderer must not expose a second SHACL slot-overlay checkbox that can hide overlay relations while leaving SHACL shape nodes visible, or vice versa.
 

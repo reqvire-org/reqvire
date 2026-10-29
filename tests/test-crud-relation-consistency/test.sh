@@ -149,7 +149,7 @@ This is a new derived requirement.
   * derivedFrom: #root-requirement
 '
 
-cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md > /dev/null 2>&1
+cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$MCP_OPERATION_BIN" add specifications/Requirements.md > /dev/null 2>&1
 
 # Verify:
 # - File has only user-created relations (Root should NOT have derive in file)
@@ -179,7 +179,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 2: Delete element with incoming relations..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Derived Requirement 1" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Derived Requirement 1" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -230,7 +230,7 @@ cat > "${TEST_DIR}/specifications/OtherRequirements.md" << 'EOF'
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Derived Requirement 2" "specifications/OtherRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -304,7 +304,7 @@ cat > "${TEST_DIR}/specifications/SystemTests.md" << 'EOF'
 EOF
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test 2" "specifications/SystemTests.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Test 2" "specifications/SystemTests.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -373,7 +373,7 @@ echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 5: Attempt to delete root element with children (should be rejected)..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Root Requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rm "Root Requirement" 2>&1)
 EXIT_CODE=$?
 set -e
 

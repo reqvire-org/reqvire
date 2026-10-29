@@ -1,3 +1,4 @@
+import os
 """Check taxonomy validation and mutation rejection against actual CLI files."""
 import pathlib
 import subprocess
@@ -16,7 +17,7 @@ def files():
 
 
 def run(*args):
-    return subprocess.run([binary, *args], cwd=root, text=True, capture_output=True, timeout=15)
+    return subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=root, text=True, capture_output=True, timeout=15)
 
 
 def reject(label, args):

@@ -10,6 +10,7 @@ import tempfile
 import traceback
 import time
 import urllib.error
+import urllib.parse
 
 binary, destination = sys.argv[1:]
 suite = pathlib.Path(__file__).resolve().parent
@@ -37,6 +38,63 @@ def selector_error(result, tool, *diagnostics):
     return (result.get('isError') is True and error.get('tool') == tool
             and all(text in error.get('message', '') for text in diagnostics)
             and '_meta' not in result and 'context' not in result.get('structuredContent', {}))
+
+
+def protocol_error(server, method, params):
+    try:
+        server.rpc(method, params)
+    except RuntimeError:
+        wire = json.loads((server.output / f'response-{server.request_id:03}.json').read_text())['response']
+        return wire.get('error', {}).get('code') == -32602 and 'result' not in wire
+    return False
+
+
+def branch_contract(server, mode, original, child):
+    """Inspect every selector once, then exercise routing on the two loaded models."""
+    tools = {t['name']: t['inputSchema'] for t in server.rpc('tools/list', {})['tools']}
+    contextual = [schema for name, schema in tools.items()
+                  if name not in ('reqvire.tool_contract', 'reqvire.worktree.list')]
+    check(f'{mode}/branch-selector-catalog',
+          server.tool('reqvire.tool_contract')['tool_contract_version'] == '3'
+          and all('branch' in schema['properties'] and 'worktree_id' not in schema['properties']
+                  and 'from_worktree_id' not in schema['properties'] for schema in contextual)
+          and 'from_branch' in tools['reqvire.worktree.create']['properties']
+          and 'branch' in tools['reqvire.worktree.remove']['required'])
+    check(f'{mode}/obsolete-selector-rejected', all(protocol_error(server, 'tools/call',
+          {'name': 'reqvire.search', 'arguments': args}) for args in (
+              {'worktree_id': child['branch']},
+              {'branch': child['branch'], 'worktree_id': child['branch']})))
+
+    try:
+        uri = 'reqvire://workspace/status?branch=' + urllib.parse.quote(child['branch'], safe='')
+        resources = server.rpc('resources/list', {})['resources']
+        templates = server.rpc('resources/templates/list', {})['resourceTemplates']
+        prompts = server.rpc('prompts/list', {})['prompts']
+        result = server.rpc('resources/read', {'uri': uri})
+        prompt = server.rpc('prompts/get', {'name': 'reqvire.workflow.verify_coverage',
+                                          'arguments': {'branch': child['branch']}})
+        guidance = prompt['messages'][0]['content']['text']
+        invalid = [
+            '?branch=', '?branch=%FF', '?worktree_id=private-context-id',
+            '?branch=main&branch=main', '?branch=main&unknown=value',
+            '?branch=main&worktree_id=' + original['branch'],
+        ]
+        ok = (any(r['uri'] == uri for r in resources)
+              and len(templates) >= 2 and prompts
+              and all('?branch={branch}' in t['uriTemplate'] for t in templates)
+              and all(any(a['name'] == 'branch' for a in p.get('arguments', []))
+                      and not any(a['name'] == 'worktree_id' for a in p.get('arguments', [])) for p in prompts)
+              and result['_meta']['reqvire/context']['branch'] == child['branch']
+              and 'worktree_id' not in result['_meta']['reqvire/context']
+              and child['branch'] in guidance and 'branch' in guidance
+              and 'worktree_id' not in guidance
+              and all(protocol_error(server, 'resources/read', {'uri': 'reqvire://workspace/status' + query})
+                      for query in invalid)
+              and protocol_error(server, 'prompts/get', {'name': 'reqvire.workflow.verify_coverage',
+                  'arguments': {'branch': child['branch'], 'worktree_id': child['branch']}}))
+        check(f'{mode}/branch-resources-and-prompts', ok)
+    except Exception:
+        check(f'{mode}/branch-resources-and-prompts', False, traceback.format_exc())
 
 
 for mode in ('mcp', 'serve'):
@@ -102,19 +160,19 @@ for embedded in (False, True):
                 check(f'{mode}/inventory-does-not-load', server.counts() == counts
                       and len(git(root, 'worktree', 'list', '--porcelain').split('worktree ')) - 1 == 3)
                 for branch, name, asset in [('main', 'Dirty Subject', 'original bytes'), ('second', 'Other Subject', 'second bytes')]:
-                    ident = rows[branch]['worktree_id']
-                    status, body = server.http('/api/project-store?worktree_id=' + ident)
+                    ident = rows[branch]['branch']
+                    status, body = server.http('/api/project-store?branch=' + urllib.parse.quote(ident, safe=''))
                     store = json.loads(body)['store']
                     check(f'{mode}/{branch}-snapshot', status == 200 and store['project']['branch'] == branch
                           and any(e['name'] == name for e in store['elements']))
-                    status, data = server.http('/shared.txt?worktree_id=' + ident)
+                    status, data = server.http('/shared.txt?branch=' + urllib.parse.quote(ident, safe=''))
                     check(f'{mode}/{branch}-asset', status == 200 and data == asset)
-                    _, seed = server.http('/assets/project-store.js?worktree_id=' + ident)
+                    _, seed = server.http('/assets/project-store.js?branch=' + urllib.parse.quote(ident, safe=''))
                     check(f'{mode}/{branch}-no-live-refresh', ident in seed and 'reqvireLiveRefresh' not in seed)
                 status, shell = server.http('/')
                 check(f'{mode}/picker-enabled', status == 200 and 'window.reqvireWorktreeRouting = true' in shell)
-                for selector in ('unknown', rows['invalid']['worktree_id']):
-                    status, _ = server.http('/api/project-store?worktree_id=' + selector)
+                for selector in ('unknown', rows['invalid']['branch']):
+                    status, _ = server.http('/api/project-store?branch=' + urllib.parse.quote(selector, safe=''))
                     check(f'{mode}/unavailable-' + ('unknown' if selector == 'unknown' else 'invalid'), status == 503)
                 if embedded:
                     server.__enter__()
@@ -126,29 +184,29 @@ for embedded in (False, True):
                         response = json.loads((server.output / f'response-{server.request_id:03}.json').read_text())['response']
                         rejected = response.get('error', {}).get('code') == -32602
                     check(f'{mode}/mutation-rejected', rejected)
-                run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, rows['main']['worktree_id'], rows['second']['worktree_id'], str(output / f'{mode}-browser-profile')], capture_output=True, text=True, timeout=100)
+                run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, rows['main']['branch'], rows['second']['branch'], str(output / f'{mode}-browser-profile')], capture_output=True, text=True, timeout=100)
                 check(f'{mode}/browser-selection', run.returncode == 0, run.stdout + run.stderr)
                 check(f'{mode}/git-unchanged', before == [(git(p, 'rev-parse', 'HEAD'), git(p, 'status', '--porcelain=v1')) for p in (root, second, invalid)]
                       and not [p for p in (root / '.git').glob('reqvire-mcp*') if p.name != 'reqvire-mcp-administration.lock'])
-                selected = rows['second']['worktree_id']
+                selected = rows['second']['branch']
                 counts = server.counts()
-                status, _ = server.http('/api/worktrees/load', {'worktree_id': selected})
+                status, _ = server.http('/api/worktrees/load', {'branch': selected})
                 check(f'{mode}/unchanged-load-reuses-cache', status == 200 and server.counts()['builds'] == counts['builds'])
                 # Equal-length edits with restored timestamps must still invalidate.
                 path = second / 'Model.md'
                 times = path.stat()
                 path.write_text(model.replace('Cache Subject', 'Fresh Subject'))
                 os.utime(path, ns=(times.st_atime_ns, times.st_mtime_ns))
-                status, _ = server.http('/api/worktrees/load', {'worktree_id': selected})
-                _, body = server.http('/api/project-store?worktree_id=' + selected)
+                status, _ = server.http('/api/worktrees/load', {'branch': selected})
+                _, body = server.http('/api/project-store?branch=' + urllib.parse.quote(selected, safe=''))
                 check(f'{mode}/read-only-refresh-on-demand', status == 200 and 'Fresh Subject' in body
                       and server.counts()['builds'] > counts['builds'])
                 path.write_text(model.replace('capability', 'invalid-type'))
-                status, _ = server.http('/api/worktrees/load', {'worktree_id': selected})
+                status, _ = server.http('/api/worktrees/load', {'branch': selected})
                 path.write_text(model.replace('Cache Subject', 'Fresh Subject'))
-                recovered, _ = server.http('/api/worktrees/load', {'worktree_id': selected})
+                recovered, _ = server.http('/api/worktrees/load', {'branch': selected})
                 check(f'{mode}/invalid-refresh-recovers', status == 503 and recovered == 200)
-                status, loaded = server.http('/api/worktrees/load', {'worktree_id': rows['unopened']['worktree_id']})
+                status, loaded = server.http('/api/worktrees/load', {'branch': rows['unopened']['branch']})
                 prepared = pathlib.Path(json.loads(loaded)['workspace_root'])
                 check(f'{mode}/branch-worktree-created-on-demand', status == 200 and prepared != root
                       and git(prepared, 'branch', '--show-current') == 'unopened'
@@ -174,43 +232,50 @@ for mode in ('mcp', 'serve'):
             git(root, 'add', '.')
             git(root, 'commit', '-qm', 'baseline')
             initial = git(root, 'rev-parse', 'HEAD')
+            git(root, 'branch', 'unopened')
             with helpers.Server(binary, root, output, mode, mode, mutations=True) as server:
                 inventory = server.tool('reqvire.worktree.list')['worktrees']
-                origin = next(row for row in inventory if row.get('original'))['worktree_id']
-                created = server.tool('reqvire.worktree.create', branch='feature-a', base_ref='main')
-                child = created['worktree_id']
+                original_row = next(row for row in inventory if row.get('original'))
+                origin, origin_branch = original_row['branch'], original_row['branch']
+                created = server.tool('reqvire.worktree.create', branch='feature/κ+%', base_ref='main')
+                child = created['branch']
+                child_branch = created['branch']
                 check(f'{mode}/create-isolated-context', child != origin and created['base_commit'] == initial
                       and git(root, 'branch', '--show-current') == 'main')
-                same = server.tool('reqvire.worktree.open', branch='feature-a')
-                check(f'{mode}/open-idempotent', same['worktree_id'] == child)
+                same = server.tool('reqvire.worktree.open', branch='feature/κ+%')
+                check(f'{mode}/open-idempotent', same['branch'] == child)
+                branch_contract(server, mode, original_row, created)
                 ambiguous = server.raw_tool('reqvire.search')
                 check(f'{mode}/ambiguous-selector-rejected', selector_error(
-                    ambiguous, 'reqvire.search', 'worktree_id is required', origin, child), ambiguous)
-                unknown = server.raw_tool('reqvire.search', worktree_id='unknown-context')
-                check(f'{mode}/unknown-selector-tool-error', selector_error(
-                    unknown, 'reqvire.search', 'Unknown or removed worktree_id: unknown-context'), unknown)
+                    ambiguous, 'reqvire.search', 'branch', origin_branch, child_branch), ambiguous)
+                rejected_branches = [server.raw_tool('reqvire.search', branch=branch)
+                                     for branch in ('unknown-branch', 'unopened', 'HEAD')]
+                check(f'{mode}/unknown-selector-tool-error', all(selector_error(
+                    result, 'reqvire.search', 'branch', branch)
+                    for result, branch in zip(rejected_branches, ('unknown-branch', 'unopened', 'HEAD'))),
+                    rejected_branches)
                 try:
-                    server.raw_tool('reqvire.search', worktree_id=42)
+                    server.raw_tool('reqvire.search', branch=42)
                     invalid = {}
                 except RuntimeError:
                     invalid = json.loads((server.output / f'response-{server.request_id:03}.json').read_text())['response']
                 check(f'{mode}/invalid-selector-protocol-error', invalid.get('error', {}).get('code') == -32602
                       and 'result' not in invalid, invalid)
                 content = (fixture / 'fixtures/other.md.txt').read_text().split('# Elements\n\n', 1)[1]
-                server.tool('reqvire.add_element', worktree_id=child, file='Model.md', content=content)
-                a = server.tool('reqvire.search', worktree_id=origin)
-                b = server.tool('reqvire.search', worktree_id=child)
+                server.tool('reqvire.add_element', branch=child_branch, file='Model.md', content=content)
+                a = server.tool('reqvire.search', branch=origin_branch)
+                b = server.tool('reqvire.search', branch=child_branch)
                 check(f'{mode}/model-isolation', 'Other Subject' not in str(a) and 'Other Subject' in str(b)
                       and (root / 'Model.md').read_text() == original)
-                semantic = server.tool('reqvire.semantic.sparql', worktree_id=child,
+                semantic = server.tool('reqvire.semantic.sparql', branch=child_branch,
                     query='ASK { ?s <https://www.reqvire.org/ontology#elementName> "Other Subject" }')
                 check(f'{mode}/semantic-isolation', semantic['boolean'] is True)
-                pending = server.raw_tool('reqvire.worktree.remove', worktree_id=child)
+                pending = server.raw_tool('reqvire.worktree.remove', branch=child_branch)
                 check(f'{mode}/dirty-removal-rejected', pending.get('isError') is True)
                 child_root = pathlib.Path(created['workspace_root'])
                 (child_root / 'unrelated.txt').write_text('external staged work')
                 git(child_root, 'add', 'unrelated.txt')
-                commit = server.tool('reqvire.git.commit', worktree_id=child, message='Accepted model\n\nExplicit commit.')
+                commit = server.tool('reqvire.git.commit', branch=child_branch, message='Accepted model\n\nExplicit commit.')
                 expected = (fixture / 'expected/runtime-after-write.md.txt').read_text()
                 actual = subprocess.check_output(['git', 'show', 'HEAD:Model.md'], cwd=child_root, text=True)
                 check(f'{mode}/accepted-only-commit', actual == expected
@@ -218,16 +283,15 @@ for mode in ('mcp', 'serve'):
                       and git(child_root, 'diff', '--cached', '--name-only') == 'unrelated.txt'
                       and commit['commit'] == git(child_root, 'rev-parse', 'HEAD')
                       and git(root, 'rev-parse', 'HEAD') == initial)
-                noop = server.tool('reqvire.git.commit', worktree_id=child, message='Nothing pending')
+                noop = server.tool('reqvire.git.commit', branch=child_branch, message='Nothing pending')
                 check(f'{mode}/commit-noop', noop['outcome'] == 'no_op')
                 git(child_root, 'reset', '-q', 'HEAD', '--', 'unrelated.txt')
                 (child_root / 'unrelated.txt').unlink()
-                protected = server.raw_tool('reqvire.worktree.remove', worktree_id=origin)
+                protected = server.raw_tool('reqvire.worktree.remove', branch=origin_branch)
                 check(f'{mode}/original-protected', protected.get('isError') is True)
                 if mode == 'serve':
                     dirty_root = pathlib.Path(temp) / 'dirty'
                     git(root, 'worktree', 'add', '-qb', 'dirty', str(dirty_root))
-                    git(root, 'branch', 'unopened')
                     _, listing = server.http('/api/worktrees')
                     rows = {r['branch']: r for r in json.loads(listing)['worktrees']}
                     check('serve/branches-listed-without-loading', rows['dirty']['state'] == rows['unopened']['state'] == 'unloaded')
@@ -238,44 +302,44 @@ for mode in ('mcp', 'serve'):
                             git(dirty_root, 'add', '.')
                         before = git(dirty_root, 'status', '--porcelain=v1')
                         counts = server.counts()
-                        status, failure = server.http('/api/worktrees/load', {'worktree_id': rows['dirty']['worktree_id']})
+                        status, failure = server.http('/api/worktrees/load', {'branch': rows['dirty']['branch']})
                         check('serve/reject-dirty-' + dirty_kind, status == 503 and 'clean' in failure
                               and git(dirty_root, 'status', '--porcelain=v1') == before
                               and server.counts()['builds'] == counts['builds'])
                         git(dirty_root, 'reset', '--hard', 'HEAD')
                         if dirty_kind == 'untracked':
                             path.unlink()
-                    status, _ = server.http('/api/worktrees/load', {'worktree_id': rows['dirty']['worktree_id']})
+                    status, _ = server.http('/api/worktrees/load', {'branch': rows['dirty']['branch']})
                     check('serve/load-after-clean-admission', status == 200)
-                    status, loaded = server.http('/api/worktrees/load', {'worktree_id': rows['unopened']['worktree_id']})
+                    status, loaded = server.http('/api/worktrees/load', {'branch': rows['unopened']['branch']})
                     check('serve/create-selected-worktree', status == 200
                           and git(pathlib.Path(json.loads(loaded)['workspace_root']), 'branch', '--show-current') == 'unopened')
                     counts = server.counts()
                     (child_root / 'Model.md').write_text('external edit must not replace accepted state')
-                    status, _ = server.http('/api/worktrees/load', {'worktree_id': child})
-                    _, retained = server.http('/api/project-store?worktree_id=' + child)
+                    status, _ = server.http('/api/worktrees/load', {'branch': child})
+                    _, retained = server.http('/api/project-store?branch=' + urllib.parse.quote(child, safe=''))
                     check('serve/owned-selection-reuses-accepted-cache', status == 200 and 'Other Subject' in retained and server.counts() == counts)
                     (child_root / 'Model.md').write_text(expected)
-                    status, a = server.http('/api/project-store?worktree_id=' + origin)
-                    status_b, b = server.http('/api/project-store?worktree_id=' + child)
+                    status, a = server.http('/api/project-store?branch=' + urllib.parse.quote(origin, safe=''))
+                    status_b, b = server.http('/api/project-store?branch=' + urllib.parse.quote(child, safe=''))
                     check('serve/runtime-isolation', status == status_b == 200
                           and 'Other Subject' not in a and 'Other Subject' in b)
                     browser_dirty = pathlib.Path(temp) / 'browser-dirty'
                     git(root, 'worktree', 'add', '-qb', 'browser-dirty', str(browser_dirty))
                     (browser_dirty / 'untracked.txt').write_text('preserve me')
                     _, listing = server.http('/api/worktrees')
-                    browser_dirty_id = next(r['worktree_id'] for r in json.loads(listing)['worktrees'] if r['branch'] == 'browser-dirty')
+                    browser_dirty_id = next(r['branch'] for r in json.loads(listing)['worktrees'] if r['branch'] == 'browser-dirty')
                     browser_run = subprocess.run(['node', str(suite / 'browser-check.mjs'), server.base, origin, child, str(output / 'serve-browser-profile'), browser_dirty_id], capture_output=True, text=True, timeout=100)
                     check('serve/browser-worktree-selection', browser_run.returncode == 0, browser_run.stdout + browser_run.stderr)
-                    status, _ = server.http('/api/project-store?worktree_id=unknown')
+                    status, _ = server.http('/api/project-store?branch=unknown')
                     check('serve/unknown-runtime-rejected', status in (404, 410, 503))
-                server.tool('reqvire.worktree.remove', worktree_id=child)
-                removed = server.raw_tool('reqvire.search', worktree_id=child)
-                remaining = server.raw_tool('reqvire.search', worktree_id=origin)
+                server.tool('reqvire.worktree.remove', branch=child_branch)
+                removed = server.raw_tool('reqvire.search', branch=child_branch)
+                remaining = server.raw_tool('reqvire.search', branch=origin_branch)
                 check(f'{mode}/remove-keeps-branch', not child_root.exists()
-                      and git(root, 'rev-parse', 'feature-a') == commit['commit']
-                      and selector_error(removed, 'reqvire.search', child)
-                      and remaining.get('_meta', {}).get('reqvire/context', {}).get('worktree_id') == origin)
+                      and git(root, 'rev-parse', child_branch) == commit['commit']
+                      and selector_error(removed, 'reqvire.search', child_branch)
+                      and remaining.get('_meta', {}).get('reqvire/context', {}).get('branch') == origin)
     except Exception:
         check(f'{mode}/lifecycle', False, traceback.format_exc())
 raise SystemExit(bool(failures))

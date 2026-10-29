@@ -10,7 +10,7 @@ set -uo pipefail
 # Acceptance Criteria:
 # - Element names are normalized according to GitHub fragment rules
 # - Subsections (Metadata, Relations, Details) are parsed correctly
-# - Element content is extracted excluding subsections
+# - Element content excludes Metadata and Relations declarations and retains Details prose
 # - Relations are extracted with types and normalized targets
 # - Element type from Metadata is parsed correctly
 #
@@ -19,7 +19,7 @@ set -uo pipefail
 # - Element ID stability and uniqueness
 # - Subsection extraction from markdown
 # - Relation parsing and target normalization
-# - Content vs Details separation
+# - Main prose and Details are retained together in content
 # - JSON output structure validation
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -233,7 +233,7 @@ fi
 
 # Move element to different file using mv command
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "My Capability Name" "specifications/Requirements.md" 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "My Capability Name" "specifications/Requirements.md" 2>&1)
 MV_EXIT=$?
 set -e
 
@@ -462,6 +462,15 @@ diff -u "$TEST_SCRIPT_DIR/expected/fenced-code-checks.txt" "$TEST_DIR/output/fen
 # ==================================
 # Final Result
 # ==================================
+PROSE_STATUS=0
+python3 "$TEST_SCRIPT_DIR/../prose_links.py" read "$REQVIRE_BIN" "$TEST_DIR" \
+  > "$TEST_DIR/output/prose-link-checks.txt" 2> "$TEST_DIR/output/prose-link-checks.stderr" || PROSE_STATUS=$?
+if [ "$PROSE_STATUS" -ne 0 ]; then
+  cat "$TEST_DIR/output/prose-link-checks.stderr"
+fi
+diff -u "$TEST_SCRIPT_DIR/expected/prose-link-checks.txt" "$TEST_DIR/output/prose-link-checks.txt" || exit 1
+[ "$PROSE_STATUS" -eq 0 ] || exit 1
+
 echo ""
 echo "✅ All fragment normalization tests passed"
 exit 0

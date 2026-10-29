@@ -8,10 +8,15 @@ jobs:
     # Keep this name: the main branch ruleset requires this exact check.
     name: Run Rust Tests
     runs-on: ubuntu-24.04
+    outputs:
+      cli_artifact_id: ${{ steps.share_cli.outputs.artifact-id }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+
+      - name: Configure browser cache
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/reqvire-browser" >> "$GITHUB_ENV"
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -19,55 +24,56 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: "24"
-
       - name: Install shell test dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --yes ripgrep
 
+      - name: Set up Node for the Vite application build
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+
       - name: Install Explorer dependencies
-        run: cd explorer && npm ci
+        run: cd explorer && bun install --frozen-lockfile
 
-      - name: Check Explorer SPA
-        run: cd explorer && npm run check
-
-      - name: Test Explorer store and refresh behavior
-        run: cd explorer && npm test
+      - name: Install headless Chromium for Explorer and end-to-end checks
+        run: cd explorer && bun --bun x --no-install playwright install --with-deps chromium --only-shell
 
       - name: Build Explorer SPA and standalone design-system bundles
         # crates/reqvire-core/build.rs embeds explorer/dist into the binary at compile time,
         # so the bundle must be built before cargo build/test.
-        run: cd explorer && npm run build:app && npm run build:ds-bundle
+        run: cd explorer && bun run build:all
 
       - name: Build CLI for Rust and end-to-end tests
-        run: cargo build --locked --bin reqvire
+        run: cargo build --release --locked --bin reqvire
 
       - name: Share current CLI with model validation
+        id: share_cli
         uses: actions/upload-artifact@v6
         with:
           name: reqvire-pr-cli
-          path: target/debug/reqvire
+          path: target/release/reqvire
           if-no-files-found: error
           retention-days: 1
 
       - name: Run Tests
         env:
-          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/debug/reqvire
+          REQVIRE_TEST_BIN: ${{ github.workspace }}/target/release/reqvire
         run: cargo test --locked --verbose
-
-      - name: Install headless Chromium for end-to-end tests
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
-        run: npx --yes playwright@1.60.0 install --with-deps chromium --only-shell
 
       - name: Run shell end-to-end tests
         env:
-          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/reqvire-browser
+          REQVIRE_BIN: ${{ github.workspace }}/target/release/reqvire
         run: |
+          # Repo/Bun/Python test tools are pinned with the local dev environment.
+          source bin/activate-hermit
+          repo version
           browser=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \( -name chrome-headless-shell -o -name headless_shell \) -print -quit)
           test -n "$browser"
           REQVIRE_TEST_BROWSER="$browser" ./tests/run_all.sh
@@ -79,10 +85,19 @@ jobs:
           name: end-to-end-test-logs
           path: /tmp/reqvire-test-logs
 
+      - name: Upload ADS verification evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: explorer-ads-verification
+          path: explorer/.ds/verification
+          include-hidden-files: true
+          if-no-files-found: ignore
+
   validate:
     name: Validate Requirements
     needs: test
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.test.outputs.cli_artifact_id != '' }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -93,18 +108,18 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: reqvire-pr-cli
-          path: target/debug
+          path: target/release
 
       - name: Make downloaded CLI executable
-        run: chmod +x target/debug/reqvire
+        run: chmod +x target/release/reqvire
 
       - name: Validate Requirements via validate command
         id: validate
         shell: bash
         run: |
           mkdir -p reports
-          ./target/debug/reqvire validate 2>&1 | tee reports/validation_report.txt
-          ./target/debug/reqvire lint 2>&1 | tee reports/lint_report.txt
+          ./target/release/reqvire validate 2>&1 | tee reports/validation_report.txt
+          ./target/release/reqvire lint 2>&1 | tee reports/lint_report.txt
 
       - name: Upload validation reports
         if: ${{ always() && steps.validate.outcome != 'skipped' }}

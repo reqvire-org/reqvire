@@ -2,12 +2,13 @@
 
 ### Forward-Only Relation Traversal Behavior
 
-When filtering model output from a starting requirement:
-1. Follow only forward relations (`derive`, `specifiedBy`, `definedBy`, `constrainedBy`, `usedBy`, `satisfiedBy`, `verifiedBy`, and `contract_bindings`) that are enabled for the selected traversal mode.
-2. Start from the specified root element when `--from` is provided.
-3. Recursively traverse outgoing relations until leaf elements are reached.
-4. Do not traverse backward relations during forward traversal mode.
-5. When no `--from` filter is provided, include the complete model.
+When generating forward model output:
+1. Follow the canonical forward report categories: `derive`, `specifiedBy`, `satisfiedBy`, `definedBy`, `constrainedBy`, `use`, `narrower`, `related`, `exactMatch`, `closeMatch` and `verifiedBy`.
+2. Resolve `--from` through the shared exact element selector and use that element as the traversal start.
+3. Without `--from`, select default roots through the shared root rules, including ontology, capability and native concept roots; an explicit type filter selects its contracted start scope.
+4. Traverse resolved targets recursively with one visited set per starting element. Authored inverse relations contribute their generated forward edges; inverse tokens themselves are not followed in this mode.
+5. Keep `contract_bindings` and `contract_references` as separate target collections on element records rather than recursive relation categories.
+6. Report `Forward` direction metadata and preserve deterministic nested output.
 
 #### Metadata
   * type: behavior
@@ -18,12 +19,12 @@ When filtering model output from a starting requirement:
 
 ### Reverse Relation Traversal Behavior
 
-When reverse mode is enabled for model traversal:
-1. Follow backward relations (derivedFrom, satisfy, verify) instead of forward relations
-2. Start from leaf elements (elements with no outgoing forward relations) when no specific element is specified
-3. Build tree structure from leaves upward toward model roots
-4. When a specific starting element is provided, start from that element and traverse upward
-5. Report "Reverse" direction indicator in output metadata
+When reverse model traversal is enabled:
+1. Follow the registered inverse categories: `derivedFrom`, `specify`, `satisfy`, `define`, `constrain`, `usedBy`, `broader`, `related`, `exactMatch`, `closeMatch` and `verify`.
+2. Without an explicit start, select leaves with no resolved outgoing forward model relations, subject to the start-type filter.
+3. With `--from`, use the selected element and follow resolved inverse targets with one visited set for that start.
+4. Keep symmetric concept associations and mappings bounded by the same visited-set behavior.
+5. Report `Reverse` direction metadata; contract dependency collections remain separately represented.
 
 #### Metadata
   * type: behavior
@@ -64,7 +65,7 @@ Coverage evaluation philosophy for verification reporting.
 
 **Roll-up Strategy:**
 - Leaf requirement verification provides coverage for parent requirements
-- Parent verification is redundant if all derived leaves are verified
+- Child coverage can establish parent coverage without making a separate parent integration verification redundant; lint classifies redundant direct verification edges according to its own reachability policy
 - Coverage percentages focus on leaf requirement verification status
 
 #### Metadata

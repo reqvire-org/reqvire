@@ -1,13 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, type ComponentChildren } from "preact";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { useStore } from "../store/StoreContext";
 import type { ProjectStoreSearchDocument } from "../store/types";
 import type { SearchKind } from "./searchKinds";
@@ -67,7 +59,7 @@ function stopWorker(session: SearchWorkerSession, reason = new Error("Search ind
   session.pending.clear();
 }
 
-export function SearchIndexProvider({ children }: { children: ReactNode }) {
+export function SearchIndexProvider({ children }: { children: ComponentChildren }) {
   const { store } = useStore();
   const contextId = JSON.stringify([store.project.workspace_root, store.project.worktree_id]);
   const [status, setStatus] = useState<SearchIndexStatus>("building");

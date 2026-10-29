@@ -75,13 +75,6 @@ reqvire:verificationTypeDescription a owl:DatatypeProperty ;
   rdfs:range xsd:string ;
   rdfs:comment "Stable semantic meaning of a verification element type." .
 
-reqvire:verificationType a reqvire:VerificationType, reqvire:VerificationElementType ;
-  rdfs:label "verification" ;
-  rdfs:comment "Compatibility alias for test-verification." ;
-  reqvire:elementTypeName "verification" ;
-  reqvire:verificationTypeName "verification" ;
-  reqvire:verificationEvidenceBacked true ;
-  reqvire:verificationTypeDescription "Compatibility alias for test-verification." .
 reqvire:testVerificationType a reqvire:VerificationType, reqvire:VerificationElementType ;
   rdfs:label "test-verification" ;
   rdfs:comment "Verification through test procedures, automated tests, fixtures, or observed test evidence." ;
@@ -425,7 +418,7 @@ reqvire:VerificationTypeShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
-    sh:in ("verification" "test-verification" "formal-proof-verification" "analysis-verification" "inspection-verification" "demonstration-verification") ;
+    sh:in ("test-verification" "formal-proof-verification" "analysis-verification" "inspection-verification" "demonstration-verification") ;
   ] ;
   sh:property [
     sh:path reqvire:verificationEvidenceBacked ;

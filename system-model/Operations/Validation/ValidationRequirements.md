@@ -186,7 +186,7 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 
 ### Integrated Validation
 
-The system shall automatically perform validation when any command requires the parsed model, eliminating the need for a separate validate command.
+WHEN a command requires a parsed model, the system SHALL require a successfully validated model snapshot before command execution.
 
 #### Details
 Implementation details shall follow the associated contract specifications.
@@ -194,14 +194,28 @@ Implementation details shall follow the associated contract specifications.
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
   * [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
+  * [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
+  * [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
+  * [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
+  * [Contract Bindings Scope Validation Contract Specification](Specifications.md#contract-bindings-scope-validation-contract-specification)
+  * [Contract Bindings Target Validation Contract Specification](Specifications.md#contract-bindings-target-validation-contract-specification)
+  * [Internal Consistency Validator Contract Specification](Specifications.md#internal-consistency-validator-contract-specification)
+  * [Model Element Prose Link Validation Specification](Specifications.md#model-element-prose-link-validation-specification)
+  * [Native Concept Taxonomy Cycle Validation Specification](Specifications.md#native-concept-taxonomy-cycle-validation-specification)
+  * [Native Concept Taxonomy Scheme Boundary Validation Specification](Specifications.md#native-concept-taxonomy-scheme-boundary-validation-specification)
+  * [Relation Element Type Validator Contract Specification](Specifications.md#relation-element-type-validator-contract-specification)
+  * [Semantic Contract Shape Validation Specification](Specifications.md#semantic-contract-shape-validation-specification)
+  * [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
+  * [Semantic Query Context Validation Specification](../../Semantics/SemanticQuerySpecifications.md#semantic-query-context-validation-specification)
 
 #### Relations
-  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
-  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
   * definedBy: [Integrated Validation Contract Specification](Specifications.md#integrated-validation-contract-specification)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/model.rs)
 ---
 
 ### Internal Consistency Validator
@@ -210,8 +224,6 @@ The system SHALL validate internal model consistency according to its consistenc
 
 #### Details
 When evaluating requirement dependencies, the system SHALL reject circular fulfillment dependencies according to its bound relation semantics.
-
-When a model mutation creates circular fulfillment dependencies, the system SHALL reject the candidate before persisting source changes.
 
 #### Metadata
   * type: requirement
@@ -246,6 +258,35 @@ Detailed cross-section and within-section duplicate handling rules shall follow 
   * verifiedBy: [Cross-Section Duplicate Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#cross-section-duplicate-validation-test)
 ---
 
+### Model Element Prose Link Validation
+
+IF a hyperlink in authored element prose resolves to a model element, THEN the system SHALL reject the model as invalid.
+
+WHEN reporting a prose-link violation, the system SHALL provide actionable repair guidance appropriate to the source and target element types.
+
+#### Concept References
+  * [Concept Reference](../../Thesaurus/Thesaurus.md#concept-reference)
+  * [Contract Dependency](../../Thesaurus/Thesaurus.md#contract-dependency)
+  * [Element](../../Thesaurus/Thesaurus.md#element)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [IdentifiersAndRelations](../../ModelStructure/IdentifiersAndRelations.md#identifiersandrelations)
+  * [ReservedSubsections](../../ModelStructure/ReservedSubsections.md#reservedsubsections)
+  * [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
+
+#### Relations
+  * definedBy: [Model Element Prose Link Validation Specification](Specifications.md#model-element-prose-link-validation-specification)
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [cli.rs](../../../crates/reqvire-cli/src/cli.rs)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
+  * satisfiedBy: [prose_links.rs](../../../crates/reqvire-core/src/graph_registry/prose_links.rs)
+  * verifiedBy: [Model Element Prose Link Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#model-element-prose-link-validation-test)
+---
+
 ### Relation Type Validation
 
 The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
@@ -262,10 +303,10 @@ The system shall validate relation types against a defined vocabulary and provid
 
 ### Native Concept Taxonomy Cycle Validation
 
-The system shall reject cycles formed by native concept `broader` and `narrower` relations before accepting model reads or persisting mutations.
+IF native concept `broader` and `narrower` relations form a taxonomy cycle, THEN the system SHALL reject the model as invalid.
 
 #### Details
-Canonical direction, reciprocal aliases, cycle diagnostics, and candidate rejection shall follow the associated specification.
+Canonical direction, reciprocal aliases, taxonomy evaluation, and cycle diagnostics shall follow the associated specification.
 
 #### Metadata
   * type: requirement
@@ -274,8 +315,8 @@ Canonical direction, reciprocal aliases, cycle diagnostics, and candidate reject
   * constrainedBy: [Validation Rule Diagnostic Shape](../../Ontologies/BehaviorValidationOperations.md#validation-rule-diagnostic-shape)
   * definedBy: [Native Concept Taxonomy Cycle Validation Specification](Specifications.md#native-concept-taxonomy-cycle-validation-specification)
   * derivedFrom: [Relation Type Validation](#relation-type-validation)
-  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * satisfiedBy: [crud.rs](../../../crates/reqvire-core/src/crud.rs)
+  * satisfiedBy: [validation.rs](../../../crates/reqvire-core/src/graph_registry/validation.rs)
   * verifiedBy: [Concept Relation Projection Verification](../../Verifications/Reports/ModelReports/ReportingVerifications.md#concept-relation-projection-verification)
 ---
 
@@ -384,14 +425,15 @@ The system shall preserve validation diagnostics as structured data before rende
 - Diagnostics shall carry source context when known, including file, line, column, and element identifier.
 - Text output shall render diagnostics for humans without requiring JSON parsing.
 - Machine-readable consumers shall be able to consume structured diagnostic fields without scraping terminal text.
+- When a validation rule defines repair guidance, the system shall preserve that guidance as structured data and render it for both human and machine consumers.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
   * definedBy: [Structured Validation Diagnostic Contract Specification](Specifications.md#structured-validation-diagnostic-contract-specification)
   * derivedFrom: [Validation Error Handling](#validation-error-handling)
+  * satisfiedBy: [error.rs](../../../crates/reqvire-core/src/error.rs)
 ---
 
 ### Validate Markdown Structure

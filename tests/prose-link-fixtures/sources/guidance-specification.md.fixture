@@ -1,0 +1,12 @@
+# Elements
+
+### Prose Source
+
+Use [delivery contract](Targets.md#target-specification).
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Contract Owner](Targets.md#contract-owner)
+---

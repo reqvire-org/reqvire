@@ -3,7 +3,7 @@
 //! observation guard; historical and uncached builds do not create cache entries.
 
 use std::cell::RefCell;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -17,6 +17,9 @@ pub struct Inputs {
     // A path can be consulted for both existence and content.
     values: BTreeMap<(PathBuf, bool), Observation>,
     changed: bool,
+    semantic_sources: BTreeMap<PathBuf, BTreeSet<PathBuf>>,
+    semantic_candidates: BTreeMap<PathBuf, BTreeSet<PathBuf>>,
+    reference_targets: BTreeMap<PathBuf, BTreeSet<PathBuf>>,
 }
 
 thread_local! {
@@ -48,14 +51,30 @@ impl Drop for InputObservationGuard {
 }
 
 impl Inputs {
+    pub fn semantic_sources(&self) -> impl Iterator<Item = (&PathBuf, &BTreeSet<PathBuf>)> {
+        self.semantic_sources.iter()
+    }
+    pub fn semantic_candidates(&self) -> impl Iterator<Item = (&PathBuf, &BTreeSet<PathBuf>)> {
+        self.semantic_candidates.iter()
+    }
+    pub fn reference_targets(&self) -> impl Iterator<Item = (&PathBuf, &BTreeSet<PathBuf>)> {
+        self.reference_targets.iter()
+    }
+    pub fn content_is_current(&self, path: &Path) -> bool {
+        self.values.get(&(path.to_path_buf(), true))
+            == Some(&content_observation(&std::fs::read_to_string(path)))
+    }
+    pub fn existence_is_current(&self, path: &Path) -> bool {
+        self.values.get(&(path.to_path_buf(), false)) == Some(&Observation::Exists(path.exists()))
+    }
     pub fn is_current(&self) -> bool {
         !self.changed
-            && self.values.iter().all(|((path, _), previous)| {
-                let current = match previous {
-                    Observation::Exists(_) => Observation::Exists(path.exists()),
-                    Observation::Content(_) => content_observation(&std::fs::read_to_string(path)),
-                };
-                current == *previous
+            && self.values.keys().all(|(path, content)| {
+                if *content {
+                    self.content_is_current(path)
+                } else {
+                    self.existence_is_current(path)
+                }
             })
     }
 }
@@ -91,4 +110,46 @@ pub fn exists(path: &Path) -> bool {
     let exists = crate::mutation_io::exists(path);
     record(path, Observation::Exists(exists));
     exists
+}
+
+pub fn read_semantic_source(path: &Path, owner: &Path) -> std::io::Result<String> {
+    let result = read_to_string(path);
+    OBSERVATIONS.with(|slot| {
+        if let Some(inputs) = slot.borrow_mut().as_mut() {
+            inputs
+                .semantic_sources
+                .entry(crate::workspace::absolute_logical_path(path))
+                .or_default()
+                .insert(crate::workspace::absolute_logical_path(owner));
+        }
+    });
+    result
+}
+
+pub fn semantic_candidate_exists(path: &Path, owner: &Path) -> bool {
+    let result = exists(path);
+    OBSERVATIONS.with(|slot| {
+        if let Some(inputs) = slot.borrow_mut().as_mut() {
+            inputs
+                .semantic_candidates
+                .entry(crate::workspace::absolute_logical_path(path))
+                .or_default()
+                .insert(crate::workspace::absolute_logical_path(owner));
+        }
+    });
+    result
+}
+
+pub fn reference_target_exists(path: &Path, owner: &Path) -> bool {
+    let result = exists(path);
+    OBSERVATIONS.with(|slot| {
+        if let Some(inputs) = slot.borrow_mut().as_mut() {
+            inputs
+                .reference_targets
+                .entry(crate::workspace::absolute_logical_path(path))
+                .or_default()
+                .insert(crate::workspace::absolute_logical_path(owner));
+        }
+    });
+    result
 }

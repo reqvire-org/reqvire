@@ -28,6 +28,7 @@ reqvire.traces
 reqvire.resources
 reqvire.change_impact
 reqvire.format
+reqvire.update_element
 reqvire.add_element
 reqvire.remove_element
 reqvire.move_element
@@ -41,6 +42,7 @@ reqvire.relink
 reqvire.move_asset
 reqvire.remove_asset
 reqvire.worktree.list
+reqvire.worktree.refresh_head
 reqvire.worktree.create
 reqvire.worktree.open
 reqvire.worktree.remove

@@ -2,7 +2,7 @@
 
 ### Trace Diagram Projection Data
 
-The system shall provide per-verification trace diagram projection data derived from report trace trees without requiring human-readable Markdown or Mermaid report output.
+The system shall provide per-verification trace diagram projection data derived from normalized report trace graphs without requiring human-readable Markdown or Mermaid report output.
 
 #### Details
 Trace diagrams define report-owned trace diagram data, roll-up semantics, relation direction, and node target metadata. Browser rendering reuses this behavior through contract bindings from the consuming interface requirement.

@@ -1,3 +1,4 @@
+import os
 """Black-box validation checks for requirement fulfillment dependency cycles."""
 
 import difflib
@@ -25,7 +26,7 @@ def snapshot(workspace):
 
 
 def run(workspace, label, *args):
-    result = subprocess.run([binary, *args], cwd=workspace, text=True,
+    result = subprocess.run([os.environ["MCP_OPERATION_BIN"] if args[0] in ("add", "rm", "mv", "rename", "merge", "mv-file", "mv-folder", "link", "unlink", "relink", "mv-asset", "rm-asset", "format") else binary, *args], cwd=workspace, text=True,
                             capture_output=True, timeout=30)
     (output / f"{label}.stdout").write_text(result.stdout)
     (output / f"{label}.stderr").write_text(result.stderr)

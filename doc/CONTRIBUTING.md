@@ -65,6 +65,14 @@ The most valuable external input is therefore precise problem analysis:
 reproducible bugs, regression cases, confusing behavior, documentation gaps, and
 well-scoped model-improvement discussion in GitHub Discussions.
 
+## Maintainer Environment
+
+The [development quick start](README.md#development-quick-start) documents the
+optional Hermit environment, pinned tools, builds and tests. Commit the `bin/`
+bootstrap/version symlinks and `hermit-packages/` definitions only. Downloaded
+tools remain in Hermit's user cache; per-checkout `.hermit/` state, Cargo outputs
+and frontend dependencies are ignored and must not be committed.
+
 ## Maintainer Development Workflow
 
 This workflow applies to maintainer-authored changes while external code and

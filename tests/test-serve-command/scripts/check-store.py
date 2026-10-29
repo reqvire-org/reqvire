@@ -28,6 +28,10 @@ try:
     assert evidence["file_path"] == "scripts/evidence.sh", "Evidence resource path is incorrect"
     assert args.evidence_text in evidence["source_text"], "Evidence source preview is missing"
     assert store["schema_version"] == "2026-10-06.project-store.v5", "Unexpected Project Store schema"
+    assert all("inverse_relation_type" in relation for relation in store["relations"]), "Core inverse vocabulary is missing"
+    evidence_relation = next(relation for relation in store["relations"] if relation["resource_id"] == evidence["id"])
+    assert evidence_relation["canonical_relation_type"] == "satisfiedBy", "Evidence relation is not canonical"
+    assert evidence_relation["inverse_relation_type"] == "satisfy", "Evidence inverse vocabulary is missing"
     for file in store["traces"]["files"].values():
         for trace in file["verifications"]:
             graph = trace["trace_graph"]

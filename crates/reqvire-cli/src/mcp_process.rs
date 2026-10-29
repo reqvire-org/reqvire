@@ -485,6 +485,32 @@ mod tests {
             fs::read(dir.path().join("literalab-extra\nname.bin")).unwrap(),
             b"unrelated"
         );
+        // Exercise the shared Git tree/blob reader through the same bounded
+        // transport, retaining binary bytes and literal NUL-delimited names.
+        fs::write(dir.path().join(path), &bytes).unwrap();
+        git(&["add", "--", path], None, None);
+        git(
+            &[
+                "-c",
+                "user.name=Git Test",
+                "-c",
+                "user.email=git@example.invalid",
+                "commit",
+                "-qm",
+                "baseline",
+            ],
+            None,
+            None,
+        );
+        let head = String::from_utf8(git(&["rev-parse", "HEAD"], None, None)).unwrap();
+        let paths = [dir.path().join(path), dir.path().join("deleted.bin")].into();
+        let mut reader = reqvire::git_commands::GitReader::new(dir.path(), |args, input| {
+            crate::mcp_session::git(dir.path(), args, input, None)
+        });
+        let files = reader.regular_files_at_commit(head.trim(), &paths).unwrap();
+        assert_eq!(files[&dir.path().join(path)].bytes.as_slice(), bytes);
+        assert!(!files.contains_key(&dir.path().join("deleted.bin")));
+        assert!(!reader.operation_in_progress().unwrap());
     }
 
     #[test]

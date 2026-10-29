@@ -26,47 +26,66 @@ This documentation is for those who want to contribute to Reqvire's development:
 
 ### Prerequisites
 
-**Install Rust and Cargo**
+Git, Bash, Make and a native C/C++ linker/toolchain are operating-system
+prerequisites. Browser checks also need Chromium and its system libraries.
 
-Install Rust using rustup:
-```bash
-curl -sSf https://sh.rustup.rs | sh
-```
+The optional [Hermit](https://cashapp.github.io/hermit/usage/get-started/)
+environment pins Rust/Cargo 1.92.0, Node.js 24.22.1, Bun 1.4.2, Python 3.12.3,
+ripgrep 15.2.0 and Google Repo 2.70. These are optional development tools;
+the multi-repository server suite prepares its own pinned Repo runtime under
+the test runner's temporary directory.
 
-Follow the on-screen prompts to complete the installation, then verify:
-```bash
-rustc --version
-cargo --version
-```
-
-### Building from Source
-
-**Clone the repository**
 ```bash
 git clone https://github.com/reqvire-org/reqvire.git
 cd reqvire
+# No global Hermit installation is required by the committed bootstrap wrapper.
+source bin/activate-hermit
+hermit install
 ```
 
-**Build the project**
+Activation affects the current shell. The first installation downloads tools;
+subsequent runs reuse the Hermit cache. It does not install OS libraries, model
+repositories, Cargo dependencies, frontend packages or browser binaries. To use
+an existing toolchain instead, install the listed tools yourself. No manually
+configured Repo source path or another project checkout is needed for tests.
+Hermit is a development convenience, not a prerequisite for installed Reqvire.
+
+### Building and testing
+
+Build the Explorer before Rust so the binary embeds the current UI:
+
 ```bash
-cargo build
+make build
+cargo test --locked
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh test-mcp-repo-workspaces
 ```
 
-**Run tests**
+The manifest-selection regressions use only temporary XML files, with no Git
+repository or Repo runtime. The separate Repo server suite bootstraps its pinned
+tool in a temporary directory; its actual feature checks use local fixture
+remotes. Full browser coverage needs a browser:
+
 ```bash
-cargo test
+cd explorer
+bun --bun x --no-install playwright install --with-deps chromium --only-shell
+cd ..
+REQVIRE_TEST_BROWSER=/absolute/path/to/chrome-headless-shell ./tests/run_all.sh
 ```
 
-**Run Reqvire locally**
+For the public website:
+
 ```bash
-cargo run -- --help
+cd website
+bun install --no-save
+bun run build
+bun run dev
 ```
 
-**Install the binary (optional)**
+To install the built CLI locally:
+
 ```bash
-cargo install --path .
+cargo install --locked --path crates/reqvire-cli
 ```
-This will install the binary to `~/.cargo/bin/reqvire`
 
 ### Project Structure
 

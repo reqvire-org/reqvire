@@ -1,5 +1,7 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useEffect } from "react";
+import { readCssToken } from "../test/cssTokens";
+import type { ComponentType } from "preact";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@/test/render";
+import { useEffect } from "preact/hooks";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ElkNode } from "elkjs/lib/elk-api";
 import ELK from "elkjs/lib/elk.bundled.js";
@@ -22,7 +24,7 @@ vi.mock("@xyflow/react", async importOriginal => {
   return { ...original, Handle: () => null, ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
     nodes: { id: string; type: string; data: unknown }[];
     edges: { id: string; source: string; target: string; label: string }[];
-    nodeTypes: Record<string, React.ComponentType<{ data: unknown }>>;
+    nodeTypes: Record<string, ComponentType<{ data: unknown }>>;
     onInit: (flow: unknown) => void;
   }) => {
     useEffect(() => { onInit(instance); }, [onInit]);
@@ -80,6 +82,15 @@ const cards = () => [...region().querySelectorAll("[data-flow-node]")];
 beforeEach(() => {
   localStorage.clear(); window.history.replaceState(null, "", "/#/traces");
   layoutEngine.mockReset().mockImplementation(testFlowLayoutEngine); onOpenElement.mockReset();
+  // jsdom does not measure the CSS-token sizing probe used before layout starts.
+  vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains("ux-trace-flow-node-size")
+      ? Number.parseFloat(readCssToken("--space-flow-node-width")) : 0;
+  });
+  vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains("ux-trace-flow-node-size")
+      ? Number.parseFloat(readCssToken("--space-flow-node-height")) : 0;
+  });
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
 });
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks(); window.history.replaceState(null, "", "/"); });

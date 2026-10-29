@@ -24,6 +24,11 @@ init_multi_workspace_repos() {
 
 REQVIRE_BIN="${REQVIRE_BIN:-reqvire}"
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Cross-worktree model operations exercise the transport-neutral core API.
+# MCP context ownership/isolation is covered by test-mcp-worktrees.
+CORE_REPO_ROOT="$(cd "$TEST_SCRIPT_DIR/../.." && pwd)"
+cargo build --quiet --manifest-path "$CORE_REPO_ROOT/Cargo.toml" -p reqvire --example fixture_operation
+export CORE_OPERATION_BIN="$CORE_REPO_ROOT/target/debug/examples/fixture_operation"
 OUTSIDE_DIR="$(mktemp -d -t reqvire-multi-crud-outside-XXXXXX)"
 CRUD_WORKSPACE="$(mktemp -d -t reqvire-multi-workspace-crud-XXXXXX)"
 
@@ -36,7 +41,7 @@ mkdir -p "$CRUD_WORKSPACE/not-a-repo"
   || fail "cross-repo CRUD fixture should validate before mutations" "$TEST_DIR/output/initial-validate.txt"
 
 set +e
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" add not-a-repo/Added.md < "$CRUD_WORKSPACE/add-elements/RepoBAddedRequirement.md") > "$TEST_DIR/output/add-non-git.txt" 2>&1
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" add not-a-repo/Added.md < "$CRUD_WORKSPACE/add-elements/RepoBAddedRequirement.md") > "$TEST_DIR/output/add-non-git.txt" 2>&1
 ADD_NON_GIT_EXIT=$?
 set -e
 if [ "$ADD_NON_GIT_EXIT" -eq 0 ]; then
@@ -49,7 +54,7 @@ fi
   || fail "add rejection must not create a file under not-a-repo"
 
 set +e
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv "Repo A Movable Requirement" not-a-repo/Moved.md) > "$TEST_DIR/output/mv-non-git.txt" 2>&1
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv "Repo A Movable Requirement" not-a-repo/Moved.md) > "$TEST_DIR/output/mv-non-git.txt" 2>&1
 MV_NON_GIT_EXIT=$?
 set -e
 if [ "$MV_NON_GIT_EXIT" -eq 0 ]; then
@@ -62,7 +67,7 @@ fi
   || fail "mv rejection must not create a file under not-a-repo"
 
 set +e
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-file repo-a/specifications/FileMove.md not-a-repo/FileMove.md) > "$TEST_DIR/output/mv-file-non-git.txt" 2>&1
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-file repo-a/specifications/FileMove.md not-a-repo/FileMove.md) > "$TEST_DIR/output/mv-file-non-git.txt" 2>&1
 MV_FILE_NON_GIT_EXIT=$?
 set -e
 if [ "$MV_FILE_NON_GIT_EXIT" -eq 0 ]; then
@@ -75,7 +80,7 @@ fi
   || fail "mv-file rejection must not create a file under not-a-repo"
 
 set +e
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-folder repo-a/specifications/FolderMove not-a-repo/FolderMove) > "$TEST_DIR/output/mv-folder-non-git.txt" 2>&1
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-folder repo-a/specifications/FolderMove not-a-repo/FolderMove) > "$TEST_DIR/output/mv-folder-non-git.txt" 2>&1
 MV_FOLDER_NON_GIT_EXIT=$?
 set -e
 if [ "$MV_FOLDER_NON_GIT_EXIT" -eq 0 ]; then
@@ -88,7 +93,7 @@ fi
   || fail "mv-folder rejection must not create a folder under not-a-repo"
 
 set +e
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-asset repo-a/docs/asset-to-move.txt not-a-repo/asset-to-move.txt) > "$TEST_DIR/output/mv-asset-non-git.txt" 2>&1
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-asset repo-a/docs/asset-to-move.txt not-a-repo/asset-to-move.txt) > "$TEST_DIR/output/mv-asset-non-git.txt" 2>&1
 MV_ASSET_NON_GIT_EXIT=$?
 set -e
 if [ "$MV_ASSET_NON_GIT_EXIT" -eq 0 ]; then
@@ -100,16 +105,16 @@ fi
 [ ! -f "$CRUD_WORKSPACE/not-a-repo/asset-to-move.txt" ] \
   || fail "mv-asset rejection must not create a file under not-a-repo"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" add repo-b/specifications/Added.md < "$CRUD_WORKSPACE/add-elements/RepoBAddedRequirement.md") > "$TEST_DIR/output/add.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" add repo-b/specifications/Added.md < "$CRUD_WORKSPACE/add-elements/RepoBAddedRequirement.md") > "$TEST_DIR/output/add.txt" 2>&1 \
   || fail "add should create an element in repo B from a multi-repo workspace root" "$TEST_DIR/output/add.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv "Repo A Movable Requirement" repo-b/specifications/MovedElement.md) > "$TEST_DIR/output/mv.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv "Repo A Movable Requirement" repo-b/specifications/MovedElement.md) > "$TEST_DIR/output/mv.txt" 2>&1 \
   || fail "mv should move an element from repo A to repo B" "$TEST_DIR/output/mv.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" rename "Repo B Rename Requirement" "Repo B Renamed Requirement") > "$TEST_DIR/output/rename.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" rename "Repo B Rename Requirement" "Repo B Renamed Requirement") > "$TEST_DIR/output/rename.txt" 2>&1 \
   || fail "rename should update an element in repo B while preserving references" "$TEST_DIR/output/rename.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" link "Repo B Link Source Requirement" satisfiedBy repo-a/docs/evidence.txt) > "$TEST_DIR/output/link.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" link "Repo B Link Source Requirement" satisfiedBy repo-a/docs/evidence.txt) > "$TEST_DIR/output/link.txt" 2>&1 \
   || fail "link should add a relation from repo B to a repo A path" "$TEST_DIR/output/link.txt"
 
 grep -Fqx '  * satisfiedBy: [evidence.txt](../../repo-a/docs/evidence.txt)' "$CRUD_WORKSPACE/repo-b/specifications/B.md" \
@@ -120,28 +125,28 @@ grep -Fqx '  * satisfiedBy: [evidence.txt](../../repo-a/docs/evidence.txt)' "$CR
 jq -e '.files[].elements[] | select(.name == "Repo B Link Source Requirement") | .relations[]? | select(.relation_type == "satisfiedBy" and .target.target == "repo-a/docs/evidence.txt")' "$TEST_DIR/output/link-search.json" >/dev/null \
   || fail "link should persist a workspace-root-relative repo A target" "$TEST_DIR/output/link-search.json"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" unlink "Repo B Link Source Requirement" repo-a/docs/evidence.txt) > "$TEST_DIR/output/unlink.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" unlink "Repo B Link Source Requirement" repo-a/docs/evidence.txt) > "$TEST_DIR/output/unlink.txt" 2>&1 \
   || fail "unlink should remove a relation from repo B to a repo A path" "$TEST_DIR/output/unlink.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" relink "Repo B Relink Requirement" satisfiedBy repo-b/docs/old-evidence.txt repo-a/docs/evidence.txt) > "$TEST_DIR/output/relink.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" relink "Repo B Relink Requirement" satisfiedBy repo-b/docs/old-evidence.txt repo-a/docs/evidence.txt) > "$TEST_DIR/output/relink.txt" 2>&1 \
   || fail "relink should replace a repo B path with a repo A path" "$TEST_DIR/output/relink.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" merge "Repo B Merge Target Requirement" "Repo A Merge Source Requirement") > "$TEST_DIR/output/merge.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" merge "Repo B Merge Target Requirement" "Repo A Merge Source Requirement") > "$TEST_DIR/output/merge.txt" 2>&1 \
   || fail "merge should merge a repo A element into a repo B target" "$TEST_DIR/output/merge.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-file repo-a/specifications/FileMove.md repo-b/specifications/FileMovedFromA.md) > "$TEST_DIR/output/mv-file.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-file repo-a/specifications/FileMove.md repo-b/specifications/FileMovedFromA.md) > "$TEST_DIR/output/mv-file.txt" 2>&1 \
   || fail "mv-file should move a file from repo A to repo B" "$TEST_DIR/output/mv-file.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-folder repo-a/specifications/FolderMove repo-b/specifications/FolderMovedFromA) > "$TEST_DIR/output/mv-folder.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-folder repo-a/specifications/FolderMove repo-b/specifications/FolderMovedFromA) > "$TEST_DIR/output/mv-folder.txt" 2>&1 \
   || fail "mv-folder should move a folder from repo A to repo B" "$TEST_DIR/output/mv-folder.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" mv-asset repo-a/docs/asset-to-move.txt repo-b/docs/asset-moved-from-a.txt) > "$TEST_DIR/output/mv-asset.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" mv-asset repo-a/docs/asset-to-move.txt repo-b/docs/asset-moved-from-a.txt) > "$TEST_DIR/output/mv-asset.txt" 2>&1 \
   || fail "mv-asset should move an asset from repo A to repo B and rewrite references" "$TEST_DIR/output/mv-asset.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" rm-asset repo-b/docs/asset-remove.txt) > "$TEST_DIR/output/rm-asset.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" rm-asset repo-b/docs/asset-remove.txt) > "$TEST_DIR/output/rm-asset.txt" 2>&1 \
   || fail "rm-asset should remove an asset in repo B and clean references" "$TEST_DIR/output/rm-asset.txt"
 
-(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" rm "Repo A Removable Requirement") > "$TEST_DIR/output/rm.txt" 2>&1 \
+(cd "$OUTSIDE_DIR" && "$MCP_OPERATION_BIN" --core-workspace --workspace "$CRUD_WORKSPACE" rm "Repo A Removable Requirement") > "$TEST_DIR/output/rm.txt" 2>&1 \
   || fail "rm should remove an element from repo A in a multi-repo workspace" "$TEST_DIR/output/rm.txt"
 
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$CRUD_WORKSPACE" validate) > "$TEST_DIR/output/final-validate.txt" 2>&1 \

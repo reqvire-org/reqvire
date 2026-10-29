@@ -18,6 +18,7 @@ body:
       multiple: true
       options:
         - Server startup or Streamable HTTP transport
+        - Stdio transport or client-managed process lifecycle
         - Tool discovery or tool metadata
         - Read-only model evidence tools
         - Mutation tools or mutation enablement
@@ -46,13 +47,15 @@ body:
     id: server
     attributes:
       label: MCP Server Startup
-      description: Include the exact command and endpoint.
+      description: Include the exact command, selected transport, and HTTP endpoint or stdio client command/args.
       render: shell
       placeholder: |
         reqvire mcp --host 127.0.0.1 --port 8081
         # or
         reqvire serve --enable-mcp --port 8080
         # endpoint: http://127.0.0.1:8081/mcp
+        # Planned stdio (not yet implemented):
+        # reqvire --workspace /absolute/path/to/project mcp --transport stdio
     validations:
       required: true
 
@@ -64,7 +67,7 @@ body:
       placeholder: |
         - Client: Codex, Claude Desktop, custom client, curl, SDK, other
         - Client version:
-        - Transport: Streamable HTTP
+        - Transport: Streamable HTTP or stdio (when available)
     validations:
       required: true
 

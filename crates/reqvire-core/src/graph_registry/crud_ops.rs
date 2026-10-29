@@ -93,8 +93,7 @@ fn rewrite_moved_concept_reference_targets(
             continue;
         };
 
-        let Ok(link) =
-            crate::utils::concept_reference_relative_link(&element.file_path, new_target)
+        let Ok(link) = crate::utils::model_reference_relative_link(&element.file_path, new_target)
         else {
             output.push(line.to_string());
             continue;
@@ -605,22 +604,21 @@ impl GraphRegistry {
                                 .unwrap_or_else(|| std::path::Path::new("."))
                                 .to_path_buf();
 
-                            // Use to_relative_identifier to make identifier relative to current file
-                            let relative_id = crate::utils::to_relative_identifier(
-                                identifier,
-                                &current_folder,
-                                true,
-                            )
-                            .unwrap_or_else(|_| identifier.clone());
-
                             let relative_id = if section == CONTRACT_REFERENCES_SECTION {
-                                crate::utils::concept_reference_relative_link(
+                                crate::utils::model_reference_relative_link(
                                     _current_file,
                                     identifier,
                                 )
-                                .unwrap_or(relative_id)
+                                .unwrap_or_else(|_| identifier.clone())
                             } else {
-                                relative_id
+                                // Registry identifiers are workspace-relative,
+                                // rather than relative to this document's folder.
+                                crate::utils::to_relative_identifier(
+                                    &format!("/{identifier}"),
+                                    &current_folder,
+                                    true,
+                                )
+                                .unwrap_or_else(|_| identifier.clone())
                             };
 
                             // Look up actual element name from registry for human-readable display
@@ -693,8 +691,7 @@ impl GraphRegistry {
                             .find('#')
                             .map_or(target_id.as_str(), |file_pos| &target_id[..file_pos]);
 
-                        // Get current file path for comparison
-                        let current_file_path = std::path::PathBuf::from(_current_file);
+                        // Compare full workspace-relative file identities.
                         let current_file_str = _current_file;
 
                         // If target is in the same file, use just the fragment
@@ -704,16 +701,9 @@ impl GraphRegistry {
                         {
                             format!("[{}](#{})", display_name, fragment)
                         } else {
-                            // Make the link relative using just the folder of the current file
-                            let current_folder = current_file_path
-                                .parent()
-                                .unwrap_or_else(|| std::path::Path::new("."))
-                                .to_path_buf();
-
-                            let relative_link = crate::utils::to_relative_identifier(
-                                relation.target.link.as_str(),
-                                &current_folder,
-                                false,
+                            let relative_link = crate::utils::model_reference_relative_link(
+                                _current_file,
+                                target_id,
                             )
                             .unwrap_or_else(|_| relation.target.link.as_str().to_string());
 
@@ -819,7 +809,7 @@ impl GraphRegistry {
                 continue;
             }
             let Some(link) =
-                crate::utils::concept_reference_relative_link(current_file, &target_id).ok()
+                crate::utils::model_reference_relative_link(current_file, &target_id).ok()
             else {
                 output.push(line.to_string());
                 continue;
@@ -1042,9 +1032,12 @@ impl GraphRegistry {
                             .parent()
                             .unwrap_or_else(|| Path::new("."))
                             .to_path_buf();
-                        let relative_id =
-                            crate::utils::to_relative_identifier(target_id, &current_folder, true)
-                                .unwrap_or_else(|_| target_id.clone());
+                        let relative_id = crate::utils::to_relative_identifier(
+                            &format!("/{target_id}"),
+                            &current_folder,
+                            true,
+                        )
+                        .unwrap_or_else(|_| target_id.clone());
                         let display_name = self
                             .get_element(target_id)
                             .map(|e| e.name.clone())
@@ -1127,7 +1120,11 @@ impl GraphRegistry {
                 .map(|v| v == "true")
                 .unwrap_or(false)
         {
-            return self.single_element_file_markdown(file_path, elements[0], with_full_relations);
+            return crate::format::apply_formatting_rules(&self.single_element_file_markdown(
+                file_path,
+                elements[0],
+                with_full_relations,
+            ));
         }
 
         let mut markdown = String::new();
@@ -1164,7 +1161,7 @@ impl GraphRegistry {
             markdown.push_str("---\n\n");
         }
 
-        markdown
+        crate::format::apply_formatting_rules(&markdown)
     }
 
     /// Copies InternalPath files to the output directory
@@ -2583,6 +2580,91 @@ impl GraphRegistry {
     // ================================
     // CRUD Operations (Add, Delete, Move)
     // ================================
+
+    /// Prepare a full-definition replacement in a private mutation candidate.
+    /// Incoming authored declarations survive; generated inverses are rebuilt
+    /// from the remaining authored definitions, never used as replacement input.
+    pub(crate) fn replace_element_from_string(
+        &mut self,
+        existing_id: &str,
+        markdown: &str,
+        target_file: &str,
+        excluded_patterns: &GlobSet,
+    ) -> Result<Element, ReqvireError> {
+        let previous = self
+            .nodes
+            .remove(existing_id)
+            .ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!("Element '{}' not found", existing_id))
+            })?
+            .element;
+        let mut replacement =
+            self.create_element_from_string(markdown, target_file, excluded_patterns)?;
+        // A concrete definition now tracks a newly created destination. The
+        // writer's virtual location marker is not part of the model candidate.
+        self.nodes.remove(&format!("__virtual__{target_file}"));
+        if previous.file_path == target_file {
+            replacement.file_order_index = previous.file_order_index;
+            if let Some(format) = previous.metadata.get("_single_element_format") {
+                replacement
+                    .metadata
+                    .insert("_single_element_format".into(), format.clone());
+            }
+            self.nodes
+                .get_mut(&replacement.identifier)
+                .expect("replacement inserted")
+                .element = replacement.clone();
+        }
+        self.modified_files.insert(previous.file_path);
+
+        if replacement.identifier != existing_id {
+            let identifiers =
+                FxHashMap::from_iter([(existing_id.to_string(), replacement.identifier.clone())]);
+            let moved = FxHashSet::from_iter([existing_id.to_string()]);
+            for (id, node) in &mut self.nodes {
+                if id == &replacement.identifier {
+                    continue;
+                }
+                let mut changed = false;
+                for relation in &mut node.element.relations {
+                    if relation.target.link.as_str() == existing_id {
+                        relation.target.link = LinkType::Identifier(replacement.identifier.clone());
+                        relation.target.element_id = Some(replacement.id.clone());
+                        changed |= relation.user_created;
+                    }
+                }
+                for entry in node
+                    .element
+                    .contract_bindings
+                    .iter_mut()
+                    .chain(&mut node.element.contract_references)
+                {
+                    if entry.target.as_str() == existing_id {
+                        entry.target = crate::element::ContractBindingTarget::ElementIdentifier(
+                            replacement.identifier.clone(),
+                        );
+                        changed = true;
+                    }
+                }
+                changed |= rewrite_moved_concept_reference_targets(
+                    &mut node.element,
+                    &identifiers,
+                    &moved,
+                );
+                if changed {
+                    self.modified_files.insert(node.element.file_path.clone());
+                }
+            }
+        }
+        for node in self.nodes.values_mut() {
+            node.element
+                .relations
+                .retain(|relation| relation.user_created);
+            node.relations.clear();
+        }
+        self.refresh_relation_context(excluded_patterns);
+        Ok(replacement)
+    }
 
     /// Creates an element from markdown string and adds it to the graph
     /// Used by CLI add command

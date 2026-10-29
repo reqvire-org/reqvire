@@ -47,14 +47,14 @@ mod mutation_tools;
 use mutation_tools::{
     add_element_tool, link_tool, merge_elements_tool, move_asset_tool, move_element_tool,
     move_file_tool, move_folder_tool, relink_tool, remove_asset_tool, remove_element_tool,
-    rename_element_tool, unlink_tool,
+    rename_element_tool, unlink_tool, update_element_tool,
 };
 
 mod dispatch;
 use dispatch::dispatch_tool;
 
 pub const MCP_PROTOCOL_VERSION: &str = "2025-11-25";
-pub const TOOL_CONTRACT_VERSION: &str = "2";
+pub const TOOL_CONTRACT_VERSION: &str = "3";
 
 pub struct ReqvireToolRegistry<'a> {
     enable_mutations: bool,
@@ -118,9 +118,19 @@ impl<'a> ReqvireToolRegistry<'a> {
             crate::model_cache::begin_write();
         }
         let exclusions = self.excluded_filename_patterns.refreshed();
+        // Stage previews through the same writer as applications. The session
+        // validates the complete candidate, returns canonical diffs, and drops
+        // this overlay instead of persisting a dry run.
+        let mut staged_args = args.clone();
+        let preview = crate::mutation_io::active()
+            && is_mutation_tool_name(name)
+            && args.get("dry_run").and_then(Value::as_bool) == Some(true);
+        if preview && name != "reqvire.update_element" {
+            staged_args["dry_run"] = Value::Bool(false);
+        }
         let result = dispatch_tool(
             name,
-            args,
+            &staged_args,
             self.enable_mutations,
             self.with_size_estimates,
             &exclusions,
@@ -131,7 +141,12 @@ impl<'a> ReqvireToolRegistry<'a> {
         if persists && !crate::mutation_io::active() {
             crate::model_cache::invalidate();
         }
-        result
+        result.map(|mut result| {
+            if preview {
+                result["dry_run"] = Value::Bool(true);
+            }
+            result
+        })
     }
 
     pub fn read_resource(&self, uri: &str) -> Result<Value, ReqvireError> {
@@ -221,7 +236,7 @@ pub fn is_mutation_tool_name(name: &str) -> bool {
 
 pub fn request_requires_write_tool(tool_name: &str, arguments: Option<&Value>) -> bool {
     is_mutation_tool_name(tool_name)
-        || (tool_name == "reqvire.format"
+        || (matches!(tool_name, "reqvire.format" | "reqvire.lint")
             && arguments
                 .and_then(|args| args.get("fix"))
                 .and_then(Value::as_bool)

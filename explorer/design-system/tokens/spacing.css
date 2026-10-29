@@ -23,50 +23,118 @@
   --space-24: 48px;
   --space-32: 64px;
 
+  /* Shared dimensions for role defaults; role tokens remain independently overridable. */
+  --space-15: 30px;
+  --space-26: 52px;
+  --space-56: 112px;
+  --space-140: 280px;
+  --space-260: 520px;
+  --space-380: 760px;
+
   /* Radii */
-  --radius-xs:   4px;   /* type-icon chips */
-  --radius-sm:   6px;   /* tags, small chips, inputs */
-  --radius-md:   8px;   /* buttons, toggles */
-  --radius-lg:   10px;  /* cards */
-  --radius-xl:   14px;  /* dialogs, large panels */
-  --radius-2xl:  20px;
+  --radius-xs:   var(--space-2);   /* type-icon chips */
+  --radius-sm:   var(--space-3);   /* tags, small chips, inputs */
+  --radius-md:   var(--space-4);   /* buttons, toggles */
+  --radius-lg:   var(--space-5);  /* cards */
+  --radius-xl:   var(--space-7);  /* dialogs, large panels */
+  --radius-2xl:  var(--space-10);
   --radius-pill: 999px;
 
   /* Control heights (dense product) */
   --control-xs: 22px;   /* count pills */
-  --control-sm: 28px;   /* compact buttons, chips */
+  --control-sm: var(--space-14);   /* compact buttons, chips */
   --control-md: 34px;   /* default buttons, inputs, toggles */
-  --control-lg: 40px;
+  --control-lg: var(--space-20);
 
   /* Icon sizes */
-  --icon-xs: 13px;
-  --icon-sm: 15px;
-  --icon-md: 17px;
-  --icon-lg: 20px;
+  --icon-xs: var(--text-sm);
+  --icon-sm: var(--text-md);
+  --icon-md: var(--text-lg);
+  --icon-lg: var(--space-10);
 
   /* Type-icon (colored rounded-square element glyph) */
-  --type-icon-sm: 16px;
-  --type-icon-md: 20px;
-  --type-icon-lg: 26px;
+  --type-icon-sm: var(--space-8);
+  --type-icon-md: var(--space-10);
+  --type-icon-lg: var(--text-2xl);
 
   /* Layout */
-  --navigation-rail-width: 52px;   /* primary navigation rail */
-  --app-header-height:     52px;   /* application header bar */
+  --navigation-rail-width: var(--space-26);   /* primary navigation rail */
+  --app-header-height:     var(--space-26);   /* application header bar */
   --content-max:    1180px; /* main column max readable width */
-  --row-height-compact: 30px;   /* compact tree/list row height */
-  --compact-column-min: 112px; /* minimum readable compact metadata/filter column width */
+  --row-height-compact: var(--space-15);   /* compact tree/list row height */
+  --compact-column-min: var(--space-56); /* minimum readable compact metadata/filter column width */
+  --space-flow-node-width: var(--space-140); /* shared model and verification flow cards */
+  --space-flow-node-height: 164px;
   --stack-gap-compact: var(--space-0); /* contiguous compact stack gap */
   --side-pane-content-inset-inline: var(--space-12); /* shared Explorer side-pane content inset */
   --side-pane-search-content-gap: var(--space-4); /* compact gap from pane quick filter to next pane block */
   --side-pane-summary-columns: repeat(2, minmax(0, 1fr)); /* compact key/value summary grid */
-  --thesaurus-map-scheme-node-min-width: calc(var(--space-32) * 4 + var(--space-4)); /* concept-scheme map node width */
-  --thesaurus-map-concept-node-min-width: calc(var(--space-32) * 3 - var(--space-2)); /* concept map node width */
+  --color-role-thesaurus-map-scheme-node-min-width: calc(var(--space-32) * 4 + var(--space-4)); /* concept-scheme map node width */
+  --color-role-thesaurus-map-concept-node-min-width: calc(var(--space-32) * 3 - var(--space-2)); /* concept map node width */
+
+  /* Toast geometry */
+  --space-zero-length: 0px; /* A length-valued zero for calc()/transforms. */
+  --toast-width: 356px;
+  --toast-swipe-threshold: 45px;
+
+  --space-breadcrumb-item-max-w: 28ch;
+  --space-modal-description-max-w: 76ch;
 
   /* Borders */
   --border-w:       1px;
   --border-w-2:     1.5px;
-  --border-w-thick: 2px;   /* selection rails, swatch outlines */
+  --border-w-thick: var(--space-1);   /* selection rails, swatch outlines */
   --border-w-heavy: 3px;   /* blockquote bars, emphasized strokes */
-  --focus-w:        2px;
+  --focus-w:        var(--space-1);
+  --focus-offset:   var(--space-1);
+  --space-store-notice-panel-max-w: var(--space-380);
+  --space-store-notice-action-min-w: 150px;
+    --space-markdown-diagram-min-w: var(--space-260);
+    --space-markdown-frame-margin: 0.9em 0 0.35em;
+    --space-markdown-frame-margin-1: 0.55em 0;
+    --space-markdown-frame-top: 0.72em;
+    --space-workspace-toolbar-actions-min-w: var(--space-140);
+    --space-workspace-crumb-max-w: 190px;
+    --space-workspace-crumb-wide-max-w: 240px;
+    --space-ontology-detail-dialog-w: 1120px;
+    --space-ontology-detail-dialog-max-h: 980px;
+    --space-ontology-detail-dialog-body-max-h: 780px;
+    --space-ontology-detail-dialog-chrome-h: 176px;
+    --space-ontology-meta-key-col: minmax(92px, 160px);
+    --space-ontology-meta-key-col-narrow: minmax(72px, 0.32fr);
+    --space-ontology-dialog-w-md: 1040px;
+    --space-ontology-dialog-w-sm: var(--space-380);
+    --space-detail-styles-margin: 0.85em 0 0.4em;
+    --space-help-legend-column-min: 18rem;
+    --space-help-legend-row-min-h: 2rem;
+    --space-file-path-max-w: 360px;
+    --space-file-tile-min-w: 230px;
+    --space-file-tile-min-h-compact: var(--space-56);
+    --space-file-row-card-min-h: 78px;
+    --space-file-hover-lift: -1px;
+    --space-trace-meta-grid-min-w: 180px;
+    --space-pane-search-results-limit: var(--space-260);
+    --space-left-pane-width: 380px;
+    --space-left-pane-collapsed-width: var(--space-15);
+    --space-graph-side-panel-w: 390px;
+    --space-graph-side-panel-max-h: 420px;
+    --space-brand-name-nudge-y: 0.5px;
+    --space-showcase-shadow-card-min-w: 160px;
+    --space-showcase-page-max-w: 1240px;
+    --space-showcase-page-wide-max-w: 1480px;
+    --space-showcase-swatch-col-min-w: 130px;
+    --space-showcase-type-label-min-w: 140px;
+    --space-showcase-space-label-min-w: 120px;
+    --space-showcase-mock-card-min-w: 220px;
+    --space-showcase-input-demo-lg-w: 480px;
+    --space-showcase-card-demo-w: 200px;
+    --space-showcase-pane-demo-w: 320px;
+    --space-showcase-shell-demo-h: 680px;
+    --space-showcase-shell-demo-min-h: 560px;
+    --space-showcase-shell-demo-mobile-min-h: 620px;
+    --space-left-pane-width-2: 318px;
+    --space-current-right-width: 268px;
   }
 }
+
+/* Project geometry and visual roles, preserved from their previous owners. */

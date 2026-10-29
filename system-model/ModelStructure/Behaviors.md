@@ -22,13 +22,13 @@ This behavior mirrors the existing relation target update behavior used when mov
 
 ### Dry-Run Mode Behavior
 
-Preview mode behavior for modification commands.
+Non-persisting operation previews.
 
 #### Details
-- Show changes without applying by default
-- Require --fix flag to apply changes
-- Show diff output for changes
-- Exit 0 for successful preview
+- Preview returns reviewable changes without modifying source files, commits or accepted state.
+- Controls are operation-specific: typed CRUD uses `dry_run: true`; MCP formatting uses `fix: false`; CLI migration defaults to preview and requires `--fix` for application.
+- Preview availability follows the operation's interface and permissions. A dry run never restores a removed CLI authoring operation.
+- Use the same candidate validation as execution. Report shared diagnostics and diffs, and reject invalid previews rather than claiming successful edits.
 
 #### Metadata
   * type: behavior
@@ -76,6 +76,8 @@ Formatting and rewrite operations shall not insert inherited or default values i
 Describes how workspace scope detection and enforcement works when Reqvire starts from a directory that may be a Git root, a child of a Git root, or a parent of Git repositories.
 
 #### Details
+These detection steps describe ordinary Git source selection. Repo mode supplies its manifest-selected worktree inventory within the same workspace path and containment boundary.
+
 **Detection Steps:**
 
 1. **Establish effective workspace root**: Use the process working directory after startup workspace selection has been applied.

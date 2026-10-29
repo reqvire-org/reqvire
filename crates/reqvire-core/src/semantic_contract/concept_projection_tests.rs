@@ -107,6 +107,7 @@ fn expected_facts() -> BTreeSet<(String, String, String)> {
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_projection_normalization_visits_each_element_and_link_once() {
     for size in [3, 12, 48] {
         let mut registry = GraphRegistry::new();
@@ -151,6 +152,7 @@ fn concept_projection_normalization_visits_each_element_and_link_once() {
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_projection_preserves_endpoint_namespaces_and_deterministic_facts() {
     let registry = fixture(false);
     let before = serde_json::to_value(registry.get_all_elements())
@@ -215,6 +217,7 @@ fn concept_projection_preserves_endpoint_namespaces_and_deterministic_facts() {
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_projection_candidates_rebuild_without_changing_accepted_relations() {
     let accepted = fixture(false);
     let accepted_index = build_semantic_index(&accepted);
@@ -259,6 +262,7 @@ fn concept_projection_candidates_rebuild_without_changing_accepted_relations() {
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_taxonomy_cycles_reject_canonical_paths_independent_of_authoring_order() {
     let parent_link = "narrower: [Projection Child](#projection-child)";
     for source in [
@@ -305,6 +309,7 @@ fn concept_taxonomy_cycles_reject_canonical_paths_independent_of_authoring_order
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_taxonomy_accepts_diamonds_and_symmetric_associations() {
     let source = FIXTURE
         .replace("narrower: [Projection Child](#projection-child)", "narrower: [Projection Child](#projection-child)\n  * broader: [Projection Isolated](#projection-isolated)")
@@ -316,6 +321,7 @@ fn concept_taxonomy_accepts_diamonds_and_symmetric_associations() {
 }
 
 #[test]
+#[serial_test::serial]
 fn concept_taxonomy_deep_chain_validation_uses_bounded_stack() {
     let mut registry = GraphRegistry::new();
     for number in 0..2048 {

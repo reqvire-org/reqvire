@@ -1,0 +1,31 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "files": {
+    "includes": [
+      "design-system/styles.css",
+      "design-system/tokens/**/*.css",
+      "design-system/components/**/*.css",
+      "design-system/patterns/**/*.css",
+      "design-system/showcase/**/*.css",
+      "src/**/*.css"
+    ]
+  },
+  "formatter": {
+    "enabled": false
+  },
+  "assist": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "none",
+      "suspicious": {
+        "noDuplicateFontNames": "error"
+      },
+      "nursery": {
+        "noDuplicateSelectors": "error"
+      }
+    }
+  }
+}

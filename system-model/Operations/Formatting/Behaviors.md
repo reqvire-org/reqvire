@@ -51,12 +51,14 @@ Deduplication rules for format fix operations.
 
 **Relations subsection:**
 - Duplicate relations (same relation_type + same target) are removed, keeping first occurrence
-- Different relation types to same target are NOT duplicates (e.g., `derivedFrom: A` and `trace: A` are both kept)
+- Different registered relation types are not duplicates solely because their targets agree; the complete candidate must still satisfy type compatibility and cycle rules.
 
 **Contract Bindings subsection:**
 - Duplicate contract_bindings (same target path or identifier) are removed, keeping first occurrence
 
-**Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
+**Shared duplicate classification:**
+- Apply the classification referenced by the owning requirement. The shared writer deduplicates equivalent entries in valid formatting input. Invalid duplicate declarations in disk sources or mutation candidates remain validation errors; formatting does not bypass model admission.
+- Cross-section duplicates are semantic errors and are not automatically removed. Report the shared validation diagnostic and preserve both declarations until the author chooses a valid repair.
 
 #### Metadata
   * type: behavior

@@ -25,12 +25,10 @@ Interface requirements define the concrete commands, generated views, transports
 
 ### Command-Line Interface
 
-As a **System Engineer**, I want Reqvire to expose command-line operations, so that model management, validation, reporting, and automation can be performed from scripts and local terminals.
+As a **System Engineer**, I want command-line model inspection, quality evidence, exports, and source upgrades, so that terminal workflows and CI can inspect and migrate models independently of an MCP client.
 
 #### Details
-Command-line interface is the capability for CLI commands, arguments, workspace selection, output modes, and command error behavior.
-
-CLI requirements define concrete command behavior. Shared interface vocabulary is bound by explicit concept references on the elements that use those terms.
+Command-line access covers retained read/query/report commands, generated artifacts, workspace and output controls, server launch, and known deterministic source migrations. It does not expose model authoring, lint repairs, or formatting. Migration is the explicit source-rewrite exception required before an incompatible model can pass normal validation.
 
 #### Metadata
   * type: capability
@@ -42,22 +40,63 @@ CLI requirements define concrete command behavior. Shared interface vocabulary i
 
 ### MCP Tool Interface
 
-As an **AI Tool Integrator**, I want Reqvire to expose model evidence and controlled mutations through MCP, so that external tools and agents can interact with the model through typed protocol operations.
+As an **AI Tool Integrator**, I want Reqvire to expose model evidence and the supported authoring and maintenance operations through typed MCP tools, so that agents and other clients evolve models under controlled permissions and shared core semantics.
 
 #### Details
-MCP tool interface is the capability for MCP transport, tool schemas, resource exposure, side-effect classification, mutation safety, and session behavior.
-
-MCP requirements define concrete protocol behavior while reusing the same model semantics as CLI and web interfaces.
+MCP tool access covers validated evidence, semantic queries, authoring, maintenance, worktree isolation, and change publication. Mutation enablement governs authoring and applying maintenance changes. Formatting preview and lint inspection remain read-only operations. Normal model validation is required before protocol service starts; source migration remains in CLI.
 
 #### Metadata
   * type: capability
 
 #### Relations
+  * derive: [MCP Change Publication](#mcp-change-publication)
   * derive: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
   * derive: [MCP Worktree Model Management](#mcp-worktree-model-management)
-  * derive: [MCP Change Publication](#mcp-change-publication)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [MCP Interface](InterfacesRequirements.md#mcp-interface)
+---
+
+### MCP Change Publication
+
+As a **System Engineer**, I want an MCP client to commit accepted model changes and publish their owning Git histories and the saved Central manifest through the existing branch workflow, so that model work can be reviewed through the existing GitHub workflow.
+
+#### Concept References
+  * [Model Change Publication](../Thesaurus/Thesaurus.md#model-change-publication)
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Model Change Publication](MCP/Tools.md#mcp-model-change-publication)
+---
+
+### MCP Model Authoring
+
+As a **System Engineer**, I want one controlled protocol interface for evolving authored model content and structure, so that authoring preserves model integrity, traceability, and accepted workspace state.
+
+#### Details
+Model authoring covers element content, relations, contract dependencies, terminology bindings, and model and evidence relocation. Typed MCP tools expose the shared core operations; command-line inspection and source migration have separate roles.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+---
+
+### MCP Model Maintenance
+
+As a **System Engineer**, I want controlled model formatting and automatic lint repairs through the protocol interface, so that maintenance remains reviewable and follows the same permissions and persistence guarantees as authoring.
+
+#### Details
+Maintenance includes formatting preview and application and safe lint repairs. Read-only quality inspection remains available from both interfaces. Source migration remains a command-line upgrade operation.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
 ---
 
 ### MCP Semantic Query Interface
@@ -89,6 +128,24 @@ MCP semantic prefix registry interface is the capability for exposing ontology e
 #### Relations
   * derivedFrom: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
   * specifiedBy: [MCP Semantic Prefix Registry Tools](MCP/Tools.md#mcp-semantic-prefix-registry-tools)
+---
+
+### MCP Worktree Model Management
+
+As an **AI Tool Integrator**, I want to manage independent model branches through Git worktrees behind one MCP endpoint, so that concurrent model work stays isolated without switching the original checkout.
+
+#### Details
+Mixed model and implementation workflows can adopt eligible external commits on an owned branch through checked HEAD refresh and normal validated model loading while retaining context identity.
+
+#### Concept References
+  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Worktree Model Sessions](MCP/Tools.md#mcp-worktree-model-sessions)
 ---
 
 ### Public Documentation Website Interface
@@ -127,50 +184,15 @@ Web requirements define concrete Explorer views, local server behavior, browser 
   * specifiedBy: [Web Interface](InterfacesRequirements.md#web-interface)
 ---
 
-### MCP Worktree Model Management
+### Explorer Directional Model Browsing
 
-As an **AI Tool Integrator**, I want to manage independent model branches through Git worktrees behind one MCP endpoint, so that concurrent model work stays isolated without switching the original checkout.
-
-#### Metadata
-  * type: capability
-
-#### Concept References
-  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Relations
-  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
-  * specifiedBy: [MCP Worktree Model Sessions](MCP/Tools.md#mcp-worktree-model-sessions)
----
-
-### MCP Change Publication
-
-As a **System Engineer**, I want an MCP client to commit accepted model changes and publish them to a branch and pull request in the same repository, so that model work can be reviewed through the existing GitHub workflow.
+As a **System Engineer**, I want to inspect either the downstream realization or upstream context of a selected model scope, so that I can understand its trace chains without mixing the two horizons.
 
 #### Metadata
   * type: capability
-
-#### Concept References
-  * [Model Change Publication](../Thesaurus/Thesaurus.md#model-change-publication)
-
-#### Relations
-  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
-  * specifiedBy: [MCP Model Change Publication](MCP/Tools.md#mcp-model-change-publication)
----
-
-### Explorer Worktree Browsing
-
-As a **System Engineer**, I want to choose any local branch in Explorer and inspect its model independently in each browser tab, so that I can compare concurrent work without switching an existing Git checkout or another client's context. Worktrees provide the isolated model workspaces behind this single branch-browsing experience.
-
-#### Metadata
-  * type: capability
-
-#### Concept References
-  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
 
 #### Relations
   * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
-  * specifiedBy: [Explorer Worktree Runtime Isolation](WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
-  * specifiedBy: [Explorer Worktree Selection](WebExplorer/Capabilities.md#explorer-worktree-selection)
 ---
 
 ### Explorer Selection Sharing
@@ -182,4 +204,23 @@ As a **System Engineer**, I want to share a selected model context and item acro
 
 #### Relations
   * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
+---
+
+### Explorer Worktree Browsing
+
+As a **System Engineer**, I want to choose any local branch in Explorer and inspect its model independently in each browser tab, so that I can compare concurrent work without switching an existing Git checkout or another client's context. Worktrees provide the isolated model workspaces behind this single branch-browsing experience.
+
+#### Details
+Branch selection defaults to HEAD mode. Owned contexts follow eligible local branch-tip changes through the shared check-and-refresh operation, with an explicit Refresh control and clear retained-model provenance when adoption is blocked.
+
+#### Concept References
+  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [Web Explorer Interface](#web-explorer-interface)
+  * specifiedBy: [Explorer Worktree Runtime Isolation](WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
+  * specifiedBy: [Explorer Worktree Selection](WebExplorer/Capabilities.md#explorer-worktree-selection)
 ---

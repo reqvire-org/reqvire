@@ -1,10 +1,10 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { coverageRows } from "../lib/coverage";
 import { routeForCoverage } from "../router/routes";
 import { writeExplorerUrl } from "../router/location";
-import whole from "../../../tests/test-scoped-coverage/expected/whole-model.json";
-import scopes from "../../../tests/test-scoped-coverage/expected/scopes.json";
+import whole from "../store/fixtures/wholeCoverage.fixture.json";
+import scopes from "../store/fixtures/coverageScopes.fixture.json";
 import showcase from "../store/fixtures/scopedCoverage.json";
 import { loadStoreCandidate } from "../store/loadStore";
 import { StoreProvider } from "../store/StoreContext";
@@ -65,7 +65,7 @@ function scopeRows() {
     row.getAttribute("data-capability-id"), row.getAttribute("aria-label"), row.getAttribute("aria-level"),
   ]);
 }
-function capabilityNames(container: HTMLElement) {
+function capabilityNames(container: Element) {
   return [...container.querySelectorAll('[data-kind="capability"][data-coverage-depth] a span:last-child')].map(node => node.textContent);
 }
 
@@ -110,16 +110,16 @@ describe("scoped coverage views", () => {
       .toEqual([["Test", "2"], ["Formal proof", "1"], ["Analysis", "0"], ["Inspection", "1"], ["Demonstration", "1"]]);
     expect(container.querySelectorAll(".coverage-kpi")).toHaveLength(3);
     expect(container.querySelectorAll(".coverage-gap-list")).toHaveLength(3);
-    const issues = container.querySelector("#coverage-section-unimplemented-requirements")!;
+    const issues = container.querySelector<HTMLElement>("#coverage-section-unimplemented-requirements")!;
     expect([...issues.querySelectorAll(".coverage-gap-row__title")].map(node => node.textContent).sort())
       .toEqual(["Alpha Gap", "Alpha Local", "Alpha Parent"]);
-    const drilldown = container.querySelector("#coverage-section-capability-coverage")!;
+    const drilldown = container.querySelector<HTMLElement>("#coverage-section-capability-coverage")!;
     expect(within(drilldown as HTMLElement).getAllByText("Verification", { exact: true })).toHaveLength(1);
     expect(within(drilldown as HTMLElement).getAllByText("Implementation", { exact: true })).toHaveLength(1);
     expect(within(drilldown as HTMLElement).getByRole("heading", { name: "Capability coverage", level: 2 })).toBeTruthy();
     expect(drilldown.compareDocumentPosition(issues) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(breakdown.compareDocumentPosition(drilldown) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(container.querySelector("#coverage-section-orphaned-verifications")).toBeNull();
+    expect(container.querySelector<HTMLElement>("#coverage-section-orphaned-verifications")).toBeNull();
     selectScope("");
     expect(selectedScope()).toBe("");
     expect(window.location.hash).toBe(routeForCoverage(null));
@@ -196,12 +196,12 @@ describe("scoped coverage views", () => {
 
   it("waits for the requested worktree snapshot before interpreting or rewriting its scope", () => {
     const a = generatedFixture();
-    a.project = { ...a.project, worktree_id: "a" };
+    a.project = { ...a.project, worktree_id: "private-a", branch: "a" };
     const b = structuredClone(a);
-    b.project = { ...b.project, worktree_id: "b" };
-    window.history.replaceState(null, "", `/?worktree_id=a${routeForCoverage(cap("Alpha Root"))}`);
+    b.project = { ...b.project, worktree_id: "private-b", branch: "b" };
+    window.history.replaceState(null, "", `/?branch=a${routeForCoverage(cap("Alpha Root"))}`);
     const view = render(shell(a, vi.fn(), true));
-    const target = new URL(`/?worktree_id=b${routeForCoverage(cap("Shared Branch"))}`, window.location.origin);
+    const target = new URL(`/?branch=b${routeForCoverage(cap("Shared Branch"))}`, window.location.origin);
     act(() => writeExplorerUrl(target));
     expect(selectedScope()).toBe(cap("Alpha Root"));
     expect(window.location.href).toBe(target.href);
@@ -237,7 +237,7 @@ describe("scoped coverage views", () => {
     expect(within(terminal).getByText("100% · 1 / 1 terminal")).toBeTruthy();
     expect([...terminal.querySelectorAll("[data-color-token]")].map(bar => [
       bar.getAttribute("data-color-token"), bar.querySelector("rect")?.getAttribute("width"),
-    ])).toEqual([["--verification", "100"], ["--resource", "100"]]);
+    ])).toEqual([["--color-role-verification", "100"], ["--color-role-resource", "100"]]);
     expect(within(terminal).queryByRole("button", { name: /Evidence for/ })).toBeNull();
     expect(within(terminal).queryByRole("list")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Collapse Shared Branch" }));
@@ -451,7 +451,7 @@ describe("scoped coverage views", () => {
     expect(within(parentRow as HTMLElement).getByRole("group", { name: /^Implementation: Blocked · 1 requirement;/ })).toBeTruthy();
     expect([...parentRow.querySelectorAll("[data-color-token]")].map(bar => [
       bar.getAttribute("data-color-token"), bar.querySelector("rect")?.getAttribute("width"),
-    ])).toEqual([["--verification", "100"], ["--resource", "50"]]);
+    ])).toEqual([["--color-role-verification", "100"], ["--color-role-resource", "50"]]);
     expect(within(branch).getAllByRole("link", { name: "requirement Alpha Gap" })).toHaveLength(1);
     expect(within(branch).getAllByRole("link", { name: "requirement Alpha Middle" })).toHaveLength(1);
     expect(within(branch).getByRole("article", { name: "Alpha Middle" })).toBeTruthy();
@@ -465,7 +465,7 @@ describe("scoped coverage views", () => {
     expect(within(gap).getByText("0% · 0 / 1 terminal")).toBeTruthy();
     expect([...gap.querySelectorAll("[data-color-token]")].map(bar => [
       bar.getAttribute("data-color-token"), bar.querySelector("rect")?.getAttribute("width"),
-    ])).toEqual([["--verification", "100"], ["--resource", "0"]]);
+    ])).toEqual([["--color-role-verification", "100"], ["--color-role-resource", "0"]]);
     fireEvent.click(within(gap).getByRole("link", { name: "requirement Alpha Gap" }));
     expect(open).toHaveBeenCalledWith("specifications/Alpha.md#alpha-gap");
   });

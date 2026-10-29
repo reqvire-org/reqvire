@@ -1,12 +1,6 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
-  type ReactNode,
-} from "react";
-import { AppShell, WorktreeLoadDialog, WorktreeSelector, type ShellActionItem, type ShellNavigationItem } from "@ds";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { type ComponentChildren } from "preact";
+import { Toaster, ExplorerWorkspace, useExplorerPane, WorktreeLoadDialog, type WorktreeSelectorProps } from "@ds";
 import { WorktreeUrlContext } from "./store/worktreeUrls";
 import { useLiveStore } from "./store/useLiveStore";
 import { StoreProvider } from "./store/StoreContext";
@@ -31,24 +25,13 @@ import {
 import { OntologiesView } from "./views/OntologiesView";
 import { ContentView } from "./components/ContentView";
 import { useTheme } from "./hooks/useTheme";
+import { useStore } from "./store/StoreContext";
+import { prepareThesaurus } from "./lib/thesaurus";
 
-const LEFT_PANE_WIDTH_DEFAULT = 380;
-const LEFT_PANE_WIDTH_MIN = 300;
-const LEFT_PANE_WIDTH_MAX = 720;
-const LEFT_PANE_WIDTH_STORAGE_KEY = "reqvire:explorer:left-pane-width";
-
-const SHELL_NAVIGATION_ITEMS: ShellNavigationItem[] = [
-  { value: "thesaurus", label: "Thesaurus", icon: "tags" },
-  { value: "model", label: "Model", icon: "folder" },
-  { value: "ontologies", label: "Ontologies", icon: "globe" },
-  { value: "traces", label: "Traces", icon: "activity" },
-  { value: "coverage", label: "Coverage", icon: "pie-chart" },
-];
-
-/** Route composition slots let the showcase use the application shell and router. */
+/** Route composition slots let the application test harness use the application shell and router. */
 export interface ExplorerViewSlots {
-  main: (props: { onOpenElement: (id: string) => void; onOpenSource: (file: string) => void }) => ReactNode;
-  sidePane: (props: { open: boolean; onToggle: () => void }) => ReactNode;
+  main: (props: { onOpenElement: (id: string) => void; onOpenSource: (file: string) => void }) => ComponentChildren;
+  sidePane: (props: { open: boolean; onToggle: () => void }) => ComponentChildren;
 }
 
 interface AppProps {
@@ -57,10 +40,10 @@ interface AppProps {
 
 export function App({ viewOverrides }: AppProps = {}) {
   const live = useLiveStore();
-  return <ExplorerApplication live={live} viewOverrides={viewOverrides} />;
+  return <><Toaster /><ExplorerApplication live={live} viewOverrides={viewOverrides} /></>;
 }
 
-/** Shared application composition; the showcase supplies fixture snapshots in place of HTTP. */
+/** Shared application composition; the application test harness supplies fixture snapshots in place of HTTP. */
 export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: ReturnType<typeof useLiveStore> }) {
   const { result, refreshError } = live;
   const displayedWorktree = result.ok ? result.store.project.worktree_id : undefined;
@@ -72,28 +55,29 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   const showRefreshError = Boolean(refreshError && !selectingWorktree
     && !(dismissedRefresh?.context === displayedWorktree && dismissedRefresh?.error === refreshError));
   const blocked = selectingWorktree || showRefreshError;
-  const worktreeSelector = live.worktreeRouting ? <WorktreeSelector density="compact" menuAlign="end"
-    value={live.selectedWorktree}
-    displayedValue={result.ok ? result.store.project.worktree_id : undefined}
-    choices={live.worktrees.map(item => ({ id: item.worktree_id, branch: item.branch, root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) }))}
-    branch={result.ok ? result.store.project.branch : undefined}
-    pending={live.switching && !refreshError}
-    onChange={live.selectWorktree}
-    onOpen={() => { void live.refreshWorktrees(); }}
-  /> : undefined;
+  const worktreeSelector: WorktreeSelectorProps | undefined = live.worktreeRouting ? {
+    value: live.selectedWorktree,
+    displayedValue: result.ok ? result.store.project.branch ?? undefined : undefined,
+    choices: live.worktrees.map(item => ({ id: item.branch, branch: item.branch,
+      root: item.workspace_root, available: item.available && (item.explorer_available || item.owned === false) })),
+    branch: result.ok ? result.store.project.branch ?? undefined : undefined,
+    pending: live.switching && !refreshError,
+    onChange: live.selectWorktree,
+    onOpen: () => { void live.refreshWorktrees(); },
+  } : undefined;
 
   if (!result.ok) {
-    return <AppShell headerContext={worktreeSelector} navigationItems={SHELL_NAVIGATION_ITEMS}
+    return <ExplorerWorkspace worktree={worktreeSelector}
       main={<MissingStoreNotice reason={result.reason} detail={refreshError ?? result.detail} />} />;
   }
 
   return (
-    <WorktreeUrlContext.Provider value={result.store.project.worktree_id}>
+    <WorktreeUrlContext.Provider value={live.worktreeRouting ? result.store.project.branch ?? undefined : undefined}>
     <StoreProvider store={result.store} schemaMismatch={result.schemaMismatch}>
       <SearchIndexProvider>
         <ExplorerUiStateProvider worktreeRouting={live.worktreeRouting}>
           {(live.switching || live.worktreeSelectionError) && <WorktreeLoadDialog
-            branch={live.worktrees.find(item => item.worktree_id === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
+            branch={live.worktrees.find(item => item.branch === live.selectedWorktree)?.branch ?? live.selectedWorktree ?? "Selected worktree"}
             error={live.worktreeSelectionError} onDismiss={live.dismissWorktreeError} /> }
           {showRefreshError && <WorktreeLoadDialog operation="refresh"
             branch={result.store.project.branch ?? "Displayed model"} error={refreshError}
@@ -106,6 +90,8 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
             worktreeSelector={worktreeSelector}
             worktreeBlocked={blocked}
             worktreeId={result.store.project.worktree_id}
+            onRefreshHead={live.refreshHead}
+            refreshingHead={live.refreshingHead}
           />
         </ExplorerUiStateProvider>
       </SearchIndexProvider>
@@ -114,15 +100,19 @@ export function ExplorerApplication({ live, viewOverrides }: AppProps & { live: 
   );
 }
 
-function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked }: AppProps & {
+function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktreeSelector, worktreeId, worktreeBlocked, onRefreshHead, refreshingHead }: AppProps & {
   recoveryWarning?: string | null;
   schemaMismatch: string | null;
-  worktreeSelector?: ReactNode;
+  worktreeSelector?: WorktreeSelectorProps;
   worktreeId?: string;
   worktreeBlocked?: boolean;
+  onRefreshHead?: () => void;
+  refreshingHead?: boolean;
 }) {
   const { route, navigateView, openElement, closeElement } = useHashRoute();
-  const { navigationNotice } = useExplorerUiState();
+  const ui = useExplorerUiState();
+  const { navigationNotice } = ui;
+  const { store } = useStore();
   const previousContext = useRef(worktreeId);
   const contextChanged = previousContext.current !== worktreeId;
   useEffect(() => {
@@ -134,14 +124,11 @@ function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktre
   }, [worktreeId, route.elementId, closeElement]);
   const viewOverride = viewOverrides?.[route.view];
   const [helpOpen, setHelpOpen] = useState(false);
-  const [leftPaneOpen, setLeftPaneOpen] = useState(true);
-  const [leftPaneResizing, setLeftPaneResizing] = useState(false);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(readStoredLeftPaneWidth);
   const [elementDetailHistory, setElementDetailHistory] = useState<string[]>([]);
   const [ontologyNodeId, setOntologyNodeId] = useState<string | null>(null);
-  const shellRef = useRef<HTMLDivElement | null>(null);
-  const leftPaneWidthRef = useRef(leftPaneWidth);
   const { isDark, toggleTheme } = useTheme();
+  const { leftPaneOpen, leftPaneResizing, leftPaneWidth, shellRef, toggleLeftPane,
+    handleLeftPaneResizePointerDown, handleLeftPaneResizeKeyDown, minWidth, maxWidth } = useExplorerPane();
   const sidePaneView =
     route.view === "content" || (route.view === "resources" && route.param)
       ? "model"
@@ -159,25 +146,6 @@ function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktre
   useEffect(() => {
     if (!route.elementId) setElementDetailHistory([]);
   }, [route.elementId]);
-
-  useEffect(() => {
-    leftPaneWidthRef.current = leftPaneWidth;
-    shellRef.current?.style.setProperty("--ux-left-pane-width", `${leftPaneWidth}px`);
-    window.localStorage.setItem(LEFT_PANE_WIDTH_STORAGE_KEY, String(leftPaneWidth));
-  }, [leftPaneWidth]);
-
-  useEffect(() => {
-    function handleResize() {
-      setLeftPaneWidth((width) => clampLeftPaneWidth(width));
-    }
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  function toggleLeftPane() {
-    setLeftPaneOpen((open) => !open);
-  }
 
   function handleShellNavigate(value: string) {
     navigateView(value as ViewId);
@@ -206,83 +174,28 @@ function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktre
     closeElement();
   }
 
-  function handleLeftPaneResizePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!leftPaneOpen || event.button !== 0) return;
 
-    const startX = event.clientX;
-    const startWidth = leftPaneWidthRef.current;
-    let nextWidth = startWidth;
-    setLeftPaneResizing(true);
-    document.body.style.cursor = "ew-resize";
-    document.body.style.userSelect = "none";
-
-    function handlePointerMove(moveEvent: PointerEvent) {
-      const delta = moveEvent.clientX - startX;
-      nextWidth = clampLeftPaneWidth(startWidth + delta);
-      shellRef.current?.style.setProperty("--ux-left-pane-width", `${nextWidth}px`);
-    }
-
-    function finishPointerDrag() {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", finishPointerDrag);
-      window.removeEventListener("pointercancel", finishPointerDrag);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-      setLeftPaneResizing(false);
-      leftPaneWidthRef.current = nextWidth;
-      setLeftPaneWidth(nextWidth);
-    }
-
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", finishPointerDrag);
-    window.addEventListener("pointercancel", finishPointerDrag);
-  }
-
-  function handleLeftPaneResizeKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    if (!leftPaneOpen) return;
-
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      event.preventDefault();
-      const direction = event.key === "ArrowLeft" ? -1 : 1;
-      const step = event.shiftKey ? 40 : 16;
-      setLeftPaneWidth((width) => clampLeftPaneWidth(width + direction * step));
-    }
-  }
-
-  const headerActions: ShellActionItem[] = [
-    {
-      id: "search",
-      label: "Search",
-      icon: "search",
-      onClick: () => navigateView("search"),
-    },
-    {
-      id: "theme",
-      label: isDark ? "Switch to light mode" : "Switch to dark mode",
-      icon: isDark ? "sun" : "moon",
-      onClick: toggleTheme,
-    },
-    {
-      id: "help",
-      label: "Help",
-      icon: "help-circle",
-      onClick: () => setHelpOpen(true),
-    },
-  ];
 
   return (
-    <AppShell
+    <ExplorerWorkspace
       inert={worktreeBlocked || undefined}
       ref={shellRef}
-      navigationItems={SHELL_NAVIGATION_ITEMS}
       activeNavigationValue={effectiveHeaderView}
-      headerActions={headerActions}
-      headerContext={worktreeSelector}
+      worktree={worktreeSelector}
+      onRefreshHead={onRefreshHead}
+      refreshingHead={refreshingHead}
+      isDark={isDark} onToggleTheme={toggleTheme}
+      onSearch={() => navigateView("search")} onHelp={() => setHelpOpen(true)}
+      thesaurus={route.view === "thesaurus" && !viewOverride ? {
+        concepts: prepareThesaurus(store.thesaurus).concepts,
+        selectedId: ui.thesaurusSelectionId, onSelectConcept: ui.setThesaurusSelectionId,
+        onOpenConcept: handleOpenElement, query: ui.thesaurusQuery, onQueryChange: ui.setThesaurusQuery,
+      } : undefined}
       leftPaneOpen={leftPaneOpen}
       leftPaneResizing={leftPaneResizing}
       leftPaneWidth={leftPaneWidth}
-      leftPaneMinWidth={LEFT_PANE_WIDTH_MIN}
-      leftPaneMaxWidth={LEFT_PANE_WIDTH_MAX}
+      leftPaneMinWidth={minWidth}
+      leftPaneMaxWidth={maxWidth}
       leftPaneCollapseLabel="Collapse explorer"
       leftPaneExpandLabel="Expand explorer"
       leftPaneResizeLabel="Resize explorer pane"
@@ -332,28 +245,7 @@ function ExplorerShell({ schemaMismatch, recoveryWarning, viewOverrides, worktre
         nodeId={contextChanged || worktreeBlocked ? null : ontologyNodeId}
         onClose={() => setOntologyNodeId(null)}
       />
-    </AppShell>
-  );
-}
-
-function readStoredLeftPaneWidth() {
-  if (typeof window === "undefined") return LEFT_PANE_WIDTH_DEFAULT;
-
-  const stored = Number(window.localStorage.getItem(LEFT_PANE_WIDTH_STORAGE_KEY));
-  return clampLeftPaneWidth(Number.isFinite(stored) ? stored : LEFT_PANE_WIDTH_DEFAULT);
-}
-
-function clampLeftPaneWidth(width: number) {
-  const viewportMax =
-    typeof window === "undefined"
-      ? LEFT_PANE_WIDTH_MAX
-      : Math.max(
-          LEFT_PANE_WIDTH_MIN,
-          Math.min(LEFT_PANE_WIDTH_MAX, window.innerWidth - 420),
-        );
-
-  return Math.round(
-    Math.min(Math.max(width, LEFT_PANE_WIDTH_MIN), viewportMax),
+    </ExplorerWorkspace>
   );
 }
 
@@ -376,7 +268,7 @@ function ActiveView({
     case "traces":
       return <TracesView activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "ontologies":
-      return <OntologiesView activeView={view} onNavigate={onNavigate} />;
+      return <OntologiesView />;
     case "coverage":
       return <CoverageView activeView={view} onNavigate={onNavigate} onOpenElement={onOpenElement} />;
     case "resources":

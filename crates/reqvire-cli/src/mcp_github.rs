@@ -183,6 +183,62 @@ impl GithubAccess {
     pub const fn available(&self) -> bool {
         self.repository.is_some()
     }
+    pub(crate) fn disable(&mut self, reason: String) {
+        self.repository = None;
+        self.reason = Some(reason);
+    }
+
+    /// Publish a manifest dependency under a stable retention ref, without
+    /// inventing a matching local component branch or changing its checkout.
+    pub(crate) fn push_dependency(&self, root: &Path, commit: &str) -> Result<Value, ReqvireError> {
+        self.verify(root)?;
+        if commit.len() < 40 || !commit.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(error("Invalid saved dependency commit"));
+        }
+        if git(root, &["rev-parse", "--verify", &format!("{commit}^0")])? != commit {
+            return Err(error("Saved dependency commit is unavailable"));
+        }
+        let reference = format!("refs/heads/reqvire/commits/{commit}");
+        let remote = || -> Result<bool, ReqvireError> {
+            let output = run(
+                root,
+                "git",
+                &["ls-remote", "--", &self.push_url, &reference],
+                None,
+                self.operation_timeout,
+            )?;
+            if !output.success {
+                return Err(error(publication_failure(&output)));
+            }
+            Ok(output.stdout.split_whitespace().next() == Some(commit))
+        };
+        if remote()? {
+            return Ok(json!({"outcome":"no_op","commit":commit,"ref":reference}));
+        }
+        let pushed = run(
+            root,
+            "git",
+            &[
+                "-c",
+                "push.followTags=false",
+                "push",
+                "--porcelain",
+                "--no-follow-tags",
+                "--",
+                &self.push_url,
+                &format!("{commit}:{reference}"),
+            ],
+            None,
+            self.operation_timeout,
+        );
+        if remote()? {
+            return Ok(json!({"outcome":"completed","commit":commit,"ref":reference}));
+        }
+        match pushed {
+            Ok(out) if !out.success && is_definite_rejection(&out) => Err(error(publication_failure(&out))),
+            _ => Err(error(format!("Dependency publication outcome is unknown for {reference}; inspect remote state before retrying"))),
+        }
+    }
     pub fn status(&self) -> Value {
         json!({"requested":self.requested,"available":self.available(),"remote":self.remote,
         "repository":self.repository.as_ref().map(Repository::argument),"reason":self.reason,"viewer_permission":self.permission})

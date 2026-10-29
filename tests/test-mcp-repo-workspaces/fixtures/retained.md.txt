@@ -1,0 +1,9 @@
+# Elements
+
+### Retained Capability
+
+An unchanged declared component.
+
+#### Metadata
+  * type: capability
+---

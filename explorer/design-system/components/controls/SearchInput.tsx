@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { InputHTMLAttributes, ReactNode } from "react";
+import { h, type InputHTMLAttributes, type ComponentChildren } from "preact";
 
 const baseUX = css`
   position: relative;
@@ -87,7 +87,7 @@ const skinX = css`
 const sizeLgUX = css`
   .ds-search__input {
     height: var(--control-lg);
-    padding-left: calc(var(--space-16) + var(--space-3));
+    padding: var(--ds-search-input-p, 0 var(--space-8) 0 calc(var(--space-16) + var(--space-3)));
     font-size: var(--text-base);
   }
 
@@ -101,10 +101,10 @@ const sizeLgUX = css`
   }
 `;
 
-export interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "style"> {
+export interface SearchInputProps extends Omit<(InputHTMLAttributes<HTMLInputElement> & { className?: string }), "size" | "style"> {
   size?: "md" | "lg";
-  icon?: ReactNode;
-  kbd?: ReactNode;
+  icon?: ComponentChildren;
+  kbd?: ComponentChildren;
 }
 
 export function SearchInput({
@@ -119,13 +119,13 @@ export function SearchInput({
     <div className={cx("ds-search", baseUX, skinX, size === "lg" && "ds-search--lg", size === "lg" && sizeLgUX, className)}>
       <span className="ds-search__icon" aria-hidden="true">
         {icon ?? (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
           </svg>
         )}
       </span>
-      <input className="ds-search__input" type={type} {...props} />
+      {h("input", { className: "ds-search__input", type, ...props })}
       {kbd ? <span className="ds-search__kbd">{kbd}</span> : null}
     </div>
   );

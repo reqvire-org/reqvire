@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, type MutableRefObject } from "react";
+import { useLayoutEffect, useRef } from "preact/hooks";
+import { type RefObject } from "preact";
 
-export function useLatestRef<T>(value: T): MutableRefObject<T> {
+export function useLatestRef<T>(value: T): RefObject<T> {
   const ref = useRef(value);
 
   useLayoutEffect(() => {

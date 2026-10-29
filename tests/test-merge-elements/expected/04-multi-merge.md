@@ -1,16 +1,5 @@
 # Elements
 
-### Child Requirement
-
-A child requirement derived from Source Requirement One.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Target Requirement](#target-requirement)
----
-
 ### Requirements Verification Objective
 
 Verification objective for concrete verification fixtures in this test model.
@@ -96,12 +85,15 @@ Details from source two with more info.
   * verifiedBy: [Target Test](Verifications.md#target-test)
 ---
 
-### Test Capability Test Merge Elements Specifications Requirements Md
+### Child Requirement
 
-Test capability root for migrated requirement fixtures.
+A child requirement derived from Source Requirement One.
 
 #### Metadata
-  * type: capability
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Target Requirement](#target-requirement)
 ---
 
 ### Unrelated Requirement
@@ -115,3 +107,10 @@ This requirement points to Source Requirement One.
   * derivedFrom: [Target Requirement](#target-requirement)
 ---
 
+### Test Capability Test Merge Elements Specifications Requirements Md
+
+Test capability root for migrated requirement fixtures.
+
+#### Metadata
+  * type: capability
+---

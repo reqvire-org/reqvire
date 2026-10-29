@@ -12,93 +12,46 @@ Renamed element: Capability A → Capability Alpha (specifications/Requirements.
   [32m11 +     * derivedFrom: [Capability Alpha](Requirements.md#capability-alpha)[0m
   [37m12       * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
   [37m13     ---[0m
-  [37m14[0m
 
 
 
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
-  [31m02 -   ### Capability D Constraint[0m
-  [32m02 +   ### Capability D[0m
-  [37m03[0m
-  [31m04 -   Rate limiting constraint for Capability D.[0m
-  [32m04 +   This is a newly added capability.[0m
-  [37m05[0m
-  [37m06     #### Metadata[0m
-  [31m07 -     * type: constraint[0m
-  [32m07 +     * type: requirement[0m
-  [32m08 +   ␤[0m
-  [32m09 +   #### Relations[0m
-  [32m10 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
-  [37m11     ---[0m
-  [31m12 -   ### Parent Capability[0m
-  [32m12 +   ### Capability D Constraint[0m
-  [37m13[0m
-  [31m14 -   This is a parent requirement.[0m
-  [32m14 +   Rate limiting constraint for Capability D.[0m
-  [37m15[0m
-  [37m16     #### Metadata[0m
-  [31m17 -     * type: requirement[0m
-  [31m17 -   ␤[0m
-  [31m17 -   #### Relations[0m
-  [31m17 -     * specify: [Test Capability Test Crud Manipulation Specifications Requirements Md](#test-capability-test-crud-manipulation-specifications-requirements-md)[0m
-  [32m17 +     * type: constraint[0m
-  [37m18     ---[0m
-  [31m19 -   ### Capability A[0m
-  [32m19 +   ### Capability E[0m
-  [37m20[0m
-  [31m21 -   This is a test requirement for capability A.[0m
-  [32m21 +   This capability has a contract binding to a contract element.[0m
+  [37m02[0m
+  [37m03     ### Capability D Constraint[0m
+
+  [37m18     #### Relations[0m
+  [37m19       * specify: [Test Capability Test Crud Manipulation Specifications Requirements Md](#test-capability-test-crud-manipulation-specifications-requirements-md)[0m
+  [37m20     ---[0m
+  [31m21 -   ### Capability A[0m
+  [32m21 +   ### Capability Alpha[0m
   [37m22[0m
-  [37m23     #### Metadata[0m
-  [37m24       * type: requirement[0m
-  [32m25 +   #### Contract Bindings[0m
-  [32m26 +     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
-  [32m27 +   ␤[0m
-  [37m28     #### Relations[0m
-  [31m29 -     * derivedFrom: [Parent Capability](#parent-capability)[0m
-  [32m29 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
-  [37m30     ---[0m
-  [31m31 -   ### Capability D[0m
-  [32m31 +   ### Complex chars, element/name example[0m
-  [37m32[0m
-  [31m33 -   This is a newly added capability.[0m
-  [32m33 +   This capability has special characters in its name including commas and slashes.[0m
-  [37m34[0m
-  [37m35     #### Metadata[0m
-  [37m36       * type: requirement[0m
-  [37m37[0m
-  [37m38     #### Relations[0m
-  [31m39 -     * derivedFrom: [Capability A](#capability-a)[0m
-  [32m39 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
-  [37m40     ---[0m
-  [31m41 -   ### Capability E[0m
-  [32m41 +   ### Parent Capability[0m
+  [37m23     This is a test requirement for capability A.[0m
+  [37m24[0m
+
+  [37m37       * type: requirement[0m
+  [37m38[0m
+  [37m39     #### Relations[0m
+  [31m40 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m40 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
+  [37m41     ---[0m
   [37m42[0m
-  [31m43 -   This capability has a contract binding to a contract element.[0m
-  [32m43 +   This is a parent requirement.[0m
-  [37m44[0m
-  [37m45     #### Metadata[0m
-  [37m46       * type: requirement[0m
-  [31m47 -   #### Contract Bindings[0m
-  [31m47 -     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
-  [31m47 -   ␤[0m
-  [37m47     #### Relations[0m
-  [31m48 -     * derivedFrom: [Capability A](#capability-a)[0m
-  [32m48 +     * specify: [Test Capability Test Crud Manipulation Specifications Requirements Md](#test-capability-test-crud-manipulation-specifications-requirements-md)[0m
-  [37m49     ---[0m
-  [31m50 -   ### Complex chars, element/name example[0m
-  [32m50 +   ### Capability Alpha[0m
-  [37m51[0m
-  [31m52 -   This capability has special characters in its name including commas and slashes.[0m
-  [32m52 +   This is a test requirement for capability A.[0m
-  [37m53[0m
-  [37m54     #### Metadata[0m
-  [37m55       * type: requirement[0m
+  [37m43     ### Capability E[0m
+
+  [37m51       * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
+  [37m52[0m
+  [37m53     #### Relations[0m
+  [31m54 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m54 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
+  [37m55     ---[0m
   [37m56[0m
-  [37m57     #### Relations[0m
-  [31m58 -     * derivedFrom: [Capability A](#capability-a)[0m
-  [32m58 +     * derivedFrom: [Parent Capability](#parent-capability)[0m
-  [37m59     ---[0m
-  [37m60[0m
-  [37m61     ### Separate Requirement Branch[0m
+  [37m57     ### Complex chars, element/name example[0m
+
+  [37m62       * type: requirement[0m
+  [37m63[0m
+  [37m64     #### Relations[0m
+  [31m65 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m65 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
+  [37m66     ---[0m
+  [37m67[0m
+  [37m68     ### Separate Requirement Branch[0m

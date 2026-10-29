@@ -415,7 +415,7 @@ reqvire:turtlePrefixScope a owl:DatatypeProperty ;
 reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
   rdfs:comment "Semantic ontology export mode that emits generated ontology document declarations plus authored ontology vocabulary with source comments. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
-  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, concept references, ontology term declarations, shape references, and generated ontology projection facts. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
+  rdfs:comment "Semantic graph export mode that emits generated ontology document declarations, authored ontology and SHACL blocks, and RDF triples for Reqvire model elements, relations, contract_bindings, contract_references, concept references, ontology term declarations, shape references, and generated ontology projection facts. Turtle serialization uses deterministic prefix declarations and safe compact prefixed names." .
 
 
 

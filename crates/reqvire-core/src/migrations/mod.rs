@@ -513,7 +513,7 @@ fn rewrite_concept_reference_links_content(
             continue;
         };
 
-        let link = utils::concept_reference_relative_link(source_file, target_identifier)?;
+        let link = utils::model_reference_relative_link(source_file, target_identifier)?;
         let leading_len = body.len() - body.trim_start().len();
         output.push(format!(
             "{}* [{}]({}){}",

@@ -289,7 +289,7 @@ This verification illegally declares requirement governance metadata.
 
 echo "Test 6: Formatting does not persist inherited/default governance metadata"
 set +e
-FORMAT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --fix 2>&1)
+FORMAT_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --fix 2>&1)
 FORMAT_EXIT=$?
 
 if [ $FORMAT_EXIT -ne 0 ]; then

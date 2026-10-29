@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 
 const baseUX = css`
   display: flex;
@@ -86,7 +86,10 @@ const tabSkinUnderlineX = css`
 const skinPillX = css`
   gap: var(--space-2);
   padding: calc(var(--space-1) + var(--border-w));
-  border: 0;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
   border-radius: var(--radius-md);
   background: var(--bg-sunken);
 `;
@@ -124,12 +127,12 @@ const tabSkinPillX = css`
 
 export interface TabItem<T extends string = string> {
   value: T;
-  label?: ReactNode;
-  icon?: ReactNode;
-  badge?: ReactNode;
+  label?: ComponentChildren;
+  icon?: ComponentChildren;
+  badge?: ComponentChildren;
 }
 
-export interface TabsProps<T extends string = string> extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "style"> {
+export interface TabsProps<T extends string = string> extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "onChange" | "style"> {
   items?: TabItem<T>[];
   value?: T;
   onChange?: (value: T) => void;

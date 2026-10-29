@@ -643,7 +643,7 @@ reqvire:RelationFamilyShape
 
 The Reqvire change impact ontology defines impact analysis concepts and propagation rules.
 
-Change impact is based on auditable graph paths. Native relations, concept references, semantic-contract use/constrain edges, and explicit requirement-owned contract contract_bindings define reachable context. This ontology defines propagation rule categories and impact semantics.
+Change impact is based on auditable graph paths. Native relations, concept references, semantic-contract use/constrain edges, and explicit requirement-owned Contract Bindings and Contract References define reachable context. This ontology defines propagation rule categories and impact semantics.
 
 #### Ontology
 ```turtle
@@ -661,7 +661,7 @@ reqvire:ChangeImpactAnalysis a owl:Class ;
 reqvire:ChangeImpactPath a owl:Class ;
   rdfs:label "Change impact path" ;
   reqvire:mapsToConcept concept:ChangeImpact ;
-  rdfs:comment "Auditable path that explains how impact propagates through model relations, contract_bindings, or semantic dependencies." .
+  rdfs:comment "Auditable path that explains how impact propagates through model relations, contract_bindings, contract_references, or semantic dependencies." .
 reqvire:ChangeImpactEdge a owl:Class ;
   rdfs:label "Change impact edge" ;
   reqvire:mapsToConcept concept:ChangeImpact ;
@@ -801,9 +801,9 @@ reqvire:directImpactClassification a reqvire:ImpactClassification ;
   reqvire:impactClassificationMeaning "Impact caused by a change to the element itself." .
 reqvire:indirectImpactClassification a reqvire:ImpactClassification ;
   rdfs:label "Indirect impact" ;
-  rdfs:comment "Impact propagated through relation, contract_bindings, hierarchy, or semantic dependency context." ;
+  rdfs:comment "Impact propagated through relation, contract_bindings, contract_references, hierarchy, or semantic dependency context." ;
   reqvire:impactClassificationName "indirect" ;
-  reqvire:impactClassificationMeaning "Impact propagated through relation, contract_bindings, hierarchy, or semantic dependency context." .
+  reqvire:impactClassificationMeaning "Impact propagated through relation, contract_bindings, contract_references, hierarchy, or semantic dependency context." .
 reqvire:potentialImpactClassification a reqvire:ImpactClassification ;
   rdfs:label "Potential impact" ;
   rdfs:comment "Impact that may require review based on semantic analysis or indirect dependency evidence." ;
@@ -972,7 +972,7 @@ reqvire:relocationNoPropagationRule a reqvire:ChangePropagationRule ;
 
 The Reqvire relation ontology defines Reqvire relation vocabulary.
 
-Relation contracts are separated from element-family contracts because relation behavior is reused across capability, requirement, contract, verification, artifact, and contract_bindings flows.
+Relation contracts are separated from element-family contracts because relation behavior is reused across capability, requirement, contract, verification, artifact, and contract dependency flows.
 
 #### Relation Semantics Context
 A Reqvire relation type defines a semantic connection between model elements, its authored direction, its inverse relation when one exists, whether it creates ownership, and whether changes should propagate through that relation during impact analysis.
@@ -1002,7 +1002,7 @@ Relation endpoint compatibility is semantic:
 - Contract dependencies comprise Contract Bindings and Contract References. Both preserve contract context and propagate change impact.
 - Contract Bindings express shared implementation obligations whose consumers contribute to the contract owner's implementation fulfillment.
 - Contract References express content dependencies that propagate change impact without contributing to the contract owner's implementation fulfillment.
-- Explicit `other` elements cannot author semantic relations; model meaning should be expressed with a specific supported element type or ontology concept references.
+- Explicit `other` elements cannot author semantic relations; model meaning should be expressed with a specific supported element type or Concept References to native concepts on permitted source types.
 
 #### Ontology
 ```turtle
@@ -1652,7 +1652,7 @@ reqvire:changePropagationRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:comment "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
   reqvire:usageCategoryName "change-propagation" ;
   reqvire:usageCategoryMeaning "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
-  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "definedBy", "constrainedBy", "constrain", "use", "usedBy", "verifiedBy", "contract_bindings" .
+  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "definedBy", "constrainedBy", "constrain", "use", "usedBy", "verifiedBy", "contract_bindings", "contract_references" .
 reqvire:verificationRollupRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Verification rollup relations" ;
   rdfs:comment "Relation names used to roll verification state from requirement leaves toward ancestors." ;
@@ -1708,6 +1708,13 @@ reqvire:contractBindingRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "contract-binding" ;
   reqvire:semanticCategoryMeaning "Explicit dependency from a requirement to reusable requirement-owned contract context in another subgraph." ;
   reqvire:semanticCategoryRelationName "contract_bindings" .
+
+reqvire:contractReferenceRelationCategory a owl:NamedIndividual, reqvire:RelationSemanticCategory ;
+  rdfs:label "Contract reference dependencies" ;
+  rdfs:comment "Content dependencies requiring review when a requirement-owned contract changes, without implementation fulfillment." ;
+  reqvire:semanticCategoryName "contract-reference" ;
+  reqvire:semanticCategoryMeaning "Content dependencies for change-impact review without implementation contribution." ;
+  reqvire:semanticCategoryRelationName "contract_references" .
 
 reqvire:deriveRelationRule a reqvire:RelationRule ;
   rdfs:label "derive" ;
@@ -1959,7 +1966,7 @@ reqvire:requirementContractBindingCompatibilityRule a reqvire:ContractBindingCom
   reqvire:contractBindingsRuleDescription "Requirement contract_bindings reference requirement-owned contracts from explicit dependency contexts." .
 
 reqvire:ownedContractContractBindingRule a reqvire:ContractBindingCompatibilityRule ;
-  rdfs:label "Owned contract contract_bindings compatibility" ;
+  rdfs:label "Owned contract binding compatibility" ;
   reqvire:contractBindingsSourceType "requirement" ;
   reqvire:contractBindingsTargetType "contract" ;
   reqvire:contractBindingsRuleDescription "A requirement contract_bindings target must be a contract already owned by exactly one compatible requirement through define/definedBy." .

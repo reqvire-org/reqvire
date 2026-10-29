@@ -1,25 +1,31 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import type { ButtonSize, ButtonTone } from "./button_contract";
 import { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./button_contract";
 
-export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
-  children?: ReactNode;
+export interface ButtonProps extends Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
   tone?: ButtonTone;
   size?: ButtonSize;
-  iconLeft?: ReactNode;
-  iconRight?: ReactNode;
+  iconLeft?: ComponentChildren;
+  iconRight?: ComponentChildren;
   block?: boolean;
 }
 
 const baseUX = css`
   display: inline-flex;
+  &[data-block] {
+    display: flex;
+    width: 100%;
+  }
   height: var(--control-md);
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
   padding: 0 var(--space-8);
-  border: var(--border-w) solid transparent;
+  border-width: var(--border-w);
+  border-style: solid;
+  border-color: transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-family: var(--font-sans);
@@ -147,11 +153,6 @@ const lgUX = css`
   font-size: var(--text-base);
 `;
 
-const blockUX = css`
-  display: flex;
-  width: 100%;
-`;
-
 const iconUX = css`
   display: inline-flex;
 `;
@@ -159,7 +160,9 @@ const iconUX = css`
 const linkSkinX = css`
   height: auto;
   padding: var(--space-2) 0;
-  border: 0;
+  border-width: 0;
+  border-style: none;
+  border-color: currentColor;
   background: transparent;
   color: var(--text-secondary);
 
@@ -197,6 +200,7 @@ export function Button({
   return (
     <button
       type={type}
+      data-block={block || undefined}
       className={cx(
         "ds-btn",
         baseUX,
@@ -204,7 +208,6 @@ export function Button({
         BUTTON_TONE_CLASSES[tone],
         sizeUX[size],
         BUTTON_SIZE_CLASSES[size],
-        block ? blockUX : "",
         block ? "ds-btn--block" : "",
         className,
       )}

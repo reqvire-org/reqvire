@@ -1,0 +1,25 @@
+export const fixture = {
+  "title": "Motion",
+  "kind": "value",
+  "text": "The quick brown fox jumps over the lazy dog",
+  "compactText": "Aa",
+  "multilineText": "The quick brown fox\njumps over the lazy dog",
+  "samples": [
+    {"token":"--dur-base","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-fast","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-instant","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-normal","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-slow","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-toast-exit","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-toast-icon","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-toast-loader","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-toast-rear-exit","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--dur-toast-stack","property":"animation-duration","probe":"0.4375s"},
+    {"token":"--ease-in-out","property":"animation-timing-function","probe":"cubic-bezier(0.13, 0.27, 0.61, 0.83)"},
+    {"token":"--ease-out","property":"animation-timing-function","probe":"cubic-bezier(0.13, 0.27, 0.61, 0.83)"},
+    {"token":"--ease-standard","property":"animation-timing-function","probe":"cubic-bezier(0.13, 0.27, 0.61, 0.83)"},
+    {"token":"--ease-toast-exit","property":"animation-timing-function","probe":"cubic-bezier(0.13, 0.27, 0.61, 0.83)"},
+    {"token":"--ease-toast-stack","property":"animation-timing-function","probe":"cubic-bezier(0.13, 0.27, 0.61, 0.83)"},
+    {"token":"--dur-reduced-motion","property":"animation-duration","probe":"0.4375s"}
+  ]
+} as const;

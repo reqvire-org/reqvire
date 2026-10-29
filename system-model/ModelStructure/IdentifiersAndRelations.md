@@ -10,290 +10,109 @@
 
 # Identifiers and Relations Specification
 
-## Identifiers in Markdown Documents
+## Identity and Addressing
 
-An **identifier** is a location-based reference for addressing elements in markdown documents.
-It consists of a file path and optionally an element name (fragment).
+An element ID is derived from its globally unique name. A canonical identifier is its workspace-relative source path plus normalized fragment, such as `system-model/Requirements.md#example-requirement`. Moving the element changes its identifier while preserving its name-derived ID.
 
-**Distinction from Element ID**:
-- **Identifier**: Location-based address for targeting elements in relations (`file.md#element-name`)
-- **Element ID**: Stable identity independent of location (derived from element name)
+Targets resolve according to their role and current model membership:
+- A model-element identifier selects a registered element. A file-only target may select the sole element of a single-element document.
+- An InternalPath selects an eligible workspace-local artifact, such as an implementation or evidence file.
+- An ExternalUrl identifies an external resource; Reqvire does not fetch it merely to validate a relation.
 
-Identifiers are used for writing relations in markdown and cross-referencing between elements. The system resolves identifiers to Element IDs during parsing for internal tracking and change detection. When an element is relocated to a different file or section, its identifier changes but its Element ID remains stable.
+Target syntax alone does not determine compatibility. Satisfaction uses implementation or evidence artifacts; ownership and verification select compatible model elements. Contract dependencies select uniquely requirement-owned contracts, and Concept References select native concepts.
 
-## Identifier in markdown document can resolve to several reference target kinds
+## Path and Fragment Normalization
 
-Reference target kind vocabulary is defined by the Reqvire core element ontology. This design document specifies parser syntax and resolution behavior for those target kinds.
+- A leading `/` means relative to the effective Reqvire workspace root, not the filesystem root.
+- Other paths are relative to the containing source document; a fragment-only target selects an element in that document.
+- Canonical stored paths are workspace-root-relative. Source serialization writes appropriate source-relative destinations.
+- Name fragments are lowercased, spaces become hyphens, disallowed anchor characters are removed, and surrounding whitespace is trimmed. Retain exactly one `#` delimiter.
+- Existing-element selectors use exact names or canonical identifiers through the shared resolver; literal new names and artifact paths keep their operation-specific domains.
 
--**Identifier**
-  - An internal system element reference with fragment, pointing to specific elements within markdown documents.
-  - Used for element-to-element relations (e.g., `derivedFrom`, `verifiedBy`, `verify`)
-  - **Example**: `"file.md#element-name"`
-- **ExternalUrl**
-  - An external URL represented as a string.
-  - Used for references to external resources
-  - **Example**: `"https://example.com"`
-- **InternalPath**
-  - An internal filesystem file path without fragment, pointing to implementation files.
-  - Used for implementation and evidence satisfaction relations (e.g., `satisfiedBy`, `satisfy`)
-  - **Example**: `"../../crates/reqvire-core/src/report/model.rs"`
+For a source at `project/documents/File1.md` in workspace `project`:
 
+| Authored target | Canonical workspace target |
+|---|---|
+| `File2.md#Example Requirement` | `documents/File2.md#example-requirement` |
+| `subfolder/File3.md#My Element (Draft)` | `documents/subfolder/File3.md#my-element-draft` |
+| `../File4.md#Example Requirement` | `File4.md#example-requirement` |
+| `/File4.md#Example Requirement` | `File4.md#example-requirement` |
+| `#Example Requirement` | `documents/File1.md#example-requirement` |
+| `../src/module.rs` | `src/module.rs` |
+| `https://example.com/evidence` | `https://example.com/evidence` |
 
-### Identifier Path Resolution Rules
+## Structured Relations
 
-- If an identifier **starts with `/`**, it is considered relative to the **effective Reqvire workspace root**.
-- If an identifier **does not start with `/`**, it is considered **relative** to the path of the document in which it appears.
-
-Each **identifier** must uniquely reference either:
-  - A **file**, or
-  - An **element within a file**.
-
-#### Identifier Path Resolution Examples
-
-Assuming the **<workspace root> folder** is `project` and a file exists at `/path/to/project/documents/File1.md`:
-
-| Identifier | Resolves to | Type  |
-|------------|------------|-----------|
-| `File2.md` | `project/documents/File2.md` | InternalPath |
-| `subfolder/File3.md` | `project/documents/subfolder/File3.md` | InternalPath |
-| `../File4.md` | `project/File4.md` | InternalPath |
-| `/File4.md` | `project/File4.md` | InternalPath |
-| `https://example.com` | `https://example.com` | ExternalUrl |
-| `../Requirments#element-name` | `project/Requirments#element-name` | Identifier |
-
----
-
-### Identifier Form Variations and Examples
-
-System recognises 2 kinds of identifier that may appear in documents and relations:
- * Simple identifiers
- * GitHub-style Markdown Link Identifiers
-
-
-Both Simple identifier and link part of GitHub-style markdown identifier can be etiher internal internal paths or external links (eg. starting with known scheme eg. https://)
-
-
-When parsing identifiers, both styles are nomarlized into the same form used internally by the system.
-
-As part of normailization process, element names are converted to **GitHub-style anchor link** fragments which are internal identifer representations:
-  - Convert to **lowercase**.
-  - Replace **spaces with hyphens (`-`)**.
-  - Remove **disallowed characters**.
-  - Remove **leading and trailing whitespace**.
-
-
-#### 1. Simple Identifiers
-
-Plain file or element references, following the path resolution rules.
-
-
-Examples:
-
-- File only identifier found in the document '<workspace root>/path/to/document.md'
-```
-file.md
-```
-  - Normalized to '<workspace root>/path/to/file.md'
-
-- File with an element fragment in the document '<workspace root>/path/to/document.md':
-```
-file.md#element name
-```
-  - Normalized to '<workspace root>/path/to/file.md#element-name'
-
-- Relative path with an element fragment in the document '<workspace root>/path/to/document.md':
-```
-../relative_path/file.md#element name
-```
-  - Normalized to '<workspace root>/path/file.md#element-name'
-
-- Element name fragment only (within the same file) in the document '<workspace root>/path/to/document.md':
-```
-#element name
-```
-  - Normalized to '<workspace root>/path/to/document.md#element-name'
-
-
-- Relative path with the element fragment with special characters in the document '<workspace root>/path/to/document.md':
-```
-path/file.md#My Element (Draft)
-```
-  - Normalized to '<workspace root>/path/to/path/file.md##my-element-draft'
-
-
-- Absolute path with the element fragment in any document:
-```
-/path/file.md#Elements
-```
-  - Normalized to '<workspace root>/path/file.md#elements'
-
-
-#### 2. GitHub-style Markdown Link Identifiers
-
-A valid GitHub-style Markdown link to a file or a fragment within a file.
-Identifier is considered the **link** part of the markdown link: everything inside '(identifier)'.
-
-Once link part is obtained from GitHub-style Markdown link, it is following same rules for normalization as **simple identifiers**.
-
-Examples:
-
-- File link in '<workspace root>/path/to/document.md':
-```
-[Specification](documents/specification.md)
-```
-  - Normalized to '<workspace root>/path/to/path/documents/specification.md'
-
-- Fragment link in '<workspace root>/path/to/document.md':  :
-```
-[My Element](documents/specification.md#my-element)
-```
-  - Normalized to '<workspace root>/path/to/path/documents/specification.md#my-element'
-
----
-
-
-##  Relations in Markdown Documents
-
-The `#### Relations` subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.
-
-The `#### Relations` subsection:
-- Is a dedicated part of an **element** section in Markdown document.
-- Starts with the `#### Relations` header.
-- Contains a list of relations in a specific format.
-
-
-The `#### Relations` subsection must be located within an element chunk.
-Each element chunk can have at most one `#### Relations` subsection.
-
-The `#### Relations` header marks the beginning of the subsection.
-
-The `#### Relations` subsection must appear directly within an element  chunk.
-It must follow the `###` header of the parent element and any preceding content.
-
-
-### Relation Structure
-
-- Relation entries are listed as bullet points (`*`), with **two spaces** (`  *`) of indentation.
-
-####  **Relation Format**
-   - Relations follow this format:
-     ```
-     * relationType: **identifier**
-     ```
-   - Example:
-     ```
-     * dependsOn: [Element2](#element2)
-     ```
-
-####  **Relation Type**
-   - Specifies the type of the relationship.
-   - Allowed characters: `[a-zA-Z]`
-   - Minimum length: **2 characters**
-   - Maximum length: **80 characters**
-   - Must be one of the predefined, case-sensitive types
-
-
-####  **Target Identifier**
-   - Specifies the target of the relation.
-   - Must be a valid **Simple Identifier** or **Git Valid Markdown Link Identifier** as defined in this document.
-
-
-
----
-
-### Examples of `#### Relations`
-
-#### 1. **Simple Relations**
-```markdown
-
-
-### My Element
-This is the content of My Element.
-
-#### Relations
-  * dependsOn: [Element2](#element2)
-  * relatedTo: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
-  * uses: [file.md](file.html)
-```
-
-#### 2. **Relations with Special Characters**
-```markdown
-
-
-### API v2.0
-Details about API version 2.0.
-
-#### Relations
-  * satisfies: [documents/specification.md#API: v2.0](documents/specification.html#api-v20)
-
-```
-
-#### 3. **Relation to an Element in the Same File**
-If the referenced element exists within the same file, the identifier can be a fragment only.
+Multi-element documents use `#### Relations` within an H3 element. Single-element documents use `## Relations` outside their named body. Entries use two-space bullet indentation and a case-sensitive registered relation token:
 
 ```markdown
-
 #### Relations
-  * extends: [Another Section](#another-section)
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * satisfiedBy: [Implementation](../src/module.rs)
 ```
 
-#### 4. **Relative Path Relations**
-If the referenced file is located in a subfolder relative to the current document, use a relative path.
-```markdown
+Canonical relation roles include:
+- `derive` / `derivedFrom`: compatible same-family hierarchy and concept-scheme context.
+- `specify` / `specifiedBy`: requirement-to-capability realization.
+- `define` / `definedBy`: unique requirement ownership of compatible contracts.
+- `verifiedBy` / `verify`: requirement-to-concrete-verification coverage.
+- `satisfiedBy` / `satisfy`: implementation or evidence satisfaction of requirements and evidence-backed verification types.
+- `constrainedBy` / `constrain` and `use` / `usedBy`: semantic-contract application and ontology context.
+- `broader` / `narrower`, `related`, `exactMatch`, and `closeMatch`: permitted native-concept taxonomy, association and mapping.
 
-#### Relations
-  * derive: [subfolder/details.md#detail-section](subfolder/details.html#detail-section)
-
-```
-
-#### 5. **Absolute Path Relations**
-
-If the reference starts with /, it points to a file or element relative to the effective workspace root.
+The following snippets illustrate source roles; referenced model elements and local artifacts must exist in the complete model.
 
 ```markdown
+### Child Requirement
+
+The system SHALL provide the child behavior.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
-  * verifiedBy: [/specifications.md#verification-steps](/specifications.html#verification-steps)
-
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * satisfiedBy: [Implementation](../src/module.rs)
 ```
-
-#### 6. **Invalid Relations Example**
 
 ```markdown
+### Example Specification
 
-This element contains invalid relation entries.
+Definition of the child behavior.
+
+#### Metadata
+  * type: specification
 
 #### Relations
-  * derivedFrom: [Element2](#element2)
-* InvalidEntry
-* : MissingRelationType
-  * invalidRelation: [path/to/file.md](path/to/file.html)
+  * define: [Child Requirement](#child-requirement)
 ```
 
-## Identifier Usage in Relations
+```markdown
+### Example Inspection
 
-Identifiers are used in relations to reference files or specific elements within files. Examples:
+Inspect the child behavior against its expected result.
 
-1. **Relation to a File**:
-   ```markdown
-   #### Relations
-     * satisfiedBy: [documents/specification.md](documents/specification.html)
-   ```
+#### Metadata
+  * type: inspection-verification
 
-2. **Relation to an Element**:
-   ```markdown
-   #### Relations
-     * derivedFrom: [documents/specification.md/section one](documents/specification.html#section-one)
-   ```
+#### Relations
+  * derivedFrom: [Verification Objective](#verification-objective)
+  * verify: [Child Requirement](#child-requirement)
+```
 
+## Dependency and Terminology Declarations
 
-## Validation rules
+Contract Bindings express shared implementation obligations; Contract References express content dependencies for change-impact review. Only requirements author them, and a requirement uses one dependency section rather than both. Their entries are Markdown links to compatible, uniquely requirement-owned contracts.
 
-The system must validate relation usage according to these rules:
-- Only the relation types defined in this registry are allowed
-- Relations should connect elements of appropriate types
-- Circular dependencies should be detected and reported
-- Duplicate relation entries of same type and target are not allowed
-- **Identifier** targets (with fragments) must reference existing elements in markdown documents
-- **InternalPath** targets (without fragments) must reference existing files in the filesystem
-- **ExternalUrl** targets are not validated for existence
+```markdown
+#### Contract References
+  * [Error Response Specification](Contracts.md#error-response-specification)
+```
+
+The MCP mutation keywords `bindContract` and `referenceContract` select these subsections. They are not ordinary Relations tokens. Permitted non-ontology, non-semantic-contract elements bind readable terminology through Concept References to native concepts. Authored prose uses readable domain words without model-element hyperlinks.
+
+## Validation
+
+The shared validators enforce registered tokens, source/target compatibility, unique ownership, current target resolution, permitted hierarchy and dependency directions, cycle rules and duplicate declarations. Capabilities receive satisfaction and verification coverage through their requirements. Verification objectives organize concrete verification work without direct verification or satisfaction edges.
+
+Disk loading and complete mutation candidates use the same semantic rules. A rejected mutation preserves source files and accepted state, and returns structured diagnostics with source/target context and repair guidance.

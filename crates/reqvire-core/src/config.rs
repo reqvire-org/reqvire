@@ -101,7 +101,15 @@ fn gitignore_pattern_to_glob(line: &str, prefix: Option<&Path>) -> String {
 pub fn get_excluded_filename_patterns_glob_set() -> GlobSet {
     let mut builder = GlobSetBuilder::new();
 
-    for pattern in read_gitignore_patterns() {
+    let repo_scope = crate::workspace::WorkspaceScope::discover()
+        .ok()
+        .filter(|s| s.repo.is_some());
+
+    for pattern in if repo_scope.is_some() {
+        Vec::new()
+    } else {
+        read_gitignore_patterns()
+    } {
         if let Ok(glob) = Glob::new(&pattern) {
             builder.add(glob);
             debug!("Added gitignore pattern: {}", pattern);
@@ -119,10 +127,31 @@ pub fn get_excluded_filename_patterns_glob_set() -> GlobSet {
         }
     }
 
-    builder
+    let exclusions = builder
         .build()
         .expect("Failed to build glob set")
-        .workspace_policy()
+        .workspace_policy();
+    if let Some(scope) = repo_scope {
+        let owners = scope
+            .git_worktrees
+            .iter()
+            .map(|root| {
+                let patterns = read_root_ignore_patterns(root, ".gitignore", None)
+                    .iter()
+                    .filter_map(|p| Glob::new(p).ok())
+                    .collect();
+                (
+                    root.strip_prefix(&scope.root)
+                        .expect("workspace owner")
+                        .to_owned(),
+                    patterns,
+                )
+            })
+            .collect();
+        exclusions.with_owners(owners)
+    } else {
+        exclusions
+    }
 }
 
 #[cfg(test)]

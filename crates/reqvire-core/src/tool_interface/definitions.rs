@@ -344,13 +344,16 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
                 vec!["query"],
             ),
         ),
-        read_tool(
+        tool(
             "reqvire.lint",
-            "Analyze model quality without applying fixes.",
+            "Inspect model quality; fix=true applies only safe repairs when mutations are enabled.",
             object_schema(vec![
+                ("fix", if enable_mutations { json!({"type":"boolean", "default":false}) } else { json!({"type":"boolean", "enum":[false], "default":false}) }),
                 ("fixable", json!({ "type": "boolean" })),
                 ("auditable", json!({ "type": "boolean" })),
             ]),
+            !enable_mutations,
+            false,
         ),
         read_tool(
             "reqvire.coverage",
@@ -412,6 +415,23 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
 
     if enable_mutations {
         tools.extend(vec![
+            mutation_tool(
+                "reqvire.update_element",
+                "Edit an existing element's opening prose (target: 'Element Text') or an exact subsection name. Apply requires expected_model_revision from the current context; dry_run previews without writing. Protected declarations require their supported tools. Ontology/Shapes/Query support replace and replace_text only.",
+                required_object_schema(
+                    vec![
+                        ("element_name", element_reference_schema("")),
+                        ("target", json!({"type": "string", "minLength": 1})),
+                        ("operation", json!({"type": "string", "enum": ["append", "replace", "replace_text", "create", "delete"]})),
+                        ("content", json!({"type": "string"})),
+                        ("old_text", json!({"type": "string"})),
+                        ("new_text", json!({"type": "string"})),
+                        ("expected_model_revision", json!({"type": "string", "pattern": "^[0-9a-f]{64}$"})),
+                        ("dry_run", json!({"type": "boolean", "default": false})),
+                    ],
+                    vec!["element_name", "target", "operation"],
+                ),
+            ),
             mutation_tool(
                 "reqvire.add_element",
                 "Add a new element from Markdown content.",
@@ -614,6 +634,7 @@ pub fn tool_exists(name: &str, enable_mutations: bool) -> bool {
 
 pub const fn mutation_tool_names() -> &'static [&'static str] {
     &[
+        "reqvire.update_element",
         "reqvire.add_element",
         "reqvire.remove_element",
         "reqvire.move_element",

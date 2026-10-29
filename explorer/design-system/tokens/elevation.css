@@ -17,9 +17,11 @@
     --shadow-xl: 0 18px 48px color-mix(in oklch, var(--slate-950) 18%, transparent),
       0 6px 16px color-mix(in oklch, var(--slate-950) 10%, transparent);
 
+    --shadow-raised: var(--shadow-md);
+
     /* Focus & selection rings (use as box-shadow) */
     --ring-focus: 0 0 0 3px var(--focus-ring);
-    --ring-selected: 0 0 0 1px var(--border-selected),
+    --shadow-selected-ring: 0 0 0 1px var(--border-selected),
       0 0 0 4px var(--ring-selected);
     --inset-hairline: inset 0 0 0 1px var(--border-subtle);
     --filter-danger-hover: brightness(0.94);
@@ -31,10 +33,22 @@
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* @kind other */
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
 
+    --dur-reduced-motion: 0.001ms;
     --dur-instant: 80ms; /* @kind other */
     --dur-fast: 130ms;   /* @kind other */
     --dur-base: 200ms;   /* @kind other */
+    --dur-normal: var(--dur-base);
     --dur-slow: 320ms;   /* @kind other */
+
+    /* Toast stacking and status motion, adapted from Sonner. */
+    --dur-toast-stack: 400ms; /* @kind other */
+    --dur-toast-exit: var(--dur-base); /* @kind other */
+    --dur-toast-rear-exit: 500ms; /* @kind other */
+    --dur-toast-icon: 300ms; /* @kind other */
+    --dur-toast-loader: var(--dur-base); /* @kind other */
+    --ease-toast-stack: cubic-bezier(0.25, 0.1, 0.25, 1); /* @kind other */
+    --ease-toast-exit: cubic-bezier(0, 0, 0.58, 1); /* @kind other */
+    --toast-stack-scale-step: 0.05; /* @kind other */
 
     /* Layering */
     --z-rail: 20;    /* @kind other */
@@ -47,6 +61,8 @@
     --z-local-base: 1;    /* @kind other */
     --z-local-raised: 2;  /* @kind other */
     --z-local-overlay: 3; /* @kind other */
+
+    --z-app-shell-z-index: calc(var(--z-sticky) + 1);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -63,8 +79,8 @@
     }
   }
 
-  [data-theme="dark"],
-  .dark {
+  :root[data-theme="dark"],
+  :root.dark {
     --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 30%, transparent);
     --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 40%, transparent),
       0 1px 3px color-mix(in oklch, var(--slate-950) 30%, transparent);
@@ -76,3 +92,5 @@
       0 8px 20px color-mix(in oklch, var(--slate-950) 50%, transparent);
   }
 }
+
+/* Project geometry and visual roles, preserved from their previous owners. */

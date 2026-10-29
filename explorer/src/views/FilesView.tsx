@@ -1,31 +1,16 @@
 import { fileDisplayName as displayName, type FolderNode, type FileManagerModel } from "../lib/fileTrees";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "./types/ExplorerViewProps";
 import type {
   ProjectStoreElement,
   ProjectStoreFile,
 } from "../store/types";
-import { ViewFrame } from "./ViewFrame";
 import { useOptionalExplorerUiState, type ModelMode } from "../state/ExplorerUiState";
 import { SourceCodePreview } from "../rendering/SourceCodePreview";
 import { routeForContent, routeForFile } from "../router/routes";
-import {
-  FileBrowserElementsPanel,
-  FileBrowserEmptyState,
-  FileBrowserFrame,
-  FileBrowserGrid,
-  FileBrowserList,
-  FileBrowserMissingFile,
-  FileBrowserModeledElement,
-  FileBrowserModeledElements,
-  FileBrowserToolbar,
-  type FileBrowserItem,
-  type FileBrowserLayout,
-  type FileBrowserMode,
-  type FileBrowserSortDirection,
-  type FileBrowserSortKey,
-} from "@ds";
+import { FileBrowserScreen, type FileBrowserItem, type FileBrowserLayout,
+  type FileBrowserMode, type FileBrowserSortDirection, type FileBrowserSortKey } from "@ds";
 
 const ROOT_FOLDER = "__root__";
 
@@ -183,114 +168,22 @@ export function FilesView({
     }
   }
 
-  return (
-    <ViewFrame testId="files">
-      <FileBrowserFrame>
-        <FileBrowserToolbar
-          breadcrumbs={folderCrumbs(currentFolder, store.project.root_label || "Project root")}
-          selectedFile={
-            selectedFile && selectedFileLabel
-              ? {
-                  name: selectedFileLabel,
-                  title: selectedFile.display_path || selectedFile.path,
-                }
-              : undefined
-          }
-          layout={layout}
-          resultCount={items.length}
-          showResultCount={!stateDriven}
-          onOpenFolder={openFolder}
-          onLayoutChange={changeLayout}
-        />
-
-        {path && !selectedFile ? (
-          <FileBrowserMissingFile path={path} />
-        ) : (
-          <>
-            {layout === "list" ? (
-              <FileBrowserList
-                items={browserItems}
-                sortKey={sortKey}
-                sortDirection={sortDirection}
-                onSort={updateSort}
-                onOpenFolder={openFolder}
-                onOpenFile={stateDriven ? openFile : undefined}
-              />
-            ) : (
-              <FileBrowserGrid
-                items={browserItems}
-                onOpenFolder={openFolder}
-                onOpenFile={stateDriven ? openFile : undefined}
-              />
-            )}
-
-            <SelectedFileElements
-              file={selectedFile}
-              layout={layout}
-              onOpenElement={onOpenElement}
-              elementById={elementById}
-            />
-          </>
-        )}
-      </FileBrowserFrame>
-    </ViewFrame>
-  );
+  return <FileBrowserScreen breadcrumbs={folderCrumbs(currentFolder, store.project.root_label || "Project root")}
+    selectedFile={selectedFile && selectedFileLabel ? { name: selectedFileLabel, title: selectedFile.display_path || selectedFile.path } : undefined}
+    layout={layout} showResultCount={!stateDriven} onOpenFolder={openFolder} onLayoutChange={changeLayout}
+    items={browserItems} sortKey={sortKey} sortDirection={sortDirection} onSort={updateSort}
+    onOpenFile={stateDriven ? openFile : undefined}
+    onNavigateFile={filePath => { window.location.hash = routeForFile(filePath); }} onOpenElement={onOpenElement}
+    missingPath={path && !selectedFile ? path : undefined}
+    elements={selectedFile?.element_ids.map(id => { const element = elementById(id);
+      return { id, name: element?.name ?? id, type: element?.element_type, family: element?.type_family };
+    })}
+    preview={selectedFile && selectedFile.element_ids.length === 0 ? <SourceCodePreview path={selectedFile.path}
+      content={selectedFile.markdown_content} kind="source file" defaultExpanded showPath /> : undefined} />;
 }
 
 function isSelectedFileItem(item: FileManagerItem, selectedFile: ProjectStoreFile | undefined) {
   return Boolean(item.file && selectedFile && item.file.path === selectedFile.path);
-}
-
-function SelectedFileElements({
-  file,
-  layout,
-  onOpenElement,
-  elementById,
-}: {
-  file: ProjectStoreFile | undefined;
-  layout: FileLayout;
-  onOpenElement: (id: string) => void;
-  elementById: (id: string) => ProjectStoreElement | undefined;
-}) {
-  if (!file) {
-    return (
-      <FileBrowserElementsPanel>
-        <FileBrowserEmptyState>Select a file row to inspect its modeled elements.</FileBrowserEmptyState>
-      </FileBrowserElementsPanel>
-    );
-  }
-  if (file.element_ids.length === 0) {
-    return (
-      <FileBrowserElementsPanel>
-        <SourceCodePreview
-          path={file.path}
-          content={file.markdown_content}
-          kind="source file"
-          defaultExpanded
-          showPath
-        />
-      </FileBrowserElementsPanel>
-    );
-  }
-  return (
-    <FileBrowserElementsPanel>
-      <FileBrowserModeledElements layout={layout}>
-        {file.element_ids.map((id) => {
-          const element = elementById(id);
-          return (
-            <FileBrowserModeledElement
-              key={id}
-              layout={layout}
-              name={element?.name ?? id}
-              type={element?.element_type}
-              family={element?.type_family}
-              onOpen={() => onOpenElement(id)}
-            />
-          );
-        })}
-      </FileBrowserModeledElements>
-    </FileBrowserElementsPanel>
-  );
 }
 
 function folderCrumbs(folder: FolderNode, rootLabel: string): { path: string; label: string }[] {

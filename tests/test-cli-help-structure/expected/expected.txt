@@ -6,7 +6,6 @@ Commands:
   serve             Serve the embedded Explorer UI via HTTP server
   export            Export the Explorer SPA as a static site to a directory
   mcp               Start Reqvire MCP server
-  format            Format and normalize requirements files. By default, shows preview without applying changes
   migrate           Preview or apply source migrations for known model-breaking changes
   validate          Validate model
   search            Search and filter model elements with comprehensive filtering options
@@ -15,18 +14,6 @@ Commands:
   coverage          Generate verification and implementation coverage report
   model             Generate model-centric structure with nested relations
   lint              Analyze model quality and detect issues in requirements relations
-  add               Add new element to model from Markdown definition
-  rm                Remove element from model
-  mv                Move element to different location
-  rename            Rename element
-  merge             Merge multiple elements into target element
-  mv-file           Move entire specification file with all its elements
-  mv-folder         Move or rename an entire folder subtree
-  link              Add relation, contract binding, or contract reference between elements
-  unlink            Remove relation, contract binding, or contract reference between elements (auto-detects type)
-  relink            Replace an existing relation target with a new target in one operation
-  mv-asset          Move/rename asset file and update all references (Contract Bindings and Relations)
-  rm-asset          Remove asset file and remove all references (Contract Bindings and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
   semantic          Export semantic RDF layers
@@ -42,6 +29,7 @@ Commands:
 
 Options:
   --workspace <DIR>         Workspace directory to operate on
+  --manifest <FILE>         Override Repo manifest location (default: .repo/manifest.xml)
   -h, --help               Print help
   -V, --version            Print version
 
@@ -60,21 +48,16 @@ EXPORT OPTIONS:
       --output <OUTPUT>         Output directory
 
 MCP OPTIONS:
-      --host <HOST>             HTTP bind address
-      --port <PORT>             HTTP server port
+      --transport <TRANSPORT>   MCP transport (default: http; values: http, stdio)
+      --host <HOST>             HTTP bind address (HTTP-only)
+      --port <PORT>             HTTP server port (HTTP-only)
       --enable-mutations        Advertise and allow mutation tools
       --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)
       --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)
       --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)
       --with-size-estimates     Include element size estimates in model evidence tools
-      --allow-origin <ORIGIN>   Additional browser origin (repeatable; loopback remains allowed)
-      --allow-host <HOST[:PORT]> Additional endpoint host or host:port (repeatable)
-
-FORMAT OPTIONS:
-      --fix                     Apply formatting changes to files
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-      --with-full-relations     Include all relations (user-created and auto-generated inverse relations)
+      --allow-origin <ORIGIN>   Additional browser origin (HTTP-only; repeatable; loopback remains allowed)
+      --allow-host <HOST[:PORT]> Additional endpoint host or host:port (HTTP-only; repeatable)
 
 MIGRATE OPTIONS:
       --fix                     Apply migration changes to files
@@ -131,94 +114,6 @@ MODEL OPTIONS:
 LINT OPTIONS:
       --fixable                 Show only auto-fixable issues
       --auditable               Show only issues requiring manual review
-      --fix                     Apply automatic fixes for auto-fixable issues
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-ADD OPTIONS:
-       <FILE>                   Target file path (relative to workspace root)
-      --content <MARKDOWN>      Element markdown content (alternative to stdin)
-      --override                Replace existing element with same name
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-RM OPTIONS:
-       <ELEMENT_NAME>           Exact element name or canonical identifier
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-MV OPTIONS:
-       <ELEMENT_NAME>           Exact element name or canonical identifier
-       <FILE>                   Target file path (relative to workspace root)
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-RENAME OPTIONS:
-       <ELEMENT_NAME>           Current exact element name or canonical identifier
-       <NEW_NAME>               New element name
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-MERGE OPTIONS:
-       <TARGET>                 Target exact element name or canonical identifier (receives merged content)
-       <SOURCES>                One or more source element names or canonical identifiers to merge into target
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-MV FILE OPTIONS:
-       <SOURCE_FILE>            Source file path (relative to current working directory)
-       <TARGET_FILE>            Target file path (relative to current working directory)
-      --squash                  Move all elements to target file's first section (if target exists)
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-MV FOLDER OPTIONS:
-       <SOURCE_FOLDER>          Source folder path (relative to current working directory)
-       <TARGET_FOLDER>          Target folder path (relative to current working directory)
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-LINK OPTIONS:
-       <SOURCE>                 Source exact element name or canonical identifier
-       <RELATION_TYPE>          Relation type, 'bindContract', or 'referenceContract'. Relations: derivedFrom, derive, specify, specifiedBy, define, definedBy, constrain, constrainedBy, use, usedBy, broader, narrower, related, exactMatch, closeMatch, satisfiedBy, satisfy, verifiedBy, verify. Use 'bindContract' to reuse compatible requirement-owned contract elements
-       <TARGET>                 Target: exact element name or canonical identifier, internal path, or external URL (for relations); compatible contract name or identifier for bindings
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-UNLINK OPTIONS:
-       <SOURCE>                 Source exact element name or canonical identifier
-       <TARGET>                 Target element name or canonical identifier, file path, or URL
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-RELINK OPTIONS:
-       <SOURCE>                 Source exact element name or canonical identifier
-       <RELATION_TYPE>          Relation type to preserve
-       <FROM_TARGET>            Existing target to replace: element name or canonical identifier, file path, or URL
-       <TO_TARGET>              Replacement element name or canonical identifier, file path, or URL
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-MV ASSET OPTIONS:
-       <OLD_PATH>               Current file path
-       <NEW_PATH>               New file path
-      --dry-run                 Preview changes without applying
-      --json                    Output results in JSON format
-      --output <FILE>           Save JSON output to file (requires --json)
-
-RM ASSET OPTIONS:
-       <FILE_PATH>              Path to file to remove
-      --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 

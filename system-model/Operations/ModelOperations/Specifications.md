@@ -37,43 +37,41 @@ Output behavior:
 Candidate semantic-contract validation for graph-backed CRUD mutations.
 
 #### Details
-Before any graph-backed CRUD mutation persists model files, the system is expected to validate the mutated in-memory model for dangling semantic-contract references.
+Before any graph-backed CRUD mutation persists model files, invoke the shared semantic-contract validator on the complete candidate through the model-operation validation gate. The owning requirement's Contract References supply schema-reference rules and diagnostics; this contract owns their mutation-time invocation and contextual enrichment.
 
-This pre-persistence validation applies to graph-backed mutation commands:
-- `add`
-- `add --override`
-- `rm`
-- `mv`
-- `rename`
-- `merge`
-- `mv-file`
-- `mv-folder`
-- `link`
-- `unlink`
-- `relink`
+This pre-persistence validation applies to shared core create/override, remove, move, rename, merge, file/folder moves and relation/dependency edits, exposed through their typed MCP authoring tools. Safe lint repair uses the same complete-candidate gate.
 
-When a mutation would leave a `Shapes` reference to an IRI that is not declared by any ontology `Ontology`, the command is expected to fail before flushing changes. The error is expected to include:
-- the referencing semantic-contract identifier
-- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
-- the missing IRI
-- fix guidance to update/remove the SHACL reference or restore the declaration
+Reject the operation before flushing changes when the shared validator reports an invalid candidate. Preserve its referencing contract, reference kind, target IRI, declaration context, and repair guidance in the response.
 
-When the mutation removed the ontology element that previously declared the missing IRI, the error is expected to include the removed declaration source identifier.
+If comparison with the accepted model identifies an ontology element removed by this mutation as the prior declaration source, add that removed source identifier to the diagnostic. Do not use the prior declaration to make the candidate valid.
 
-The command is expected not to persist source-file changes when this validation fails.
-
-When a mutation would leave a `Shapes` reference to an IRI that is declared by an ontology element outside the semantic contract's explicit ontology-use graph, the command is expected to fail before flushing changes. The error is expected to include:
-- the referencing semantic-contract identifier
-- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
-- the referenced IRI
-- the declaring ontology identifier
-- guidance to add a `use` relation to the declaring ontology, move the declaration into the semantic contract's explicit ontology-use graph, or update/remove the reference
+Rejection preserves authored files and accepted state according to the model-operation gate. Apply the same checks to supported typed previews and core/MCP entry points.
 
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [CRUD Semantic Contract Mutation Validation](ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
+---
+
+### Canonical Model Mutation Persistence Specification
+
+Canonical serialization of successful model mutations.
+
+#### Details
+- Apply the same normalization as default formatting to authored model documents affected by create/override, removal, move, rename, merge, file/folder moves, relation and contract-dependency edits, asset-reference changes, and safe lint repairs. Normalize before durable acceptance and optional commit, within the same transaction as the semantic change.
+- Preserve the document's valid single-element or multi-element header, page text, element prose, literal fenced payloads and semantic identities. Normalize reserved subsection layout, file-local hierarchy ordering, relation ordering, human-readable link labels, source-relative links, whitespace and final newline through the existing formatting engine.
+- Default mutation persistence preserves the authored relation subset; do not materialize generated inverses. Only an explicit formatting request with full relations enabled expands that subset.
+- Limit normalization to affected model documents. Preserve untouched documents and evidence asset bytes; do not format the whole workspace as a side effect. Semantic no-ops must not churn unrelated sources.
+- Validate the complete resulting candidate using the shared model validators. Normalization must not choose a repair for invalid prose hyperlinks, dependency ownership, hierarchy or semantic intent.
+- Prepare serialized contents before replacing durable files or publishing accepted graph/revision state. Validation, serialization or persistence failure must preserve the pre-operation files and accepted state through the shared transaction/rollback behavior.
+- After a successful write, default formatting preview reports no further changes for the documents just persisted. Explicit full-relation formatting may still propose additional inverse declarations.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [Canonical Model Mutation Persistence](ElementManipulationRequirements.md#canonical-model-mutation-persistence)
 ---
 
 ### Create Element Workflow Specification
@@ -92,8 +90,8 @@ When creating a new element, the system is expected to:
 - Insert the element into the target file following Element Ordering Behavior
 - Reject the operation and report validation errors if validation fails
 - Provide updates report following Diff Output Format Specification
-- The system is expected to support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
-- When override targets an ontology element, the operation is expected to support ontology rebasing by updating `ontology_base` and `ontology_prefix` and rewriting dependent ontology boundaries, inherited prefix declarations, imports, and reachable SHACL references atomically before persistence
+- Ordinary creation applies when the supplied name is absent, including an override-enabled request whose name does not yet exist.
+- Existing-name replacement is governed by the separately owned atomic override behavior; duplicate creation without override remains invalid.
 
 #### Metadata
   * type: specification
@@ -107,9 +105,10 @@ Detailed workflow for deleting existing model elements.
 Resolve the subject by exact name or canonical identifier through the bound element-selection contract before orphan checks or candidate changes.
 
 When deleting an element, the system is expected to:
+- Apply orphan checks to actual deletion of the element. Same-identity replacement retains the element in the completed candidate and is governed by atomic override validation.
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
-- Validate the candidate model before persistence and reject deletion when removing the element would leave semantic-contract SHACL references to ontology terms that are no longer declared anywhere
+- Invoke the shared candidate validation gate before persistence and reject deletion if the remaining model violates the referenced semantic-contract validation rules
 - Report semantic deletion blockers with the referencing semantic-contract identifier, reference kind, missing IRI, and the deleted element/semantic contract that removed the declaration when known
 - Provide clear error message listing orphaned children with resolution guidance
 - Allow deletion if children have other parent hierarchical relations
@@ -225,26 +224,26 @@ When moving a file, the system is expected to:
 - Accept source file path (relative to the effective workspace root)
 - Accept target file path (relative to the effective workspace root)
 - Allow source and target files to be in different eligible Git worktrees under the same effective workspace root
-- Accept optional squashing flag
+- Accept optional core squashing control, exposed as MCP `squash`
 - Validate both source and target paths
 - Move the physical file from source to target location
 - Update all element identifiers within the file to reflect the new file path
 - Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
-- Preserve all file content, structure, and formatting
+- Preserve domain content, fenced payloads and valid document form while canonically normalizing affected model documents
 - Provide updates report following Diff Output Format Specification
 
 The system is expected to reject the operation with a clear error message if:
 - The source file does not exist
-- The target file already exists (unless --squash flag is provided)
+- The target file already exists (unless `squash: true` is requested)
 - The source or target paths fail validation
 - The target file resolves to a workspace folder outside all eligible Git worktrees
-- `--squash` is used with a target that is an existing `# Element` file
+- `squash: true` is used with a target that is an existing `# Element` file
 
 **Squash Mode Behavior:**
-When the --squash flag is provided and the target file already exists, the system is expected to:
+When `squash: true` is requested and the target file already exists, the system is expected to:
 - Move all elements from the source file to the target end of file
 - Remove the source file after all elements have been successfully moved
-- Preserve element ordering from the source file when inserting into target section
+- Apply the shared file-local hierarchy ordering to the combined destination document
 - Reject squash if target is `# Element` format (single-element file)
 
 #### Metadata
@@ -378,6 +377,33 @@ When renaming an element, the system is expected to:
 The system is expected to reject the operation with a clear error message if:
 - The element does not exist
 - The new name conflicts with an existing element
+
+#### Metadata
+  * type: specification
+---
+
+### Focused Element Editing Specification
+
+Contract for selected-content edits on an existing element.
+
+#### Details
+
+##### Targets and Applicability
+- The target is a case-sensitive nonempty string. Element Text selects opening prose before the first subsection recognized by the document grammar. Other values are exact subsection names.
+- Element Text, Details and permitted custom prose subsections support append, replace and replace_text; optional named prose subsections additionally support create and delete. Element-type restrictions still apply, including concept prohibition of Details. Creation appends a new content subsection using canonical document form while preserving existing subsection order and protected declarations.
+- Ontology, Shapes and Query permit replace and replace_text on their complete native Markdown payloads, including the required fenced block. They reject append, create and delete; required payloads and language rules remain enforced. Structured payload content must not escape its subsection.
+- Metadata, Relations, Properties, Contract Bindings, Contract References, Concept References, Labels, Mappings, External Ontology and Produces are protected from all operations here. Other native reserved sections require an explicit supported editing policy rather than falling through as custom prose. Scope Note and Examples may be edited only through their existing element-type syntax and validation. Repeated/ambiguous subsection selection is rejected.
+
+##### Operation Arguments
+- append, replace and create require a string content and reject old_text/new_text arguments. Append retains existing contents and inserts a deterministic paragraph separator when both sides are nonempty. Replace changes only contents; an empty replacement clears them if valid. Create generates the subsection heading and fails if it already exists.
+- replace_text requires nonempty old_text and a string new_text; reject content. Match literal text exactly once within the target and never search the rest of the element or file. Zero or multiple matches are errors. Empty new_text is allowed subject to validation.
+- delete rejects content, old_text and new_text. Delete removes both heading and content, rejects Element Text and required/protected sections, and fails for a missing subsection.
+- All operations except create reject missing subsections. Reject unknown operations, unsupported combinations and structural boundary injection. A missing element never creates an element.
+
+##### Revision and Evidence
+- Application requires expected_model_revision, the existing canonical accepted-model fingerprint for the selected context. Preview may omit it; when supplied it must match for previews too. Check equality within the exclusive mutation transaction before preparing the candidate.
+- Return the base_model_revision for preview/application, selected element identifier/name, target and edit operation, ordinary update diff evidence, dry_run state and changed files. The surrounding MCP context identifies the accepted model revision; successful application advances it only for an effective edit.
+- Same-content replacement or empty append is an explicit no-op with empty diffs/changed files and unchanged accepted revision and pending set. Do not label it as a persisted change. Successful effective edits require nonempty accurate diffs, updated accepted reads and durable source bytes. Existing commit and recovery policy applies.
 
 #### Metadata
   * type: specification

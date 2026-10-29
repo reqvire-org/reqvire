@@ -1,9 +1,9 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 import type { ButtonSize, ButtonTone } from "./button_contract";
 
-export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
-  children: ReactNode;
+export interface IconButtonProps extends Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style"> {
+  children: ComponentChildren;
   size?: Extract<ButtonSize, "sm" | "md">;
   tone?: Extract<ButtonTone, "secondary" | "ghost">;
   active?: boolean;

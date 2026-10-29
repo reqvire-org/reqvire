@@ -1,0 +1,20 @@
+# Elements
+
+### Prose Source
+
+The system SHALL deliver using [delivery contract](Targets.md#target-specification).
+
+#### Details
+Delivery terminology uses [delivery term][delivery].
+
+[delivery]: Targets.md#target-concept
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Target Specification](Targets.md#target-specification)
+
+#### Relations
+  * specify: [Authoring Capability](Targets.md#authoring-capability)
+---

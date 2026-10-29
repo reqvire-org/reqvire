@@ -36,7 +36,7 @@ echo ""
 echo "Test 1: Move to existing file without --squash should fail..."
 
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file "specifications/Source.md" "specifications/Target.md" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file "specifications/Source.md" "specifications/Target.md" 2>&1)
 ERROR_EXIT=$?
 set -e
 
@@ -75,7 +75,7 @@ TARGET_BEFORE=$(grep -c "^### " "$TEST_DIR/specifications/Target.md" || true)
 
 # Perform squash move operation
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv-file --squash "specifications/Source.md" "specifications/Target.md" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv-file --squash "specifications/Source.md" "specifications/Target.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 

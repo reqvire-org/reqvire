@@ -13,8 +13,9 @@ Navigation behavior in the served Explorer.
 - External links open in new tab
 
 **Breadcrumbs:**
-- Show path: Home > File > Section > Element
-- Each segment clickable
+- Show the active workspace branch and workspace-root-relative folder/file focus using the shared Model or Resources navigation. Parsed elements belong directly to their modeled source file.
+- Folder and file segments navigate to their corresponding workspace focus; element activation uses the shared detail modal with source browsing as a secondary action.
+- Document headings and reserved subsections are content anchors rather than hierarchy nodes.
 
 **Search:**
 - Client-side ranked search in the `index.html#/search` Explorer route backed by Project Store search documents

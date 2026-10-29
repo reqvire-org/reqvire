@@ -2,7 +2,7 @@
 
 ### CLI Interface Verification Objective
 
-This objective groups verification that the Reqvire command-line interface exposes stable commands, options, workspace selection, and ontology output behavior.
+This objective groups verification of retained command-line inspection, reports, exports, query artifacts, workspace controls and server launch, plus deterministic migration before normal validation. It includes the breaking removal of CLI authoring, formatting and lint repair.
 
 #### Metadata
   * type: verification-objective
@@ -37,9 +37,9 @@ This test verifies that the system properly handles the source-control commit re
 
 ##### Test Procedure
 1. Create test fixtures with a workspace containing an eligible Git worktree with multiple commits
-2. Run Reqvire with --change-impact --git-commit=HEAD~1
+2. Run `reqvire change-impact --git-commit=HEAD~1`
 3. Verify that the specified commit is used as baseline
-4. Run Reqvire with --change-impact (no git-commit flag)
+4. Run `reqvire change-impact` without a git-commit flag
 5. Verify that the current eligible worktree HEAD is used as the default baseline
 6. Run with invalid commit reference and verify appropriate error
 
@@ -53,45 +53,13 @@ This test verifies that the system properly handles the source-control commit re
 
 ### CLI Help Structure Verification
 
-This test verifies that the CLI help output displays all commands and their options flattened in the main help, and that all CLI command requirements are covered.
+Verify main help advertises the supported CLI surface and its applicable options.
 
 #### Details
-
-##### Acceptance Criteria
-- Running `reqvire` (without arguments) displays the main help output as the default command
-- Main help output shows Usage line: `reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]`
-- Main help lists all available commands under "Commands:" section
-- Main help lists all global options under "Options:" section
-- Command-specific options are displayed under dedicated headings (e.g., "SUMMARY OPTIONS:", "FORMAT OPTIONS:")
-- All command options are flattened and visible in the main help without needing to drill down
-- Help output includes nested subcommands expanded (e.g., "traces", "coverage")
-- Each command's help text is descriptive and clear
-
-##### Test Criteria
-1. **Main help output structure**
-   Command: `reqvire`
-   - exits code **0**
-   - output contains "Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]"
-   - output contains "Commands:" section
-   - output contains "Options:" section with `-h, --help`, `-V, --version`
-
-2. **Command listing completeness**
-   - All current CLI commands are listed: serve, mcp, format, migrate, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, mv-folder, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
-
-3. **Options flattening - all command-specific option sections present**
-   - SERVE OPTIONS section visible
-   - MCP OPTIONS section visible
-   - FORMAT OPTIONS section visible
-   - MIGRATE OPTIONS section visible
-   - CHANGE IMPACT OPTIONS section visible
-   - TRACES OPTIONS section visible
-   - COVERAGE OPTIONS section visible
-   - MODEL OPTIONS section visible
-   - ONTOLOGIES OPTIONS section visible
-
-4. **Help text quality**
-   - Each command has descriptive help text
-   - Options have clear descriptions
+- Compare fixture-based main help output with the expected retained catalog: validation, lint inspection, coverage, search/collect/submodels, model/traces/containment/resources/change-impact, static and semantic/concept exports, managed query list/validate/export/check, ontologies alias, migrate, server launch and help/version.
+- Require no authoring/format command entries or option headings, and no `--fix` in lint options. Migration options retain `--fix`.
+- Running without arguments exits successfully and displays usage, global controls and flattened supported command options. Nested semantic/concept commands and filters/output controls remain discoverable.
+- The interface-boundary verification covers argument rejection and source preservation. These revised expected outputs are acceptance criteria for the subsequent implementation/test update.
 
 #### Metadata
   * type: test-verification
@@ -104,7 +72,6 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Ontologies Command](../../../Interfaces/CLI/Commands.md#cli-ontologies-command)
   * verify: [CLI Search Command](../../../Interfaces/CLI/Commands.md#cli-search-command)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
-  * verify: [Format Command](../../../Interfaces/CLI/Commands.md#format-command)
   * verify: [Validate Command](../../../Interfaces/CLI/Commands.md#validate-command)
   * verify: [Served Explorer Browser Interface](../../../Interfaces/WebExplorer/Capabilities.md#served-explorer-browser-interface)
 ---
@@ -115,6 +82,8 @@ This verification shall prove that the migrate command previews and applies dete
 
 #### Details
 Expected checks:
+- A known legacy fixture fails normal validation and MCP startup. CLI migration preview still succeeds without changing source bytes; application matches the expected migrated fixture. Normal validation and read-only MCP startup succeed after the supported migration. No MCP migration or pre-validation maintenance tool is advertised.
+- Compare reports and complete source trees against fixtures with unified diffs. These startup and interface-boundary checks extend the existing migration evidence in the subsequent implementation stage.
 - Run `reqvire validate` on a fixture with legacy contract relations and verify migration candidates are reported.
 - Run `reqvire migrate` and verify the dry-run preview reports legacy contract relation rewrites without changing source files.
 - Run `reqvire migrate --fix` and verify legacy `refinedBy` and `refine` relations are rewritten to `definedBy` and `define`.
@@ -198,29 +167,6 @@ Expected checks:
   * verify: [CLI Size Estimate JSON Option](../../../Interfaces/CLI/Commands.md#cli-size-estimate-json-option)
 ---
 
-### Explicit Workspace Selection Verification
-
-This verification shall prove that Reqvire commands can be launched outside a project while operating on an explicitly selected workspace.
-
-#### Details
-Expected checks:
-- Run a normal CLI report command from outside the target workspace using `--workspace <DIR>` and verify it reads the selected workspace model.
-- Run model mutation commands from outside the target workspace using `--workspace <DIR>` and verify changed files are written inside the selected workspace.
-- Run file move mutation from outside the target workspace using `--workspace <DIR>` and verify the moved file and updated model references remain inside the selected workspace.
-- Run change-impact from outside the target workspace using `--workspace <DIR>` and verify source-control comparison is computed against the selected workspace context.
-- Run MCP stdio startup from outside the target workspace using `--workspace <DIR>` and verify workspace status reports the selected workspace.
-- Verify workspace selection is applied before ignore-pattern loading and model validation.
-- Verify invalid workspace paths fail before command execution.
-- Verify omitting `--workspace` preserves current working directory behavior.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
-  * verify: [Explicit Workspace Selection](../../../Interfaces/CLI/Commands.md#explicit-workspace-selection)
----
-
 ### CLI Traces Result Presentation Verification
 
 Verify that trace-report presentation fulfills the CLI output obligation independently of the referenced core algorithm.
@@ -235,8 +181,61 @@ Verify that trace-report presentation fulfills the CLI output obligation indepen
 
 #### Relations
   * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
-  * verify: [CLI Traces Result Presentation](../../../Interfaces/CLI/Commands.md#cli-traces-result-presentation)
   * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
+  * verify: [CLI Traces Result Presentation](../../../Interfaces/CLI/Commands.md#cli-traces-result-presentation)
+---
+
+### Explicit Workspace Selection Verification
+
+This verification shall prove that Reqvire commands can be launched outside a project while operating on an explicitly selected workspace.
+
+#### Details
+Expected checks:
+- Run a normal CLI report command from outside the target workspace using `--workspace <DIR>` and verify it reads the selected workspace model.
+- Run change-impact from outside the target workspace using `--workspace <DIR>` and verify source-control comparison is computed against the selected workspace context.
+- Start MCP Streamable HTTP from outside the target workspace using `--workspace <DIR>`, initialize at `/mcp`, and verify `reqvire.workspace_status` reports the selected workspace.
+- Verify workspace selection is applied before ignore-pattern loading and model validation.
+- Verify invalid workspace paths fail before command execution.
+- Verify omitting `--workspace` preserves current working directory behavior.
+
+The existing harness also exercises shared-core element and file moves through the current CLI adapter. Those cases establish selected-workspace path handling, not acceptance of CLI authoring under the new interface boundary or MCP mutation transport. MCP authoring acceptance is covered by the separate mutation and interface-boundary verification plans.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
+  * verify: [Explicit Workspace Selection](../../../Interfaces/CLI/Commands.md#explicit-workspace-selection)
+---
+
+### Model Interface Operation Boundary Verification
+
+Verify the supported CLI catalog, rejected authoring surface, MCP permissions, and source-migration exception as one interface acceptance matrix.
+
+#### Details
+Acceptance checks:
+- Compare root and nested help against the exact retained command catalog, including static and semantic exports, concept tools, managed-query inspections, workspace controls, server launch, and migrations.
+- For every removed CLI authoring command and CLI `format`, test invocation and preview/dry-run forms; test `lint --fix`. Require argument rejection with MCP guidance before loading even an invalid fixture, and compare source trees to prove no writes.
+- Verify retained CLI reads and artifact generation still operate without an MCP client; artifact output does not introduce a model mutation path.
+- Verify migration preview leaves incompatible source fixtures unchanged, migration application performs only supported rewrites, and the upgraded model validates before MCP can start.
+- Compare read-only and mutation-enabled MCP catalogs: authoring tools require enablement; formatting preview and lint reporting remain available; applying format or lint fixes requires enablement.
+- Verify no MCP migration tool or pre-validation service mode is advertised, and invalid startup never opens a usable protocol endpoint.
+
+Executable fixtures reject the removed CLI surface before workspace loading, compare the retained help catalog, exercise migration preview/application, and check typed MCP permission schemas and source diffs.
+
+- Exercise failures on retained validation/report commands as well as removed arguments: require contextual CLI messages and actionable guidance, nonzero failure exits, and logging that preserves structured stdout under its default and explicitly selected filters.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
+  * satisfiedBy: [test.sh](../../../../tests/test-cli-help-structure/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-contract-relation-migration/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-interface-boundary/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
+  * verify: [Detailed Error Handling and Logging](../../../Interfaces/CLI/Commands.md#detailed-error-handling-and-logging)
+  * verify: [Model Interface Operation Boundary](../../../Interfaces/InterfacesRequirements.md#model-interface-operation-boundary)
 ---
 
 ### npm Concurrent Launch Verification
@@ -254,6 +253,6 @@ Verify packaged CLI invocation and atomic extraction under concurrent first use.
 
 #### Relations
   * derivedFrom: [CLI Interface Verification Objective](#cli-interface-verification-objective)
-  * verify: [npm CLI Distribution](../../../Interfaces/CLI/Commands.md#npm-cli-distribution)
   * satisfiedBy: [test.sh](../../../../tests/test-npm-launcher/test.sh)
+  * verify: [npm CLI Distribution](../../../Interfaces/CLI/Commands.md#npm-cli-distribution)
 ---

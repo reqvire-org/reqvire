@@ -20,7 +20,7 @@ Contract bindings MUST be placed at the requirement level responsible for implem
 **Downstream contract_bindings propagation:**
 If a contract binding (contract identifier) is already bound to an ancestor requirement in the derivation hierarchy, descendants cannot reuse the same target:
 - Contract Bindings propagate downstream through the derivedFrom chain
-- Re-bindContract at a descendant level is redundant
+- Rebinding at a descendant level is redundant
 
 Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing reuser) may reuse the contract.
 
@@ -34,18 +34,18 @@ Only requirements in a separate branch of the hierarchy (no derivedFrom chain co
 
 Rules requiring contract_bindings targets to have compatible ownership before being reusable.
 
-An contract_bindings target is valid only when it matches the bindContract element family:
-- Ontology elements are not reusable; ontology vocabulary bindings use `#### Concept References` or semantic-contract `use` relations.
+A Contract Binding target is valid only for a compatible requirement source and uniquely owned contract:
+- Ontology elements are not Contract Binding targets. Permitted model elements bind terminology to native concepts through `#### Concept References`; structural OWL terms can bridge to those concepts through `reqvire:mapsToConcept`. Semantic contracts depend on ontology through `use`, and requirements are constrained through `constrainedBy`.
 - Requirement contract_bindings target reusable requirement-owned non-semantic-contract elements only: `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
 - Only requirement elements may author Contract Bindings subsections.
-- Verification elements must express evidence through `satisfiedBy` and verified targets through `verify`; they must not author contract_bindings.
+- Concrete verifications identify verified requirements through `verify`. Only evidence-backed verification types may author `satisfiedBy`; verification objectives author neither verification nor satisfaction edges. Verification-family elements cannot author Contract Bindings.
 - Requirement-owned non-semantic-contract elements must have a `define` relation to exactly one compatible requirement owner before they can be reused.
 - Capabilities must not own contracts; invalid capability contract ownership edges are not cross-subgraph contract bindings.
 - Contract elements without a valid `define` relation cannot be reused anywhere.
 
 Contract Bindings compatibility is defined by the Reqvire relation, requirement, contract, and semantic-contract model contracts.
 
-**Rationale**: Enforces model hygiene by keeping ontology vocabulary in concept references and semantic-contract `use` relations, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.
+**Rationale**: Keeps native concept terminology, structural OWL vocabulary, and SHACL constraint dependencies in their respective channels, while ensuring reusable requirement contracts are owned by exactly one requirement before being consumed elsewhere.
 
 #### Metadata
   * type: constraint
@@ -56,7 +56,7 @@ Contract Bindings compatibility is defined by the Reqvire relation, requirement,
 Rules for keeping cross-subgraph contract bindings one-directional.
 
 #### Details
-For cross-subgraph contract contract_bindings, flow is defined from the bindContract element's capability-root hierarchy to the defining owner's capability-root hierarchy.
+For cross-subgraph Contract Bindings, flow is defined from the consuming requirement's capability-root hierarchy to the defining owner's capability-root hierarchy.
 
 **One-direction invariant:**
 - If subgraph `A` reuses a contract owned by subgraph `B`, then subgraph `B` must not reuse contracts owned by subgraph `A`
@@ -76,7 +76,7 @@ Validation rules for element type and relation type combinations.
 Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, capability/requirement contract vocabulary, and verification type vocabulary.
 
 Validation shall enforce those model contracts so that:
-- hierarchy relations stay within capability, requirement, or ontology hierarchy families
+- hierarchy relations retain the compatible capability, requirement, ontology, concept and verification-family rules
 - `specify`/`specifiedBy` is the requirement-to-capability bridge
 - `define`/`definedBy` is limited to requirement-owned subordinate details and contracts
 - `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction

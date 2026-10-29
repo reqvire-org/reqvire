@@ -35,7 +35,9 @@ pub(crate) fn compile_glob_matcher(pattern: &str) -> Result<GlobMatcher, Reqvire
     Ok(Glob::new(pattern)?.compile_matcher())
 }
 
-pub(crate) fn concept_reference_relative_link(
+/// Render a normalized workspace-relative model identifier from a source file.
+/// Its path is rooted at the workspace, even when a same-named local file exists.
+pub(crate) fn model_reference_relative_link(
     source_file: &str,
     target_identifier: &str,
 ) -> Result<String, ReqvireError> {
@@ -47,7 +49,7 @@ pub(crate) fn concept_reference_relative_link(
         .parent()
         .map(PathBuf::from)
         .unwrap_or_default();
-    to_relative_identifier(target_identifier, &source_parent, false)
+    to_relative_identifier(&format!("/{target_identifier}"), &source_parent, false)
 }
 
 pub(crate) fn resolve_model_target_identifier(
@@ -143,7 +145,7 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
                 path.display()
             );
             if excluded_filename_patterns.is_match(path)
-                || excluded_filename_patterns.is_match(filename)
+                || excluded_filename_patterns.is_global_match(filename)
             {
                 debug!(
                     "File '{}' is excluded due to matching a glob pattern.",
@@ -156,7 +158,7 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
     };
 
     if excluded_filename_patterns.is_match(&relative_path)
-        || excluded_filename_patterns.is_match(filename)
+        || excluded_filename_patterns.is_global_match(filename)
     {
         debug!(
             "File '{}' is excluded due to matching a glob pattern.",
@@ -311,6 +313,15 @@ pub fn scan_markdown_files(
             }
             let mut files = Vec::new();
             let workspace_scope = workspace::WorkspaceScope::discover()?;
+
+            if workspace_scope.repo.is_some() {
+                return Ok(workspace_scope
+                    .owned_files()?
+                    .into_iter()
+                    .filter(|p| p.extension().is_some_and(|e| e == "md"))
+                    .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
+                    .collect());
+            }
 
             for scan_dir in workspace_scope.scan_roots() {
                 debug!("Scanning for markdown files in: {}", scan_dir.display());
@@ -849,6 +860,7 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn test_all_git_operations_sequential() {
         // Disable git caching for tests to prevent interference
         git_commands::disable_git_cache_for_tests();

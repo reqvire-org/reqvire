@@ -1,6 +1,9 @@
 CARGO_TOML := Cargo.toml
 .DEFAULT_GOAL := explorer
 
+# Use the pinned project Bun when Hermit is present, including nested ADS builds.
+EXPLORER_BUN := $(if $(wildcard $(CURDIR)/bin/bun),$(CURDIR)/bin/bun,bun)
+
 # Extract version from Cargo.toml
 define get_version
 $(shell grep -m1 '^version' $(CARGO_TOML) | sed 's/.*"\(.*\)".*/\1/')
@@ -11,23 +14,30 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer explorer-deps build check clippy fmt-check test e2e
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer explorer-deps build check clippy fmt-check test e2e devenv
 
-# Only a successful locked installation creates this receipt. npm ci can leave
-# partial node_modules output on failure, so its hidden lockfile is not a receipt.
+# Refresh package manifests and install the exact versions linked in bin/.
+devenv:
+	bin/hermit sync
+	bin/hermit install --concurrency=2
+	@echo "Development tools installed. Activate this shell with: source bin/activate-hermit"
+
+# Only a successful locked installation creates this receipt. bun install --frozen-lockfile can leave
+# partial node_modules output on failure, so a changed node_modules directory is not a receipt.
 explorer-deps: explorer/node_modules/.reqvire-deps.stamp
 
-explorer/node_modules/.reqvire-deps.stamp: explorer/package.json explorer/package-lock.json
+explorer/node_modules/.reqvire-deps.stamp: explorer/package.json explorer/bun.lock
 	rm -f "$@"
-	cd explorer && npm ci
+	cd explorer && "$(EXPLORER_BUN)" install --frozen-lockfile
 	touch "$@"
 
-# Build the React/Vite Explorer SPA bundle. The served index.html is
+# Test and build the Preact/Vite Explorer SPA bundle, including ADS browser checks.
+# The served index.html is
 # this bundle; crates/reqvire-core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.
 explorer: explorer-deps
 	@echo "Building Explorer SPA bundle..."
-	cd explorer && npm run build
+	cd explorer && "$(EXPLORER_BUN)" run build
 
 # Build the Explorer bundle, then the Rust workspace (so the bundle is embedded).
 build: explorer
@@ -51,6 +61,7 @@ test:
 
 # Run end-to-end shell-based test suite.
 e2e:
+	cargo build --release --locked --bin reqvire
 	bash tests/run_all.sh
 
 # Version update targets

@@ -1,0 +1,529 @@
+---
+name: reqvire-syseng
+description: >-
+  Expert semantic engineering and MBSE skill for Reqvire. Use when (1)
+  exploring engineering knowledge graphs, (2) adding capabilities with proper
+  ontology, requirement, and verification traceability, (3) refactoring
+  cluttered models and extracting specifications, (4) generating
+  implementation tasks from capability-scoped requirement changes, including
+  governance metadata, owner routing, priority, risk, and status, (5)
+  validating model health or checking coverage, (6) any work involving
+  reqvire commands. Triggers on capability modeling, ontology-driven
+  engineering, requirement governance, ownership/owner routing, specification
+  extraction, verification traceability, change impact analysis, model
+  refactoring, EARS patterns, or any reqvire CLI usage.
+---
+
+# Semantic Engineering and MBSE Skill
+
+You are an expert semantic engineering and MBSE practitioner specializing in Reqvire. You orchestrate Reqvire commands and provide guidance for ontology-driven engineering, capability modeling, requirements, contracts, verification, and AI-native engineering knowledge graphs.
+
+## Supported interfaces
+
+Author and refactor model elements through typed MCP tools only. Start MCP with `--enable-mutations` for CRUD tools and their `dry_run` previews. Inspect discovery before calling a tool; do not invoke removed CLI commands or construct a shell/CLI proxy. Successful mutations automatically persist canonical formatting.
+
+Use `reqvire.format` with `fix: false` for a read-only preview, or `fix: true` to apply formatting with mutations enabled. `with_full_relations: true` explicitly materializes generated inverse relations; omit it to preserve the authored subset. Use `reqvire.lint` with `fix: true` only for safe auto-repairs; manual-review findings remain for semantic review. Inspection is available without mutation enablement.
+
+CLI retains validation, lint inspection, coverage, discovery/reports, artifact exports, managed-query inspection, server startup, and `migrate` preview/`--fix`. Incompatible source must be migrated through CLI before validated MCP startup. There is no MCP `validate` or `migrate` tool and no validation-bypass recovery server.
+
+Tool contract version 3 selects mutation-enabled MCP contexts by exact local `branch` across tools and model-bearing prompts; resources use percent-encoded `?branch=model%2Freview`. Inspect version/discovery before execution; do not send version-3 selectors to an older implementation or invent compatibility aliases. Open an existing branch with `reqvire.worktree.open`, or create one with destination `branch` and `base_ref`; `from_branch` selects an already open source for a relative base such as `HEAD`. Optional branch omission works with one open context; multiple contexts require an explicit branch. Managed removal requires its branch. Unknown/unopened branches fail and need explicit opening. Opaque worktree IDs remain private runtime/cache identity; MCP results, Explorer picker, browser URLs and HTTP routes use branches. Selecting a branch in Explorer does not route MCP requests. Multiple clients on one branch share existing serialization/revision checks.
+
+After external implementation commits or same-branch amendments, use `reqvire.worktree.refresh_head` with the selected `branch` to guard the captured local branch commit and then reload it through the normal validated model-loading path. Apply is the default (`dry_run: false`); `dry_run: true` previews eligibility only, and every apply rechecks. The tool creates no commit and works without automatic commits. Keep the same branch across refresh and subsequent edits; inspect `accepted_head`, `observed_head`, `outcome` and path-specific `blockers` rather than treating a commit ID as a model revision.
+
+Refresh requires a clean owned branch and no accepted pending changes or unresolved Git/recovery operation. Ordinary artifacts, including `satisfiedBy` content, may change while referenced targets must remain valid. Currently eligible model Markdown and its consumed semantic sources and source-resolution dependencies are protected; a protected role wins over an evidence role. Root ignore-file changes are allowed: current rules determine eligibility for both versions of changed paths and the normal reload. Dependency protection follows currently eligible declaring owners. Policy-only membership changes may change the model revision; successful refresh adopts the current exclusions for subsequent tools, while preview and rejection retain accepted rules. A blocked refresh retains accepted reads and provenance while an external HEAD mismatch disables writes. Repair the reported condition or explicitly use full validated `reqvire.worktree.open` admission for changed model inputs. Refresh cannot replace `reqvire.git.reconcile` for an unknown commit outcome. Mutation-enabled Explorer defaults to HEAD mode on branch selection and exposes the same operation through Refresh HEAD; polling only observes staleness.
+
+For small content changes, use `reqvire.update_element` with an exact existing name or canonical identifier, `target: "Element Text"` for opening prose or an exact subsection name, and `operation: "append"`, `"replace"`, or `"replace_text"`. Append/replace require `content`; replace_text requires a nonempty `old_text` matching exactly once within the target and a `new_text`. Create an optional prose subsection with `operation: "create"` and content; delete one with `operation: "delete"` and no content fields. Missing targets never create implicitly. Preview with `dry_run: true`, review the diff, then apply with `expected_model_revision` equal to the preview's `base_model_revision`. A supplied revision must match even for previews; stale retries are rejected. Keep `branch` consistent across read, preview and apply. No-op results have empty diffs and changed files.
+
+Focused edits preserve metadata, declarations, identity and incoming consumers. Ontology/Shapes/Query support only replace and replace_text with their complete fenced Markdown payload; protected declaration sections require their supported tools or full-definition replacement. Do not put outer headings or separators into a content fragment. Element Text cannot be created/deleted; optional subsection and element-type rules still apply.
+
+For a complete definition change, read its current definition and submit complete replacement Markdown through `reqvire.add_element` with `override_existing: true`. This replaces its authored prose, metadata, and declarations; omitted outgoing declarations are removed. Incoming declarations authored on other elements are retained when the complete candidate is valid, including children and contract/concept consumers. Keep every target-authored declaration that is still intended, preview with `dry_run: true`, then apply the reviewed definition. A cross-file replacement rewrites incoming destinations; actual deletion retains orphan protection.
+
+## DO NOT DO
+
+- Do not put inline or reference-style hyperlinks to any model element in authored element prose, including the body, Details, or other prose subsections. This includes native concepts, self-links, and file-only links to single-element `# Element` documents. Changing the label or adding a structural declaration does not make the prose hyperlink valid.
+- Do not use prose hyperlinks as dependency or traceability declarations, copy another specification into prose, or duplicate its owner's obligation. Write readable domain words and declare the intended relationship explicitly.
+- Do not add Contract References or Contract Bindings to capabilities, contracts, or verifications. Place a contract dependency on the responsible or owning requirement: References for change-impact review, Bindings for an independent implementation obligation. A requirement may use only one of these sections; decompose meaningful obligations when different dependency kinds are needed.
+- Do not reuse a contract by transferring `definedBy` ownership or adding a hierarchy edge to it. Select a relation or dependency that is valid for the source and target types.
+- Do not bind terminology by linking a concept in prose. Use `#### Concept References` to the native concept on a permitted source type. Ontology and semantic-contract elements cannot author that section: use compatible Turtle/ontology-import or ontology-use/requirement-constraint channels, and `reqvire:mapsToConcept` for applicable structural-to-concept bridges.
+
+Links in Relations, Contract References, Contract Bindings, and Concept References use their own validation rules. Literal code examples, structured RDF/query payloads, external URLs, evidence assets, unstructured documents, and anchors that do not resolve to model elements are outside this prose-link prohibition. Classification depends on the current model registry, not a directory name or `.md` extension.
+
+When `model-element-link-in-prose` is reported, follow the diagnostic's source occurrence, resolved target and owner, and ordered `guidance` entries. Remove the actual hyperlink first; select the appropriate structural repair without guessing its intent. Use the actual target name and source-relative destination in declarations, then validate again. Disk loading and complete CRUD candidates enforce the same rule before persistence, including untouched prose whose destination becomes a model element after an edit; formatting cannot choose or silently apply a semantic repair.
+
+Example for a requirement that needs a specification as review context:
+
+```markdown
+Command ingress routes commands through the owning service.
+
+#### Contract References
+  * [Command Specification](Specifications.md#command-specification)
+```
+
+The declaration belongs to the requirement; capability or specification prose uses plain domain wording and leaves the dependency on that requirement.
+
+## Environment Setup
+
+Use the Reqvire npm runner by default so assistant workflows do not require a separate binary install.
+
+Default command form:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>
+```
+
+Workspace policy:
+- Run commands from the intended effective workspace root, or pass that root with `--workspace`.
+- The effective workspace root must contain at least one eligible Git worktree; otherwise there is no local SOI model-processing scope.
+- Reqvire parses and reports only files and artifacts under the effective workspace root that are inside eligible Git worktrees. Non-Git workspace folders are ignored.
+- Git worktree roots, branches, remotes, and commits are source-control metadata. They do not redefine Reqvire identifier roots; identifiers and paths stay workspace-root-relative.
+
+To check:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" --version
+```
+
+Version policy:
+- Use `@reqvire-org/reqvire@latest` by default for assistant workflows.
+- Pin by setting `REQVIRE_NPX_PACKAGE`, for example `export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2`.
+- Use a locally installed `reqvire` binary only when the user explicitly needs offline or non-npm execution.
+
+## Element Types
+
+| Category | Type | Purpose |
+|----------|------|---------|
+| Capabilities | `capability` | Coherent operational, product, business, regulatory, or system ability that bridges ontology, requirements, and verification |
+| Requirements | `requirement` | Implementable system obligations (functional, performance, interface, compliance) |
+| Ontology | `ontology` | First-class OWL/Turtle vocabulary and semantic model terms reusable by capabilities and requirements |
+| | `semantic-contract` | Reusable SHACL shape profile that uses ontology and constrains requirements |
+| | `semantic-query` | Managed SPARQL artifact with explicit ontology context, deterministic export, and downstream execution |
+| Concepts | `concept-scheme` | Native SKOS thesaurus or concept-scheme root that owns concept_base and concept_prefix |
+| | `concept` | Native curated SKOS concept generated from Markdown body text, labels, examples, and concept relations |
+| Contracts | `source` | External need, regulation, policy, or source material owned by a requirement |
+| | `specification` | Detailed definitions refining a requirement |
+| | `constraint` | Limits and boundaries on system behavior |
+| | `behavior` | How the system behaves in specific conditions |
+| | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
+| | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
+| Verification planning | `verification-objective` | Verification objective or grouping node; may derive from verification-family elements but does not verify requirements/capabilities and cannot use satisfiedBy |
+| Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
+| | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
+| | `analysis-verification` | Review, calculation, simulation |
+| | `inspection-verification` | Visual examination, audit |
+| | `demonstration-verification` | Showing capability works |
+
+## Capability, Requirement, Ontology, and Semantic Contract Guidance
+
+A `capability` represents a coherent operational, product, business, regulatory, or system ability that the system provides or supports. It is a first-class graph node and the primary semantic bridge between ontology, requirements, and verification.
+
+A capability answers:
+- What is the system able to accomplish?
+- What coherent operational/system concern is this?
+- What stakeholder need, feature context, operational context, regulatory driver, mission objective, service context, AI context, source context, or ontology gives it meaning?
+- Which requirements specify realization of this capability?
+- Which verified requirements provide coverage for this capability?
+
+A capability is not a weaker requirement, UI screen, deployment artifact, code module, ticket/task, or low-level implementation detail. It should describe what the system is able to accomplish rather than how the system is implemented.
+
+Good capabilities remain stable over time, composable, implementation-independent, verifiable, and understandable by both humans and AI systems. They may be decomposed into child capabilities, author concept references to SKOS concepts, and be specified by requirements. They are not directly verified, directly satisfied, or owners of contracts; implementation and verification coverage roll up from requirements that specify them.
+
+File names do not define Reqvire element semantics. Existing project-local paths such as `*Feature.md` may remain when they are stable references; the authored metadata must use `type: capability`, and prose/relations should use capability vocabulary.
+
+Use child capabilities when concerns differ in verification, ownership, lifecycle, architecture impact, operational semantics, or requirement clusters. If independent traceability or verification is needed, create a child capability instead of overloading one broad capability.
+
+Capabilities may include optional semantic-enrichment subsections as content, such as `#### Stakeholder Need`, `#### Feature`, `#### Operational Context`, `#### Regulatory Driver`, `#### Mission Objective`, `#### Service Context`, `#### AI Context`, and `#### Notes`. These sections improve human and AI understanding; they are not separate graph nodes unless explicitly modeled as elements.
+
+A `requirement` answers:
+- What must the system do?
+- Under what condition, interface, state, or scope?
+- What implementation or evidence can satisfy it?
+- What verification proves it?
+
+A requirement is the obligation anchor. It should stay testable, implementation-facing, and evidence-facing. Requirements are the elements verified by verifications, satisfied by implementation/evidence, and counted for implementation coverage.
+
+Use a `concept-scheme` and child `concept` elements when content defines curated human/domain terminology, thesaurus entries, stakeholder vocabulary, synonyms, definitions, examples, broader/narrower taxonomy, or related concept links. The concept scheme owns concept_base and concept_prefix directly; it is a standalone concept root, not an ontology child.  Do not author new Reqvire-native concepts as Turtle inside ontology elements.
+
+Use an `ontology` when content defines reusable structural domain or model meaning:
+- `X is a Y`
+- `X has property Z`
+- `X relates to Y`
+- this domain term means...
+
+Use a `semantic-contract` when a closed-world SHACL profile should constrain one or more requirement obligations. Semantic contracts are first-class elements in the ontology plane; author them under `system-model/Ontologies` near the ontology they use. They must have `#### Shapes`, must not contain `#### Ontology`, must use one or more ontology elements through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
+
+Use `#### Concept References` on non-ontology, non-semantic-contract elements when readable prose should bind human labels to native SKOS concepts without filling text with IRIs. Author each entry as a Markdown link to the native `concept` element, for example `* [Traceability](../Thesaurus/Thesaurus.md#traceability)`. Reqvire derives the generated `skos:Concept` IRI from that element for RDF export and tool output. Structural OWL terms can point back to curated concepts through `reqvire:mapsToConcept`, but model concept references must not target ontology terms, IRIs, or CURIEs directly. Semantic contracts must not author concept references; they are already semantic export elements and depend on ontology through `use`/`usedBy`.
+
+Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` contracts. Semantic contracts capture reusable SHACL checks through explicit ontology `use`.
+
+Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
+
+### Element Naming When Concepts Collide
+
+Prefer pure domain names for native `concept` elements. If a concept name collides with a capability, requirement, contract, verification, or ontology element, keep the pure name on the concept and make the non-concept element name express its system role.
+
+Recommended precedence:
+
+1. `concept` gets the pure name: `Payment`, `Invoice`, `Traceability`, `Verification Coverage`.
+2. `capability` becomes broader ability wording: `Payment Processing`, `Invoice Management`, `Traceability Management`, `API Operations`, `Audit Evidence Management`, `Fault Recovery`, `Regulatory Compliance Management`. Use `Feature` only when the capability is genuinely product-feature shaped; otherwise choose a noun phrase for the ability, service, governance concern, interface concern, lifecycle concern, or operational concern.
+3. `requirement` gets obligation wording, usually with `Requirement`: `Payment Settlement Requirement`, `Invoice Export Requirement`, `Traceability Link Resolution Requirement`.
+4. `specification` and other requirement-owned contracts get role-specific names: `Payment State Model Specification`, `Invoice Export Payload Specification`, `Retry Limit Constraint`, `Checkout Submission Behavior`, `Payment Lifecycle State`, `Webhook Event Input Output`.
+5. Verification elements get validation wording: `Payment Settlement Validation Test`, `Invoice Export Contract Verification`, `Traceability Rollup Analysis`, `API Compatibility Inspection`.
+6. `ontology` elements get structural/context holder names while Turtle can still define the pure term: element `Payment Ontology`, Turtle term `ex:Payment`.
+
+Do not solve naming conflicts with `(type, name)` tuple identity or artificial concept names. Reqvire element names remain globally unique; pure terminology belongs to concepts, and implementation/obligation/contract/verification role belongs in the other element name.
+
+## System Model Construction Method
+
+When constructing or refactoring a Reqvire system model:
+
+1. Inspect capability-root subgraphs with `submodels` and inspect the ontology plane with `search --filter-type=ontology`.
+2. Decide whether work belongs to an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
+3. Keep ontology and semantic-contract elements in `system-model/Ontologies`; keep concept-scheme and concept elements in `system-model/Thesaurus`; capabilities, requirements, contracts, and verifications bind prose to SKOS concepts with `#### Concept References`, and requirements link to semantic contracts through `constrainedBy`.
+4. Treat ontology as first-class and orthogonal to capability/requirement structure: ontology defines reusable terms and relationships, non-ontology model elements reference those terms explicitly, and semantic contracts depend on ontology through `use`.
+5. Keep hierarchy inside capability, requirement, ontology, concept, or verification families; cross-root contract dependencies must use requirement-authored Contract Bindings for implementation obligations or Contract References for review dependencies.
+6. Move stable reusable structural meaning to ontology, curated terminology to native concepts, obligations to requirements, and exact implementation/interface behavior to requirement-owned contracts.
+7. Use concept references for non-ontology prose-to-SKOS-concept bindings, use `use`/`usedBy` for semantic-contract ontology dependencies, constrain requirements with `constrain`/`constrainedBy`, or reference reusable requirement-owned contracts from consuming requirements instead of using hierarchy to cross submodel boundaries.
+8. Update verifications and e2e fixtures in the same slice when requirements, report shape, names, or output expectations change.
+9. Validate in slices with `validate`, `lint`, `submodels`, and focused tests before broadening the refactor.
+
+## Ontology Commands
+
+Use CLI semantic export commands when a shell workflow needs RDF layers:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer ontologies
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer shapes
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" concepts validate
+# Export generated SKOS plus ontology-to-concept bridges when needed:
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer ontologies --layer concepts
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer model
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" semantic export --layer model --layer external-used
+```
+
+For MCP workflows, use the read-only split semantic tools. `reqvire.semantic.export` is the canonical RDF export operation and accepts `layers` with `ontologies`, `shapes`, `concepts`, `model`, `external-used`, `prefixes`, and `queries`; omitted or empty layers export all public layers. `reqvire.semantic.ontologies`, `reqvire.semantic.shapes`, `reqvire.semantic.concepts`, `reqvire.semantic.model`, and `reqvire.semantic.graph` are wrappers over the same layer serializer. `reqvire.semantic.ontologies` returns authored OWL/RDF ontology vocabulary, `reqvire.semantic.shapes` returns semantic-contract SHACL shapes, `reqvire.semantic.concepts` returns generated SKOS concept scheme/thesaurus triples without authored ontology bridge triples, `reqvire.semantic.model` returns generated Reqvire model facts, and `reqvire.semantic.graph` is equivalent to `reqvire.semantic.export` with omitted layers. Use `reqvire.semantic.export` with `layers: ["ontologies", "external-used"]` when used external subset triples are needed, and with `layers: ["ontologies", "concepts"]` when ontology-to-concept bridge triples and generated SKOS concepts are both needed. Ontology export returns generated ontology document declarations plus serialized authored ontology content, semantic index summary, source block metadata, diagnostics, authored ontology term declarations, and SHACL references. Each generated ontology document declaration uses the resolved `ontology_base` as the `owl:Ontology` IRI and lists same-base ontology elements as contributors. Authored named ontology resources get generated `rdfs:isDefinedBy <ontology_base>` ownership facts; Explorer uses those facts as OWL document metadata for grouping, search, and modals rather than rendering ontology document nodes or `isDefinedBy` edges. Model layer export includes generated Reqvire model facts for elements, relations, contract_bindings, contract_references, concept references, ontology term declarations, shape references, and ontology projection facts. Local External Ontology files are parsed as internal dependencies for validation and term resolution; the `external-used` export layer and MCP helper `include_external: true` expose only the used external subset, and imported terms remain marked external rather than authored. Concept references are exported in model mode as model term-reference facts such as `reqvire:conceptReference` and `reqvire:referencesTerm`; they are not injected into the clean authored OWL/SHACL document and are not generated `reqvire:OntologyConstruct` records. Use the read-only `reqvire.semantic.prefixes` MCP tool when a client needs ontology-defined prefixes, namespaces, source element prose content, and a reusable `sparql_prefix_block` before writing queries; pass `include_external: true` only when imported external prefixes for the used subset are needed. Use the read-only `reqvire.semantic.vocabulary` MCP tool when a client needs compact paged classes, properties, relation families, controlled vocabularies, semantic contracts, query patterns, source maps, diagnostics, and prefixes before writing SPARQL; pass `ontology_document` or `ontology_base` to filter authored vocabulary to one OWL document, and combine `include_external: true` with `ontology_document` to filter used external subset terms to one declared external ontology source. Use the read-only `reqvire.semantic.sparql` MCP tool when a client needs to run SPARQL directly against the model-owned Oxigraph semantic store. It requires `query` and accepts optional `full` defaulting to true and optional `include_external` defaulting to false; `include_external` queries the used external subset rather than the raw full dependency graph, and results are structured for SELECT, ASK, CONSTRUCT, and DESCRIBE. MCP clients can also call standard `prompts/list` and `prompts/get` for build-time Reqvire workflow prompts, including `reqvire.semantic.query`, `reqvire.semantic.verification_search`, `reqvire.semantic.contract_context_search`, `reqvire.semantic.author_ontology_contract`, `reqvire.workflow.explore_model`, `reqvire.workflow.plan_change`, `reqvire.workflow.generate_implementation_tasks`, `reqvire.workflow.author_capability_requirement`, `reqvire.workflow.author_or_align_verification`, `reqvire.workflow.refactor_model_structure`, `reqvire.workflow.audit_change_impact`, `reqvire.workflow.author_concepts`, `reqvire.workflow.model_quality_audit`, and `reqvire.workflow.verify_coverage`. Use `reqvire.workflow.audit_change_impact` when the user asks whether changed system-model elements require updates to impacted capabilities, requirements, specifications, contracts, verifications, or website documentation artifacts. Use `reqvire.workflow.generate_implementation_tasks` for task planning from capability-scoped changes; use `reqvire.workflow.author_capability_requirement` for capability and requirement authoring; use `reqvire.workflow.author_or_align_verification` for verification criteria, evidence, and test alignment; use `reqvire.workflow.refactor_model_structure` for intent-preserving model refactors; use `reqvire.semantic.author_ontology_contract` for ontology and semantic-contract authoring; use `reqvire.workflow.author_concepts` for native concept-scheme and concept work; and use `reqvire.workflow.model_quality_audit` for validation, lint, coverage, containment, and model-health audits. Raw full external dependency triples remain internal and are only surfaced via explicit full-external mode.
+
+## Ontology Mutation Semantics
+
+Ontology elements are first-class mutation targets and need boundary-safe rewrites:
+
+- Use `reqvire.add_element` with `override_existing: true` to rebase an ontology element (`ontology_base` or `ontology_prefix` changes) so dependent boundaries, inherited prefix bindings, imports, and reachable SHACL references are rewritten together.
+- `relink` is the way to re-point ontology hierarchy edges such as `derivedFrom`.
+- `merge` for ontology elements folds source `#### Ontology` content into the target element’s single `#### Ontology` block (source ontology block does not stay separate).
+- `mv-file --squash` moves ontology elements at file level only; it does not fold ontology content, it relocates elements and keeps each ontology block in its element.
+
+## Model Commands
+
+Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots, concept roots, and capability roots. The command emits JSON to stdout by default; use `--output <file>` to save the report.
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --output model.json
+```
+
+## Relation Types
+
+| Relation | Allowed Sources | Purpose |
+|----------|-----------------|---------|
+| `derivedFrom` / `derive` | `capability`, `requirement`, `ontology`, `concept-scheme`, `concept`, verification-family elements | Hierarchy/context within compatible families: capability-to-capability, requirement-to-requirement, ontology-to-ontology, concept-to-concept-scheme/concept, or verification-family-to-verification-family |
+| `specify` / `specifiedBy` | `requirement` / `capability` | Bridge from requirements to their owning capability |
+| `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
+| `verifiedBy` / `verify` | `requirement` / concrete verification element | Link requirements to concrete verification elements; capabilities are covered through requirement rollup and `verification-objective` is excluded |
+| `definedBy` / `define` | `requirement` | Ownership of subtype-compatible non-semantic contract elements |
+| `constrainedBy` / `constrain` | `requirement` / `semantic-contract` | Link requirements to semantic contracts that constrain them |
+| `use` / `usedBy` | `semantic-contract` / `ontology` | Link semantic contracts to the ontology vocabulary they use |
+| `broader` / `narrower` | `concept` / `concept` | SKOS taxonomy between native concept elements |
+| `related` | `concept` / `concept` | SKOS associative relation between native concept elements |
+| `exactMatch` / `closeMatch` | `concept` / concept element or external IRI | SKOS concept mapping relation when mapping semantics are intentional |
+| Contract Bindings | `requirement` | Declare implementation obligations contributing to the contract owner’s fulfillment |
+| Contract References | `requirement` | Declare content dependencies for change-impact review without contributing to the owner’s fulfillment |
+
+For ontology/SPARQL workflows, prefer relation-family vocabulary over raw relation-token matching. `reqvire:RelationFamily` groups inverse pairs and normalized query properties for hierarchy, capability specification, contract ownership, semantic-contract constraint, semantic-contract ontology use, verification, satisfaction, and cross-subgraph contract dependency. Only hierarchy families have transitive closure semantics; the others are direct semantic relationships unless a separate ontology rule states otherwise.
+
+**Key constraints:**
+- Requirements specify capabilities through `specify`; capabilities point back to those requirements with `specifiedBy`
+- Capability hierarchy uses `derivedFrom`/`derive` only between capabilities
+- Requirement hierarchy uses `derivedFrom`/`derive` only between requirements
+- Ontology hierarchy uses `derivedFrom`/`derive` only between ontology elements; ontology elements do not author contract bindings or references
+- Concept schemes are standalone roots that own concept_base and concept_prefix directly
+- Concept hierarchy uses `derivedFrom` from `concept` to `concept-scheme` or another `concept`; SKOS taxonomy uses `broader`/`narrower` and is not inferred from hierarchy
+- Verification-family hierarchy uses `derivedFrom`/`derive` between `verification-objective` and concrete verification elements; objectives organize verification work but do not use `verify`, `verifiedBy`, or `satisfiedBy`
+- Capabilities are not directly verified or directly satisfied; capability coverage rolls up from requirements that specify them
+- Among concrete verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
+- Each non-semantic-contract is owned by exactly one valid requirement owner via `definedBy`
+- Semantic contracts must use `constrain`/`constrainedBy` for requirement application and `use`/`usedBy` for ontology vocabulary context; they must not use `define`/`definedBy`
+- Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `definedBy`/`define`
+- Capabilities do not author contract bindings or references; they use `#### Concept References` for SKOS concept dependencies
+- Requirement contract bindings and references may target compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` contracts only
+- Semantic contracts must not author `#### Concept References`
+
+**Traceability flow:**
+```
+Capability
+  ├── Concept References → SKOS concepts
+  ├── derive → Subcapability
+  └── specifiedBy → Requirement
+
+Requirement
+  ├── specify → Capability
+  ├── derive → Child Requirement
+  ├── Contract Bindings → Shared Implementation Obligation
+  ├── Contract References → Contract Content for Review
+  ├── Concept References → SKOS concepts
+  ├── definedBy → Source/Spec/Constraint/Behavior/State/Input-Output
+  ├── constrainedBy → Semantic Contract → use → Ontology
+  ├── satisfiedBy → Code
+  └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
+```
+
+## Choosing Contract Dependencies
+
+**Contract dependency** is the umbrella term for Contract Bindings and Contract References. A **Contract Reference** declares a content dependency that propagates change impact without contributing to the contract owner's implementation fulfillment. Keep the specific Markdown subsection names `Contract Bindings` and `Contract References`.
+
+- Use `definedBy` for the requirement that owns a contract.
+- Use **Contract Bindings** when the consuming requirement is responsible for implementing a shared obligation. The contract owner's implementation coverage depends on every required binding consumer being covered. Bind the responsible child requirement when it fulfills the obligation independently; bind a parent only when its whole subtree is intentionally responsible.
+- Use **Contract References** when a requirement needs the contract as input or context and must be reviewed when it changes. Documentation, a view displaying computed coverage, and an adapter using an existing kernel service are common examples. Consuming a service or its output does not by itself implement the service's owning requirement.
+- Both kinds retain contract content in `collect` and propagate change impact. References do not contribute implementation evidence, blockers, or fulfillment dependencies. After converting a binding to a reference, an owner may become terminal and need its own direct `satisfiedBy` evidence; do not add evidence merely to preserve a percentage.
+- A requirement may contain one dependency section, never both, even for different targets. If it contains genuinely different obligations, model those as meaningful child requirements before assigning dependency kinds. Do not change a reference into a binding merely to make the section constraint pass.
+- Both target compatible, uniquely requirement-owned contract elements. References reject files, URLs, self-dependencies, and cycles through referenced/bound contract owners and requirement parents. Bindings also retain their hierarchy-independence and fulfillment-cycle constraints.
+
+For example, an endpoint requirement implementing the shared error schema binds its contract:
+
+```markdown
+#### Contract Bindings
+  * [Error Response Specification](Specifications.md#error-response-specification)
+```
+
+A documentation requirement describing that schema references it instead:
+
+```markdown
+#### Contract References
+  * [Error Response Specification](Specifications.md#error-response-specification)
+```
+
+Use `reqvire.link` with `source: "Documentation"`, `relation_type: "referenceContract"`, and `target: "Error Response Specification"`, `unlink`, and the dedicated `--has-contract-references` / `--filter-contract-references` search filters. Target filters are globs over normalized identifiers. Read the Link workflow when converting existing dependencies or editing multiple targets.
+
+## Verification Authoring
+
+Verification should be authored as a structured plan, then implemented as evidence-linked elements:
+
+- Start with `verification-objective` to define scope, intent, and grouping (capability-level or requirement-level goals). A `verification-objective` organizes intent only; it does not carry `verify` or `satisfiedBy`.
+- Add concrete verification nodes (`test-verification`, `formal-proof-verification`, `analysis-verification`, `inspection-verification`, `demonstration-verification`) with explicit `#### Details` describing pass/fail criteria and assumptions. Every concrete verification must have a `derivedFrom` relation to a `verification-objective` parent.
+- Link concrete verifications with the `verify` / `verifiedBy` relation pair:
+  - requirement `- verifiedBy: [Verification](path.md#verification-element)`
+  - verification `- verify: [Requirement](path.md#requirement-element)`
+- Record executable evidence only on evidence-backed concrete verifications using `satisfiedBy`:
+  - requirement `- satisfiedBy: [Test Report](path.md#evidence-or-asset)`
+  - test-verification `- satisfiedBy: [Evidence](path.md#artifact-or-result)`
+  - formal-proof-verification `- satisfiedBy: [Proof Artifact](path.md#proof-report)`
+- Prefer one direct objective per verification purpose; split mixed objectives instead of merging incompatible check types.
+
+Good objective titles (examples):
+
+- API performance boundary verification
+- Authentication and authorization assurance
+- Backward-compatible migration validation
+- Behavior consistency across requirement branches
+- Build and dependency reproducibility checks
+- Capability end-to-end demonstration verification
+- Data quality and schema migration validation
+- Deployment and rollback verification
+- Fault recovery and degradation handling
+- Interoperability across integrations
+- I/O contract conformance verification
+- Latency and throughput verification
+- Non-functional compliance and auditability
+- Regression protection for critical requirements
+- Resilience against resource exhaustion
+- Security controls and attack-surface verification
+- Safety constraints and failure-state validation
+- Storage and message durability verification
+- User accessibility and operability checks
+- Versioned evidence pack validation
+
+Anti-patterns to avoid:
+- adding `satisfiedBy` on non-evidence-backed verification types
+- linking constraints via `definedBy` instead of `constrain`
+- binding ontology to model elements through Contract Bindings
+- duplicating the same obligation in multiple verification nodes instead of using one node with precise criteria
+
+When authoring verifications, always update at least one of:
+- `verify` coverage expectations (`verifiedBy`/`satisfiedBy` paths)
+- `coverage`-relevant leaf requirements
+- corresponding evidence references in related files
+
+## Document Structure
+
+- Files begin with `# Elements` (multi-element) or `# Element` (single-element)
+- Elements are `###` headers with unique names per file
+- Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Contract Bindings**, **Contract References**, **Concept References**
+- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block
+- Native `concept-scheme` and `concept` elements use the main body for definitions; concept elements may also use `#### Labels`, `#### Scope Note`, `#### Examples`, and `#### Mappings`. They must not use `#### Ontology`, `#### Shapes`, `#### Concepts`, `#### Details`, `#### Definition`, or `#### Top Concepts`.
+- Non-reserved `####` subsections become element content (use for inline specs/behaviors)
+- Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
+- Contract Bindings and Contract References syntax: `  * [Name](path.md#element)`. A requirement uses one of these sections, never both (even for distinct targets). Use references for documentation and other content dependencies; use bindings for implementation obligations. References must remain acyclic, including paths through contract owners, bindings, and requirement ancestry.
+
+## Requirement Governance Metadata
+
+Governance-bearing elements (`capability`, `requirement`) may define governance metadata in `#### Metadata`:
+
+| Key | Values | Default | Meaning |
+|-----|--------|---------|---------|
+| `status` | `draft`, `review`, `approved` | `approved` | Lifecycle readiness for use in engineering decisions |
+| `priority` | `low`, `medium`, `high`, `critical` | `medium` | Relative implementation/planning importance |
+| `risk` | `low`, `medium`, `high`, `critical` | `low` | Requirement-driven delivery, safety, compliance, integration, or validation risk |
+| `owner` | free-form string | unassigned | Accountability/routing label; may be a person, role, team, department, subsystem group, or task owner |
+
+Missing governance fields inherit from the nearest parent capability or requirement through `derivedFrom` and `specify`; otherwise defaults apply. Search JSON exposes effective values and their sources under `governance_metadata`. Text and JSON search summaries expose governance counters.
+
+Governance metadata belongs directly on capability and requirement elements only. Contracts and verifications must not author `status`, `priority`, `risk`, or `owner` in metadata; they receive governance context from their owning or linked capability/requirement.
+
+### When and How to Use Governance
+
+Use governance metadata whenever work involves planning, prioritization, routing, readiness, or risk:
+
+- **Task generation and implementation planning**: include effective `status`, `priority`, `risk`, and `owner` in task summaries
+- **Triage and search**: use `--filter-status`, `--filter-priority`, `--filter-risk`, and `--filter-owner` before manually scanning files
+- **Change impact review**: surface high/critical priority or risk requirements first
+- **Ownership routing**: route questions and tasks using `owner`; it may name a person, role, team, department, subsystem group, or task owner
+- **Model cleanup/refactoring**: preserve explicit governance metadata and keep inherited/default values implicit unless the user asks to author them
+
+Do not use governance metadata as a substitute for model structure:
+
+- `status` does not replace verification, validation, or coverage
+- `priority` does not change requirement hierarchy or traceability
+- `risk` describes requirement-level delivery/safety/compliance/integration/validation risk; it is not a test result
+- `owner` does not replace `definedBy` ownership or implementation `satisfiedBy` links
+
+When adding new requirements, omit governance keys unless the user, source requirement, or specification explicitly defines them. Defaults and inheritance are still effective in the graph model.
+
+## EARS Patterns
+
+- **Ubiquitous**: "The system SHALL [capability]"
+- **Event-driven**: "When [trigger] the system SHALL [response]"
+- **State-driven**: "While [state] the system SHALL [capability]"
+- **Unwanted**: "If [condition] then the system SHALL [response]"
+- **Optional**: "Where [capability] the system SHALL [capability]"
+
+Requirements should contain EARS statements only (body + `#### Details`). Technical details belong in contract elements linked via `definedBy`.
+
+## Core Rules
+
+1. Always run commands from the intended effective workspace root, or pass that root with `--workspace`
+2. Use full paths starting with `system-model/` (if other content root, ask user)
+3. Never guess — read files before making changes
+4. Validate after each significant change
+5. When reading requirements, inspect both **contract_bindings** and **contract_references** and distinguish implementation obligations from review dependencies
+6. Use the Reqvire `collect` command to gather full context from capability, requirement, or ontology starts
+   - **Requirement upstream** (default): requirement ancestors, owning capability context, bound and referenced contracts, and authored concept-reference context
+   - **Capability downstream**: child capabilities and specified requirements
+   - **Ontology downstream**: child ontology elements and semantic contracts that use reachable ontology
+   - **Downstream**: `collect "Element" --direction DOWNSTREAM`
+7. Use the Reqvire `submodels` command to inspect independent subgraphs before refactors
+   - `submodels --from "<ROOT>"`: scoped view (root excluded from reported submodels)
+8. Implementation coverage (`coverage`) applies to `requirement` elements only
+9. Hierarchy integrity: mutations must preserve single-root hierarchy ownership
+   - Violations should output `Single-root hierarchy ownership violation`
+   - If unclear, verify with `validate` after mutation
+10. Treat governance metadata as planning context
+   - Preserve explicit values when editing requirements
+   - Do not add governance keys to contracts or verifications
+   - Use `owner` as an accountability/routing label, not necessarily a person
+
+## Task Routing
+
+Load the right reference file for your task — don't work from memory on complex workflows:
+
+| Task | Reference | When |
+|------|-----------|------|
+| **Explore model** | [explore.md](references/explore.md) | Understanding structure, browsing, traceability analysis |
+| **Add capabilities** | [AddCapability.md](references/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
+| **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
+| **Refactor containment structure** | [ContainmentStructureRefactor.md](references/ContainmentStructureRefactor.md) | Reorganize folders/files around capability, ontology, and verification planes without changing model intent |
+| **Refactor ontology/contracts** | [CapabilitySemanticContractRefactor.md](references/CapabilitySemanticContractRefactor.md) | Separate capability scope, reusable ontology terms, requirement obligations, and reusable semantic contracts |
+| **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
+| **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in contracts, language ownership |
+| **Generate tasks** | [CreatingTasks.md](references/CreatingTasks.md) | Implementation plans from capability-scoped changes |
+| **Refactor submodel boundaries** | [SubmodelRefactor.md](references/SubmodelRefactor.md) | Split into independent submodels, contract bindings and references |
+| **Align verifications** | [VerificationAlignment.md](references/VerificationAlignment.md) | Sync verification criteria with test assertions |
+| **Normalize design-doc ownership** | [DesignDocOwnership.md](references/DesignDocOwnership.md) | One owner per design document |
+| **Add requirement** | [AddRequirement.md](references/AddRequirement.md) | Adding a requirement with EARS pattern, traceability, and coverage |
+| **Add verification** | [AddVerification.md](references/AddVerification.md) | Adding verifications for leaf requirements, verification-objective hierarchy |
+| **Link / Unlink** | [Link.md](references/Link.md) | Adding or removing relations between elements |
+| **Move elements / files** | [Move.md](references/Move.md) | Moving elements between files or renaming file locations |
+| **Remove element** | [Remove.md](references/Remove.md) | Deleting elements and cleaning up relations |
+| **Rename element** | [RenameElement.md](references/RenameElement.md) | Renaming elements and updating all references |
+| **Collect context** | [Collect.md](references/Collect.md) | Upstream/downstream trace context collection |
+| **Containment analysis** | [Containment.md](references/Containment.md) | Analyzing and improving model containment structure |
+| **Setup** | [Setup.md](references/Setup.md) | Skill installation, environment verification, assistant instructions |
+
+**Quick tasks** (no reference needed): search, validate, single link/unlink/move, collect context.
+
+## Quick Start Common Workflows
+
+- Explore capabilities and requirements with `search`, then gather full context with `collect`
+- Add or modify requirements through MCP only after reading the owning capability and requirement chain
+- Keep governance metadata on capability and requirement elements only
+- Route implementation tasks by effective `owner`, `priority`, `risk`, and `status`
+- Validate after meaningful edits with `validate`, then run CLI `lint`/`coverage` and MCP `reqvire.format` preview as needed
+
+## Command Reference
+
+Use this prefix when executing Reqvire commands:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD"
+```
+
+The examples below show Reqvire arguments after that prefix.
+
+```bash
+# Explore
+search --short --json | jq '.summary'
+search --filter-type="requirement" --filter-name=".*Pattern.*" --short
+search --not-have-relations="verifiedBy" --short
+search --filter-status="review" --short
+search --filter-priority="high,critical" --short
+search --filter-risk="high,critical" --json
+search --filter-owner="Platform|Safety" --json
+model [--from "Element"] [--reverse] [--filter-type="requirement"] [--output <file>]
+collect "Element" [--direction DOWNSTREAM] [--json]
+submodels [--from "Root"]
+
+# Quality
+validate [--json]
+lint [--fixable] [--auditable]
+coverage [--json]
+migrate [--fix] [--json]
+
+# Analysis
+change-impact --git-commit=<hash> [--json]
+traces [--output <file>] [--filter-name=".*Pattern.*"]
+resources [--output <file>]
+containment [--short] [--output <file>]
+
+serve [--port 8080]
+```
+
+`change-impact --git-commit=<hash>` compares the current workspace snapshot to a base snapshot materialized from the current eligible Git worktree. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
+
+**Common flags:** Availability depends on the command. Commands with text and JSON output require `--json` with `--output <file>`. JSON-only `model`, `containment`, `resources`, and `traces` emit JSON to stdout by default and accept `--output <file>` directly. Use `--short` and `--dry-run` only where supported.
+
+Use typed `dry_run: true` to preview authoring operations through mutation-enabled MCP; inspect the complete candidate diff before applying it.
+
+Use `migrate` to preview or apply deterministic source migrations for known breaking model-contract changes. It defaults to dry-run preview; use `migrate --fix` only when the user has approved applying source rewrites. Current migrations cover legacy single-element `# Documents` headers and creation of one shared verification-objective holder in root `VerificationObjectiveMigration.md` with holder-owned `derive` links to standalone concrete verifications.
+
+## Validation & Quality Checklist
+
+Run after every meaningful change:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate          # Structure and relations
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint      # Model hygiene
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage          # Verification + implementation gaps
+```
+
+After major refactoring, also run the same prefix with `resources`, `traces`, `model`, and `containment`.
+
+## Managed semantic queries
+
+Model reusable SPARQL documents as `semantic-query` elements with a Query section and ontology `use` relations. Use the ontology-authoring query reference for syntax and validation. Core query requirements own semantics; CLI and MCP requirements consume their specifications through Contract References. `semantic query list`, `validate`, `export`, and `check` share the native index and artifact contract.

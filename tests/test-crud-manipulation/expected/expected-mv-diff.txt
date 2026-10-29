@@ -14,33 +14,32 @@ Moved element: Capability C (specifications/OtherRequirements.md#capability-c)
   [32m11 +     * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
   [32m12 +   ---[0m
   [32m13 +   ␤[0m
-  [32m14 +   ␤[0m
 
 
 
 📄 specifications/Requirements.md
-  [37m001     # Elements[0m
-  [37m002[0m
-  [37m003     ### Capability D Constraint[0m
+  [37m01     # Elements[0m
+  [37m02[0m
+  [37m03     ### Capability D Constraint[0m
 
-  [37m029     #### Relations[0m
-  [37m030       * derivedFrom: [Parent Capability](#parent-capability)[0m
-  [37m031     ---[0m
-  [31m032 -   ### Capability C[0m
-  [31m032 -   ␤[0m
-  [31m032 -   This is a test requirement for capability C with relations.[0m
-  [31m032 -   ␤[0m
-  [31m032 -   #### Metadata[0m
-  [31m032 -     * type: requirement[0m
-  [31m032 -   ␤[0m
-  [31m032 -   #### Relations[0m
-  [31m032 -     * derivedFrom: [Capability A](#capability-a)[0m
-  [31m032 -     * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
-  [31m032 -   ---[0m
-  [31m032 -   ␤[0m
-  [37m032     ### Capability D[0m
-  [37m033[0m
-  [37m034     This is a newly added capability.[0m
+  [37m29     #### Relations[0m
+  [37m30       * derivedFrom: [Parent Capability](#parent-capability)[0m
+  [37m31     ---[0m
+  [31m32 -   ### Capability C[0m
+  [31m32 -   ␤[0m
+  [31m32 -   This is a test requirement for capability C with relations.[0m
+  [31m32 -   ␤[0m
+  [31m32 -   #### Metadata[0m
+  [31m32 -     * type: requirement[0m
+  [31m32 -   ␤[0m
+  [31m32 -   #### Relations[0m
+  [31m32 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [31m32 -     * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
+  [31m32 -   ---[0m
+  [31m32 -   ␤[0m
+  [37m32     ### Capability D[0m
+  [37m33[0m
+  [37m34     This is a newly added capability.[0m
 
 
 
@@ -66,4 +65,3 @@ Moved element: Capability C (specifications/OtherRequirements.md#capability-c)
   [31m19 -     * verify: [Capability C](../Requirements.md#capability-c)[0m
   [32m19 +     * verify: [Capability C](../OtherRequirements.md#capability-c)[0m
   [37m20     ---[0m
-  [32m21 +   ␤[0m

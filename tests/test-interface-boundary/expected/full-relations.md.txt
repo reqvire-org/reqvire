@@ -1,0 +1,62 @@
+# Elements
+
+### Repair Capability
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Repair Root](#repair-root)
+---
+
+### Repair Root
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derive: [Added Requirement](Added.md#added-requirement)
+  * derive: [Repair Left](#repair-left)
+  * derive: [Repair Right](#repair-right)
+  * specify: [Repair Capability](#repair-capability)
+---
+
+### Repair Left
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derive: [Repair Review Leaf](#repair-review-leaf)
+  * derive: [Repair Safe Leaf](#repair-safe-leaf)
+  * derivedFrom: [Repair Root](#repair-root)
+---
+
+### Repair Review Leaf
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Repair Left](#repair-left)
+  * derivedFrom: [Repair Right](#repair-right)
+---
+
+### Repair Safe Leaf
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Repair Left](#repair-left)
+---
+
+### Repair Right
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derive: [Repair Review Leaf](#repair-review-leaf)
+  * derivedFrom: [Repair Root](#repair-root)
+---

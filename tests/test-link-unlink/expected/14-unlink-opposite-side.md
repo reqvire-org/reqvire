@@ -29,4 +29,3 @@ Capability root.
 #### Metadata
   * type: capability
 ---
-

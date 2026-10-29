@@ -143,7 +143,7 @@ fi
 
 # Test 5: --fix flag
 set +e
-FIX_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --fix 2>&1)
+FIX_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" lint --fix 2>&1)
 FIX_EXIT=$?
 set -e
 
@@ -189,6 +189,20 @@ fi
 if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT") > /dev/null; then
   echo "❌ FAILED: Post-fix output mismatch"
   diff -u "${TEST_SCRIPT_DIR}/expected/expected-after-fix.txt" <(echo "$POST_FIX_OUTPUT")
+  exit 1
+fi
+
+# Convergence without a direct ancestor edge stays manual review during repair.
+cp "$TEST_SCRIPT_DIR/fixtures/branch-review.md.fixture" "$TEST_DIR/specifications/BranchReview.md"
+BRANCH_REVIEW_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" lint --json) || exit 1
+printf '%s\n' "$BRANCH_REVIEW_JSON" | jq -S '[.needs_manual_review[] | select(.type == "multi_branch_convergence" and .element.identifier == "specifications/BranchReview.md#branch-review-leaf")]' > "$TEST_DIR/branch-review.json"
+if ! diff -u <(jq -S . "$TEST_SCRIPT_DIR/expected/branch-review.json") "$TEST_DIR/branch-review.json"; then
+  echo "FAILED: convergence without a direct edge did not match the manual-review fixture"
+  exit 1
+fi
+(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" lint --fix) > "$TEST_DIR/branch-review-repair.log" 2>&1 || exit 1
+if ! diff -u "$TEST_SCRIPT_DIR/fixtures/branch-review.md.fixture" "$TEST_DIR/specifications/BranchReview.md"; then
+  echo "FAILED: repair changed a manual-review convergence fixture"
   exit 1
 fi
 

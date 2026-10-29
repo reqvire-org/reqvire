@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
 const baseUX = css`
@@ -62,10 +62,10 @@ const skinX = css`
   }
 `;
 
-export type SidebarSectionProps = Omit<HTMLAttributes<HTMLElement>, "style"> & {
-  title?: ReactNode;
-  action?: ReactNode;
-  children: ReactNode;
+export type SidebarSectionProps = Omit<(HTMLAttributes<HTMLElement> & { className?: string }), "style"> & {
+  title?: ComponentChildren;
+  action?: ComponentChildren;
+  children: ComponentChildren;
 };
 
 export function SidebarSection({

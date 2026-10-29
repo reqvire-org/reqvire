@@ -48,7 +48,7 @@ echo "Test 2: Default format preserves only user-created relations"
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/specifications/Requirements.md.backup"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --fix 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --fix 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -72,7 +72,7 @@ cp "$TEST_DIR/specifications/Requirements.md.backup" "$TEST_DIR/specifications/R
 echo "Test 3: --with-full-relations inserts auto-generated relations"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --with-full-relations --fix 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -96,7 +96,7 @@ assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-full-relations-Verific
 echo "Test 4: Idempotency check"
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" format --with-full-relations --fix 2>&1)
 EXIT_CODE=$?
 set -e
 

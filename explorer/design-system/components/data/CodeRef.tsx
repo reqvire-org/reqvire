@@ -1,8 +1,8 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import { type HTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
-export interface CodeRefProps extends Omit<HTMLAttributes<HTMLElement>, "style"> {
-  children?: ReactNode;
+export interface CodeRefProps extends Omit<(HTMLAttributes<HTMLElement> & { className?: string }), "style"> {
+  children?: ComponentChildren;
 }
 
 const baseUX = css`

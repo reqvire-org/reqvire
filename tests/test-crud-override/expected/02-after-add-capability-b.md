@@ -32,4 +32,3 @@ Test capability root for migrated requirement fixtures.
 #### Metadata
   * type: capability
 ---
-

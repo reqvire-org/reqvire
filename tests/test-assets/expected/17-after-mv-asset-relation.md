@@ -16,6 +16,6 @@ This requirement is satisfied by a script.
   * type: requirement
 
 #### Relations
-  * specify: [Relations Test System](#relations-test-system)
   * satisfiedBy: [test_script.sh](../src/test_script.sh)
+  * specify: [Relations Test System](#relations-test-system)
 ---

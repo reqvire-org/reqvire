@@ -29,7 +29,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
 
       <Section title="HTTP Transport">
         <p className="text-zinc-600 mb-4">
-          The server uses MCP Streamable HTTP. The endpoint is fixed at{" "}
+          HTTP is the default MCP transport. The endpoint is fixed at{" "}
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
             /mcp
           </code>
@@ -57,6 +57,45 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
           Requests without an Origin header and HTTP(S) loopback origins are
           accepted by default. Add other browser origins explicitly with the
           repeatable <code>--allow-origin</code> option.
+        </p>
+      </Section>
+
+      <Section title="Local Project Stdio">
+        <p className="text-zinc-600 mb-4">
+          A stdio-capable client launches a dedicated Reqvire process for each
+          configured project without a listening port. HTTP remains the default;
+          select stdio explicitly in the client&apos;s command
+          and arguments:
+        </p>
+        <CodeBlock>{`{
+  "mcpServers": {
+    "reqvire": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y", "@reqvire-org/reqvire@latest",
+        "--workspace", "/absolute/path/to/project",
+        "mcp", "--transport", "stdio"
+      ]
+    }
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Configuration syntax depends on the client. An absolute workspace path
+          selects the project even when the client launches from another directory.
+          Native startup also accepts <code>reqvire mcp --transport stdio</code>.
+          Both transports expose the same tools, resources, prompts, and
+          permission checks. Append <code>--enable-mutations</code> for authoring;
+          clean-worktree admission and exclusive ownership still apply, and
+          <code> --enable-commits</code> remains a separate opt-in.
+        </p>
+        <p className="text-zinc-600">
+          HTTP-only options <code>--host</code>, <code>--port</code>,
+          <code> --allow-origin</code>, and <code>--allow-host</code> are rejected
+          with stdio. Protocol messages use stdout; diagnostics use stderr. Closing
+          stdin stops the process and its workers, releases ownership locks,
+          and preserves pending model changes and managed worktrees. Embedded MCP
+          through <code>serve --enable-mcp</code> continues to use HTTP.
         </p>
       </Section>
 
@@ -357,15 +396,53 @@ reqvire serve --enable-mcp --allow-origin https://app.example.com`}</CodeBlock>
           assistant should be allowed to modify the model.
         </p>
         <CodeBlock>{`reqvire mcp --enable-mutations`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Use <code>reqvire.update_element</code> for small content edits. Target
+          <code> Element Text</code> for opening prose, or an exact subsection
+          name. Append and replace take <code>content</code>; replace_text takes
+          <code> old_text</code> matching exactly once within that target and
+          <code> new_text</code>. Optional prose subsections support explicit
+          create and delete. Preview first, then apply with
+          <code> expected_model_revision</code> set to the preview's
+          <code> base_model_revision</code> in the same worktree context. Stale
+          revisions are rejected; identity and declarations stay attached.
+        </p>
+        <CodeBlock>{`// MCP tool calls: preview, review the diff, then apply
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", dry_run: true})
+reqvire.update_element({element_name: "Token Expiry Requirement", target: "Element Text", operation: "append", content: "When a token expires, the system SHALL reject it.", expected_model_revision: "<base_model_revision from preview>"})`}</CodeBlock>
+        <p className="text-zinc-600 mt-4 mb-4">
+          Ontology, Shapes and Query accept only replace or replace_text on their
+          complete fenced Markdown payloads. Declaration sections such as
+          Metadata, Relations, Contract References and Labels are protected.
+          Missing subsections require explicit creation; Element Text cannot be
+          created or deleted. Empty append and same-content replacement return
+          empty diffs without changing the accepted revision.
+        </p>
+        <p className="text-zinc-600 mt-4 mb-4">
+          For a full definition change, use <code>reqvire.add_element</code> with
+          <code> override_existing: true</code> and its complete replacement
+          Markdown. Read the current definition first: omitted authored metadata
+          and outgoing declarations are removed. Incoming children, ownership,
+          contract consumers, and concept references remain when the complete
+          candidate is valid. Preview with <code>dry_run: true</code> before
+          applying the same definition. A cross-file replacement updates incoming
+          destinations; invalid replacements retain the accepted model and files.
+        </p>
+        <p className="text-zinc-600 mt-4 mb-4">
+          MCP validates the model before starting. Migration remains CLI-only:
+          preview with <code>reqvire migrate</code> and apply with{" "}
+          <code>reqvire migrate --fix</code> before starting the server.
+          There is no MCP migration tool or startup mode that bypasses validation.
+        </p>
         <BulletList
           items={[
-            "Mutation mode adds add, remove, move, rename, merge, link, unlink, relink, move-asset, and remove-asset tools.",
+            "Mutation mode exposes typed CRUD, relation, file/folder, and asset tools, including their previews. It also enables format application and safe lint repair with fix: true; format preview and lint inspection remain available in read-only mode. Authored-model writes automatically format affected documents.",
             "Startup requires a clean Git worktree on a committed branch, a valid model, and Git author identity. Only one mutation-enabled MCP server may own the branch.",
             "Successful changes are validated and saved before the updated model is published. Automatic commits are off by default: HEAD and staging stay unchanged, and results omit the commit field.",
             "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
             "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
             "The running server owns its model snapshot. External edits are not imported and affected model files may be overwritten. Stop the server before editing its workspace externally.",
-            "After a commit timeout, MCP checks local Git automatically. A verified published commit is reconciled and returns success without repeating the ref side effect. Confirmed non-publication returns an error: automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits uncommitted. If verification or recovery cannot complete, the accepted snapshot remains readable with a diagnostic and further writes are blocked. Resolve conflicting evidence, then inspect reqvire.git.reconcile with the exact attempted_commit (dry_run defaults to true) and apply dry_run: false for verified live recovery. Missing live evidence and other recovery failures require preservation, manual repair, validation, and normal admission. Repair a stalled hook before committing again.",
+            "After a commit timeout, MCP checks local Git automatically. A verified published commit is reconciled and returns success without repeating the ref side effect. Confirmed non-publication returns an error: single-repository automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits uncommitted. Repo workspaces retain confirmed component commits and accepted pending changes until the final Central commit. If verification or recovery cannot complete, the accepted snapshot remains readable with a diagnostic and further writes are blocked. Resolve conflicting evidence, then inspect reqvire.git.reconcile with the exact attempted_commit (dry_run defaults to true) and apply dry_run: false for verified live recovery. Missing live evidence and other recovery failures require preservation, manual repair, validation, and normal admission. Repair a stalled hook before committing again.",
             "Restart requires the same clean-start checks. Use reqvire.git.commit for accepted pending changes before stopping, or resolve saved changes before restarting. Branch creation and remote publication require explicit tool calls.",
             "Leftover lock files are reused after their holders exit. A worker that survives its parent still owns its locks. If startup reports a lock error, check the named path and OS error: fix permissions for the server/container user or use a filesystem with locking support as indicated. Do not delete lock files to bypass an active owner.",
             "Most mutation tools support dry_run.",
@@ -401,16 +478,32 @@ reqvire serve --enable-mcp --enable-mutations
           accepted uncommitted writes when automatic commits are disabled.
         </p>
         <p className="text-zinc-600 mb-4">
+          Mutation-enabled Explorer selects branches in HEAD mode. Selecting an
+          admitted context checks an external branch-tip change through the same
+          operation as the Refresh HEAD button and MCP tool. Eligible implementation
+          commits and same-branch amendments update accepted Git provenance and
+          resource bytes through normal validated model loading, retaining the semantic
+          revision for unchanged model inputs and the same branch context. Polling reports staleness without adopting a new commit.
+        </p>
+        <p className="text-zinc-600 mb-4">
           Each browser tab keeps its own branch selection in the URL across reload
           and back/forward navigation. Switching retains cached context data and
           does not redirect MCP calls or preload other branches. Use
-          <code> reqvire.worktree.list</code> to obtain admitted context IDs for MCP
+          <code> reqvire.worktree.list</code> to find open branches for MCP
           requests. Prepared worktrees and their changes survive server shutdown.
         </p>
+        <p className="text-zinc-600 mb-4">
+          The branch-selector workflow below uses tool contract version 3.
+          Check discovery and contract compatibility when upgrading an older
+          client or build. Opening a branch registers
+          its model session; subsequent requests select it explicitly without
+          switching the original checkout or a global active branch.
+        </p>
         <DetailGrid items={[
-          { name: "reqvire.worktree.create", desc: "Requires branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_worktree_id for relative bases such as HEAD. The selected source must be clean." },
+          { name: "reqvire.worktree.create", desc: "Requires destination branch and base_ref. Uses a local commit or ref without fetching. With multiple contexts, pass from_branch for relative bases such as HEAD. The selected source branch must already be open and clean." },
           { name: "reqvire.worktree.open", desc: "Requires an existing local branch. Reuses a healthy context or admits its clean worktree, creating a managed worktree when necessary. It never forces a second checkout." },
-          { name: "reqvire.worktree.remove", desc: "Requires worktree_id. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected." },
+          { name: "reqvire.worktree.refresh_head", desc: "Checks and adopts the selected owned branch's local HEAD. dry_run defaults to false; true checks only. After the guard passes, uses normal validated loading. Requires a clean tree, no accepted pending changes, the same branch and no unresolved Git/recovery operation. Creates no commit and works without --enable-commits." },
+          { name: "reqvire.worktree.remove", desc: "Requires branch. Removes only clean, server-created secondary worktrees and preserves the branch and commits. Original and externally created worktrees are protected. Reopen the retained branch explicitly before using it again." },
           { name: "reqvire.git.commit", desc: "Requires a message and commits only accepted pending changes. Unrelated staged files and intervening external versions are excluded. No pending changes means no new commit. This tool works without GitHub enablement." },
           { name: "reqvire.git.reconcile", desc: "Verifies a live recorded unknown-outcome commit using exact attempted_commit and context routing. Preview is the default; dry_run: false completes only its affected index entries and accepted state after all checks pass. It preserves unrelated recorded staging and never updates a ref or retries a commit." },
         ]} />
@@ -421,16 +514,101 @@ reqvire serve --enable-mcp --enable-mutations
 
 {
   "name": "reqvire.coverage",
-  "arguments": { "worktree_id": "<returned worktree_id>" }
+  "arguments": { "branch": "model/review" }
+}
+
+{
+  "name": "reqvire.worktree.refresh_head",
+  "arguments": { "branch": "model/review", "dry_run": true }
 }`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          Pass the returned <code>worktree_id</code> to workspace-bound tools
-          and prompts. Resources use <code>?worktree_id=...</code>. Omission
-          works with one admitted context; with multiple contexts it is an error.
-          IDs belong to the current server session. Each result identifies its
+          Refresh permits ordinary implementation, evidence, documentation and
+          configuration edits, including changed <code>satisfiedBy</code> content,
+          while referenced targets must remain valid. It blocks recognised model
+          Markdown under current exclusions, consumed semantic sources and
+          source-resolution changes whose declaring owners remain eligible.
+          This includes new or converted model documents,
+          ignored or outside-worktree semantic sources, and new files shadowing
+          an existing source fallback. A protected role wins over an evidence role;
+          unreferenced RDF and excluded examples have no automatic protected role.
+          Changes to root <code>.gitignore</code> and <code>.reqvireignore</code>
+          are allowed: current rules govern both versions of changed paths, normal
+          loading and subsequent tools. Policy-only changes can include or exclude
+          unchanged documents and change the model revision. Preview and rejection
+          keep the accepted exclusion rules; successful refresh adopts the current rules.
+          Results distinguish <code>accepted_head</code> from <code>observed_head</code>
+          and return <code>refreshed</code>, <code>unchanged</code>, <code>checked</code>
+          or <code>blocked</code>, with bounded path-specific blockers and next actions.
+          Every apply repeats the checks. A rejection keeps accepted reads and
+          the prior Explorer publication; external HEAD staleness disables writes.
+          Changed model inputs require explicit full validated admission through
+          <code> reqvire.worktree.open</code>. Unknown commit outcomes still use
+          <code> reqvire.git.reconcile</code>.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          Pass the exact local <code>branch</code> to workspace-bound tools
+          and prompts. MCP resources use <code>?branch=model%2Freview</code>.
+          Optional selection may be omitted with one open context; multiple
+          contexts require a branch. Unknown or unopened branches fail without
+          fallback or automatic opening. Version 3 rejects the removed
+          <code> worktree_id</code> and <code>from_worktree_id</code> inputs.
+          Branch names are the public interface for selectors, response context, inventory, the Explorer picker, browser URLs and HTTP routes. Opaque IDs stay private to worker sessions, runtime publication and caches.
+          Clients targeting the same branch share its serialization and revision
+          checks; a branch selector does not grant exclusive client ownership.
+          Each result identifies its
           context and accepted model revision. Discovery and worktree inventory
           are server-wide. Restart preserves worktree files and branches but
           requires clean admission again.
+        </p>
+      </Section>
+
+      <Section title="Repo Workspaces">
+        <p className="text-zinc-600 mb-4">
+          Repo&apos;s active manifest makes Central and its declared components one
+          model. Install Git, Python 3 and Google Repo, initialize and sync the
+          client, then start from Central. The User Guide covers preparation.
+          An initialized <code>.repo/manifest.xml</code> selects the native manifest,
+          including its includes and local overlays. No root copy is needed. An explicit
+          <code> --manifest</code> selects another manifest file location,
+          preserving the same format and Git versioning.
+        </p>
+        <CodeBlock>{`reqvire mcp --enable-mutations
+
+# Or expose Explorer and MCP together
+reqvire serve --enable-mcp --enable-mutations
+
+# Optional: use another manifest file location
+reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBlock>
+        <BulletList items={[
+          "The branch argument selects a Central worktree. Repo-managed manifest inputs are copied privately and retained across removal and reopening. Files belonging to Central follow that worktree's Git history. Preparation uses local objects without a network sync.",
+          "The same typed mutation tools edit Central-relative paths. Each file is saved in its owning repository. By default the edits remain pending and create no commits.",
+          "reqvire.git.commit saves changed components first and updates pins in the selected manifest declarations, preserving their composition. Repo-managed files retain their manifest project's Git workflow; Central-owned files are checkpointed with Central. Unchanged components create no commit; --enable-commits uses the same workflow automatically.",
+          "If a later save fails, confirmed component commits remain retained. The accepted model stays readable and pending changes remain until the selected checkpoint succeeds. Inspect per-project outcomes before retrying; an unknown ref outcome blocks writes until reconciled.",
+          "With GitHub publication enabled, required component commits are pushed before Central. Manifest Git commits and publication remain with their owning repository; --manifest does not change ownership. Pull-request operations address Central; callers cannot substitute arbitrary repositories.",
+          "Changing the selected manifest or project HEAD externally requires full validated admission. Refresh HEAD does not silently replace the composition of an accepted model.",
+        ]} />
+        <CodeBlock>{`{
+  "name": "reqvire.worktree.create",
+  "arguments": { "branch": "model/review", "base_ref": "main" }
+}
+{
+  "name": "reqvire.rename_element",
+  "arguments": {
+    "branch": "model/review",
+    "element_name": "Component Requirement",
+    "new_name": "Reviewed Component Requirement",
+    "dry_run": true
+  }
+}
+{
+  "name": "reqvire.git.commit",
+  "arguments": { "branch": "model/review", "message": "Review component requirement" }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Preview the mutation, apply it with <code>dry_run: false</code>, then
+          commit. Context metadata reports the selected manifest, project commits
+          and per-project pending paths. No project selector or separate model
+          namespace is needed.
         </p>
       </Section>
 
@@ -453,7 +631,7 @@ reqvire mcp --enable-mutations --enable-github --github-remote upstream`}</CodeB
           { name: "reqvire.github.pr.comment", desc: "Requires a positive pr_number and non-empty body. Adds the exact comment to a PR in the pinned repository, including a PR on another branch. Pending local changes are allowed; commenting never commits or pushes them." },
         ]} />
         <p className="text-zinc-600 mt-4">
-          Only the startup repository and configured remote are supported; forks
+          Publication uses the startup repository and configured remote. In Repo mode, declared component repositories are also checked and pinned at admission; dependency commits are published first. Forks
           are not supported. Automatic commits remain a separate opt-in through
           <code> --enable-commits</code>. Repository access at startup does not
           guarantee permission for every operation: push rules and later permission

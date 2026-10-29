@@ -7,13 +7,13 @@ Rules for detecting duplicate link targets across subsections.
 **Cross-section duplicates** (same target in BOTH Relations AND Contract Bindings):
 - Applies to identifier targets
 - Treated as semantic errors requiring user resolution
-- The validate command fails with error
-- The format command does not auto-fix (user must decide which section to keep)
+- Validation reports an error for the supplied model snapshot
+- Repair requires an explicit author decision about which declaration to keep
 
 **Within-section duplicates** (same entry repeated in Relations OR in Contract Bindings):
 - Treated as formatting issues, not validation errors
-- The format fix operation removes duplicate entries
-- The validate command does not fail for within-section duplicates
+- Duplicate entries can be normalized without changing the declared dependency
+- Validation does not fail solely for within-section duplicates
 
 #### Metadata
   * type: constraint

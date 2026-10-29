@@ -111,7 +111,11 @@ pub fn eligible_git_worktrees_state() -> Value {
 }
 
 pub fn git_output<const N: usize>(args: [&str; N]) -> Option<String> {
-    let output = Command::new("git").args(args).output().ok()?;
+    let output = Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
+        .args(args)
+        .output()
+        .ok()?;
     if !output.status.success() {
         return None;
     }
@@ -123,6 +127,7 @@ fn git_output_in_dir<const N: usize>(
     args: [&str; N],
 ) -> Option<String> {
     let output = Command::new("git")
+        .env("GIT_OPTIONAL_LOCKS", "0")
         .args(args)
         .current_dir(directory)
         .output()

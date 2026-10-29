@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "sourceDir": "src",
+  "dsDir": "design-system",
+  "publicAlias": "@ds",
+  "publicEntry": "index.ts",
+  "stylesEntry": "styles.css",
+  "tokenDir": "tokens",
+  "inlineStyleFiles": [],
+  "boundaries": {
+    "styleWrites": [
+      {
+        "file": "design-system/components/core/toast/geometry.ts",
+        "properties": [
+          "--ds-toast-index",
+          "--ds-toast-layer",
+          "--ds-toast-offset",
+          "--ds-toast-height",
+          "--ds-toast-front-height",
+          "--ds-toast-total-height",
+          "--ds-toast-count",
+          "--ds-toast-swipe-x",
+          "--ds-toast-swipe-y",
+          "--ds-toast-exit-x",
+          "--ds-toast-exit-y",
+          "--ds-toast-exit-scale"
+        ]
+      },
+      {
+        "file": "design-system/patterns/shell/useExplorerPane.ts",
+        "properties": [
+          "--ux-left-pane-width",
+          "cursor",
+          "user-select"
+        ]
+      },
+      {
+        "file": "design-system/patterns/graphs/ontologyGraphRendererImpl.ts",
+        "properties": [
+          "cursor",
+          "height",
+          "display",
+          "list-style",
+          "overflow-y"
+        ]
+      },
+      {
+        "file": "src/rendering/MarkdownContent.tsx",
+        "properties": [
+          "max-width",
+          "width",
+          "height",
+          "min-height",
+          "filter"
+        ]
+      },
+      {
+        "file": "design-system/patterns/graphs/KnowledgeGraphCanvasImpl.tsx",
+        "properties": [
+          "cursor"
+        ]
+      },
+      {
+        "file": "design-system/palette.ts",
+        "properties": [
+          "color"
+        ]
+      },
+      {
+        "file": "design-system/review/tokens/TokenSamples.tsx",
+        "properties": [
+          "--ux-token-sample-value"
+        ]
+      }
+    ],
+    "componentVariables": [
+      "--ds-coderef-min-w",
+      "--ds-coderef-ow",
+      "--ds-coderef-text-align",
+      "--ds-coderef-ws",
+      "--ds-search-icon-left",
+      "--ds-search-icon-sz",
+      "--ds-search-input-bg",
+      "--ds-search-input-border",
+      "--ds-search-input-color",
+      "--ds-search-input-fs",
+      "--ds-search-input-h",
+      "--ds-search-input-p",
+      "--ds-search-input-placeholder-color",
+      "--ds-section-head-p",
+      "--ds-stat-display",
+      "--ds-stat-jc",
+      "--ds-stat-min-w",
+      "--ds-tab-h",
+      "--ds-table-min-w",
+      "--ds-table-td-border",
+      "--ds-table-td-p",
+      "--ds-table-th-bg",
+      "--ds-table-th-border",
+      "--ds-table-th-fw",
+      "--ds-tablewrap-bg",
+      "--ds-tablewrap-border",
+      "--ds-tablewrap-radius",
+      "--ds-tabs-border-bottom",
+      "--ds-tabs-h",
+      "--ds-togglerow-bg",
+      "--ds-togglerow-border",
+      "--ds-togglerow-gap",
+      "--ds-togglerow-h",
+      "--ds-togglerow-jc",
+      "--ds-togglerow-label-min-w",
+      "--ds-togglerow-label-of",
+      "--ds-togglerow-label-toe",
+      "--ds-togglerow-label-ws",
+      "--ds-togglerow-line-color",
+      "--ds-togglerow-line-h",
+      "--ds-togglerow-line-min-h",
+      "--ds-togglerow-line-p",
+      "--ds-togglerow-line-swatch-bg",
+      "--ds-togglerow-line-swatch-border",
+      "--ds-togglerow-line-swatch-w",
+      "--ds-togglerow-meta-ai",
+      "--ds-togglerow-meta-bg",
+      "--ds-togglerow-meta-color",
+      "--ds-togglerow-meta-display",
+      "--ds-togglerow-meta-fw",
+      "--ds-togglerow-meta-h",
+      "--ds-togglerow-meta-jc",
+      "--ds-togglerow-meta-lh",
+      "--ds-togglerow-meta-min-w",
+      "--ds-togglerow-meta-p",
+      "--ds-togglerow-meta-radius",
+      "--ds-togglerow-min-h",
+      "--ds-togglerow-p",
+      "--ds-togglerow-radius",
+      "--ds-togglerow-shadow",
+      "--ds-togglerow-static-cursor",
+      "--ds-treeitem-count-ml",
+      "--ds-treeitem-h",
+      "--ds-treeitem-icon-color",
+      "--ds-treeitem-label-flex",
+      "--ds-treeitem-lh",
+      "--ds-treeitem-pl-base",
+      "--ds-treeitem-pr",
+      "--ds-treeitem-twist-color",
+      "--ds-treeitem-twist-w"
+    ]
+  },
+  "assets": {
+    "publicDirs": [
+      "public/assets"
+    ],
+    "generatedPaths": [
+      "dist",
+      "design-system/dist-kit",
+      "design-system/dist-showcase",
+      ".vite",
+      ".ds",
+      "_ds_bundle.js",
+      "design-system/_ds_bundle.js",
+      "design-system/reqvire-explorer.css",
+      "design-system/_ds_manifest.json",
+      "design-system/_adherence.oxlintrc.json"
+    ],
+    "generatedFiles": [
+      "project-store.js",
+      "android-chrome-192x192.png",
+      "apple-touch-icon.png",
+      "browserconfig.xml",
+      "favicon-16x16.png",
+      "favicon-32x32.png",
+      "favicon.ico",
+      "icon-192.png",
+      "icon-512.png",
+      "logo.png",
+      "mstile-150x150.png",
+      "site.webmanifest"
+    ]
+  },
+  "framework": "preact",
+  "mcp": {
+    "previewManifest": ".ds/preview/manifest.json",
+    "apps": [],
+    "showcaseTitle": "Reqvire Design System",
+    "capture": {
+      "channel": "chrome"
+    },
+    "behaviorProfiles": {
+      "widget": {
+        "runner": "playwright",
+        "command": "bun",
+        "args": [
+          "run",
+          "test:behavior",
+          "--"
+        ],
+        "mode": "browser",
+        "timeoutMs": 240000
+      }
+    }
+  },
+  "behaviorLibraries": [
+    "@sigma/edge-curve",
+    "@sigma/node-image",
+    "@xyflow/react",
+    "elkjs",
+    "graphology",
+    "graphology-layout-forceatlas2",
+    "graphology-layout-noverlap",
+    "sigma"
+  ],
+  "usage": {
+    "notifications": [
+      {
+        "api": "toast",
+        "host": "Toaster",
+        "rootFiles": [
+          "src/App.tsx",
+          "design-system/components/core/Toast.ads.scenario.tsx"
+        ]
+      }
+    ],
+    "restrictedImports": [
+      "sonner"
+    ]
+  },
+  "acceptance": {
+    "checks": [
+      "lint:style",
+      "typecheck"
+    ],
+    "behaviorChecks": true
+  },
+  "validation": {
+    "checks": [
+      "lint:style",
+      "typecheck",
+      "test",
+      "build:app"
+    ],
+    "behaviorChecks": true
+  }
+}

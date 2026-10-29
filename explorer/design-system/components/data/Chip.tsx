@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
 
 const baseUX = css`
@@ -58,11 +58,11 @@ const skinX = css`
   }
 `;
 
-export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
+export interface ChipProps extends Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "style"> {
   active?: boolean;
-  icon?: ReactNode;
-  count?: ReactNode;
-  children: ReactNode;
+  icon?: ComponentChildren;
+  count?: ComponentChildren;
+  children: ComponentChildren;
 }
 
 export function Chip({

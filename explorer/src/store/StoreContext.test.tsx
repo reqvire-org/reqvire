@@ -1,5 +1,5 @@
-import { renderHook } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { renderHook } from "@/test/render";
+import { type ComponentChildren } from "preact";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as modelFlow from "../lib/modelFlow";
 import * as traces from "../lib/traces";
@@ -12,7 +12,7 @@ afterEach(() => vi.restoreAllMocks());
 
 function mount(initial: ExplorerProjectStore) {
   let store = initial;
-  const hook = renderHook(useStore, { wrapper: ({ children }: { children: ReactNode }) =>
+  const hook = renderHook(useStore, { wrapper: ({ children }: { children: ComponentChildren }) =>
     <StoreProvider store={store} schemaMismatch={null}>{children}</StoreProvider>,
   });
   return { result: hook.result, update(next: ExplorerProjectStore) { store = next; hook.rerender(); } };
@@ -216,6 +216,7 @@ describe("derived store inputs", () => {
         expect(selected.nodes.some(node => node.element.id === selection)).toBe(true);
       }
     }
+    modelFlow.selectModelFlow(index, initial.elements[0].id, initial.project.root_label, "upstream");
     expect(relationReads).toBe(preparedReads);
     expect(prepare).toHaveBeenCalledTimes(1);
     update({ ...initial, project: { ...initial.project, root_label: "Renamed workspace" },

@@ -1,0 +1,12 @@
+# Elements
+
+### Stdio Added Requirement
+
+The system SHALL preserve accepted local model work.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Stdio Project A](Model.md#stdio-project-a)
+---

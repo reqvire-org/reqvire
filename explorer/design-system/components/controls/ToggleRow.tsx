@@ -1,5 +1,5 @@
 import { css, cx } from "@linaria/atomic";
-import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type TargetedMouseEvent, type ComponentChildren } from "preact";
 import { Badge } from "../core/Badge";
 import { TokenSwatch } from "../data/TokenVisual";
 import type { DesignSystemColorToken } from "../../palette";
@@ -114,9 +114,7 @@ const skinX = css`
   }
 
   &.is-off .ds-togglerow__label {
-    text-decoration: var(--ds-togglerow-off-label-td, none);
-    text-decoration-color: var(--ds-togglerow-off-label-td-color);
-    text-decoration-thickness: var(--ds-togglerow-off-label-td-w);
+    text-decoration: var(--ds-togglerow-off-label-td, none) var(--ds-togglerow-off-label-td-color, currentColor) var(--ds-togglerow-off-label-td-w, auto);
   }
 
   &.is-off .ds-togglerow__swatch {
@@ -158,7 +156,8 @@ const skinLineX = css`
 
   .ds-togglerow__swatch {
     height: 0;
-    border-top: var(--border-w-thick) solid;
+    border-top-width: var(--border-w-thick);
+    border-top-style: solid;
     border-color: var(--ds-togglerow-line-swatch-border, var(--ds-token-swatch-color, currentColor));
     border-radius: 0;
     background: var(--ds-togglerow-line-swatch-bg, transparent) !important;
@@ -188,11 +187,11 @@ const skinFilterX = css`
   }
 `;
 
-export type ToggleRowProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onToggle" | "style"> & {
-  label: ReactNode;
+export type ToggleRowProps = Omit<(ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }), "onToggle" | "style"> & {
+  label: ComponentChildren;
   colorToken?: DesignSystemColorToken;
-  icon?: ReactNode;
-  meta?: ReactNode;
+  icon?: ComponentChildren;
+  meta?: ComponentChildren;
   on?: boolean;
   line?: boolean;
   static?: boolean;
@@ -215,7 +214,7 @@ export function ToggleRow({
   ...props
 }: ToggleRowProps) {
   const hasStaticClass = className.split(/\s+/).includes("ds-togglerow--static");
-  const toggle = (event: MouseEvent<HTMLButtonElement>) => {
+  const toggle = (event: TargetedMouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (!event.defaultPrevented) onToggle?.();
   };

@@ -9,7 +9,7 @@ describe("parseHash", () => {
       const parsed = parseHash(hash, "model");
       expect(new URLSearchParams(parsed.param!).get("selected")).toBe(id);
       expect(parseHash(routeForElement("other.md#element"), parsed).param).toBe(parsed.param);
-      expect(worktreeUrl(`https://example.test/?worktree_id=a${hash}`, "b").hash).toBe(`#/${view}`);
+      expect(worktreeUrl(`https://example.test/?branch=main${hash}`, "b").hash).toBe(`#/${view}`);
     }
     expect(new URLSearchParams(parseHash(routeForSelection("traces", null, { file: id }), "model").param!).get("file")).toBe(id);
   });
@@ -49,10 +49,11 @@ describe("parseHash", () => {
   });
 
   it("resumes the target worktree scope without carrying the previous scope", () => {
-    const url = worktreeUrl(`https://example.test/export/index.html?theme=dark&worktree_id=a${routeForCoverage("a.md#capability")}`, "b");
+    const url = worktreeUrl(`https://example.test/export/index.html?theme=dark&branch=main${routeForCoverage("a.md#capability")}`, "feature/κ+%");
     expect(url.pathname).toBe("/export/index.html");
     expect(url.searchParams.get("theme")).toBe("dark");
-    expect(url.searchParams.get("worktree_id")).toBe("b");
+    expect(url.searchParams.get("branch")).toBe("feature/κ+%");
+    expect(url.searchParams.has("worktree_id")).toBe(false);
     expect(url.hash).toBe("#/coverage");
     expect(worktreeUrl("https://example.test/#/content/a.md", "b").hash).toBe("#/content/a.md");
   });

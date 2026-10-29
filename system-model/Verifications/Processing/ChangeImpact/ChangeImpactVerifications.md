@@ -31,16 +31,15 @@ This test verifies that capability, specified requirement, ontology, and semanti
 - Semantic-contract content changes propagate to constrained requirements through `constrain`.
 - Semantic-contract content changes do not propagate backward to ontology vocabulary through `use`.
 - Ontology content changes propagate to semantic contracts through `usedBy`, then to constrained requirements and downstream verifications.
-- Ontology term changes propagate through explicit concept references and semantic-contract use/constrain paths.
 
 ##### Test Criteria
-- Modify a capability, its specified requirement, the constraining semantic contract, a contract-only ontology, and an ontology term referenced by concept references.
+- Exercise the four fixture changes independently: capability content, its specified requirement content, the constraining semantic contract's minimum cardinality, and contract-only ontology content.
 - Run `reqvire change-impact --json`; assert exit code 0 and valid JSON.
 - Assert the capability impact tree contains the specified requirement.
 - Assert the requirement impact tree contains the semantic contract and verification.
 - Assert the semantic-contract impact tree contains the constrained requirement and verification, but not the used ontology.
 - Assert the contract-only ontology impact tree contains the semantic contract, constrained requirement, and verification.
-- Assert concept-reference and semantic-contract dependency paths are represented without capability ontology contract_bindings.
+- These fixtures establish the listed capability, requirement, semantic-contract and ontology impact paths. They do not assert native concept changes or `reqvire:mapsToConcept` bridge changes.
 
 #### Metadata
   * type: test-verification
@@ -86,7 +85,7 @@ This test verifies that the system correctly implements change impact detection,
 
 ##### Acceptance Criteria
 - System correctly detects changes between different versions of requirements
-- System correctly identifies element relocations (same Element ID, different file_path or section)
+- System correctly identifies element relocations across source files while preserving the name-derived Element ID and reporting changed location-based identifiers
 - Relocated elements without content changes do not trigger impact propagation
 - Relocated elements WITH content or relation changes appear in BOTH "Relocated" AND "Changed" sections
 - Relocated elements appear in a separate "Relocated" section in the report

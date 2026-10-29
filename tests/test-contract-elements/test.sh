@@ -360,7 +360,7 @@ echo "Test 13: Rename Contract element updates contract_bindings identifiers..."
 
 # Rename the constraint element
 set +e
-RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Test Constraint Element" "Renamed Constraint" 2>&1)
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Test Constraint Element" "Renamed Constraint" 2>&1)
 RENAME_EXIT=$?
 set -e
 
@@ -402,7 +402,7 @@ fi
 
 # Rename back for subsequent tests
 set +e
-RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Renamed Constraint" "Test Constraint Element" 2>&1)
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" rename "Renamed Constraint" "Test Constraint Element" 2>&1)
 RENAME_EXIT=$?
 set -e
 
@@ -424,7 +424,7 @@ EOF
 
 # Move the constraint element to a new file
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" specifications/Contracts.md 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Test Constraint Element" specifications/Contracts.md 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -466,7 +466,7 @@ fi
 
 # Move back for cleanup
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Test Constraint Element" specifications/Requirements.md 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" mv "Test Constraint Element" specifications/Requirements.md 2>&1)
 MOVE_EXIT=$?
 set -e
 

@@ -1,0 +1,11 @@
+# Element
+
+## Metadata
+  * type: requirement
+
+## Relations
+  * specify: [Authoring Capability](Targets.md#authoring-capability)
+
+## Prose Source
+
+The system SHALL use the [delivery contract](Single.md).

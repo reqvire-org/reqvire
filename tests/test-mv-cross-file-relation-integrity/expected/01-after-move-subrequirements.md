@@ -22,4 +22,3 @@ The system SHALL implement a sub-capability of Capability A.
 #### Relations
   * derivedFrom: [Capability A](#capability-a)
 ---
-

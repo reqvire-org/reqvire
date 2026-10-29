@@ -1,23 +1,22 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import foundationCss from "../../design-system/styles.css?inline";
+import postcss from "postcss";
 import { beforeEach } from "vitest";
 
-const colorsCss = readFileSync(
-  resolve(process.cwd(), "design-system/tokens/colors.css"),
-  "utf8",
-);
-
-const rootBlock = colorsCss.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
-const rootTokens = Array.from(rootBlock.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/gi)).map(
-  ([, token, value]) => [token, value.trim()] as const,
-);
+// jsdom 25 cannot parse cascade layers. Load the actual Vite-processed
+// foundation, unwrapping its single base layer for this test environment.
+// Browser builds keep the original layer and cascade unchanged.
+const foundation = postcss.parse(foundationCss);
+foundation.walkAtRules("layer", (layer) => {
+  if (layer.params !== "base" || !layer.nodes) throw new Error("Test foundation adapter only supports the base layer.");
+  layer.replaceWith(...layer.nodes);
+});
+const stylesheet = document.createElement("style");
+stylesheet.textContent = foundation.toString();
+document.head.append(stylesheet);
 
 beforeEach(() => {
   document.documentElement.classList.remove("dark");
   document.documentElement.removeAttribute("data-theme");
-  for (const [token, value] of rootTokens) {
-    document.documentElement.style.setProperty(token, value);
-  }
 });
 
 if (!globalThis.ResizeObserver) {

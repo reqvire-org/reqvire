@@ -1,0 +1,10 @@
+PASS mcp-contract
+PASS mutation-permission
+PASS text-and-subsection-lifecycle
+PASS single-element-document
+PASS parents-and-consumers
+PASS semantic-payloads
+PASS target-and-operation-rules
+PASS protected-subsections
+PASS boundary-and-semantic-validation
+PASS revision-and-pending-state

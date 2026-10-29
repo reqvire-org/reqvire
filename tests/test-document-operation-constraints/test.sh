@@ -28,7 +28,7 @@ run_cmd_expect_fail_with_expected() {
   shift 2
   set +e
   local out
-  out=$(cd "$TEST_DIR" && "$REQVIRE_BIN" "$@" 2>&1)
+  out=$(cd "$TEST_DIR" && "$MCP_OPERATION_BIN" "$@" 2>&1)
   local code=$?
   set -e
   [ $code -ne 0 ] || auto_fail "Command unexpectedly succeeded: reqvire $*"
