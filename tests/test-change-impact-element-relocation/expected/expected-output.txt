@@ -22,8 +22,8 @@
 * [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring) ⚠️
 
 * [Display Settings](specifications/SecondFile/Requirements.md#display-settings)
-    * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
-    * satisfiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
+    * satisfiedBy -> [display_impl.txt](specifications/SecondFile/display_impl.txt)
+    * satisfiedBy -> [display_test.txt](specifications/SecondFile/display_test.txt)
 
 * [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency) ⚠️
 

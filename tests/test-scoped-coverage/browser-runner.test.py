@@ -1,6 +1,5 @@
 import importlib.util
 from pathlib import Path
-import sys
 import tempfile
 import unittest
 
@@ -14,9 +13,8 @@ class BrowserDeadlineTest(unittest.TestCase):
     def test_timeout_retains_partial_diagnostics(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
-            command = [sys.executable, "-u", "-c",
-                       "import sys,time; print('first: PASS'); "
-                       "print('START reload', file=sys.stderr); time.sleep(30)"]
+            command = ["sh", "-c",
+                       "printf 'first: PASS\\n'; printf 'START reload\\n' >&2; exec sleep 30"]
             with self.assertRaisesRegex(AssertionError, "(?s)timed out.*START reload"):
                 coverage.run_browser(command, output, timeout=0.5)
             self.assertEqual((output / "browser.stdout").read_text(), "first: PASS\n")
@@ -26,9 +24,8 @@ class BrowserDeadlineTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
             with self.assertRaisesRegex(AssertionError, "(?s)Browser failed:.*failed assertion"):
-                coverage.run_browser([sys.executable, "-c",
-                    "import sys; print('failed assertion', file=sys.stderr); sys.exit(1)"], output)
-            self.assertEqual(coverage.run_browser([sys.executable, "-c", "print('PASS')"], output), "PASS\n")
+                coverage.run_browser(["sh", "-c", "printf 'failed assertion\\n' >&2; exit 1"], output)
+            self.assertEqual(coverage.run_browser(["sh", "-c", "printf 'PASS\\n'"], output), "PASS\n")
 
 
 if __name__ == "__main__":

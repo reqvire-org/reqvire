@@ -35,20 +35,10 @@ def scenario(commits):
         git('add', '.')
         git('commit', '-qm', 'baseline')
         shim = base / 'git'
-        shim.write_text('#!/usr/bin/env python3\n' + f'''
-import os,sys,time
-from pathlib import Path
-base=Path({str(base)!r})
-if sys.argv[1:]==['status','--porcelain'] and (base/'armed').exists():
-    (base/('entered-'+str(os.getpid()))).write_text('ready')
-    deadline=time.monotonic()+15
-    while not (base/'release').exists():
-        if time.monotonic()>deadline: sys.exit(99)
-        time.sleep(0.005)
-os.execv({real_git!r},[{real_git!r},*sys.argv[1:]])
-''')
+        shutil.copy2(Path(__file__).parent / 'fixtures/git-parallel.sh', shim)
         shim.chmod(0o755)
-        env = dict(os.environ, PATH=str(base)+os.pathsep+os.environ['PATH'])
+        env = dict(os.environ, PATH=str(base)+os.pathsep+os.environ['PATH'],
+                   REQVIRE_WORKER_TEST_BASE=str(base), REAL_TEST_GIT=real_git)
         process = subprocess.Popen([binary, '__mcp-worktree-worker'], cwd=root, env=env,
                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         condition = threading.Condition()

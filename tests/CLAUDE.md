@@ -61,6 +61,12 @@ Use `ls tests/` to see all available test directories. Each `test-*` directory c
 
 ## Writing Test Scripts
 
+Prefer Bash for fixture setup and command execution, `jq` for JSON assertions,
+and `diff -u` for expected output comparisons, following the existing shell tests.
+Do not add Python wrappers for work those tools express clearly. Use Python when
+it provides substantive protocol, concurrency, process-lifecycle, or graph
+handling, and reuse existing helpers for those cases.
+
 ### Test Script Template (test.sh)
 ```bash
 #!/bin/bash

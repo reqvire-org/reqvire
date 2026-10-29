@@ -880,6 +880,8 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Impact Scope Computation Specification](../../Processing/ChangeImpact/Specifications.md#impact-scope-computation-specification)
+  * [Repo Change Impact Baseline Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-baseline-specification)
+  * [Repo Change Impact Reporting Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-reporting-specification)
   * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)

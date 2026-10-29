@@ -23,4 +23,7 @@ python3 "$TEST_SCRIPT_DIR/check_repo_workspaces.py" "$REQVIRE_BIN" "$TEST_DIR" >
 source "$TEST_SCRIPT_DIR/check_native_repo.sh"
 run_native_repo_cases
 diff -u "$TEST_SCRIPT_DIR/expected/checks.txt" "$TEST_DIR/output/checks.txt" || status=1
+source "$TEST_SCRIPT_DIR/check_change_impact.sh"
+run_impact_cases
+diff -u "$TEST_SCRIPT_DIR/expected/impact-checks.txt" "$TEST_DIR/output/impact-checks.txt" || status=1
 exit "$status"

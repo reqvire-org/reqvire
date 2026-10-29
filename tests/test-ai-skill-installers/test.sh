@@ -7,4 +7,4 @@ WORK_DIR="${TEST_DIR:-$(mktemp -d)}"
 
 
 # Pin the external installer for reproducible package acceptance checks.
-python3 "$TEST_SCRIPT_DIR/check_skills.py" "$REPO_ROOT" "$WORK_DIR"
+bash "$TEST_SCRIPT_DIR/check_skills.sh" "$REPO_ROOT" "$WORK_DIR"

@@ -252,7 +252,7 @@ This verification checks native concept projection correctness, acyclic taxonomy
 #### Relations
   * satisfiedBy: [concept_projection_tests.rs](../../../../crates/reqvire-core/src/semantic_contract/concept_projection_tests.rs)
   * satisfiedBy: [concept_taxonomy.rs](../../../../crates/reqvire-core/tests/concept_taxonomy.rs)
-  * satisfiedBy: [check-taxonomy.py](../../../../tests/test-concept-elements/check-taxonomy.py)
+  * satisfiedBy: [check-taxonomy.sh](../../../../tests/test-concept-elements/check-taxonomy.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-concept-elements/test.sh)
   * verify: [Native Concept Taxonomy Cycle Validation](../../../Operations/Validation/ValidationRequirements.md#native-concept-taxonomy-cycle-validation)
   * verify: [Concept Relation Projection Materialization](../../../Reports/ModelReports/ReportingRequirements.md#concept-relation-projection-materialization)

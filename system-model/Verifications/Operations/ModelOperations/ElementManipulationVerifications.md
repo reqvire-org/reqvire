@@ -61,6 +61,39 @@ Concrete override verification covers the parent and consumer fixture matrix, fu
   * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
 ---
 
+### Create Element Override Test
+
+Verify atomic full-definition override through typed MCP and the accepted mutation transaction.
+
+#### Details
+- Override childless existing content and compare the complete resulting source fixture; require the shared result to identify an update and the reloaded model to validate.
+- Reject duplicate creation without override and preserve files. Override of a previously absent name follows ordinary creation.
+- Compare replacement content and explicit target-authored metadata/relations against the supplied full definition, using unified source diffs.
+- Override capability and requirement parents whose children author incoming relations in other files. Compare preview and apply diffs, unchanged incoming documents, stable child identifiers, inherited governance, and fresh model validation. Actual deletion of the sole requirement parent remains rejected.
+- Preserve contract ownership, Contract Reference and Contract Binding consumers, native Concept References, and verification-objective hierarchy. Cross-file overrides rewrite child, owner, reference, binding, and concept destinations to the replacement location.
+- Distinguish incoming declarations from target-authored outgoing hierarchy. Omitting the only authored parent edge rejects an orphan; a valid omitted edge disappears from both graph directions without resurrection from a generated inverse.
+- Reject incompatible target types, missing owners and parents, requirement cycles, mixed capability roots, invalid concept-scheme metadata, and model-element prose links in preview and apply. Compare complete source trees, accepted revisions and pending changes; a valid subsequent override succeeds.
+- Preserve pending accepted work and previously captured reads. Inject automatic Git publication failure and require restored source, index, HEAD, accepted revision and pending state, followed by a successful retry.
+- Retain ontology base/prefix/import/SHACL rebasing and semantic removal rejection through the ontology-aware and semantic-contract CRUD suites.
+
+#### Concept References
+  * [Authored Element Definition](../../../Thesaurus/Thesaurus.md#authored-element-definition)
+  * [Element Override](../../../Thesaurus/Thesaurus.md#element-override)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
+  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-crud/test.sh)
+  * verify: [Atomic Element Override](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
+  * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
+---
+
 ### Atomic Relation Relink Test
 
 Verify atomic relation rewiring in the shared core operation.
@@ -102,7 +135,7 @@ Executable verification for canonical writes within model mutation transactions.
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-interface-boundary/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
-  * satisfiedBy: [fenced_code.py](../../../../tests/test-parsing-functionality/fenced_code.py)
+  * satisfiedBy: [fenced_code.sh](../../../../tests/test-parsing-functionality/fenced_code.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-crud/test.sh)
   * verify: [Canonical Model Mutation Persistence](../../../Operations/ModelOperations/ElementManipulationRequirements.md#canonical-model-mutation-persistence)
   * verify: [CRUD Semantic Contract Mutation Validation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
@@ -175,39 +208,6 @@ Test cases:
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
-  * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
----
-
-### Create Element Override Test
-
-Verify atomic full-definition override through typed MCP and the accepted mutation transaction.
-
-#### Details
-- Override childless existing content and compare the complete resulting source fixture; require the shared result to identify an update and the reloaded model to validate.
-- Reject duplicate creation without override and preserve files. Override of a previously absent name follows ordinary creation.
-- Compare replacement content and explicit target-authored metadata/relations against the supplied full definition, using unified source diffs.
-- Override capability and requirement parents whose children author incoming relations in other files. Compare preview and apply diffs, unchanged incoming documents, stable child identifiers, inherited governance, and fresh model validation. Actual deletion of the sole requirement parent remains rejected.
-- Preserve contract ownership, Contract Reference and Contract Binding consumers, native Concept References, and verification-objective hierarchy. Cross-file overrides rewrite child, owner, reference, binding, and concept destinations to the replacement location.
-- Distinguish incoming declarations from target-authored outgoing hierarchy. Omitting the only authored parent edge rejects an orphan; a valid omitted edge disappears from both graph directions without resurrection from a generated inverse.
-- Reject incompatible target types, missing owners and parents, requirement cycles, mixed capability roots, invalid concept-scheme metadata, and model-element prose links in preview and apply. Compare complete source trees, accepted revisions and pending changes; a valid subsequent override succeeds.
-- Preserve pending accepted work and previously captured reads. Inject automatic Git publication failure and require restored source, index, HEAD, accepted revision and pending state, followed by a successful retry.
-- Retain ontology base/prefix/import/SHACL rebasing and semantic removal rejection through the ontology-aware and semantic-contract CRUD suites.
-
-#### Concept References
-  * [Authored Element Definition](../../../Thesaurus/Thesaurus.md#authored-element-definition)
-  * [Element Override](../../../Thesaurus/Thesaurus.md#element-override)
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
-  * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-crud/test.sh)
-  * verify: [Atomic Element Override](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
   * verify: [Create Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
 ---
 
@@ -465,6 +465,65 @@ The test shall verify that element manipulation operations are persisted to sour
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-file-persistence/test.sh)
   * verify: [Element Manipulation File Persistence](../../../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
+---
+
+### Focused Element Editing Verification Objective
+
+Group acceptance of bounded content changes, declaration preservation, revision preconditions and rejected edits through the production MCP boundary.
+
+#### Details
+The focused-editing suite was authored before implementation. Its initial red run reached a discoverable no-op MCP facade and failed substantive state/diff assertions. Passing discovery, schema checks or rejection cases alone does not prove successful editing. Concrete verifications below require observable effects and transaction recovery; this grouping objective carries no implementation evidence.
+
+Use ten independent scenarios with one primary fixture/server per scenario. Related edits form a single lifecycle; compact rejection tables cover distinct rules without repeating the operation/target/preview cross-product. Capture whole-model declaration and untargeted-content controls once around each scenario, source/revision preservation at each rejected request, and fresh restart checks for semantic payloads and revision/pending work. Shared MCP schema and context validation retain their existing verification ownership.
+
+#### Metadata
+  * type: verification-objective
+
+#### Relations
+  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
+---
+
+### Focused Element Editing Acceptance Test
+
+Verify actual bounded source changes and declaration retention through production stdio MCP calls.
+
+#### Details
+- Exercise append and replace on Element Text and Details, exact-text edits, custom subsection creation/deletion and empty existing text. Compare explicit expected target content, complete source snapshots, stable identity/metadata/relations/dependencies, untouched neighbours and incoming consumers, preview/application diffs and fresh validated reloads. Success-shaped no-ops must fail these cases.
+- Exercise single-element documents, Unicode/CRLF source and fenced literal headings. Preserve literal fenced bytes while normalizing document line endings. New text stays before following reserved sections; code examples do not become structural boundaries.
+- Replace/edit native Ontology, Shapes and Query payloads through valid fixtures; preserve required fences, semantic context and neighbouring declarations. Confirm semantic reads and fresh validation reflect edits.
+- Require base revision evidence, changed accepted revision/pending paths for effective applications, stable HEAD/index without automatic commits, and explicit same-content/empty-append no-ops. Retain an earlier accepted mutation while editing another element. Fresh reads and restart must agree with persisted bytes.
+- Revision checks reject an old revision after a successful edit or another accepted change; retrying the old append cannot duplicate it. Keep pending state and source bytes unchanged after rejection.
+- Inject Git publication failure after a focused edit has prepared source changes. Restore source, index, HEAD, accepted revision and pending state; retry against the same base successfully, then reject that now-stale revision. Captured reads retain the original source and preview/application diffs agree.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
+  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
+---
+
+### Focused Element Editing Rejection Test
+
+Verify rejected focused edits preserve the source tree and accepted model state.
+
+#### Details
+- Use one table for distinct target and operation rules: missing elements, absent append/delete targets, duplicate creation, case/whitespace-sensitive target names, ambiguous/empty/out-of-target exact matches, representative missing or incompatible operation arguments, reserved Element Text create/delete, and forbidden Details on concepts. Exercise missing and stale application revisions, stale preview revisions and retry protection in the revision lifecycle.
+- Cover each protected declaration category once with a valid same-content replacement, so rejection cannot be attributed to malformed payload syntax. Check protected absent Properties creation and representative unsupported Ontology append, required Shapes deletion and Query creation; do not repeat every target against every operation and mode.
+- Reject new element/subsection boundaries, separators and fence escape that would reinterpret neighbours, forbidden prose links and invalid Turtle/SHACL/SPARQL. Keep valid fenced examples as positive controls.
+- Compare source bytes, accepted revision and pending changes after each rejected request with the scenario's shared accepted baseline. Include representative preview and application rejections. Compare HEAD/index, model declarations and untargeted content around the scenario; the revision lifecycle additionally performs a valid edit after rejection. Require MCP tool errors for semantic rejection and the existing invalid-params protocol error for unavailable-tool rejection. Generic field-type, required-field, unknown-field/operation and invalid-context validation remain covered by shared MCP verification rather than duplicated in this suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
+  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
+  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
 ---
 
 ### Merge Elements Test
@@ -852,63 +911,4 @@ Test cases:
   * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
   * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
   * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
----
-
-### Focused Element Editing Verification Objective
-
-Group acceptance of bounded content changes, declaration preservation, revision preconditions and rejected edits through the production MCP boundary.
-
-#### Details
-The focused-editing suite was authored before implementation. Its initial red run reached a discoverable no-op MCP facade and failed substantive state/diff assertions. Passing discovery, schema checks or rejection cases alone does not prove successful editing. Concrete verifications below require observable effects and transaction recovery; this grouping objective carries no implementation evidence.
-
-Use ten independent scenarios with one primary fixture/server per scenario. Related edits form a single lifecycle; compact rejection tables cover distinct rules without repeating the operation/target/preview cross-product. Capture whole-model declaration and untargeted-content controls once around each scenario, source/revision preservation at each rejected request, and fresh restart checks for semantic payloads and revision/pending work. Shared MCP schema and context validation retain their existing verification ownership.
-
-#### Metadata
-  * type: verification-objective
-
-#### Relations
-  * derivedFrom: [Element Mutation and File Operation Verification Objective](#element-mutation-and-file-operation-verification-objective)
----
-
-### Focused Element Editing Acceptance Test
-
-Verify actual bounded source changes and declaration retention through production stdio MCP calls.
-
-#### Details
-- Exercise append and replace on Element Text and Details, exact-text edits, custom subsection creation/deletion and empty existing text. Compare explicit expected target content, complete source snapshots, stable identity/metadata/relations/dependencies, untouched neighbours and incoming consumers, preview/application diffs and fresh validated reloads. Success-shaped no-ops must fail these cases.
-- Exercise single-element documents, Unicode/CRLF source and fenced literal headings. Preserve literal fenced bytes while normalizing document line endings. New text stays before following reserved sections; code examples do not become structural boundaries.
-- Replace/edit native Ontology, Shapes and Query payloads through valid fixtures; preserve required fences, semantic context and neighbouring declarations. Confirm semantic reads and fresh validation reflect edits.
-- Require base revision evidence, changed accepted revision/pending paths for effective applications, stable HEAD/index without automatic commits, and explicit same-content/empty-append no-ops. Retain an earlier accepted mutation while editing another element. Fresh reads and restart must agree with persisted bytes.
-- Revision checks reject an old revision after a successful edit or another accepted change; retrying the old append cannot duplicate it. Keep pending state and source bytes unchanged after rejection.
-- Inject Git publication failure after a focused edit has prepared source changes. Restore source, index, HEAD, accepted revision and pending state; retry against the same base successfully, then reject that now-stale revision. Captured reads retain the original source and preview/application diffs agree.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
-  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
-  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
-  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
----
-
-### Focused Element Editing Rejection Test
-
-Verify rejected focused edits preserve the source tree and accepted model state.
-
-#### Details
-- Use one table for distinct target and operation rules: missing elements, absent append/delete targets, duplicate creation, case/whitespace-sensitive target names, ambiguous/empty/out-of-target exact matches, representative missing or incompatible operation arguments, reserved Element Text create/delete, and forbidden Details on concepts. Exercise missing and stale application revisions, stale preview revisions and retry protection in the revision lifecycle.
-- Cover each protected declaration category once with a valid same-content replacement, so rejection cannot be attributed to malformed payload syntax. Check protected absent Properties creation and representative unsupported Ontology append, required Shapes deletion and Query creation; do not repeat every target against every operation and mode.
-- Reject new element/subsection boundaries, separators and fence escape that would reinterpret neighbours, forbidden prose links and invalid Turtle/SHACL/SPARQL. Keep valid fenced examples as positive controls.
-- Compare source bytes, accepted revision and pending changes after each rejected request with the scenario's shared accepted baseline. Include representative preview and application rejections. Compare HEAD/index, model declarations and untargeted content around the scenario; the revision lifecycle additionally performs a valid edit after rejection. Require MCP tool errors for semantic rejection and the existing invalid-params protocol error for unavailable-tool rejection. Generic field-type, required-field, unknown-field/operation and invalid-context validation remain covered by shared MCP verification rather than duplicated in this suite.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Focused Element Editing Verification Objective](#focused-element-editing-verification-objective)
-  * satisfiedBy: [check_update.py](../../../../tests/test-update-element/check_update.py)
-  * satisfiedBy: [test.sh](../../../../tests/test-update-element/test.sh)
-  * verify: [Focused Element Content Editing](../../../Operations/ModelOperations/ElementManipulationRequirements.md#focused-element-content-editing)
 ---

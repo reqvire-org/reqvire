@@ -25,6 +25,21 @@ Command names, eligibility algorithms, blocker codes and publication transitions
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+reqvire:WorkspaceModelSnapshot a owl:Class ;
+  rdfs:comment "Complete model inputs and repository revision selections for one workspace composition, independently of a live checkout." .
+reqvire:RepositoryRevisionSelection a owl:Class ;
+  rdfs:comment "A repository identity, selected commit and workspace-relative mount path belonging to one model snapshot." .
+reqvire:snapshotRepositorySelection a owl:ObjectProperty ;
+  rdfs:domain reqvire:WorkspaceModelSnapshot ; rdfs:range reqvire:RepositoryRevisionSelection .
+reqvire:selectionRepository a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepositoryRevisionSelection ; rdfs:range reqvire:GitRepository .
+reqvire:selectionCommit a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepositoryRevisionSelection ; rdfs:range reqvire:GitCommit .
+reqvire:selectionWorkspacePath a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RepositoryRevisionSelection ; rdfs:range xsd:string .
+reqvire:snapshotManifestInput a owl:ObjectProperty ;
+  rdfs:domain reqvire:WorkspaceModelSnapshot ; rdfs:range reqvire:ModelInputDependency .
+
 reqvire:WorktreeContext a owl:Class ;
   reqvire:mapsToConcept concept:MCPWorktreeContext ;
   rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a Central worktree's manifest can select component sources within that same context." .

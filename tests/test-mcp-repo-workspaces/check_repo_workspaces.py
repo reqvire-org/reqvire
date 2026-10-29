@@ -239,13 +239,7 @@ def explicit_manifest():
     resolver_bin.mkdir()
     launches = f.output / 'resolver-launches.txt'
     wrapper = resolver_bin / 'python3'
-    wrapper.write_text(f'#!{sys.executable}\n'
-                       'import os, sys\n'
-                       "if len(sys.argv) > 2 and sys.argv[1] == '-c' and "
-                       "'from manifest_xml import RepoClient' in sys.argv[2]:\n"
-                       f'    with open({str(launches)!r}, "a") as log:\n'
-                       '        log.write("resolve\\n")\n'
-                       f'os.execv({sys.executable!r}, [{sys.executable!r}, *sys.argv[1:]])\n')
+    shutil.copy2(SUITE / 'fixtures/resolver-double.sh', wrapper)
     wrapper.chmod(0o755)
     counts = []
     for count in (1, 64):
@@ -257,7 +251,9 @@ def explicit_manifest():
             '#### Relations\n', '#### Relations\n' + relations))
         launches.write_text('')
         command(f.central, BINARY, '--manifest', 'default.xml', 'validate',
-                env={**ENV, 'PATH': str(resolver_bin) + os.pathsep + ENV['PATH']})
+                env={**ENV, 'PATH': str(resolver_bin) + os.pathsep + ENV['PATH'],
+                     'REQVIRE_REPO_TEST_RESOLVER_LOG': str(launches),
+                     'REQVIRE_REPO_TEST_PYTHON': sys.executable})
         counts.append(len(launches.read_text().splitlines()))
     (f.output / 'resolver-counts.json').write_text(json.dumps(counts))
     assert counts[0] > 0 and counts[0] == counts[1], (
@@ -514,39 +510,13 @@ def publication_environment(f):
     state = f.base / 'github-state'
     state.mkdir()
     (state / 'scenario.json').write_text('{}')
-    shutil.copy2(SUITE.parent / 'test-mcp-publication/fixtures/gh-double.py', bins / 'gh')
+    shutil.copy2(SUITE.parent / 'test-mcp-publication/fixtures/gh-double.sh', bins / 'gh')
     (bins / 'gh').chmod(0o755)
     mapping = {'https://github.com/test/project.git': str(f.remotes / 'central'),
                'https://github.com/test/component': str(f.remotes / 'component'),
                'https://github.com/test/component.git': str(f.remotes / 'component')}
     real_git = shutil.which('git')
-    wrapper = '''#!/usr/bin/python3
-import json, os, pathlib, sys
-args = sys.argv[1:]
-mapping = json.loads(os.environ['REQVIRE_REPO_TEST_REMOTES'])
-network = 'push' in args or 'ls-remote' in args
-if network:
-    # Real git also accepts a configured remote name instead of an explicit URL.
-    import subprocess
-    for index, arg in enumerate(args):
-        if arg in ('origin', 'local'):
-            probe = subprocess.run([REAL_GIT, 'remote', 'get-url', arg], capture_output=True, text=True)
-            if probe.returncode == 0 and probe.stdout.strip() in mapping:
-                args[index] = probe.stdout.strip()
-    urls = [a for a in args if a in mapping]
-    if 'push' in args:
-        with open(os.environ['REQVIRE_REPO_TEST_PUSHES'], 'a') as log:
-            log.write(json.dumps({'cwd': os.getcwd(), 'targets': urls}) + '\\n')
-        if pathlib.Path(os.environ['REQVIRE_REPO_TEST_FAIL_COMPONENT']).exists() and any('component' in a for a in urls):
-            sys.stderr.write('Injected component remote denial\\n')
-            sys.exit(1)
-    args = [mapping.get(a, a) for a in args]
-    if any(a.startswith(('https://', 'ssh://', 'git@')) for a in args):
-        sys.stderr.write('Network forbidden in offline Repo test\\n')
-        sys.exit(99)
-os.execv(REAL_GIT, [REAL_GIT, *args])
-'''.replace('REAL_GIT', repr(real_git))
-    (bins / 'git').write_text(wrapper)
+    shutil.copy2(SUITE / 'fixtures/git-double.sh', bins / 'git')
     (bins / 'git').chmod(0o755)
     git(f.central, 'remote', 'set-url', 'origin', 'https://github.com/test/project.git')
     git(f.component, 'remote', 'set-url', 'local', 'https://github.com/test/component')
@@ -554,6 +524,7 @@ os.execv(REAL_GIT, [REAL_GIT, *args])
     f.initial_central = commit(f.central, 'Register authorized publication remotes')
     return {'PATH': str(bins) + os.pathsep + ENV['PATH'],
             'REQVIRE_GH_TEST_STATE': str(state), 'REQVIRE_REPO_TEST_REMOTES': json.dumps(mapping),
+            'REQVIRE_REPO_TEST_GIT_BINARY': real_git,
             'REQVIRE_REPO_TEST_PUSHES': str(f.output / 'pushes.jsonl'),
             'REQVIRE_REPO_TEST_FAIL_COMPONENT': str(f.output / 'deny-component')}
 

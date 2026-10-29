@@ -11,6 +11,11 @@ Propagation categories and relation impact rules are defined by the Reqvire rela
 - Content changes → propagate impact
 - Path renames → track but no impact
 
+
+
+**Comparison invocation:**
+The change-impact command accepts `--git-commit` and the optional `--base-manifest-commit` under the shared baseline-selection contract. Forward the effective workspace and selected manifest to shared composition reconstruction and reporting; do not implement adapter-local component selection. Preserve text output by default and JSON output with `--json`.
+
 #### Metadata
   * type: behavior
 ---

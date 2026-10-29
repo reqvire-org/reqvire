@@ -41,7 +41,7 @@ The system shall provide brightness controls.
 
 #### Relations
   * derivedFrom: [Battery Saver](#battery-saver)
-  * satisfiedBy: display_impl.py
+  * satisfiedBy: display_impl.txt
 
 ---
 

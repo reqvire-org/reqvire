@@ -181,7 +181,7 @@ The current CLI regression harness exercises the shared parser, mutation parser 
 
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
-  * satisfiedBy: [fenced_code.py](../../../tests/test-parsing-functionality/fenced_code.py)
+  * satisfiedBy: [fenced_code.sh](../../../tests/test-parsing-functionality/fenced_code.sh)
   * satisfiedBy: [test.sh](../../../tests/test-parsing-functionality/test.sh)
   * verify: [Fenced Code Content Preservation](../../ModelStructure/StructureAndParsing.md#fenced-code-content-preservation)
 ---

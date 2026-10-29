@@ -453,7 +453,7 @@ else
 fi
 
 # Dedicated fence parsing verification: controls, RED reproduction, and CLI mutations.
-if ! python3 "$TEST_SCRIPT_DIR/fenced_code.py" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/fenced-code-checks.txt" 2>&1; then
+if ! bash "$TEST_SCRIPT_DIR/fenced_code.sh" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/fenced-code-checks.txt" 2>&1; then
   cat "$TEST_DIR/output/fenced-code-checks.txt"
   exit 1
 fi

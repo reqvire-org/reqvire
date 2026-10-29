@@ -24,7 +24,7 @@ This test verifies that the system properly handles the source-control commit re
 
 ##### Acceptance Criteria
 - System shall support --git-commit flag for change impact analysis
-- System shall use the specified commit reference to materialize the base workspace snapshot in the current single-worktree comparison mode
+- System shall use the specified commit reference to materialize the base workspace snapshot in ordinary single-worktree mode, and reconstruct the manifest-defined baseline composition in Repo mode
 - System shall default to the current eligible worktree HEAD when the flag is not specified and Git metadata is available
 - System shall handle relative commit references (HEAD~1, etc.) without changing the workspace-root-relative identifier namespace
 

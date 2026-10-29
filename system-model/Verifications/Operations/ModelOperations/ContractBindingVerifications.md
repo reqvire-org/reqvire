@@ -282,7 +282,7 @@ Verify contract reference identifier updates across authored models and publishe
 #### Relations
   * derivedFrom: [Contract Bindings and Resource Operation Verification Objective](#contract-bindings-and-resource-operation-verification-objective)
   * satisfiedBy: [contract_references.rs](../../../../crates/reqvire-core/tests/contract_references.rs)
-  * satisfiedBy: [check_references.py](../../../../tests/test-contract-references/check_references.py)
+  * satisfiedBy: [check_references.sh](../../../../tests/test-contract-references/check_references.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-contract-references/test.sh)
   * verify: [MCP Mutation Execution Flow](../../../Interfaces/MCP/Tools.md#mcp-mutation-execution-flow)
   * verify: [MCP Relation Management Tools](../../../Interfaces/MCP/Tools.md#mcp-relation-management-tools)

@@ -39,28 +39,7 @@ def worker(read_only=False, commits=False):
         log = base / "git.jsonl"
         hook = base / "hook.json"
         wrapper = base / "git"
-        wrapper.write_text(f"#!{sys.executable}\n" + '''import json, os, pathlib, subprocess, sys
-args = sys.argv[1:]
-with open(os.environ['GIT_OBSERVATION_LOG'], 'a') as log:
-    log.write(json.dumps(args) + '\\n')
-hook = pathlib.Path(os.environ['GIT_OBSERVATION_HOOK'])
-config = json.loads(hook.read_text()) if hook.exists() else {}
-match = all(token in args for token in config.get('match', [])) and bool(config)
-if match and config.get('fail'):
-    sys.exit(1)
-if match and config.get('before'):
-    hook.unlink()
-    subprocess.run([os.environ['REAL_TEST_GIT'], *config['run']], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-result = subprocess.run([os.environ['REAL_TEST_GIT'], *args], capture_output=True)
-if match and not config.get('before'):
-    hook.unlink()
-    subprocess.run([os.environ['REAL_TEST_GIT'], *config['run']], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-sys.stdout.buffer.write(result.stdout)
-sys.stderr.buffer.write(result.stderr)
-sys.exit(result.returncode)
-''')
+        shutil.copy2(Path(__file__).parent / 'fixtures/git-observation.sh', wrapper)
         wrapper.chmod(0o755)
         env = dict(os.environ, PATH=str(base) + os.pathsep + os.environ["PATH"],
                    REAL_TEST_GIT=real_git, GIT_OBSERVATION_LOG=str(log), GIT_OBSERVATION_HOOK=str(hook))

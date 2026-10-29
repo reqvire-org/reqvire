@@ -639,6 +639,64 @@ reqvire:RelationFamilyShape
   * use: [Reqvire Verification Ontology](Verification.md#reqvire-verification-ontology)
 ---
 
+### Repo Workspace Comparison Shape
+
+Constrains the structural identity and provenance of complete workspace comparisons. Runtime comparison records are governed by their report contract; this shape does not imply they are already materialized in semantic exports.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:RepoWorkspaceComparisonShape a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeImpactAnalysis ;
+  sh:property [
+    sh:path reqvire:comparisonBaseSnapshot ;
+    sh:class reqvire:WorkspaceModelSnapshot ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:comparisonCurrentSnapshot ;
+    sh:class reqvire:WorkspaceModelSnapshot ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+  ] .
+reqvire:WorkspaceModelSnapshotShape a sh:NodeShape ;
+  sh:targetClass reqvire:WorkspaceModelSnapshot ;
+  sh:property [
+    sh:path reqvire:snapshotRepositorySelection ;
+    sh:class reqvire:RepositoryRevisionSelection ;
+    sh:minCount 1 ;
+  ] .
+reqvire:RepositoryRevisionSelectionShape a sh:NodeShape ;
+  sh:targetClass reqvire:RepositoryRevisionSelection ;
+  sh:property [
+    sh:path reqvire:selectionRepository ;
+    sh:class reqvire:GitRepository ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:selectionCommit ;
+    sh:class reqvire:GitCommit ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:selectionWorkspacePath ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ; sh:maxCount 1 ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Cross-Repository Change Impact Reporting](../Processing/ChangeImpact/ChangeImpactRequirements.md#cross-repository-change-impact-reporting)
+  * constrain: [Manifest-Based Change Impact Baselines](../Processing/ChangeImpact/ChangeImpactRequirements.md#manifest-based-change-impact-baselines)
+  * use: [Reqvire Change Impact Ontology](#reqvire-change-impact-ontology)
+  * use: [Reqvire Worktree Session Ontology](WorktreeSessions.md#reqvire-worktree-session-ontology)
+---
+
 ### Reqvire Change Impact Ontology
 
 The Reqvire change impact ontology defines impact analysis concepts and propagation rules.
@@ -653,6 +711,15 @@ Change impact is based on auditable graph paths. Native relations, concept refer
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:comparisonBaseSnapshot a owl:ObjectProperty ;
+  rdfs:domain reqvire:ChangeImpactAnalysis ;
+  rdfs:range reqvire:WorkspaceModelSnapshot ;
+  rdfs:comment "The complete historical workspace composition used as the comparison baseline." .
+reqvire:comparisonCurrentSnapshot a owl:ObjectProperty ;
+  rdfs:domain reqvire:ChangeImpactAnalysis ;
+  rdfs:range reqvire:WorkspaceModelSnapshot ;
+  rdfs:comment "The complete current workspace composition assessed by the comparison." .
 
 reqvire:ChangeImpactAnalysis a owl:Class ;
   rdfs:label "Change impact analysis" ;
