@@ -5,6 +5,13 @@ export const fixture = {
   "compactText": "Aa",
   "multilineText": "The quick brown fox\njumps over the lazy dog",
   "samples": [
+    {"token":"--dur-moderate","property":"animation-duration","probe":"0.375s"},
+    {"token":"--dur-slower","property":"animation-duration","probe":"0.375s"},
+    {"token":"--ease-enter","property":"animation-timing-function","probe":"cubic-bezier(.13,.27,.61,.83)"},
+    {"token":"--ease-enter-strong","property":"animation-timing-function","probe":"cubic-bezier(.13,.27,.61,.83)"},
+    {"token":"--ease-exit","property":"animation-timing-function","probe":"cubic-bezier(.13,.27,.61,.83)"},
+    {"token":"--ease-exit-strong","property":"animation-timing-function","probe":"cubic-bezier(.13,.27,.61,.83)"},
+    {"token":"--ease-strong","property":"animation-timing-function","probe":"cubic-bezier(.13,.27,.61,.83)"},
     {"token":"--dur-base","property":"animation-duration","probe":"0.4375s"},
     {"token":"--dur-fast","property":"animation-duration","probe":"0.4375s"},
     {"token":"--dur-instant","property":"animation-duration","probe":"0.4375s"},

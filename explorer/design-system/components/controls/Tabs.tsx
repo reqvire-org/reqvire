@@ -20,7 +20,7 @@ const tabBaseUX = css`
   align-items: center;
   gap: var(--space-5);
   height: var(--ds-tab-h, var(--app-header-height));
-  padding: 0 var(--space-7);
+  padding: 0 var(--control-padding-sm);
   border: 0;
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
@@ -60,9 +60,9 @@ const tabSkinUnderlineX = css`
   &::after {
     content: "";
     position: absolute;
-    right: var(--space-6);
+    right: var(--control-padding-sm);
     bottom: 0;
-    left: var(--space-6);
+    left: var(--control-padding-sm);
     height: var(--border-w-thick);
     border-radius: var(--border-w-thick) var(--border-w-thick) 0 0;
     background: transparent;
@@ -85,7 +85,7 @@ const tabSkinUnderlineX = css`
 
 const skinPillX = css`
   gap: var(--space-2);
-  padding: calc(var(--space-1) + var(--border-w));
+  padding: calc(var(--control-inset) + var(--border-w));
   border-top: 0;
   border-right: 0;
   border-bottom: 0;
@@ -95,8 +95,8 @@ const skinPillX = css`
 `;
 
 const tabSkinPillX = css`
-  height: var(--control-sm);
-  padding: 0 var(--space-7);
+  height: var(--control-height-sm);
+  padding: 0 var(--control-padding-sm);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   background: transparent;

@@ -19,7 +19,7 @@ export const fixture = {
     {"token":"--radius-2xl","property":"border-radius","probe":"13.375px"},
     {"token":"--radius-lg","property":"border-radius","probe":"13.375px"},
     {"token":"--radius-md","property":"border-radius","probe":"13.375px"},
-    {"token":"--radius-pill","property":"border-radius","probe":"13.375px"},
+    {"token":"--radius-full","property":"border-radius","probe":"13.375px"},
     {"token":"--radius-sm","property":"border-radius","probe":"13.375px"},
     {"token":"--radius-xl","property":"border-radius","probe":"13.375px"},
     {"token":"--radius-xs","property":"border-radius","probe":"13.375px"}

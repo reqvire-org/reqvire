@@ -12,7 +12,7 @@ const baseUX = css`
   width: var(--ds-spinner-size);
   height: var(--ds-spinner-size);
   flex: 0 0 auto;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   animation: ds-spinner-spin calc(var(--dur-base) * 4) linear infinite;
 
   &[data-size="md"] {

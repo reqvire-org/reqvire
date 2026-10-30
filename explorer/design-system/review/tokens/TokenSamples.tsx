@@ -39,8 +39,8 @@ const layout = css`
   .ux-token-value { margin: var(--space-6) 0; padding: var(--space-6); border: var(--border-w) solid var(--border-subtle); border-radius: var(--radius-xs); overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--text-caption); }
   .ux-token-contexts { display: inline-flex; gap: var(--space-1); flex: none; }
   .ux-token-light, .ux-token-dark { padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--border-default); border-radius: var(--radius-xs); }
-  .ux-token-light { background: var(--slate-0); }
-  .ux-token-dark { background: var(--slate-950); }
+  .ux-token-light { background: var(--color-paper); }
+  .ux-token-dark { background: var(--color-ink); }
   .ux-token-note { color: var(--text-muted); font-size: var(--text-caption); }
   .ux-token-secondary { margin-top: var(--space-12); }
   .ux-token-secondary > summary { cursor: pointer; padding-block: var(--space-6); color: var(--text-muted); }

@@ -73,20 +73,20 @@ const tracePanelBaseUX = css`
   .trace-file-count,
   .trace-tree-count-badge {
     flex: 0 0 auto;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     font-size: var(--text-caption);
     font-weight: var(--weight-semibold);
     line-height: 1;
   }
 
   .trace-file-count {
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) var(--control-padding-sm);
   }
 
   .trace-tree-count-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--space-1) var(--space-4);
+    padding: var(--space-1) var(--control-padding-sm);
   }
 
   .trace-verification-list {
@@ -350,8 +350,8 @@ const coverageDashboardBaseUX = css`
 
   .coverage-controls select {
     max-width: 100%;
-    min-height: var(--control-md);
-    padding: var(--space-4) var(--space-6);
+    min-height: var(--control-height-md);
+    padding: var(--space-4) var(--control-padding-md);
     border: var(--border-w) solid var(--border-subtle);
     border-radius: var(--radius-md);
     font: inherit;
@@ -459,7 +459,7 @@ const coverageDashboardBaseUX = css`
     display: grid;
     flex: none;
     place-items: center;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
   }
 
   .coverage-donut {
@@ -610,7 +610,7 @@ const coverageDashboardBaseUX = css`
     overflow: hidden;
     width: 100%;
     height: var(--space-2);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
   }
 
   .coverage-bar__fill {
@@ -652,8 +652,8 @@ const coverageDashboardBaseUX = css`
   .coverage-gap-list__head span,
   .coverage-more {
     flex: none;
-    border-radius: var(--radius-pill);
-    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--control-padding-sm);
     font-size: var(--text-caption);
     font-weight: var(--weight-semibold);
     line-height: var(--leading-tight);
@@ -743,8 +743,14 @@ const coverageDashboardSkinX = css`
   background: var(--bg-surface);
 
   .coverage-controls select {
-    background: var(--bg-surface);
+    background: var(--bg-field);
     color: var(--text-body);
+  }
+
+  .coverage-controls select:disabled {
+    border-color: var(--border-disabled);
+    background: var(--bg-disabled);
+    color: var(--text-disabled);
   }
 
   .coverage-header {
@@ -1252,9 +1258,10 @@ const coverageScopeControl = css`
   width: 100%;
   min-width: 0;
   .coverage-controls__field { display: flex; flex-direction: column; gap: var(--space-4); font-size: var(--text-caption); }
-  select { width: 100%; min-width: 0; min-height: var(--control-md); padding: var(--space-4) var(--space-6);
+  select { width: 100%; min-width: 0; min-height: var(--control-height-md); padding: var(--space-4) var(--control-padding-md);
     border: var(--border-w) solid var(--border-subtle); border-radius: var(--radius-md);
-    background: var(--bg-surface); color: var(--text-strong); font: inherit; }
+    background: var(--bg-field); color: var(--text-strong); font: inherit; }
+  select:disabled { border-color: var(--border-disabled); background: var(--bg-disabled); color: var(--text-disabled); }
 `;
 
 export function CoverageControls({ scope, onScopeChange, scopes, disabled = false }: {

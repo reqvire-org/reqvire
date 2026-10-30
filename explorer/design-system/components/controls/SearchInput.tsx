@@ -9,8 +9,8 @@ const baseUX = css`
 
   .ds-search__input {
     width: 100%;
-    height: var(--ds-search-input-h, var(--control-md));
-    padding: var(--ds-search-input-p, 0 var(--space-8) 0 var(--space-16));
+    height: var(--ds-search-input-h, var(--control-height-md));
+    padding: var(--ds-search-input-p, 0 var(--control-padding-md) 0 var(--space-16));
     font-family: var(--font-sans);
     font-size: var(--ds-search-input-fs, var(--text-sm));
     outline: none;
@@ -55,7 +55,7 @@ const baseUX = css`
 const skinX = css`
   .ds-search__input {
     color: var(--ds-search-input-color, var(--text-body));
-    background: var(--ds-search-input-bg, var(--bg-surface));
+    background: var(--ds-search-input-bg, var(--bg-field));
     border: var(--ds-search-input-border, var(--border-w) solid var(--border-default));
     border-radius: var(--ds-search-input-radius, var(--radius-md));
   }
@@ -70,7 +70,7 @@ const skinX = css`
 
   .ds-search__input:focus {
     border-color: var(--ds-search-input-focus-border-color, var(--border-focus));
-    background: var(--ds-search-input-focus-bg, var(--ds-search-input-bg, var(--bg-surface)));
+    background: var(--ds-search-input-focus-bg, var(--ds-search-input-bg, var(--bg-field)));
   }
 
   .ds-search__icon {
@@ -86,8 +86,8 @@ const skinX = css`
 
 const sizeLgUX = css`
   .ds-search__input {
-    height: var(--control-lg);
-    padding: var(--ds-search-input-p, 0 var(--space-8) 0 calc(var(--space-16) + var(--space-3)));
+    height: var(--control-height-lg);
+    padding: var(--ds-search-input-p, 0 var(--control-padding-lg) 0 calc(var(--space-16) + var(--space-3)));
     font-size: var(--text-base);
   }
 

@@ -66,15 +66,15 @@ const headerBaseUX = css`
 
 const markBaseUX = css`
   display: inline-flex;
-  width: var(--control-md);
-  height: var(--control-md);
+  width: var(--control-height-md);
+  height: var(--control-height-md);
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
 `;
 
 const markSkinX = css`
-  background: var(--danger-tint);
+  background: var(--danger-bg);
   border: var(--border-w) solid var(--danger-border);
   border-radius: var(--radius-md);
   color: var(--danger);
@@ -122,7 +122,7 @@ const statusBaseUX = css`
 const statusSkinX = css`
   border: var(--border-w) solid var(--danger-border);
   border-radius: var(--radius-md);
-  background: var(--danger-tint);
+  background: var(--danger-bg);
   color: var(--text-strong);
 
   svg {

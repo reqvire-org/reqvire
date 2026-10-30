@@ -354,8 +354,8 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     const textStrong = cssVar('--text-strong');
     const textBody = cssVar('--text-body');
     const textMuted = cssVar('--text-muted');
-    const textInverse = cssVar('--slate-0');
-    const labelOnLight = cssVar('--slate-950');
+    const textInverse = cssVar('--color-paper');
+    const labelOnLight = cssVar('--color-ink');
     const defaultEdge = cssVar('--color-role-edge-default');
     const colorBySemanticType = {
         'semantic-query': { fill: cssVar('--color-role-ontology'), stroke: cssVar('--color-role-ontology-ink'), text: textStrong },

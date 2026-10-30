@@ -89,8 +89,8 @@ const baseUX = css`
 
   .ux-coverage-drilldown__disclosure-space {
     display: flex;
-    flex: 0 0 var(--control-sm);
-    height: var(--control-sm);
+    flex: 0 0 var(--control-height-sm);
+    height: var(--control-height-sm);
   }
 
   .ux-coverage-drilldown__marker-space {
@@ -123,7 +123,7 @@ const baseUX = css`
   .ux-coverage-drilldown__bar {
     display: block;
     height: var(--space-3);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     overflow: hidden;
   }
 

@@ -9,7 +9,7 @@ const baseUX = css`
   gap: var(--space-4);
 
   .ds-relation__kind {
-    padding: var(--space-1) var(--space-4);
+    padding: var(--space-1) var(--control-padding-sm);
     border-radius: var(--radius-sm);
     font-family: var(--font-mono);
     font-size: var(--text-micro);
@@ -24,7 +24,7 @@ const baseUX = css`
     min-width: 0;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-2) var(--space-6);
+    padding: var(--space-2) var(--control-padding-sm);
     border-radius: var(--radius-sm);
     cursor: pointer;
     font-size: var(--text-sm);
@@ -37,7 +37,6 @@ const baseUX = css`
 
   .ds-relation__target:disabled {
     cursor: default;
-    opacity: 0.72;
     pointer-events: none;
   }
 
@@ -73,8 +72,10 @@ const skinX = css`
     background: var(--bg-hover);
   }
 
+  .ds-relation__target:disabled,
   .ds-relation__target:disabled:hover {
     background: transparent;
+    color: var(--text-disabled);
   }
 `;
 

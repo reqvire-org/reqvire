@@ -12,8 +12,8 @@ const baseUX = css`
   height: var(--ds-badge-h, calc(var(--space-8) + var(--space-1)));
   align-items: center;
   justify-content: center;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-pill);
+  padding: 0 var(--control-padding-sm);
+  border-radius: var(--radius-full);
   font-size: var(--text-micro);
   font-variant-numeric: tabular-nums;
   font-weight: var(--weight-semibold);
@@ -31,13 +31,8 @@ const accentSkinX = css`
 `;
 
 const solidSkinX = css`
-  background: var(--slate-700);
-  color: var(--slate-0);
-
-  [data-theme="dark"] & {
-    background: var(--slate-300);
-    color: var(--slate-900);
-  }
+  background: var(--slate-10);
+  color: var(--slate-1);
 `;
 
 const dotSkinX = css`

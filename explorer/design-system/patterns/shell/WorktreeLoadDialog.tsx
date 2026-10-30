@@ -26,7 +26,7 @@ const statusUX = css`
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  height: var(--control-sm);
+  height: var(--control-height-sm);
   color: var(--danger);
 `;
 const branchUX = css`

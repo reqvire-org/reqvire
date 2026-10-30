@@ -39,7 +39,7 @@ const schemaAlertBaseUX = css`
 const schemaAlertSkinX = css`
   border: var(--border-w) solid var(--danger-border);
   border-radius: var(--radius-md);
-  background: var(--danger-tint);
+  background: var(--danger-bg);
   color: var(--text-strong);
   box-shadow: var(--shadow-xs);
 

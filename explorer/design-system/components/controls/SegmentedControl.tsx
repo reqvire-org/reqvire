@@ -5,7 +5,7 @@ const baseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: calc(var(--space-1) + var(--border-w));
+  padding: calc(var(--control-inset) + var(--border-w));
   border: var(--border-w) solid var(--border-subtle);
   border-radius: var(--radius-md);
 
@@ -19,8 +19,8 @@ const itemBaseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  height: var(--ds-segmented-item-h, calc(var(--control-xs) + var(--space-2)));
-  padding: 0 var(--space-7);
+  height: var(--ds-segmented-item-h, calc(var(--control-height-xs) + var(--space-2)));
+  padding: 0 var(--control-padding-sm);
   border: 0;
   border-radius: var(--radius-sm);
   font-size: var(--text-caption);

@@ -7,15 +7,15 @@
 @layer base {
   :root {
     /* Shadows - light */
-    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 4%, transparent);
-    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 6%, transparent),
-      0 1px 3px color-mix(in oklch, var(--slate-950) 5%, transparent);
-    --shadow-md: 0 2px 4px color-mix(in oklch, var(--slate-950) 6%, transparent),
-      0 4px 12px color-mix(in oklch, var(--slate-950) 7%, transparent);
-    --shadow-lg: 0 8px 20px color-mix(in oklch, var(--slate-950) 10%, transparent),
-      0 2px 6px color-mix(in oklch, var(--slate-950) 6%, transparent);
-    --shadow-xl: 0 18px 48px color-mix(in oklch, var(--slate-950) 18%, transparent),
-      0 6px 16px color-mix(in oklch, var(--slate-950) 10%, transparent);
+    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--color-ink) 4%, transparent);
+    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-ink) 6%, transparent),
+      0 1px 3px color-mix(in oklch, var(--color-ink) 5%, transparent);
+    --shadow-md: 0 2px 4px color-mix(in oklch, var(--color-ink) 6%, transparent),
+      0 4px 12px color-mix(in oklch, var(--color-ink) 7%, transparent);
+    --shadow-lg: 0 8px 20px color-mix(in oklch, var(--color-ink) 10%, transparent),
+      0 2px 6px color-mix(in oklch, var(--color-ink) 6%, transparent);
+    --shadow-xl: 0 18px 48px color-mix(in oklch, var(--color-ink) 18%, transparent),
+      0 6px 16px color-mix(in oklch, var(--color-ink) 10%, transparent);
 
     --shadow-raised: var(--shadow-md);
 
@@ -32,13 +32,21 @@
     --ease-standard: cubic-bezier(0.2, 0, 0, 1);   /* @kind other */
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* @kind other */
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+    /* Roles: enter decelerates, exit accelerates; -strong curves for rare important moments. */
+    --ease-enter: var(--ease-out);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --ease-strong: var(--ease-in-out);
+    --ease-enter-strong: cubic-bezier(0, 0, 0.3, 1);
+    --ease-exit-strong: cubic-bezier(0.4, 0.14, 1, 1);
 
     --dur-reduced-motion: 0.001ms;
     --dur-instant: 80ms; /* @kind other */
     --dur-fast: 130ms;   /* @kind other */
+    --dur-moderate: 160ms;
     --dur-base: 200ms;   /* @kind other */
     --dur-normal: var(--dur-base);
     --dur-slow: 320ms;   /* @kind other */
+    --dur-slower: 480ms;
 
     /* Toast stacking and status motion, adapted from Sonner. */
     --dur-toast-stack: 400ms; /* @kind other */
@@ -51,13 +59,16 @@
     --toast-stack-scale-step: 0.05; /* @kind other */
 
     /* Layering */
+    --z-base: 0;
     --z-rail: 20;    /* @kind other */
     --z-sticky: 40;  /* @kind other */
     --z-pane-resizer: 45; /* @kind other */
     --z-popover: 60; /* @kind other */
+    --z-dropdown: var(--z-popover);
     --z-overlay: 80; /* @kind other */
     --z-modal: 90;   /* @kind other */
     --z-toast: 100;  /* @kind other */
+    --z-tooltip: 110;
     --z-local-base: 1;    /* @kind other */
     --z-local-raised: 2;  /* @kind other */
     --z-local-overlay: 3; /* @kind other */
@@ -65,31 +76,47 @@
     --z-app-shell-z-index: calc(var(--z-sticky) + 1);
   }
 
+  /* Reduced motion: every duration is instant (WCAG 2.3.3). */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-reduced-motion: 0ms;
+      --dur-instant: 0ms;
+      --dur-fast: 0ms;
+      --dur-moderate: 0ms;
+      --dur-base: 0ms;
+      --dur-slow: 0ms;
+      --dur-slower: 0ms;
+      --dur-toast-stack: 0ms;
+      --dur-toast-rear-exit: 0ms;
+      --dur-toast-icon: 0ms;
+    }
+  }
+
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 30%, transparent);
-      --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 40%, transparent),
-        0 1px 3px color-mix(in oklch, var(--slate-950) 30%, transparent);
-      --shadow-md: 0 2px 6px color-mix(in oklch, var(--slate-950) 45%, transparent),
-        0 6px 16px color-mix(in oklch, var(--slate-950) 40%, transparent);
-      --shadow-lg: 0 10px 24px color-mix(in oklch, var(--slate-950) 55%, transparent),
-        0 2px 8px color-mix(in oklch, var(--slate-950) 45%, transparent);
-      --shadow-xl: 0 24px 60px color-mix(in oklch, var(--slate-950) 65%, transparent),
-        0 8px 20px color-mix(in oklch, var(--slate-950) 50%, transparent);
+      --shadow-xs: 0 1px 1px color-mix(in oklch, var(--color-ink) 30%, transparent);
+      --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-ink) 40%, transparent),
+        0 1px 3px color-mix(in oklch, var(--color-ink) 30%, transparent);
+      --shadow-md: 0 2px 6px color-mix(in oklch, var(--color-ink) 45%, transparent),
+        0 6px 16px color-mix(in oklch, var(--color-ink) 40%, transparent);
+      --shadow-lg: 0 10px 24px color-mix(in oklch, var(--color-ink) 55%, transparent),
+        0 2px 8px color-mix(in oklch, var(--color-ink) 45%, transparent);
+      --shadow-xl: 0 24px 60px color-mix(in oklch, var(--color-ink) 65%, transparent),
+        0 8px 20px color-mix(in oklch, var(--color-ink) 50%, transparent);
     }
   }
 
   :root[data-theme="dark"],
   :root.dark {
-    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 30%, transparent);
-    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 40%, transparent),
-      0 1px 3px color-mix(in oklch, var(--slate-950) 30%, transparent);
-    --shadow-md: 0 2px 6px color-mix(in oklch, var(--slate-950) 45%, transparent),
-      0 6px 16px color-mix(in oklch, var(--slate-950) 40%, transparent);
-    --shadow-lg: 0 10px 24px color-mix(in oklch, var(--slate-950) 55%, transparent),
-      0 2px 8px color-mix(in oklch, var(--slate-950) 45%, transparent);
-    --shadow-xl: 0 24px 60px color-mix(in oklch, var(--slate-950) 65%, transparent),
-      0 8px 20px color-mix(in oklch, var(--slate-950) 50%, transparent);
+    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--color-ink) 30%, transparent);
+    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-ink) 40%, transparent),
+      0 1px 3px color-mix(in oklch, var(--color-ink) 30%, transparent);
+    --shadow-md: 0 2px 6px color-mix(in oklch, var(--color-ink) 45%, transparent),
+      0 6px 16px color-mix(in oklch, var(--color-ink) 40%, transparent);
+    --shadow-lg: 0 10px 24px color-mix(in oklch, var(--color-ink) 55%, transparent),
+      0 2px 8px color-mix(in oklch, var(--color-ink) 45%, transparent);
+    --shadow-xl: 0 24px 60px color-mix(in oklch, var(--color-ink) 65%, transparent),
+      0 8px 20px color-mix(in oklch, var(--color-ink) 50%, transparent);
   }
 }
 

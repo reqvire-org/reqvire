@@ -19,6 +19,7 @@
   a { text-decoration: none; }
   button { font-family: inherit; }
   ::selection { background: var(--accent-subtle); color: var(--text-strong); }
+  :focus-visible { outline: var(--focus-w) solid var(--border-focus); outline-offset: var(--focus-offset); }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) { color-scheme: dark; }
   }

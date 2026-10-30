@@ -128,7 +128,7 @@ function parseHexColor(color: string) {
 
 function sigmaLabelSettings() {
   return {
-    labelColor: { color: cssVar("--slate-950") },
+    labelColor: { color: cssVar("--color-ink") },
     edgeLabelColor: { color: cssVar("--text-muted") },
     labelWeight: "600",
     edgeLabelWeight: "600",

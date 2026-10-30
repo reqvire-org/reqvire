@@ -315,7 +315,7 @@ const gridUX = css`
     display: inline-flex;
     width: fit-content;
     align-items: center;
-    padding: var(--space-1) var(--space-4);
+    padding: var(--space-1) var(--control-padding-sm);
     font-size: var(--text-caption);
     font-weight: var(--weight-bold);
     line-height: 1.2;
@@ -364,7 +364,7 @@ const gridSkinX = css`
   }
 
   .ux-file-browser__count-badge {
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     background: var(--bg-sunken);
     color: var(--text-muted);
   }
@@ -377,7 +377,7 @@ const itemActionUX = css`
   align-items: center;
   gap: var(--space-4);
   box-sizing: border-box;
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--control-padding-sm);
   text-align: left;
   text-decoration: none;
   font-size: var(--text-sm);
@@ -509,7 +509,7 @@ const elementsUX = css`
     align-items: center;
     gap: var(--space-4);
     box-sizing: border-box;
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-4) var(--control-padding-sm);
     text-align: left;
   }
 `;

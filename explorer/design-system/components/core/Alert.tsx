@@ -28,25 +28,25 @@ const skinX = css`
 `;
 
 const dangerSkinX = css`
-  background: var(--danger-tint);
+  background: var(--danger-bg);
   border-color: var(--danger-border);
   color: var(--danger);
 `;
 
 const warningSkinX = css`
-  background: var(--warning-tint);
+  background: var(--warning-bg);
   border-color: var(--warning-border);
   color: var(--warning);
 `;
 
 const successSkinX = css`
-  background: var(--success-tint);
+  background: var(--success-bg);
   border-color: var(--success-border);
   color: var(--success);
 `;
 
 const infoSkinX = css`
-  background: var(--info-tint);
+  background: var(--info-bg);
   border-color: var(--info-border);
   color: var(--info);
 `;

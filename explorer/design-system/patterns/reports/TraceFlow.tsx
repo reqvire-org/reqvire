@@ -75,7 +75,7 @@ const baseUX = css`
     max-width: calc(100% - var(--space-16));
     padding: var(--space-3) var(--space-6);
     border: var(--border-w) solid var(--border-default);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     font-size: var(--text-sm);
   }
   .ux-trace-flow-focus span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -159,7 +159,7 @@ const baseUX = css`
     align-items: center;
     gap: var(--space-2);
     margin-top: auto;
-    min-height: var(--control-sm);
+    min-height: var(--control-height-sm);
   }
   .ux-trace-flow-node-footer > button { flex: none; }
   .react-flow__handle { visibility: hidden; }

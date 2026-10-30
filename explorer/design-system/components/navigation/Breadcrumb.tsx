@@ -18,6 +18,11 @@ const baseUX = css`
   }
 
   .ds-crumbs__item {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
     display: inline-flex;
     min-width: 0;
     max-width: var(--space-breadcrumb-item-max-w);
@@ -93,12 +98,15 @@ export function Breadcrumb({ items = [], className = "", ...props }: BreadcrumbP
         const last = i === items.length - 1;
         return (
           <span className="ds-crumbs__segment" key={i}>
-            <span
-              className={["ds-crumbs__item", last ? "is-current" : ""].filter(Boolean).join(" ")}
-              onClick={!last ? it.onClick : undefined}
-            >
-              {it.label}
-            </span>
+            {!last && it.onClick ? (
+              <button type="button" className="ds-crumbs__item" onClick={it.onClick}>
+                {it.label}
+              </button>
+            ) : (
+              <span className={["ds-crumbs__item", last ? "is-current" : ""].filter(Boolean).join(" ")} aria-current={last ? "page" : undefined}>
+                {it.label}
+              </span>
+            )}
             {!last ? (
               <span className="ds-crumbs__sep" aria-hidden="true">
                 <Icon name="chevron-right" size={14} />
