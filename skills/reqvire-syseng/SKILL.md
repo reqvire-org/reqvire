@@ -497,7 +497,7 @@ coverage [--json]
 migrate [--fix] [--json]
 
 # Analysis
-change-impact [--git-commit=<ref>] [--base-manifest-commit=<ref>] [--json]
+change-impact [--git-commit=<ref>] [--json]
 traces [--output <file>] [--filter-name=".*Pattern.*"]
 resources [--output <file>]
 containment [--short] [--output <file>]
@@ -505,7 +505,7 @@ containment [--short] [--output <file>]
 serve [--port 8080]
 ```
 
-`change-impact` defaults to HEAD. Ordinary Git mode requires one eligible worktree; an aggregate without a Repo composition remains ambiguous. In Repo mode `--git-commit` selects Central's base, while the historical manifest pins each component by full commit ID. A separately versioned native manifest requires `--base-manifest-commit` (MCP `base_manifest_commit`); omit it for Central-owned manifests and ordinary Git mode. Missing local history fails without fetching or changing checkouts. Paths remain workspace-root-relative. See [Creating Tasks](references/CreatingTasks.md#step-1-analyze-change-impact) for baseline selection and provenance review.
+`change-impact` defaults to HEAD and has one baseline selector: `--git-commit` (MCP `git_commit`). Ordinary Git mode requires one eligible worktree; an aggregate without a Repo composition remains ambiguous. In Repo mode the selected workspace-root repository commit supplies its model, manifest and includes, while that historical manifest pins each component by full commit ID. Select a manifest tracked in that repository with global `--manifest`; independent manifest history is rejected with path-specific guidance instead of guessing another revision. Missing local objects fail without fetching or changing checkouts. Paths remain workspace-root-relative. See [Creating Tasks](references/CreatingTasks.md#step-1-analyze-change-impact) for baseline and provenance review.
 
 **Common flags:** Availability depends on the command. Commands with text and JSON output require `--json` with `--output <file>`. JSON-only `model`, `containment`, `resources`, and `traces` emit JSON to stdout by default and accept `--output <file>` directly. Use `--short` and `--dry-run` only where supported.
 

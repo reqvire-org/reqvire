@@ -377,7 +377,10 @@ impl ChangeImpactReport {
         if let Some(comparison) = &self.comparison {
             output.push_str("### Workspace Comparison\n\n");
             for (label, side) in [("Base", &comparison.base), ("Current", &comparison.current)] {
-                output.push_str(&format!("* {label} Central: `{}`\n", side.central_commit));
+                output.push_str(&format!(
+                    "* {label} workspace repository: `{}`\n",
+                    side.central_commit
+                ));
                 for input in &side.manifest_inputs {
                     output.push_str(&format!(
                         "  * Manifest {}: `{}`\n",

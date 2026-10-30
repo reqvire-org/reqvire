@@ -14,7 +14,7 @@ Propagation categories and relation impact rules are defined by the Reqvire rela
 
 
 **Comparison invocation:**
-The change-impact command accepts `--git-commit` and the optional `--base-manifest-commit` under the shared baseline-selection contract. Forward the effective workspace and selected manifest to shared composition reconstruction and reporting; do not implement adapter-local component selection. Preserve text output by default and JSON output with `--json`.
+The change-impact command accepts `--git-commit` as its sole baseline selector under the shared baseline-selection contract. In Repo mode the selected workspace-root repository commit supplies the root model and historical manifest; the manifest supplies the component commits. Forward the effective workspace and selected manifest to shared composition reconstruction and reporting; do not implement adapter-local component selection. Preserve text output by default and JSON output with `--json`.
 
 #### Metadata
   * type: behavior

@@ -89,7 +89,7 @@ SEARCH OPTIONS:
       --filter-contract-references <GLOB> Only include elements with Contract Reference targets matching this glob (e.g., "*#error-response-specification")
 
 CHANGE IMPACT OPTIONS:
-      --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
+      --git-commit <GIT_COMMIT> Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 

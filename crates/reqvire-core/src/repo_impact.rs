@@ -387,11 +387,17 @@ fn project_objects(
     Err(failure(format!("repo_impact_base_unavailable: project {} ({}) revision {} is unavailable locally; no fetch was attempted",project.name,project.path.display(),project.revision)))
 }
 
+fn manifest_history_unavailable(path: &Path) -> ReqvireError {
+    failure(format!(
+        "repo_impact_manifest_history_unavailable: {} has no version in the selected workspace-root repository history; use --manifest to select a manifest tracked in the workspace-root repository",
+        path.display()
+    ))
+}
+
 pub fn historical_model(
     scope: &WorkspaceScope,
     current: &RepoWorkspace,
     git_commit: &str,
-    base_manifest_commit: Option<&str>,
     exclusions: &ExclusionSet,
 ) -> Result<(ModelManager, Comparison), ReqvireError> {
     let root = &scope.root;
@@ -412,29 +418,12 @@ pub fn historical_model(
                 current.manifest.display()
             ))
         })?;
-    let native = !source.root.as_os_str().is_empty();
-    if !native && base_manifest_commit.is_some() {
-        return Err(failure(
-            "base_manifest_commit is only valid for a separately versioned manifest repository",
-        ));
+    if !source.root.as_os_str().is_empty() || !source.tracked {
+        return Err(manifest_history_unavailable(&current.manifest));
     }
-    let native_commit = if native {
-        let reference = base_manifest_commit.ok_or_else(|| {
-            failure(format!(
-                "base_manifest_commit_required: {}",
-                current.manifest.display()
-            ))
-        })?;
-        Some(resolve(&root.join(&source.root), reference)?)
-    } else {
-        None
-    };
     for (path, owner) in &current.manifest_sources {
-        if !owner.tracked || (!owner.root.as_os_str().is_empty() && owner.root != source.root) {
-            return Err(failure(format!(
-                "Historical manifest input has no identifiable version: {}",
-                path.display()
-            )));
+        if !owner.tracked || !owner.root.as_os_str().is_empty() {
+            return Err(manifest_history_unavailable(path));
         }
     }
     let central_files = tree(root, &central)?;
@@ -463,27 +452,9 @@ pub fn historical_model(
             staged.join(".repo/manifests/.git"),
             "gitdir: ../manifests.git\n",
         )?;
-        if let Some(commit) = &native_commit {
-            materialize(
-                &staged.join(&source.root),
-                &tree(&root.join(&source.root), commit)?,
-            )?;
-        }
-        // The generated selection wrapper locates the versioned native entry;
-        // it is never substituted for that entry's historical declarations.
-        let wrapper = if native {
-            let name = current
-                .manifest
-                .strip_prefix(".repo/manifests")
-                .map_err(|e| failure(e.to_string()))?;
-            format!(
-                "<manifest><include name=\"{}\"/></manifest>\n",
-                quick_xml::escape::escape(name.to_string_lossy())
-            )
-        } else {
-            "<manifest/>\n".to_owned()
-        };
-        std::fs::write(staged.join(".repo/manifest.xml"), wrapper)?;
+        // Repo's generated wrapper is administration, not historical input.
+        // The selected manifest and includes come from the one base tree.
+        std::fs::write(staged.join(".repo/manifest.xml"), "<manifest/>\n")?;
         base = RepoWorkspace::resolve_with_repo(
             staged,
             current.selection.clone(),
@@ -493,24 +464,14 @@ pub fn historical_model(
     base.central_commit = central.clone();
     base.central_repository = current.central_repository.clone();
     for path in base.manifest_input_paths() {
-        let (owner, commit) = if native && path.starts_with(&source.root) {
-            (
-                source.root.clone(),
-                native_commit.clone().expect("native manifest commit"),
-            )
-        } else if central_files.contains_key(&path) {
-            (PathBuf::new(), central.clone())
-        } else {
-            return Err(failure(format!(
-                "Historical manifest input has no identifiable version: {}",
-                path.display()
-            )));
-        };
+        if !central_files.contains_key(&path) {
+            return Err(manifest_history_unavailable(&path));
+        }
         base.manifest_sources.insert(
             path,
             repo_workspace::ManifestSource {
-                root: owner,
-                commit,
+                root: PathBuf::new(),
+                commit: central.clone(),
                 tracked: true,
             },
         );

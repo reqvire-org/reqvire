@@ -76,7 +76,7 @@ When comparing complete workspace compositions, the system SHALL identify model 
 
 ### Manifest-Based Change Impact Baselines
 
-When comparing a manifest-defined workspace, the system SHALL reconstruct the complete historical model from Central and the selected historical manifest inputs and pinned component revisions without modifying the active workspace.
+When comparing a manifest-defined workspace, the system SHALL use one selected workspace-root repository commit to reconstruct its model, historical manifest inputs and pinned component revisions without modifying the active workspace. If that commit cannot identify a selected manifest input's history, the system SHALL reject the comparison with the affected path rather than request another baseline revision or guess a composition.
 
 #### Metadata
   * type: requirement

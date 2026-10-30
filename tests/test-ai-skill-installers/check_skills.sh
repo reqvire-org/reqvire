@@ -73,7 +73,8 @@ while IFS= read -r -d '' package; do
     done < <(find "$package" -type f -name '*.md' -print0)
 done < <(find "$source" -mindepth 1 -maxdepth 1 -type d -print0 | sort -z)
 skills discovery "$work" --list
-sed -E $'s/\033\\[[0-?]*[ -/]*[@-~]//g' "$work/discovery.stdout" > "$work/discovery-plain.txt"
+# ANSI control ranges are ASCII byte ranges, independent of locale collation.
+LC_ALL=C sed -E $'s/\033\\[[0-?]*[ -/]*[@-~]//g' "$work/discovery.stdout" > "$work/discovery-plain.txt"
 sed -nE 's/^│[[:space:]]+(reqvire-[a-z-]+)[[:space:]]*$/\1/p' "$work/discovery-plain.txt" | LC_ALL=C sort > "$work/names.txt"
 fixture names.txt
 printf 'PASS canonical package manifests, links, and CLI discovery\n' > "$work/checks.txt"

@@ -31,11 +31,11 @@ EOF
     impact_base=$(impact_commit "$central" 'Historical combined model')
     cp "$central/default.xml" "$native"
     cp "$central/parts/projects.xml" "$(dirname "$native")/parts/projects.xml"
-    manifest_base=$(impact_commit "$(dirname "$native")" 'Historical manifest inputs')
+    impact_commit "$(dirname "$native")" 'Historical manifest inputs' > /dev/null
     sed -i "s/$alpha/$omega/" "$central/parts/projects.xml"
     impact_current=$(impact_commit "$central" 'Current combined model')
     cp "$central/parts/projects.xml" "$(dirname "$native")/parts/projects.xml"
-    manifest_current=$(impact_commit "$(dirname "$native")" 'Current manifest inputs')
+    impact_commit "$(dirname "$native")" 'Current manifest inputs' > /dev/null
     (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
     # Keep Central's web identity distinct from component file remotes. Reports
     # must not invent Central blob URLs for component-owned paths.
@@ -96,18 +96,16 @@ impact_graph() {
 }
 
 impact_provenance() {
-    local prefix="${1:-}" base_manifest=$impact_base current_manifest=$impact_current
-    if [[ -n "$prefix" ]]; then base_manifest=$manifest_base; current_manifest=$manifest_current; fi
     jq -S --arg base "$impact_base" --arg current "$impact_current" \
         --arg alpha "$alpha" --arg omega "$omega" --arg docs "$docs_commit" \
-        --arg prefix "$prefix" --arg mb "$base_manifest" --arg mc "$current_manifest" '
+        '
       .comparison | select(.workspace_mode == "repo") |
       [.base, .current] | to_entries | map(
         .key as $side | .value |
         {central: (.central_commit == (if $side == 0 then $base else $current end)),
          inputs: (.manifest_inputs == [
-           {path: ($prefix + "default.xml"), commit: (if $side == 0 then $mb else $mc end)},
-           {path: ($prefix + "parts/projects.xml"), commit: (if $side == 0 then $mb else $mc end)}]),
+           {path: "default.xml", commit: (if $side == 0 then $base else $current end)},
+           {path: "parts/projects.xml", commit: (if $side == 0 then $base else $current end)}]),
          projects: ([.projects[] | {name,path,commit}] == [
            {name:"component",path:"repositories/component",commit:(if $side == 0 then $alpha else $omega end)},
            {name:"docs",path:"repositories/docs",commit:$docs}]),
@@ -171,14 +169,11 @@ impact_text() {
 impact_mcp() {
     local mode=${1:-mcp} selection=${2:-central} args
     impact_start_server "$mode" "$selection"
-    if [[ "$selection" == native ]]; then
-        impact_rpc reqvire.tool_contract '{}' "$native_case/tool-contract.json"
-        jq -e '.result.structuredContent.tools[] | select(.name == "reqvire.change_impact") |
-          .inputSchema.properties | has("base_manifest_commit")' "$native_case/tool-contract.json"
-    fi
+    impact_rpc reqvire.tool_contract '{}' "$native_case/tool-contract.json"
+    jq -e '.result.structuredContent.tools[] | select(.name == "reqvire.change_impact") |
+      .inputSchema.properties | has("git_commit") and (has("base_manifest_commit") | not)' "$native_case/tool-contract.json"
     impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
-    args=$(jq -n --arg commit "$impact_base" --arg manifest "$manifest_base" --arg selection "$selection" \
-        '{branch:"main",git_commit:$commit} + if $selection == "native" then {base_manifest_commit:$manifest} else {} end')
+    args=$(jq -n --arg commit "$impact_base" '{branch:"main",git_commit:$commit}')
     impact_state > "$native_case/before-state.txt"
     local result=0
     impact_rpc reqvire.change_impact "$args" "$native_case/impact-result.json" || result=1
@@ -190,37 +185,49 @@ impact_mcp() {
     jq -S '.result.structuredContent.context | {model_revision,accepted_head,pending_changes,writes_available}' \
         "$native_case/status-after.json" > "$native_case/accepted-after.json"
     diff -u "$native_case/accepted-before.json" "$native_case/accepted-after.json"
+    if [[ "$selection" == native ]]; then
+        [[ "$result" != 0 ]] || { echo 'Independent manifest history was silently guessed'; return 1; }
+        grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact-result.json"
+        impact_cli native --json && return 1
+        grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
+        return 0
+    fi
     [[ "$result" == 0 ]] || { cat "$native_case/impact-result.json"; return 1; }
     jq '.result.structuredContent | del(.context)' "$native_case/impact-result.json" > "$native_case/mcp-impact.json"
     impact_graph "$native_case/mcp-impact.json"
-    local extra=()
-    [[ "$selection" != native ]] || extra+=(--base-manifest-commit "$manifest_base")
-    impact_cli "$selection" "${extra[@]}" --json
+    impact_cli "$selection" --json
     jq -S . "$native_case/impact.out" > "$native_case/cli-normalized.json"
     jq -S . "$native_case/mcp-impact.json" > "$native_case/mcp-normalized.json"
     diff -u "$native_case/cli-normalized.json" "$native_case/mcp-normalized.json"
 }
 
 impact_native() {
-    impact_cli native --base-manifest-commit "$manifest_base" --json
-    impact_graph "$native_case/impact.out"
-    impact_provenance '.repo/manifests/'
-    cp "$native_case/impact.out" "$native_case/native-default-impact.json"
-    # A versioned native entry containing only an include remains a manifest
-    # input; only Repo's generated selection wrapper is omitted from provenance.
+    if impact_cli native --json; then echo 'Independent manifest history was silently guessed'; return 1; fi
+    grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
+    grep -Fq .repo/manifests/ "$native_case/impact.diagnostic"
+    grep -Fq 'tracked in the workspace-root repository' "$native_case/impact.diagnostic"
     impact_state > "$native_case/before-explicit-native.txt"
-    (cd "$central" && "$REQVIRE_BIN" --manifest .repo/manifests/default.xml change-impact \
-        --git-commit "$impact_base" --base-manifest-commit "$manifest_base" --json) \
-        > "$native_case/native-explicit-impact.json"
+    if (cd "$central" && "$REQVIRE_BIN" --manifest .repo/manifests/default.xml change-impact \
+        --git-commit "$impact_base" --json) > "$native_case/explicit-native.out" 2>&1; then
+        echo 'Changing manifest location silently guessed independent history'; return 1
+    fi
     impact_state > "$native_case/after-explicit-native.txt"
     diff -u "$native_case/before-explicit-native.txt" "$native_case/after-explicit-native.txt"
-    diff -u "$native_case/native-default-impact.json" "$native_case/native-explicit-impact.json"
+    grep -Fq repo_impact_manifest_history_unavailable "$native_case/explicit-native.out"
+    # The workspace-root commit and its tracked manifest still identify the
+    # complete baseline, regardless of the native checkout's separate history.
+    impact_cli central --json
+    impact_graph "$native_case/impact.out"
+    impact_provenance
 }
 
-impact_native_required() {
-    if impact_cli native --json; then echo 'Native manifest history was silently guessed'; return 1; fi
-    grep -Fq base_manifest_commit_required "$native_case/impact.diagnostic"
-    grep -Fq .repo/manifests/ "$native_case/impact.diagnostic"
+impact_single_selector() {
+    impact_cli central --json
+    impact_graph "$native_case/impact.out"
+    if impact_cli central --base-manifest-commit HEAD --json; then
+        echo 'Removed second baseline selector was accepted'; return 1
+    fi
+    grep -Fq "unexpected argument '--base-manifest-commit'" "$native_case/impact.diagnostic"
 }
 
 impact_include() {
@@ -366,9 +373,10 @@ provenance cli/repo-impact-provenance-and-links
 text cli/repo-impact-text
 mcp mcp/repo-impact-parity-and-isolation
 serve serve/repo-impact-parity-and-isolation
-native cli/repo-impact-native-history
-native_mcp mcp/repo-impact-native-history
-native_required cli/repo-impact-native-history-required
+foreign_manifest cli/repo-impact-independent-manifest-history-rejected
+foreign_mcp mcp/repo-impact-independent-manifest-history-rejected
+foreign_serve serve/repo-impact-independent-manifest-history-rejected
+selector cli/repo-impact-single-baseline-selector
 include cli/repo-impact-historical-includes
 missing cli/repo-impact-missing-base-commit
 unlocked cli/repo-impact-unlocked-base-revision
@@ -387,9 +395,10 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         provenance) impact_provenance_case ;;
         text) impact_text ;;
         mcp|serve) impact_mcp "$1" ;;
-        native) impact_native ;;
-        native_mcp) impact_mcp mcp native ;;
-        native_required) impact_native_required ;;
+        foreign_manifest) impact_native ;;
+        foreign_mcp) impact_mcp mcp native ;;
+        foreign_serve) impact_mcp serve native ;;
+        selector) impact_single_selector ;;
         include) impact_include ;;
         missing|unlocked) impact_bad_base "$1" ;;
         add|remove|move) impact_project "$1" ;;

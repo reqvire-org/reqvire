@@ -56,12 +56,12 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 #### Details
 **Selection**
 - In ordinary Git mode retain the single-eligible-worktree behavior and existing `--git-commit` / `git_commit` default of HEAD. An ordinary multi-worktree workspace without a Repo composition remains ambiguous and MUST be rejected.
-- In Repo mode `--git-commit` / `git_commit` selects Central's base commit, defaulting to its accepted HEAD. Resolve it once to a locally available commit; never apply this ref independently to components.
-- Read the selected manifest path and every Central-owned include from that base Central tree, even when its files are absent from the current tree. The default Repo selection and explicit `--manifest` location retain their existing ownership rules.
-- Add optional change-impact argument `--base-manifest-commit <ref>`, with MCP field `base_manifest_commit`, for a selected manifest owned by Repo's separate manifest Git checkout. It selects a locally available commit in that owning repository. Require it when Central history cannot identify the historical manifest inputs. Reject this argument for Central-owned manifests and ordinary Git mode. Do not silently reuse the current native manifest as a historical base.
+- In Repo mode `--git-commit` / `git_commit` is the sole baseline selector. It selects the workspace-root repository's base commit, defaulting to its accepted HEAD. That commit identifies both the root model and the historical manifest composition. Resolve it once locally; never apply this ref independently to components.
+- Read the selected manifest and all includes from that selected repository tree, even when files are absent from the current tree. The historical manifest pins every declared component by its own commit. The global `--manifest` option selects the manifest location without adding another baseline revision selector.
+- A selected manifest with independent Git ownership cannot be reconstructed from the workspace-root commit. Reject that historical comparison with the affected input path and guidance to select a manifest tracked in the workspace-root repository. Do not guess another repository's revision, reuse live manifest bytes, or expose a second CLI/MCP baseline selector. Current model inspection and authoring retain their existing native Repo ownership rules.
 - Resolve all base includes and overlays from their identified owning historical trees. If an input is unversioned or its historical version cannot be identified, fail with the input path; never mix historical declarations with live inputs.
 - Require historical component revisions to be full commit object IDs. Reject mutable branch/tag selections in a baseline instead of guessing their historical value. Current composition revisions may use the admitted locally resolved commits.
-- Support Repo's existing include, remote, revision precedence and ownership semantics. Do not introduce a second manifest format or reinterpret Central's commit as manifest-project history.
+- Support Repo's existing include, remote, revision precedence and ownership semantics. Do not introduce a second manifest format or reinterpret the selected workspace-root commit as unrelated manifest-project history.
 
 **Complete historical scope**
 - Materialize Central and every base-declared project's model, semantic dependencies and eligible local artifacts at its own commit, under that composition's workspace-relative paths and ignore rules.
@@ -78,7 +78,7 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 
 
 **Diagnostics**
-Missing native manifest history reports `base_manifest_commit_required` with the selected manifest-project path. An unavailable historical project commit reports `repo_impact_base_unavailable`; a mutable historical component revision reports `repo_impact_base_unlocked`. Both project errors identify the project name, workspace-relative path and requested revision. Repo-generated selection wrappers locate the native manifest inputs; their bytes are not substituted for the versioned declarations or required to have a Git history.
+An independently owned or unversioned manifest input reports `repo_impact_manifest_history_unavailable` with its path and guidance to use a manifest tracked in the workspace-root repository. An unavailable historical project commit reports `repo_impact_base_unavailable`; a mutable historical component revision reports `repo_impact_base_unlocked`. Both project errors identify the project name, workspace-relative path and requested revision. Repo-generated selection wrappers retain their existing source-selection role; their bytes cannot substitute for a manifest versioned in the selected repository history.
 
 #### Metadata
   * type: specification
@@ -97,7 +97,7 @@ Missing native manifest history reports `base_manifest_commit_required` with the
 - Current provenance identifies the accepted/current source commits even when model inputs include permitted pending changes. It MUST NOT imply those pending bytes are committed; existing context/pending-state evidence remains authoritative.
 - Text reports include an equivalent composition provenance summary. All model identifiers, evidence paths and relocation paths remain workspace-relative.
 - Resolve source links using the relevant side's owning repository, repository-relative source path and commit. Removed source links use base provenance; changed/added/impacted source links use current provenance. Do not prefix component paths with Central's GitHub identity or commit. When a repository URL cannot be mapped to a supported web URL, retain a workspace-relative link without inventing a remote URL.
-- CLI and MCP use the shared baseline and comparison semantics. MCP discovery exposes optional `base_manifest_commit`; it does not add a component selector or reinterpret the context's Central branch. Embedded MCP uses the same accepted-snapshot semantics.
+- CLI and MCP use the shared single-selector baseline and comparison semantics. MCP discovery exposes optional `git_commit` only for baseline selection; it does not add another repository revision selector or reinterpret the selected context branch. Embedded MCP uses the same accepted-snapshot semantics.
 - The structural comparison vocabulary describes snapshots and repository revision selections; it does not require runtime session/provenance RDF instances to be exported.
 
 #### Metadata

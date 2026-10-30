@@ -683,7 +683,7 @@ Quality and traceability tool behavior is inherited from reused Reqvire lint, co
 
 
 
-`reqvire.change_impact` accepts optional `git_commit` and `base_manifest_commit` fields under the shared Repo baseline contract. Discovery MUST advertise the optional native manifest selector. Route through the selected context and shared comparison operation, using the accepted current model and captured repository provenance; return the additive comparison provenance under the shared report contract. Standalone and embedded endpoints apply the same semantics.
+`reqvire.change_impact` accepts optional `git_commit` as its sole baseline revision selector under the shared Repo contract. Discovery MUST advertise that field with a default of HEAD and MUST NOT advertise a separate manifest revision selector. In Repo mode the selected workspace-root repository commit supplies the root model, manifest and includes, while that historical manifest supplies component pins. Route through the selected context and shared comparison operation, using the accepted current model and captured repository provenance; return the additive comparison provenance under the shared report contract. Standalone and embedded endpoints apply the same semantics.
 
 #### Metadata
   * type: specification

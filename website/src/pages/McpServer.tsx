@@ -616,24 +616,27 @@ reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBloc
         <p className="text-zinc-600 mb-4">
           <code>reqvire.change_impact</code> compares complete Repo compositions
           using the same baseline rules as the CLI. <code>git_commit</code>
-          selects Central&apos;s base commit, defaulting to its accepted HEAD.
-          Historical manifests supply full commit IDs for the components; the
-          Central ref is never applied independently to them. For a native
-          manifest with separate Git history, also supply
-          <code> base_manifest_commit</code> in that owning repository:
+          is the sole baseline selector, defaulting to the workspace-root
+          repository&apos;s accepted HEAD. That commit supplies the root model,
+          manifest and includes. The historical manifest supplies full commit
+          IDs for components; the root ref is never applied independently to
+          them. At server startup, use global <code>--manifest</code> to select
+          a manifest tracked in the workspace-root repository:
         </p>
-        <CodeBlock>{`{
+        <CodeBlock>{`reqvire --manifest default.xml mcp --enable-mutations
+
+{
   "name": "reqvire.change_impact",
   "arguments": {
     "branch": "model/review",
-    "git_commit": "origin/main",
-    "base_manifest_commit": "origin/main"
+    "git_commit": "origin/main"
   }
 }`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
-          Omit <code>base_manifest_commit</code> for Central-owned manifests and
-          ordinary Git mode, where it is rejected. Missing native manifest
-          history reports <code>base_manifest_commit_required</code>; mutable
+          A selected manifest with independent Git history reports
+          <code> repo_impact_manifest_history_unavailable</code>, naming the
+          input and directing the caller to a tracked workspace-root manifest.
+          The comparison never guesses a second revision. Mutable
           historical project pins report <code>repo_impact_base_unlocked</code>,
           and unavailable project objects report
           <code> repo_impact_base_unavailable</code>. Inputs must be versioned
@@ -645,7 +648,7 @@ reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBloc
           accepted pending edits. An impact request does not import external
           file or manifest changes. Baseline failures preserve that model,
           revision, pending changes and write availability. The report&apos;s
-          <code> comparison</code> records base/current Central commits,
+          <code> comparison</code> records base/current workspace-root commits,
           manifest inputs and project provenance. Inspect pending-state metadata
           separately: recorded commits do not imply pending bytes are committed.
         </p>

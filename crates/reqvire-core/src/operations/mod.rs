@@ -221,7 +221,6 @@ pub fn containment_hierarchy(
 pub fn change_impact_report(
     model: &ModelManager,
     git_commit: &str,
-    base_manifest_commit: Option<&str>,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<(change_impact::ChangeImpactReport, String, String), ReqvireError> {
     let registry = &model.graph_registry;
@@ -234,18 +233,12 @@ pub fn change_impact_report(
             &scope,
             repo,
             git_commit,
-            base_manifest_commit,
             excluded_filename_patterns,
         )?;
         let mut report = change_impact::compute_change_impact(registry, &reference.graph_registry)?;
         let current_commit = comparison.current.central_commit.clone();
         report.comparison = Some(comparison);
         return Ok((report, String::new(), current_commit));
-    }
-    if base_manifest_commit.is_some() {
-        return Err(ReqvireError::ProcessError(
-            "base_manifest_commit requires a separately versioned Repo manifest".into(),
-        ));
     }
     let mut reference_model = ModelManager::new();
     match reference_model.parse_and_validate_with_mode(

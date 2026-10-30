@@ -345,8 +345,9 @@ reqvire coverage --from "Shared Branch" --json`}</CodeBlock>
             --git-commit
           </code>
           option selects the base commit, defaulting to HEAD. Ordinary Git mode
-          requires one eligible worktree. In Repo mode it selects Central&apos;s
-          base commit; the historical manifest supplies each component&apos;s
+          requires one eligible worktree. In Repo mode it selects the
+          workspace-root repository&apos;s base commit, including its model,
+          manifest and includes; that historical manifest supplies each component&apos;s
           own revision. A collection of independent worktrees without a Repo
           composition remains ambiguous.
         </p>
@@ -367,30 +368,28 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           available locally. Reqvire reads historical files without changing
           active checkouts and never fetches or runs Repo sync.
         </p>
-        <CodeBlock>{`# Manifest and its includes are versioned in Central
-reqvire --manifest default.xml change-impact --git-commit origin/main --json
-
-# Repo's selected manifest has its own Git repository
-# Each ref resolves in its owning repository: Central, then manifest checkout.
-reqvire change-impact --git-commit origin/main \\
-  --base-manifest-commit origin/main --json --output reports/impact.json`}</CodeBlock>
+        <CodeBlock>{`# The root model, manifest and includes share one Git history.
+# The historical manifest pins each component to its own commit.
+reqvire --manifest default.xml change-impact --git-commit origin/main \\
+  --json --output reports/impact.json`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          When the manifest has separate Git history, supply
-          <code> --base-manifest-commit</code> explicitly. Central&apos;s commit
-          cannot identify that history. Every include and overlay also needs
-          identifiable historical ownership. Missing history, mutable baseline
-          pins or unavailable project commits fail the comparison with a
-          diagnostic; no partial baseline is reported. The extra selector is
-          rejected for Central-owned manifests and ordinary Git mode.
+          One selected commit identifies the complete baseline. Keep the
+          manifest and its includes versioned in the workspace-root repository;
+          use global <code>--manifest</code> to select that file. If the selected
+          native manifest has independent Git history, the comparison reports
+          <code> repo_impact_manifest_history_unavailable</code> with its path
+          and guidance to select a tracked workspace-root manifest. Missing
+          objects or mutable historical project pins also fail explicitly;
+          Reqvire never guesses another revision or reports a partial baseline.
         </p>
         <p className="text-zinc-600 mt-4">
           Repo JSON reports add <code>comparison</code> with
           <code> workspace_mode: "repo"</code> and <code>base</code> /
-          <code> current</code> records. Each includes Central&apos;s commit,
+          <code> current</code> records. Each includes the workspace-root repository&apos;s commit,
           versioned manifest inputs and project identities, paths and commits.
           Text reports include the same composition summary. Source links use
           the owning repository and the relevant side&apos;s commit; model paths
-          remain relative to Central. Current commit provenance does not mean
+          remain workspace-root-relative. Current commit provenance does not mean
           pending working changes have been committed.
         </p>
         <div className="mt-5">
@@ -609,8 +608,9 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           For a Repo composition, also prepare the declared checkouts and all
           historical pinned objects, including retained history for removed
-          projects, before running reports. Select the base manifest commit
-          when its history is separate. The single-repository example below
+          projects, before running reports. Version the manifest with the
+          workspace-root model and select it with <code>--manifest</code>.
+          The single-repository example below
           does not perform that preparation.
         </p>
         <CodeBlock>{`name: Reqvire PR Checks

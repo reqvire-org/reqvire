@@ -33,7 +33,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Run from the intended effective workspace root, or pass that root with `--workspace`. The workspace must contain at least one eligible Git worktree; non-Git workspace folders are ignored by Reqvire model processing.
 
-For historical impact, ordinary Git mode requires one eligible worktree. A distributed model needs a versioned Google Repo composition rooted at Central, with declared projects and locally available history. Repo baselines select Central and manifest history separately when they have different Git owners; see Change Impact before choosing refs.
+For historical impact, ordinary Git mode requires one eligible worktree. A distributed model needs a versioned Google Repo composition, declared projects and locally available history. One workspace-root repository commit identifies its model, historical manifest and component pins. Select a manifest tracked in that repository; independent manifest history cannot supply a complete baseline from that commit. See Change Impact before choosing a ref.
 
 ## Reference Documents
 

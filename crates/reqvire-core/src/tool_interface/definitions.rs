@@ -379,10 +379,7 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "Analyze change impact against a Git commit or a complete historical Repo composition.",
             object_schema(vec![(
                 "git_commit",
-                json!({ "type": "string", "default": "HEAD" }),
-            ), (
-                "base_manifest_commit",
-                    json!({ "type": "string", "minLength": 1, "description": "Historical commit in Repo's separate manifest repository; required when Central does not own the selected manifest." }),
+                json!({ "type": "string", "default": "HEAD", "description": "Base Git commit; in Repo mode its tree supplies the root model, manifest and includes, whose pins select component commits." }),
             )]),
         ),
     ];

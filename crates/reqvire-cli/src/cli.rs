@@ -311,16 +311,12 @@ pub enum Commands {
 
     /// Analyze change impact and provide report
     #[clap(
-        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Base Git commit (Central in Repo mode) [default: HEAD]\n      --base-manifest-commit <REF>  Base commit in Repo's separate manifest repository\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
+        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
     )]
     ChangeImpact {
-        /// Git commit hash to use when comparing models
+        /// Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]
         #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
         git_commit: String,
-
-        /// Historical commit in Repo's separately versioned manifest repository
-        #[clap(long, value_name = "REF", help_heading = "CHANGE IMPACT OPTIONS")]
-        base_manifest_commit: Option<String>,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
@@ -1289,13 +1285,11 @@ pub async fn handle_command(
         Some(Commands::ChangeImpact {
             json,
             git_commit,
-            base_manifest_commit,
             output,
         }) => {
             let (report, base_url, current_commit) = operations::change_impact_report(
                 &model_manager,
                 &git_commit,
-                base_manifest_commit.as_deref(),
                 excluded_filename_patterns,
             )?;
 

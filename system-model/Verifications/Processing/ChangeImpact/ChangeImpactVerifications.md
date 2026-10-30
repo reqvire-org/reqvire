@@ -202,7 +202,7 @@ Verifies that repository boundaries preserve the complete model comparison and i
 - Added and removed projects produce the corresponding element additions and removals.
 - A project path move without content changes yields stable-name relocations without false additions, removals or content changes.
 - CLI, standalone MCP and embedded MCP yield equivalent shared report data.
-- The optional native baseline selector is discoverable as a typed MCP field; no component selector is introduced.
+- CLI and MCP expose one baseline revision selector. MCP discovery advertises `git_commit` and omits the removed separate manifest selector; no component selector is introduced.
 
 ##### Test Criteria
 Run the Bash Repo workspace suite and compare its PASS inventory, normalized provenance and relocation JSON with the committed golden files. Use jq for structured report assertions and diff for deterministic comparisons. Repeated comparisons of unchanged snapshots MUST be deterministic. Runtime vocabulary and shape exports MUST retain the workspace-snapshot and repository-selection declarations.
@@ -292,8 +292,8 @@ Verifies complete historical composition reconstruction and read isolation using
 #### Details
 
 ##### Acceptance Criteria
-- Central-owned manifests and includes are loaded from the requested Central base commit; current files do not substitute for deleted historical includes.
-- Native manifest-project history is explicitly selected through the CLI and typed MCP field. Missing history produces the specified diagnostic.
+- The sole selected workspace-root repository commit supplies its model, manifest and includes. Historical component commits come from that manifest. Current files do not substitute for deleted historical includes.
+- Independent native manifest history is rejected with the affected path and guidance to select a manifest tracked in the workspace-root repository. CLI, standalone MCP and embedded MCP preserve source state and accepted context on that error. A tracked workspace-root manifest remains usable when unrelated native manifest history exists.
 - Missing historical component objects and mutable baseline revisions produce project-specific errors without a partial report.
 - Base-only projects remain discoverable from retained local objects after their live checkout is removed.
 - Ordinary ambiguous multi-worktree comparisons retain their existing rejection.
@@ -301,7 +301,7 @@ Verifies complete historical composition reconstruction and read isolation using
 - Standalone and embedded MCP preserve the accepted model revision, pending changes and write availability. Accepted pending additions remain in current comparison inputs even after external working-file edits.
 
 ##### Test Criteria
-Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS; single-worktree errors and unknown baseline arguments are failures, not skips or expected failures. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
+Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; independent-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
 
 #### Metadata
   * type: test-verification

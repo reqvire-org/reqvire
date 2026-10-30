@@ -35,16 +35,16 @@ Analyze how changes to requirements propagate through the model.
 
    Ordinary Git mode requires one eligible worktree; `--git-commit` selects its base, defaulting to HEAD. A plain aggregate with multiple independent worktrees remains ambiguous.
 
-   **Repo composition:** Run at Central, with an initialized Repo workspace and declared projects prepared locally. `--git-commit` selects Central's base only. Reconstruct the baseline from its historical manifest and each component's full commit ID; do not apply the Central ref separately in components. For a Central-owned manifest, use the selected `--manifest` location with the commands above. For a separately versioned native manifest, explicitly select its owning Git repository's baseline too:
+   **Repo composition:** Run at the workspace root, with an initialized Repo workspace and declared projects prepared locally. `--git-commit` is the sole baseline selector: read the root model, selected manifest and includes from that repository commit, then load each component at the full commit ID pinned by that historical manifest. Do not apply the root ref independently in components. Use global `--manifest` to select a tracked manifest:
 
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact \
-     --git-commit="$BASE_COMMIT" --base-manifest-commit="$MANIFEST_BASE_COMMIT" --json --output /tmp/impact.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" --manifest default.xml change-impact \
+     --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
    ```
 
-   Choose `MANIFEST_BASE_COMMIT` from the manifest repository's own history for the intended product baseline. Omitting it in that mode reports `base_manifest_commit_required`; supplying it in ordinary Git mode or for a Central-owned manifest is invalid. Every include/overlay needs identifiable historical ownership. Mutable baseline project pins report `repo_impact_base_unlocked`; missing project objects report `repo_impact_base_unavailable`. Removed projects may use retained local Repo object storage. Do not drop unavailable projects or reuse current XML to produce a partial comparison. Reqvire never fetches, syncs or changes active checkouts during analysis.
+   Every manifest input must have identifiable history in the selected workspace-root repository. Independent native manifest history reports `repo_impact_manifest_history_unavailable` with the input path and guidance to select a manifest tracked in that repository. Mutable baseline project pins report `repo_impact_base_unlocked`; missing project objects report `repo_impact_base_unavailable`. Removed projects may use retained local Repo object storage. Do not drop unavailable projects, guess a second revision or reuse live XML to produce a partial comparison. Reqvire never fetches, syncs or changes active checkouts during analysis.
 
-   **Mutation-enabled MCP:** Use `reqvire.change_impact` with the same selected `branch`, `git_commit` and, when required, `base_manifest_commit`. The current side is the accepted model, captured composition and accepted pending edits, including embedded MCP. External changes are not imported by this read. A baseline error preserves the accepted revision, pending edits and write availability.
+   **Mutation-enabled MCP:** Use `reqvire.change_impact` with the same selected `branch` and optional `git_commit`. The current side is the accepted model, captured composition and accepted pending edits, including embedded MCP. External changes are not imported by this read. A baseline error preserves the accepted revision, pending edits and write availability.
 
 4. **Analyze the results:**
 
