@@ -35,33 +35,10 @@ def fixture(name, version="1.2.3"):
     with tarfile.open(base / f"package/artifacts/reqvire-{target}.tar.gz", "w:gz") as archive:
         archive.add(executable, arcname=f"reqvire-{target}")
     wrapper = base / "bin/tar"
-    wrapper.write_text(f'''#!{sys.executable}
-import os, pathlib, subprocess, sys, time
-barrier = pathlib.Path(os.environ["BARRIER"])
-(barrier / str(os.getpid())).touch()
-if os.environ.get("BARRIER_COUNT"):
-    deadline = time.monotonic() + 10
-    while len(list(barrier.iterdir())) < int(os.environ["BARRIER_COUNT"]):
-        if time.monotonic() > deadline: sys.exit(88)
-        time.sleep(0.01)
-# One launcher may fail after extraction, while the others publish.
-fail = os.environ.get("FAIL_EXTRACT") == "1"
-if os.environ.get("FAIL_ONE"):
-    try:
-        fd = os.open(barrier / "failed", os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        os.close(fd)
-        fail = True
-    except FileExistsError: pass
-result = subprocess.run([{tar!r}, *sys.argv[1:]])
-if fail:
-    destination = pathlib.Path(sys.argv[sys.argv.index("-C") + 1])
-    (destination / "reqvire-{target}").write_bytes(b"partial executable")
-    time.sleep(0.05)
-    sys.exit(17)
-sys.exit(result.returncode)
-''')
+    shutil.copy2(Path(__file__).parent / 'fixtures/tar-double.sh', wrapper)
     wrapper.chmod(0o755)
-    env = {**os.environ, "TMPDIR": str(base / "tmp"), "PATH": str(base / "bin") + os.pathsep + os.environ["PATH"], "BARRIER": str(base / "barrier")}
+    env = {**os.environ, "TMPDIR": str(base / "tmp"), "PATH": str(base / "bin") + os.pathsep + os.environ["PATH"], "BARRIER": str(base / "barrier"),
+           "REQVIRE_TEST_REAL_TAR": tar, "REQVIRE_TEST_TAR_TARGET": target}
     cache = base / "tmp/reqvire-npm" / (version + "-" + platform.replace("/", "-"))
     return base, env, cache
 

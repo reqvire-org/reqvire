@@ -22,6 +22,15 @@
   --space-20: 40px;
   --space-24: 48px;
   --space-32: 64px;
+  --space-40: 80px;
+  --space-48: 96px;
+  --space-80: 160px;
+  /* Gaps between stacked items and between prose blocks. */
+  --space-stack-sm: var(--space-4);
+  --space-stack-md: var(--space-8);
+  --space-stack-lg: var(--space-12);
+  --space-flow-paragraph: var(--space-6);
+  --space-flow-heading: var(--space-16);
 
   /* Shared dimensions for role defaults; role tokens remain independently overridable. */
   --space-15: 30px;
@@ -38,19 +47,25 @@
   --radius-lg:   var(--space-5);  /* cards */
   --radius-xl:   var(--space-7);  /* dialogs, large panels */
   --radius-2xl:  var(--space-10);
-  --radius-pill: 999px;
+  --radius-full: 999px;
 
   /* Control heights (dense product) */
-  --control-xs: 22px;   /* count pills */
-  --control-sm: var(--space-14);   /* compact buttons, chips */
-  --control-md: 34px;   /* default buttons, inputs, toggles */
-  --control-lg: var(--space-20);
+  --control-height-xs: 22px;   /* count pills */
+  --control-height-sm: var(--space-14);   /* compact buttons, chips */
+  --control-height-md: 34px;   /* default buttons, inputs, toggles */
+  --control-height-lg: var(--space-20);
+  --control-padding-sm: var(--space-4);
+  --control-padding-md: var(--space-6);
+  --control-padding-lg: var(--space-8);
+  /* Gap between a control's edge and a round part inside it: a switch thumb, a segment track. */
+  --control-inset: var(--space-1);
 
   /* Icon sizes */
   --icon-xs: var(--text-sm);
   --icon-sm: var(--text-md);
   --icon-md: var(--text-lg);
   --icon-lg: var(--space-10);
+  --icon-xl: var(--space-12);
 
   /* Type-icon (colored rounded-square element glyph) */
   --type-icon-sm: var(--space-8);
@@ -61,6 +76,20 @@
   --navigation-rail-width: var(--space-26);   /* primary navigation rail */
   --app-header-height:     var(--space-26);   /* application header bar */
   --content-max:    1180px; /* main column max readable width */
+  /* Page containers and a 4/8/12-column grid. */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --grid-columns-sm: 4;
+  --grid-columns-md: 8;
+  --grid-columns-lg: 12;
+  --grid-gutter: var(--space-12);
+  --grid-gutter-narrow: var(--space-8);
+  --grid-gutter-condensed: var(--border-w);
+  --grid-margin-sm: var(--space-8);
+  --grid-margin-md: var(--space-12);
+  --grid-margin-lg: var(--space-16);
   --row-height-compact: var(--space-15);   /* compact tree/list row height */
   --compact-column-min: var(--space-56); /* minimum readable compact metadata/filter column width */
   --space-flow-node-width: var(--space-140); /* shared model and verification flow cards */
@@ -114,12 +143,12 @@
     --space-file-hover-lift: -1px;
     --space-trace-meta-grid-min-w: 180px;
     --space-pane-search-results-limit: var(--space-260);
-    --space-left-pane-width: 380px;
-    --space-left-pane-collapsed-width: var(--space-15);
+    --side-pane-width: 380px;
+    --side-pane-collapsed-width: var(--space-15);
     --space-graph-side-panel-w: 390px;
     --space-graph-side-panel-max-h: 420px;
     --space-brand-name-nudge-y: 0.5px;
-    --space-showcase-shadow-card-min-w: 160px;
+    --space-showcase-shadow-card-min-w: var(--space-80);
     --space-showcase-page-max-w: 1240px;
     --space-showcase-page-wide-max-w: 1480px;
     --space-showcase-swatch-col-min-w: 130px;

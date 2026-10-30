@@ -9,6 +9,10 @@ Trace changes in system model is the capability for impact propagation, auditabl
 
 Change impact uses native Reqvire relations, requirement-owned Contract Bindings and Contract References, semantic-contract `use`/`constrain` relations, and explicit concept references. Semantic references are model facts, not capability ontology contract_bindings.
 
+
+
+This capability includes reviewing a product model distributed across manifest-selected Git repositories by comparing complete historical and current repository compositions, retaining source provenance and cross-repository dependency paths.
+
 #### Metadata
   * type: capability
   * owner: syseng

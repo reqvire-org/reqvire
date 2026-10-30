@@ -58,13 +58,26 @@ done
 # Compare normalized RDF from the valid projection fixture, including foreign namespaces.
 mkdir -p "$TEST_DIR/output"
 (cd "$TEST_DIR" && "$REQVIRE_BIN" semantic export --layer concepts --jsonld) > "$TEST_DIR/output/projection.jsonld"
-python3 "$TEST_DIR/check-projection.py" "$TEST_DIR/output/projection.jsonld" > "$TEST_DIR/output/projection-relations.txt"
+# Sort explicit facts without deduplicating or inferring reciprocal edges.
+jq -r '
+  (if type == "object" then
+     if has("@graph") then .["@graph"] else [.] end
+   else . end) |
+  [ .[] | . as $node | (.["@id"] // "") as $subject |
+    select(($subject | startswith("https://example.test/projection-")) or
+      $subject == "https://external.example/Exact" or
+      $subject == "https://external.example/Close") |
+    ["broader", "narrower", "related", "exactMatch", "closeMatch"][] as $relation |
+    ($node["http://www.w3.org/2004/02/skos/core#" + $relation] // [])[] |
+    "\($subject) \($relation) \(.["@id"])"
+  ] | sort[]
+' "$TEST_DIR/output/projection.jsonld" > "$TEST_DIR/output/projection-relations.txt"
 if ! diff -u "$TEST_DIR/expected/projection-relations.txt" "$TEST_DIR/output/projection-relations.txt"; then
   echo "FAILED: generated concept relationships differ from canonical endpoint IRIs"
   exit 1
 fi
 
-python3 "$TEST_DIR/check-taxonomy.py" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/taxonomy-checks.txt"
+bash "$TEST_DIR/check-taxonomy.sh" "$REQVIRE_BIN" "$TEST_DIR" > "$TEST_DIR/output/taxonomy-checks.txt"
 diff -u "$TEST_DIR/expected/taxonomy-checks.txt" "$TEST_DIR/output/taxonomy-checks.txt"
 
 if [ $MODEL_EXIT -ne 0 ]; then

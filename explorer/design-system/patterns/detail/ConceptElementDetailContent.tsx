@@ -91,9 +91,9 @@ const conceptChipRowUX = css`
 const conceptChipUX = css`
   display: inline-flex;
   align-items: center;
-  min-height: var(--control-xs);
+  min-height: var(--control-height-xs);
   border-radius: var(--radius-sm);
-  padding: 0 var(--space-4);
+  padding: 0 var(--control-padding-sm);
   background: var(--color-role-concept-tint);
   color: var(--text-body);
   font-size: var(--text-sm);

@@ -24,7 +24,7 @@ Verify that the shared system engineering skill references can be followed to ob
 
 #### Relations
   * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)
-  * satisfiedBy: [check_skills.py](../../../../tests/test-ai-skill-installers/check_skills.py)
+  * satisfiedBy: [check_skills.sh](../../../../tests/test-ai-skill-installers/check_skills.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-ai-skill-installers/test.sh)
   * verify: [AI Skills Instruction Contracts](../../../Integration/AIAssistance/AISkills.md#ai-skills-instruction-contracts)
   * verify: [AI Skills Markdown Implementation Artifacts](../../../Integration/AIAssistance/AISkills.md#ai-skills-markdown-implementation-artifacts)
@@ -72,7 +72,7 @@ Verify that the canonical four-skill collection is complete, discoverable, and d
 
 #### Relations
   * derivedFrom: [AI Skill Installer Verification Objective](#ai-skill-installer-verification-objective)
-  * satisfiedBy: [check_skills.py](../../../../tests/test-ai-skill-installers/check_skills.py)
+  * satisfiedBy: [check_skills.sh](../../../../tests/test-ai-skill-installers/check_skills.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-ai-skill-installers/test.sh)
   * verify: [AI Skill Installer Distribution](../../../Integration/AIAssistance/AISkills.md#ai-skill-installer-distribution)
 ---

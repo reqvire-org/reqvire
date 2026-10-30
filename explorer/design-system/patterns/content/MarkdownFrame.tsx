@@ -81,21 +81,21 @@ const markdownBaseUX = css`
     flex-wrap: wrap;
     gap: var(--space-1);
     align-items: center;
-    padding: var(--space-1);
+    padding: var(--control-inset);
     border-radius: var(--radius-md);
   }
 
   .diagram-nav-btn {
     display: inline-flex;
-    min-width: var(--control-sm);
-    min-height: var(--control-sm);
+    min-width: var(--control-height-sm);
+    min-height: var(--control-height-sm);
     align-items: center;
     justify-content: center;
     border-width: var(--border-w);
     border-style: solid;
     border-color: transparent;
     border-radius: var(--radius-xs);
-    padding: 0 var(--space-3);
+    padding: 0 var(--control-padding-sm);
     font-family: inherit;
     font-style: inherit;
     font-variant: inherit;
@@ -134,7 +134,7 @@ const markdownBaseUX = css`
     top: var(--space-markdown-frame-top);
     width: var(--ux-markdown-list-marker-size);
     height: var(--ux-markdown-list-marker-size);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
   }
 
   ol {

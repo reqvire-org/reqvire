@@ -175,8 +175,8 @@ if [ $EXIT_CODE_VALID_JSON -ne 0 ]; then
   exit 1
 fi
 
-# Check if output is valid JSON
-if ! echo "$OUTPUT_VALID_JSON" | python3 -m json.tool > /dev/null 2>&1; then
+# Require exactly one valid JSON value, including false or null.
+if ! printf '%s\n' "$OUTPUT_VALID_JSON" | jq -s -e 'length == 1' > /dev/null 2>&1; then
   echo "❌ FAILED: Validate command --json output is not valid JSON"
   echo "Output: $OUTPUT_VALID_JSON"
   exit 1
@@ -266,4 +266,5 @@ fi
 
 # Test 4: Contract-consumer and mixed requirement fulfillment cycles.
 # The Python driver runs every scenario and reports explicit expected/actual diffs.
-python3 "$TEST_DIR/check_fulfillment_cycles.py" "$REQVIRE_BIN" "$TEST_DIR"
+TEST_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+bash "$TEST_SCRIPT_DIR/check_fulfillment_cycles.sh" "$REQVIRE_BIN" "$TEST_DIR"

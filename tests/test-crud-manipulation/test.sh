@@ -898,7 +898,7 @@ fi
 
 # A removed verification rewrites its referring file without changing evidence targets.
 artifact_link_status=0
-python3 "$TEST_SCRIPT_DIR/check_rm_artifact_links.py" || artifact_link_status=$?
+bash "$TEST_SCRIPT_DIR/check_rm_artifact_links.sh" || artifact_link_status=$?
 if ! diff -u "$TEST_SCRIPT_DIR/expected/rm-artifact-links-checks.txt" "$TEST_DIR/output/rm-artifact-links-checks.txt"; then
   artifact_link_status=1
 fi

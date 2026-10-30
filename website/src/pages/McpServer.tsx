@@ -610,6 +610,48 @@ reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBloc
           and per-project pending paths. No project selector or separate model
           namespace is needed.
         </p>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
+          Historical Change Impact
+        </h3>
+        <p className="text-zinc-600 mb-4">
+          <code>reqvire.change_impact</code> compares complete Repo compositions
+          using the same baseline rules as the CLI. <code>git_commit</code>
+          is the sole baseline selector, defaulting to the workspace-root
+          repository&apos;s accepted HEAD. That commit supplies the root model,
+          manifest and includes. The historical manifest supplies full commit
+          IDs for components; the root ref is never applied independently to
+          them. At server startup, use global <code>--manifest</code> to select
+          a manifest tracked in the workspace-root repository:
+        </p>
+        <CodeBlock>{`reqvire --manifest default.xml mcp --enable-mutations
+
+{
+  "name": "reqvire.change_impact",
+  "arguments": {
+    "branch": "model/review",
+    "git_commit": "origin/main"
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          A selected manifest with independent Git history reports
+          <code> repo_impact_manifest_history_unavailable</code>, naming the
+          input and directing the caller to a tracked workspace-root manifest.
+          The comparison never guesses a second revision. Mutable
+          historical project pins report <code>repo_impact_base_unlocked</code>,
+          and unavailable project objects report
+          <code> repo_impact_base_unavailable</code>. Inputs must be versioned
+          and locally available; analysis never fetches or syncs.
+        </p>
+        <p className="text-zinc-600">
+          In mutation-enabled contexts, including embedded MCP, the current side
+          is the selected branch&apos;s accepted model, captured composition and
+          accepted pending edits. An impact request does not import external
+          file or manifest changes. Baseline failures preserve that model,
+          revision, pending changes and write availability. The report&apos;s
+          <code> comparison</code> records base/current workspace-root commits,
+          manifest inputs and project provenance. Inspect pending-state metadata
+          separately: recorded commits do not imply pending bytes are committed.
+        </p>
       </Section>
 
       <Section title="GitHub Publication">

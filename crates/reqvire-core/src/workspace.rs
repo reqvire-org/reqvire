@@ -119,7 +119,7 @@ impl WorkspaceScope {
                 if path == owner {
                     return true;
                 }
-                if path.join(".git").exists() {
+                if crate::mutation_io::exists(path.join(".git")) {
                     return false;
                 }
                 parent = path.parent();

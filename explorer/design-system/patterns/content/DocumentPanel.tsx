@@ -123,7 +123,7 @@ const toolbarSkinX = css`
 const commandBaseUX = css`
   border: 0;
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--control-padding-sm);
   cursor: pointer;
   font-size: var(--text-sm);
   text-align: left;

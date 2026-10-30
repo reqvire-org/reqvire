@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "typecheck": "tsc -b",
     "build": "vite-react-ssg build",
     "preview": "vite preview"
   },
@@ -53,6 +54,7 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@types/node": "^24.19.2",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",

@@ -99,7 +99,7 @@ Acceptance review for the typed MCP `reqvire.add_element` adapter.
   * satisfiedBy: [check_atomic.py](../../../../tests/test-crud-override/check_atomic.py)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
-  * satisfiedBy: [fenced_code.py](../../../../tests/test-parsing-functionality/fenced_code.py)
+  * satisfiedBy: [fenced_code.sh](../../../../tests/test-parsing-functionality/fenced_code.sh)
   * verify: [MCP Add Element Tool](../../../Interfaces/MCP/Tools.md#mcp-add-element-tool)
 ---
 

@@ -1,7 +1,7 @@
 /* ============================================================
    Reqvire Explorer — Typography tokens
    Geist (UI/display) · Geist Mono (code, IDs, paths)
-   The product is dense: default UI text sits at 13px.
+   The product is dense: default UI text sits at 13px (0.8125rem).
    ============================================================ */
 
 @layer base {
@@ -13,17 +13,20 @@
   --font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono",
                "Cascadia Code", Menlo, Consolas, monospace;
 
-  /* Type scale (px) */
+  /* Type scale (rem, from the 13px-default px scale) */
   --text-inline-code:  0.92em;
-  --text-micro:  11px;  /* eyebrow / section labels (uppercase) */
-  --text-caption:var(--space-6);  /* meta, counts, tags */
-  --text-sm:     13px;  /* default UI text — rows, controls, chips */
-  --text-base:   var(--space-7);  /* body / reading text in panels */
-  --text-md:     15px;
-  --text-lg:     17px;  /* card titles, panel headings */
-  --text-xl:     21px;  /* dialog titles, view headers */
-  --text-2xl:    26px;  /* big numbers, hero counts */
-  --text-3xl:    33px;  /* display */
+  --text-micro:  0.6875rem;  /* eyebrow / section labels (uppercase) */
+  --text-caption: 0.75rem;  /* meta, counts, tags */
+  --text-sm:     0.8125rem;  /* default UI text — rows, controls, chips */
+  --text-base:   0.875rem;  /* body / reading text in panels */
+  --text-md:     0.9375rem;
+  --text-lg:     1.0625rem;  /* card titles, panel headings */
+  --text-xl:     1.3125rem;  /* dialog titles, view headers */
+  --text-2xl:    1.625rem;  /* big numbers, hero counts */
+  --text-3xl:    2.0625rem;  /* display */
+  --text-4xl:    2.5rem;
+  --text-5xl:    3rem;
+  --text-xs:     var(--text-caption);
 
   /* Weights — keep UI weight disciplined even though Geist is variable */
   --weight-regular:  400;
@@ -33,6 +36,7 @@
   --weight-bold:     700;
 
   /* Line heights */
+  --leading-none:    1;
   --leading-tight:   1.2;
   --leading-snug:    1.35;
   --leading-normal:  1.55;
@@ -42,6 +46,7 @@
   --tracking-label:  0.07em;   /* uppercase section labels */
   --tracking-tight: -0.011em;  /* large display */
   --tracking-normal: 0;
+  --tracking-wide:   0.025em;
   --tracking-mono:  -0.01em;
 
   /* ---- Composite roles (font shorthand-ish helpers) ---------- */

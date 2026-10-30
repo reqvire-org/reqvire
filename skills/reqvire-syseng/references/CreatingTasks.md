@@ -23,10 +23,10 @@ Understand how changes to requirements propagate through the model:
 ```bash
 # Run change impact analysis comparing to base branch
 BASE_COMMIT=$(git merge-base main HEAD)
-reqvire change-impact --git-commit=$BASE_COMMIT
+reqvire change-impact --git-commit="$BASE_COMMIT"
 
 # Save to JSON for programmatic analysis
-reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
+reqvire change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
 
 # Compare against specific commit
 reqvire change-impact --git-commit=<commit-hash>
@@ -35,7 +35,19 @@ reqvire change-impact --git-commit=<commit-hash>
 reqvire change-impact --git-commit=HEAD~1
 ```
 
-`--git-commit` materializes the base snapshot from the current eligible Git worktree inside the effective workspace. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
+In ordinary Git mode, `--git-commit` selects the single eligible worktree's baseline, defaulting to HEAD. An aggregate containing independent worktrees without a Repo composition remains ambiguous.
+
+In Repo mode, `--git-commit` selects the workspace-root repository's base commit. Read its model, manifest and includes from that commit; the historical manifest supplies each component's full commit ID. One selected commit identifies the complete baseline. Use global `--manifest` to select the manifest tracked in that repository:
+
+```bash
+reqvire --manifest default.xml change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
+```
+
+All historical manifest inputs must be identifiable in the selected workspace-root repository history. Independent native manifest ownership reports `repo_impact_manifest_history_unavailable` with the affected path and guidance to select a tracked workspace-root manifest. Do not infer another repository's revision or reuse live XML. Component pins must be full commit IDs and objects must be local, including those for removed projects. Reqvire fails incomplete baselines rather than fetching, syncing or modifying active checkouts.
+
+Inspect Repo report `comparison.base` and `comparison.current`: each records `central_commit` (the workspace-root repository commit), `manifest_inputs` (`path`, owning `commit`) and `projects` (`name`, `path`, `repository`, `commit`). Use these selections to inspect each repository's diff and route tasks. Paths and identifiers remain workspace-root-relative. In mutation-enabled MCP, use the same selected `branch`; `git_commit` follows the CLI rules, and the current side uses the accepted model/composition and pending edits. Impact reads do not import external file changes. Commit provenance does not mean pending bytes are committed.
+
+For website or documentation repositories, include them as declared Repo projects. Give their obligations requirements with Contract References to the product contracts they describe, concrete verifications and `satisfiedBy` page sources. This carries review impact across repositories without adding implementation obligations to the contract owner. A remote link alone cannot supply another repository's model or historical graph.
 
 The change-impact command identifies:
 - `added[]` - New capabilities/requirements/contracts/verifications
@@ -44,6 +56,8 @@ The change-impact command identifies:
 - `relocated[]` - Relocated elements (same name, different path)
 - `impact_scope[]` - Per-branch scope roots: common parent capabilities or requirements covering all impacted elements. Use this for a high-level summary of affected model areas
 - `invalidated_verifications[]` - Verifications that need re-review
+
+Top-level `added` and `changed` entries are smart-filtered roots. Traverse their `change_impact_tree` as well as enumerating scope children before deciding what needs a task. An invalidated verification requires evidence review; it does not mean its test failed.
 
 **Change Propagation Rules:**
 - **Parent → Child**: Parent capability or requirement changes propagate to derived children

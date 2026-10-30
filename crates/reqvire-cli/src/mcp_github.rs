@@ -690,8 +690,24 @@ mod tests {
                 .expect("validated worktree context invariant");
             let gh = temp.path().join("gh");
             let script = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../tests/test-mcp-publication/fixtures/gh-double.py");
-            fs::write(&gh,format!("#!/usr/bin/python3\nimport os, runpy\nos.environ['REQVIRE_GH_TEST_STATE'] = {}\nrunpy.run_path({}, run_name='__main__')\n",json!(state.to_str().expect("validated worktree context invariant")),json!(script.to_str().expect("validated worktree context invariant")))).expect("validated worktree context invariant");
+                .join("../../tests/test-mcp-publication/fixtures/gh-double.sh");
+            let quote = |path: &Path| {
+                format!(
+                    "'{}'",
+                    path.to_str()
+                        .expect("UTF-8 fixture path")
+                        .replace('\'', "'\\''")
+                )
+            };
+            fs::write(
+                &gh,
+                format!(
+                    "#!/bin/bash\nexport REQVIRE_GH_TEST_STATE={}\nexec bash {} \"$@\"\n",
+                    quote(&state),
+                    quote(&script)
+                ),
+            )
+            .expect("write GitHub fixture wrapper");
             fs::set_permissions(&gh, fs::Permissions::from_mode(0o755))
                 .expect("validated worktree context invariant");
             Self {
@@ -767,12 +783,17 @@ mod tests {
         let script = fs::read_to_string(&fixture.gh)
             .expect("read test fixture")
             .replace(
-                "import os, runpy\n",
-                "import os, runpy, sys, time\nif sys.argv[1:] == ['--version']: time.sleep(0.4)\n",
+                "exec bash ",
+                "if [[ $# == 1 && $1 == --version ]]; then sleep 0.4; fi\nexec bash ",
             );
         fs::write(&fixture.gh, script).expect("write test fixture");
+        let started = std::time::Instant::now();
         let access = fixture.access();
         assert!(access.available(), "{}", access.status());
+        assert!(
+            started.elapsed() >= Duration::from_millis(400),
+            "slow fixture must actually delay startup"
+        );
         assert_eq!(access.check_timeout, CHECK_TIMEOUT);
         assert_eq!(access.operation_timeout, OP_TIMEOUT);
     }

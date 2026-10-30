@@ -311,10 +311,10 @@ pub enum Commands {
 
     /// Analyze change impact and provide report
     #[clap(
-        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
+        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
     )]
     ChangeImpact {
-        /// Git commit hash to use when comparing models
+        /// Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]
         #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
         git_commit: String,
 
@@ -1288,7 +1288,7 @@ pub async fn handle_command(
             output,
         }) => {
             let (report, base_url, current_commit) = operations::change_impact_report(
-                &model_manager.graph_registry,
+                &model_manager,
                 &git_commit,
                 excluded_filename_patterns,
             )?;

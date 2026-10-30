@@ -170,7 +170,7 @@ export const governanceValueSkinX = css`
 `;
 
 export const governanceProvenanceSkinX = css`
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: transparent;
   padding: 0;
   color: var(--text-faint);
@@ -234,8 +234,8 @@ export const relationDisclosureTitleUX = css`
 
 export const relationDisclosureCountUX = css`
   min-width: var(--space-8);
-  padding: 0 var(--space-2);
-  border-radius: var(--radius-pill);
+  padding: 0 var(--control-padding-sm);
+  border-radius: var(--radius-full);
   font-size: var(--text-caption);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
@@ -317,14 +317,14 @@ export const relationKindBaseUX = css`
   align-items: center;
   justify-self: start;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-5);
+  padding: var(--space-1) var(--control-padding-sm);
   font-family: var(--font-mono);
   font-size: var(--text-caption);
   line-height: 1.45;
 `;
 
 export const relationKindSkinX = css`
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-sunken);
   color: var(--text-muted);
 `;
@@ -336,7 +336,7 @@ export const relationEndpointBaseUX = css`
   max-width: min(100%, var(--ux-detail-chip-link-max-w, 100%));
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--control-padding-sm);
   border: 0;
   font-family: inherit;
   font-size: var(--text-sm);
@@ -399,7 +399,7 @@ export const sourceLinkBaseUX = css`
 `;
 
 export const sourceLinkSkinX = css`
-  color: var(--accent);
+  color: var(--text-link);
 
   &:hover {
     text-decoration: underline;

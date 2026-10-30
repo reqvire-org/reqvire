@@ -61,7 +61,7 @@ const canvasSkin = css`
     .react-flow__arrowhead polyline.arrowclosed { fill: var(--text-muted); }
     .react-flow__edge-text { font-size: var(--text-caption); fill: var(--text-body); }
     .react-flow__edge-textbg { fill: var(--bg-surface); }
-    .react-flow__handle { background-color: var(--text-strong); border: var(--border-w) solid var(--bg-surface); border-radius: var(--radius-pill); }
+    .react-flow__handle { background-color: var(--text-strong); border: var(--border-w) solid var(--bg-surface); border-radius: var(--radius-full); }
     .react-flow__nodesselection-rect, .react-flow__selection { background: var(--bg-selected); border: var(--border-w) dotted var(--accent); }
     .react-flow__node:focus-visible { outline: var(--border-w-2) solid var(--accent); outline-offset: var(--space-1); }
     .react-flow__attribution { font-size: var(--text-micro); background: var(--bg-canvas); padding: var(--space-1) var(--space-2); margin: 0; }

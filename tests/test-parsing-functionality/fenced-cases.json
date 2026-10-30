@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "label": "bare",
+      "code": "```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n```\n"
+    },
+    {
+      "label": "unordered-star",
+      "code": "  * ```\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n"
+    },
+    {
+      "label": "unordered-dash",
+      "code": "  - ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n"
+    },
+    {
+      "label": "unordered-plus",
+      "code": "  +   ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n"
+    },
+    {
+      "label": "ordered-dot",
+      "code": "  1. ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n"
+    },
+    {
+      "label": "ordered-parenthesis",
+      "code": "  2) ```\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n"
+    },
+    {
+      "label": "nested-list",
+      "code": "* Parent list item\n    *   ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n        ```\n"
+    },
+    {
+      "label": "longer-fence",
+      "code": "  * ````markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n      ```\n      ### Still Literal\n      ````\n"
+    },
+    {
+      "label": "longer-closer",
+      "code": "  * ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n      ````\n"
+    },
+    {
+      "label": "trailing-text",
+      "code": "  * ```markdown\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n      ``` not a closing fence\n      ### Still Literal\n      ```\n"
+    },
+    {
+      "label": "red-three-fences",
+      "code": "  * ```\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n     ```\n  *   ```\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n        ```\n  *   ```\n      ### Phantom Element\n      #### Metadata\n        * type: capability\n      #### Relations\n        * derivedFrom: [Missing](#missing)\n      #### Concept References\n        * [Missing](#missing)\n      ---\n        ```\n"
+    }
+  ],
+  "document": "# Elements\n\n### Fence Parent\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * derive: [Fence Following](#fence-following)\n  * specify: [Fence Example](#fence-example)\n---\n\n### Fence Example\n\nLiteral code example.\n\n__CODE__\n#### Metadata\n  * type: capability\n---\n\n### Fence Following\n\nFollowing element remains addressable.\n\n#### Metadata\n  * type: requirement\n\n#### Relations\n  * derivedFrom: [Fence Parent](#fence-parent)\n---\n"
+}

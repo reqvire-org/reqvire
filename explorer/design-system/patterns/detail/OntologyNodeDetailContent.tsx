@@ -295,7 +295,7 @@ const sourceLinkBaseUX = css`
 `;
 
 const sourceLinkSkinX = css`
-  color: var(--accent);
+  color: var(--text-link);
 
   &:hover {
     text-decoration: underline;
@@ -356,7 +356,7 @@ const metadataBadgeRowUX = css`
 
 const ontologyTypePillBaseUX = css`
   display: inline-block;
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--control-padding-sm);
   margin: var(--space-1) var(--space-2) var(--space-1) 0;
   font-size: var(--text-micro);
   text-decoration: none;
@@ -444,14 +444,14 @@ const ontologySymbolBaseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--control-padding-sm);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
 `;
 
 const ontologySymbolSkinX = css`
   border: var(--border-w) solid var(--border-default);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-sunken);
   color: var(--text-secondary);
 `;
@@ -497,7 +497,7 @@ const ontologyCardHeadUX = css`
 `;
 
 const ontologyKindBaseUX = css`
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--control-padding-sm);
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);
@@ -516,7 +516,7 @@ const ontologyFacetBaseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--control-padding-sm);
   font-family: var(--font-mono);
   font-size: var(--text-caption);
 
@@ -529,7 +529,7 @@ const ontologyFacetBaseUX = css`
 
 const ontologyFacetSkinX = css`
   border: var(--border-w) solid var(--border-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-surface);
   color: var(--text-strong);
 `;
@@ -558,7 +558,7 @@ const ontologyConstructGlyphBaseUX = css`
 
 const ontologyConstructGlyphSkinX = css`
   border: var(--border-w) solid var(--color-role-rdf-class-border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--color-role-rdf-class-tint);
   color: var(--text-strong);
 `;
@@ -606,7 +606,7 @@ const ontologyTermBaseUX = css`
   min-width: 0;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-4);
+  padding: var(--space-1) var(--control-padding-sm);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
   overflow-wrap: anywhere;
@@ -620,7 +620,7 @@ const ontologyTermBaseUX = css`
 
 const ontologyTermSkinX = css`
   border: var(--border-w) solid var(--border-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-surface);
   color: var(--text-strong);
 `;

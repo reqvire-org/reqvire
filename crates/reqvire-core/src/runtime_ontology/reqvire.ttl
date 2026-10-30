@@ -138,6 +138,7 @@ reqvire:RelationSemanticPattern rdfs:isDefinedBy <https://www.reqvire.org/ontolo
 reqvire:RelationUsageCategory rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepoManifest rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepoWorkspace rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:RepositoryRevisionSelection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:Requirement rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RequirementCoverage rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RequirementElementType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -183,6 +184,7 @@ reqvire:VerificationRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/on
 reqvire:VerificationRollup rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:VerificationRollupRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:VerificationType rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:WorkspaceModelSnapshot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:WorkspaceRoot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:WorktreeContext rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:acceptedHeadCommit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -239,6 +241,8 @@ reqvire:classExpressionKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> 
 reqvire:combinedImplementationRollupRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:commentStyleName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:commitObjectId rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:comparisonBaseSnapshot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:comparisonCurrentSnapshot rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptLabel rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReference rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:conceptReferenceDependencyRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -551,6 +555,9 @@ reqvire:satisfiedByRelationRule rdfs:isDefinedBy <https://www.reqvire.org/ontolo
 reqvire:satisfiesTraceabilityRelationKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:satisfy rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:satisfyRelationRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:selectionCommit rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:selectionRepository rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:selectionWorkspacePath rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticArtifactExportMode rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticCategoryMeaning rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:semanticCategoryName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -579,6 +586,8 @@ reqvire:shapeOverlayKind rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:shapesSubsection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:shapesText rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:singleRootHierarchyOwnershipRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:snapshotManifestInput rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:snapshotRepositorySelection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:sourceBehavior rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:sourceBlockId rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:sourceElementIdentifier rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -1657,6 +1666,14 @@ reqvire:blockXmlCommentStyle a reqvire:CommentStyleKind ;
 # File: system-model/Ontologies/RelationsAndImpact.md
 # Line: 7
 
+reqvire:comparisonBaseSnapshot a owl:ObjectProperty ;
+	rdfs:domain reqvire:ChangeImpactAnalysis ;
+	rdfs:range reqvire:WorkspaceModelSnapshot ;
+	rdfs:comment "The complete historical workspace composition used as the comparison baseline." .
+reqvire:comparisonCurrentSnapshot a owl:ObjectProperty ;
+	rdfs:domain reqvire:ChangeImpactAnalysis ;
+	rdfs:range reqvire:WorkspaceModelSnapshot ;
+	rdfs:comment "The complete current workspace composition assessed by the comparison." .
 reqvire:ChangeImpactAnalysis a owl:Class ;
 	rdfs:label "Change impact analysis" ;
 	reqvire:mapsToConcept concept:ChangeImpact ;
@@ -1701,53 +1718,53 @@ reqvire:impactEdge a owl:ObjectProperty ;
 	rdfs:range reqvire:ChangeImpactEdge ;
 	rdfs:comment "Propagation edge included in a change-impact path." .
 reqvire:semanticDependency a owl:ObjectProperty .
-_:b1 a owl:Class .
-_:b2 rdf:first reqvire:ChangeImpactAnalysis .
-_:b1 owl:unionOf _:b2 .
-_:b3 rdf:first reqvire:SemanticDependency .
-_:b2 rdf:rest _:b3 .
-_:b3 rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:domain _:b1 .
-_:b4 a owl:Class .
-_:b5 rdf:first reqvire:SemanticDependency .
-_:b4 owl:unionOf _:b5 .
-_:b6 rdf:first reqvire:SemanticContract .
-_:b5 rdf:rest _:b6 .
-_:b6 rdf:rest rdf:nil .
-reqvire:semanticDependency rdfs:range _:b4 ;
+_:d58c2265b5516d84413a4815262a334f a owl:Class .
+_:ac7f4e0a1008ab1e4a3c7ae1487e14ce rdf:first reqvire:ChangeImpactAnalysis .
+_:d58c2265b5516d84413a4815262a334f owl:unionOf _:ac7f4e0a1008ab1e4a3c7ae1487e14ce .
+_:bef571fba3481df7dbac289c85cbb5cb rdf:first reqvire:SemanticDependency .
+_:ac7f4e0a1008ab1e4a3c7ae1487e14ce rdf:rest _:bef571fba3481df7dbac289c85cbb5cb .
+_:bef571fba3481df7dbac289c85cbb5cb rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:domain _:d58c2265b5516d84413a4815262a334f .
+_:c830bbee4e48141ab3bcc28252f44745 a owl:Class .
+_:d5a92778cba27a045e0abe4683f3ade7 rdf:first reqvire:SemanticDependency .
+_:c830bbee4e48141ab3bcc28252f44745 owl:unionOf _:d5a92778cba27a045e0abe4683f3ade7 .
+_:f3ed6ac3e50a4f21082070784a6bd332 rdf:first reqvire:SemanticContract .
+_:d5a92778cba27a045e0abe4683f3ade7 rdf:rest _:f3ed6ac3e50a4f21082070784a6bd332 .
+_:f3ed6ac3e50a4f21082070784a6bd332 rdf:rest rdf:nil .
+reqvire:semanticDependency rdfs:range _:c830bbee4e48141ab3bcc28252f44745 ;
 	rdfs:comment "Semantic dependency considered during change-impact analysis, or the semantic contract target resolved by a dependency record." .
 reqvire:reviewedByVerification a owl:ObjectProperty ;
 	rdfs:domain reqvire:ImpactReview ;
 	rdfs:range reqvire:Verification ;
 	rdfs:comment "Verification evidence or method used to review an impact." .
 reqvire:impactReason a owl:DatatypeProperty .
-_:b7 a owl:Class .
-_:b8 rdf:first reqvire:ChangeImpactEdge .
-_:b7 owl:unionOf _:b8 .
-_:b9 rdf:first reqvire:ChangePropagationRule .
-_:b8 rdf:rest _:b9 .
-_:b9 rdf:rest rdf:nil .
-reqvire:impactReason rdfs:domain _:b7 ;
+_:b538de2c2a99d40cdce909b1351b70a6 a owl:Class .
+_:f0bfc9198f8c1a9a8cd5de2b160a8944 rdf:first reqvire:ChangeImpactEdge .
+_:b538de2c2a99d40cdce909b1351b70a6 owl:unionOf _:f0bfc9198f8c1a9a8cd5de2b160a8944 .
+_:a30f323e2e7f105632fd555dc5651062 rdf:first reqvire:ChangePropagationRule .
+_:f0bfc9198f8c1a9a8cd5de2b160a8944 rdf:rest _:a30f323e2e7f105632fd555dc5651062 .
+_:a30f323e2e7f105632fd555dc5651062 rdf:rest rdf:nil .
+reqvire:impactReason rdfs:domain _:b538de2c2a99d40cdce909b1351b70a6 ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Human-readable reason explaining why an edge or rule propagates impact." .
 reqvire:impactRelation a owl:DatatypeProperty .
-_:b10 a owl:Class .
-_:b11 rdf:first reqvire:ChangeImpactEdge .
-_:b10 owl:unionOf _:b11 .
-_:b12 rdf:first reqvire:ChangePropagationRule .
-_:b11 rdf:rest _:b12 .
-_:b12 rdf:rest rdf:nil .
-reqvire:impactRelation rdfs:domain _:b10 ;
+_:b00a62d19e4de6a3d81d678ea6404447 a owl:Class .
+_:c051c0a9f4044b3c42d0111b4dfce25d rdf:first reqvire:ChangeImpactEdge .
+_:b00a62d19e4de6a3d81d678ea6404447 owl:unionOf _:c051c0a9f4044b3c42d0111b4dfce25d .
+_:ad1d0c25aebd28084184bb16b485c4d8 rdf:first reqvire:ChangePropagationRule .
+_:c051c0a9f4044b3c42d0111b4dfce25d rdf:rest _:ad1d0c25aebd28084184bb16b485c4d8 .
+_:ad1d0c25aebd28084184bb16b485c4d8 rdf:rest rdf:nil .
+reqvire:impactRelation rdfs:domain _:b00a62d19e4de6a3d81d678ea6404447 ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Canonical relation or dependency token that caused an impact edge or activates a propagation rule." .
 reqvire:impactDirection a owl:DatatypeProperty .
-_:b13 a owl:Class .
-_:b14 rdf:first reqvire:ChangeImpactEdge .
-_:b13 owl:unionOf _:b14 .
-_:b15 rdf:first reqvire:ChangePropagationRule .
-_:b14 rdf:rest _:b15 .
-_:b15 rdf:rest rdf:nil .
-reqvire:impactDirection rdfs:domain _:b13 ;
+_:cfcbf7352838589657ff480f146a7057 a owl:Class .
+_:cb1ae631ed888161832f39ef96dc46d0 rdf:first reqvire:ChangeImpactEdge .
+_:cfcbf7352838589657ff480f146a7057 owl:unionOf _:cb1ae631ed888161832f39ef96dc46d0 .
+_:b8897a40c4efa2fd020f29745fa19263 rdf:first reqvire:ChangePropagationRule .
+_:cb1ae631ed888161832f39ef96dc46d0 rdf:rest _:b8897a40c4efa2fd020f29745fa19263 .
+_:b8897a40c4efa2fd020f29745fa19263 rdf:rest rdf:nil .
+reqvire:impactDirection rdfs:domain _:cfcbf7352838589657ff480f146a7057 ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Propagation direction token for an impact edge or propagation rule." .
 reqvire:impactScope a owl:DatatypeProperty ;
@@ -2324,47 +2341,47 @@ reqvire:semanticContractConstrainsRequirement a owl:ObjectProperty ;
 	owl:inverseOf reqvire:requirementConstrainedBySemanticContract ;
 	rdfs:comment "Normalized direct constraint relation from a semantic contract to a constrained requirement." .
 reqvire:use a owl:ObjectProperty .
-_:b16 a owl:Class .
-_:b17 rdf:first reqvire:SemanticContract .
-_:b16 owl:unionOf _:b17 .
-_:b18 rdf:first reqvire:SemanticQuery .
-_:b17 rdf:rest _:b18 .
-_:b18 rdf:rest rdf:nil .
-reqvire:use rdfs:domain _:b16 ;
+_:b9acec95c27a02f02833af322ff45f85 a owl:Class .
+_:e48e7b6010697e7f4f440d86d6f97d63 rdf:first reqvire:SemanticContract .
+_:b9acec95c27a02f02833af322ff45f85 owl:unionOf _:e48e7b6010697e7f4f440d86d6f97d63 .
+_:ff1244c00226299f56f6d5bd0f16d040 rdf:first reqvire:SemanticQuery .
+_:e48e7b6010697e7f4f440d86d6f97d63 rdf:rest _:ff1244c00226299f56f6d5bd0f16d040 .
+_:ff1244c00226299f56f6d5bd0f16d040 rdf:rest rdf:nil .
+reqvire:use rdfs:domain _:b9acec95c27a02f02833af322ff45f85 ;
 	rdfs:range reqvire:Ontology ;
 	owl:inverseOf reqvire:usedBy ;
 	rdfs:comment "Relation from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:usedBy a owl:ObjectProperty ;
 	rdfs:domain reqvire:Ontology .
-_:b19 a owl:Class .
-_:b20 rdf:first reqvire:SemanticContract .
-_:b19 owl:unionOf _:b20 .
-_:b21 rdf:first reqvire:SemanticQuery .
-_:b20 rdf:rest _:b21 .
-_:b21 rdf:rest rdf:nil .
-reqvire:usedBy rdfs:range _:b19 ;
+_:fb24ca2ea732b75e7667463d88c68ccd a owl:Class .
+_:c323c930e298882d7a8b7d0fa875e449 rdf:first reqvire:SemanticContract .
+_:fb24ca2ea732b75e7667463d88c68ccd owl:unionOf _:c323c930e298882d7a8b7d0fa875e449 .
+_:bda59a067f1c592aa411653fa878c536 rdf:first reqvire:SemanticQuery .
+_:c323c930e298882d7a8b7d0fa875e449 rdf:rest _:bda59a067f1c592aa411653fa878c536 .
+_:bda59a067f1c592aa411653fa878c536 rdf:rest rdf:nil .
+reqvire:usedBy rdfs:range _:fb24ca2ea732b75e7667463d88c68ccd ;
 	owl:inverseOf reqvire:use ;
 	rdfs:comment "Relation from ontology vocabulary to a semantic contract or query that uses it." .
 reqvire:semanticContractUsesOntology a owl:ObjectProperty .
-_:b22 a owl:Class .
-_:b23 rdf:first reqvire:SemanticContract .
-_:b22 owl:unionOf _:b23 .
-_:b24 rdf:first reqvire:SemanticQuery .
-_:b23 rdf:rest _:b24 .
-_:b24 rdf:rest rdf:nil .
-reqvire:semanticContractUsesOntology rdfs:domain _:b22 ;
+_:a771e32068412a759ba91e7a5d61bf87 a owl:Class .
+_:bde0c30b97fb00124bfb2cb76cfcc458 rdf:first reqvire:SemanticContract .
+_:a771e32068412a759ba91e7a5d61bf87 owl:unionOf _:bde0c30b97fb00124bfb2cb76cfcc458 .
+_:a2d86b7c798092f2b573cd3642636492 rdf:first reqvire:SemanticQuery .
+_:bde0c30b97fb00124bfb2cb76cfcc458 rdf:rest _:a2d86b7c798092f2b573cd3642636492 .
+_:a2d86b7c798092f2b573cd3642636492 rdf:rest rdf:nil .
+reqvire:semanticContractUsesOntology rdfs:domain _:a771e32068412a759ba91e7a5d61bf87 ;
 	rdfs:range reqvire:Ontology ;
 	owl:inverseOf reqvire:ontologyUsedBySemanticContract ;
 	rdfs:comment "Normalized direct dependency from a semantic contract or query to ontology vocabulary it uses." .
 reqvire:ontologyUsedBySemanticContract a owl:ObjectProperty ;
 	rdfs:domain reqvire:Ontology .
-_:b25 a owl:Class .
-_:b26 rdf:first reqvire:SemanticContract .
-_:b25 owl:unionOf _:b26 .
-_:b27 rdf:first reqvire:SemanticQuery .
-_:b26 rdf:rest _:b27 .
-_:b27 rdf:rest rdf:nil .
-reqvire:ontologyUsedBySemanticContract rdfs:range _:b25 ;
+_:f75bb85eb07a8dee836b2eff005e9fb8 a owl:Class .
+_:f4ec73a6b9845d4d73d579b183c30a4c rdf:first reqvire:SemanticContract .
+_:f75bb85eb07a8dee836b2eff005e9fb8 owl:unionOf _:f4ec73a6b9845d4d73d579b183c30a4c .
+_:c792d1c56ad89dcb85a6910f7cd507e4 rdf:first reqvire:SemanticQuery .
+_:f4ec73a6b9845d4d73d579b183c30a4c rdf:rest _:c792d1c56ad89dcb85a6910f7cd507e4 .
+_:c792d1c56ad89dcb85a6910f7cd507e4 rdf:rest rdf:nil .
+reqvire:ontologyUsedBySemanticContract rdfs:range _:f75bb85eb07a8dee836b2eff005e9fb8 ;
 	owl:inverseOf reqvire:semanticContractUsesOntology ;
 	rdfs:comment "Normalized direct dependency from ontology vocabulary to semantic contracts that use it." .
 reqvire:verify a owl:ObjectProperty ;
@@ -2434,11 +2451,11 @@ reqvire:contractReferencedBy reqvire:relationPredicateLayer reqvire:normalizedRe
 reqvire:implementedByArtifact a owl:ObjectProperty ;
 	rdfs:domain reqvire:Capability ;
 	rdfs:range reqvire:Artifact .
-_:b28 rdf:first reqvire:specifiedBy .
-reqvire:implementedByArtifact owl:propertyChainAxiom _:b28 .
-_:b29 rdf:first reqvire:satisfiedBy .
-_:b28 rdf:rest _:b29 .
-_:b29 rdf:rest rdf:nil .
+_:b805639f96c2058c23a786752fde7e08 rdf:first reqvire:specifiedBy .
+reqvire:implementedByArtifact owl:propertyChainAxiom _:b805639f96c2058c23a786752fde7e08 .
+_:e1eb7195d7ff63385e30ce34bef9f436 rdf:first reqvire:satisfiedBy .
+_:b805639f96c2058c23a786752fde7e08 rdf:rest _:e1eb7195d7ff63385e30ce34bef9f436 .
+_:e1eb7195d7ff63385e30ce34bef9f436 rdf:rest rdf:nil .
 reqvire:implementedByArtifact rdfs:comment "Inferred capability-to-artifact evidence trace when a specifying requirement has direct satisfaction. This trace alone does not establish complete capability implementation coverage." .
 reqvire:derive reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
 reqvire:derivedFrom reqvire:relationPredicateLayer reqvire:authoredRelationLayer .
@@ -3054,13 +3071,13 @@ reqvire:declaresTerm a owl:ObjectProperty ;
 	rdfs:domain reqvire:SemanticBlock ;
 	rdfs:range reqvire:OntologyTerm .
 reqvire:referencesTerm a owl:ObjectProperty .
-_:b30 a owl:Class .
-_:b31 rdf:first reqvire:SemanticBlock .
-_:b30 owl:unionOf _:b31 .
-_:b32 rdf:first reqvire:SemanticQuery .
-_:b31 rdf:rest _:b32 .
-_:b32 rdf:rest rdf:nil .
-reqvire:referencesTerm rdfs:domain _:b30 ;
+_:e6bb7b220ffa73a15739b40e4c00bbe0 a owl:Class .
+_:c14f071665aaa4ecd3c3c33d03af6d1a rdf:first reqvire:SemanticBlock .
+_:e6bb7b220ffa73a15739b40e4c00bbe0 owl:unionOf _:c14f071665aaa4ecd3c3c33d03af6d1a .
+_:efb79d30fe0816b2200a52064b4074e9 rdf:first reqvire:SemanticQuery .
+_:c14f071665aaa4ecd3c3c33d03af6d1a rdf:rest _:efb79d30fe0816b2200a52064b4074e9 .
+_:efb79d30fe0816b2200a52064b4074e9 rdf:rest rdf:nil .
+reqvire:referencesTerm rdfs:domain _:e6bb7b220ffa73a15739b40e4c00bbe0 ;
 	rdfs:range reqvire:OntologyTerm .
 reqvire:externalOntologyResource a owl:ObjectProperty ;
 	rdfs:domain reqvire:ExternalOntologySource ;
@@ -3182,13 +3199,13 @@ reqvire:elementId a owl:DatatypeProperty ;
 	rdfs:range xsd:string ;
 	rdfs:comment "Stable model element id emitted in semantic export records." .
 reqvire:lineNumber a owl:DatatypeProperty .
-_:b33 a owl:Class .
-_:b34 rdf:first reqvire:SemanticBlock .
-_:b33 owl:unionOf _:b34 .
-_:b35 rdf:first reqvire:SemanticQuery .
-_:b34 rdf:rest _:b35 .
-_:b35 rdf:rest rdf:nil .
-reqvire:lineNumber rdfs:domain _:b33 ;
+_:a87d2076642f6a27641c9d0b60a0c4f1 a owl:Class .
+_:cdbd87d2c82bc55b5785381df5583b6b rdf:first reqvire:SemanticBlock .
+_:a87d2076642f6a27641c9d0b60a0c4f1 owl:unionOf _:cdbd87d2c82bc55b5785381df5583b6b .
+_:ff5404924d1802eded708bc18455f161 rdf:first reqvire:SemanticQuery .
+_:cdbd87d2c82bc55b5785381df5583b6b rdf:rest _:ff5404924d1802eded708bc18455f161 .
+_:ff5404924d1802eded708bc18455f161 rdf:rest rdf:nil .
+reqvire:lineNumber rdfs:domain _:a87d2076642f6a27641c9d0b60a0c4f1 ;
 	rdfs:range xsd:integer ;
 	rdfs:comment "Source line number for a semantic block, query artifact, or semantic source projection record." .
 reqvire:relationType a owl:DatatypeProperty ;
@@ -3372,10 +3389,10 @@ reqvire:ConcreteVerification a owl:Class ;
 reqvire:EvidenceBackedVerification a owl:Class ;
 	rdfs:label "Evidence-backed verification" ;
 	rdfs:subClassOf reqvire:ConcreteVerification .
-_:b36 a owl:Restriction ;
+_:ab28349249b626b187ba46f179c9c9f6 a owl:Restriction ;
 	owl:onProperty reqvire:satisfiedBy ;
 	owl:someValuesFrom reqvire:Artifact .
-reqvire:EvidenceBackedVerification rdfs:subClassOf _:b36 ;
+reqvire:EvidenceBackedVerification rdfs:subClassOf _:ab28349249b626b187ba46f179c9c9f6 ;
 	owl:disjointWith reqvire:NonEvidenceBackedVerification ;
 	rdfs:comment "Verification class whose instances require satisfiedBy evidence for coverage satisfaction." .
 reqvire:NonEvidenceBackedVerification a owl:Class ;
@@ -3566,6 +3583,25 @@ reqvire:nonEvidenceBackedVerificationRule a reqvire:VerificationRollupRule ;
 # File: system-model/Ontologies/WorktreeSessions.md
 # Line: 19
 
+reqvire:WorkspaceModelSnapshot a owl:Class ;
+	rdfs:comment "Complete model inputs and repository revision selections for one workspace composition, independently of a live checkout." .
+reqvire:RepositoryRevisionSelection a owl:Class ;
+	rdfs:comment "A repository identity, selected commit and workspace-relative mount path belonging to one model snapshot." .
+reqvire:snapshotRepositorySelection a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorkspaceModelSnapshot ;
+	rdfs:range reqvire:RepositoryRevisionSelection .
+reqvire:selectionRepository a owl:ObjectProperty ;
+	rdfs:domain reqvire:RepositoryRevisionSelection ;
+	rdfs:range reqvire:GitRepository .
+reqvire:selectionCommit a owl:ObjectProperty ;
+	rdfs:domain reqvire:RepositoryRevisionSelection ;
+	rdfs:range reqvire:GitCommit .
+reqvire:selectionWorkspacePath a owl:DatatypeProperty ;
+	rdfs:domain reqvire:RepositoryRevisionSelection ;
+	rdfs:range xsd:string .
+reqvire:snapshotManifestInput a owl:ObjectProperty ;
+	rdfs:domain reqvire:WorkspaceModelSnapshot ;
+	rdfs:range reqvire:ModelInputDependency .
 reqvire:WorktreeContext a owl:Class ;
 	reqvire:mapsToConcept concept:MCPWorktreeContext ;
 	rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a Central worktree's manifest can select component sources within that same context." .

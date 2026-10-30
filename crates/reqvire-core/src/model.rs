@@ -18,6 +18,9 @@ pub struct ModelManager {
     pub semantic_store: Option<SemanticModelStore>,
     /// The constructed index also retains diagnostics after strict validation failure.
     semantic_index: Option<Arc<SemanticIndex>>,
+    /// Source selection observed while constructing this graph. Accepted MCP
+    /// file views may advance Git provenance without rebuilding the graph.
+    source_scope: Option<Arc<crate::workspace::WorkspaceScope>>,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -39,6 +42,7 @@ impl ModelManager {
             graph_registry: GraphRegistry::new(),
             semantic_store: None,
             semantic_index: None,
+            source_scope: None,
         }
     }
 
@@ -46,6 +50,10 @@ impl ModelManager {
     /// Mutation candidates must be validated against their own fresh index.
     pub fn semantic_index(&self) -> Option<&SemanticIndex> {
         self.semantic_index.as_deref()
+    }
+
+    pub(crate) fn source_scope(&self) -> Option<&crate::workspace::WorkspaceScope> {
+        self.source_scope.as_deref()
     }
 
     pub fn parse_and_validate(
@@ -86,6 +94,7 @@ impl ModelManager {
         self.graph_registry = GraphRegistry::new();
         self.semantic_store = None;
         self.semantic_index = None;
+        self.source_scope = Some(Arc::new(crate::workspace::WorkspaceScope::discover()?));
 
         // Pass 1: Element collection with local validation
         let pass1_errors =

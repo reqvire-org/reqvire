@@ -6,6 +6,7 @@ Contract dependencies include Contract Bindings for shared implementation obliga
 
 Workflow:
 - Start with `reqvire.workspace_status` and state the comparison base. If a base argument is not supplied, identify or ask for the intended git base before claiming change coverage.
+- In a Repo workspace, one `git_commit` identifies the root model and historical manifest/includes; that manifest supplies component commits. Use a manifest tracked in the workspace-root repository instead of guessing an independent manifest revision.
 - Run `reqvire.change_impact` and separate `added[]`, `changed[]`, `removed[]`, `relocated[]`, `impact_scope[]`, and `invalidated_verifications[]`.
 - Treat `impact_scope[]` as affected-area roots, then use downstream collection from each scope root so child capabilities, requirements, contracts, and verifications are not skipped.
 - For each changed or impacted capability and requirement, gather upstream context with `reqvire.collect`; include contract bindings, contract references, owned contracts, concept references, semantic contracts, verification links, and implementation/evidence links.

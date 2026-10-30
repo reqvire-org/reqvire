@@ -55,8 +55,8 @@ export interface AppShellProps extends Omit<(HTMLAttributes<HTMLDivElement> & { 
 }
 
 const shellBaseUX = css`
-  --ux-left-pane-width: var(--space-left-pane-width);
-  --ux-left-pane-collapsed-width: var(--space-left-pane-collapsed-width);
+  --ux-left-pane-width: var(--side-pane-width);
+  --ux-left-pane-collapsed-width: var(--side-pane-collapsed-width);
   --ux-graph-side-panel-w: var(--space-graph-side-panel-w);
   --ux-graph-side-panel-max-h: var(--space-graph-side-panel-max-h);
   --ux-current-left-width: var(--ux-left-pane-width);
@@ -168,7 +168,7 @@ const headerBaseUX = css`
     display: grid;
     flex-basis: auto;
     grid-template-columns: var(--ux-header-leading-width) minmax(0, 1fr);
-    grid-template-rows: var(--app-header-height) var(--control-lg);
+    grid-template-rows: var(--app-header-height) var(--control-height-lg);
     height: auto;
   }
 

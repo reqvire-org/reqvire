@@ -681,6 +681,10 @@ The MCP interface is expected to expose read-only quality and traceability tools
 #### Details
 Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. Lint inspection is the default `fix: false` form of a conditional tool; repair is separately gated by the MCP lint-fix contract. Quality inspection and the other traceability tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against source-control commits require an eligible Git worktree and include the compared commit and current eligible worktree `HEAD` in result metadata.
 
+
+
+`reqvire.change_impact` accepts optional `git_commit` as its sole baseline revision selector under the shared Repo contract. Discovery MUST advertise that field with a default of HEAD and MUST NOT advertise a separate manifest revision selector. In Repo mode the selected workspace-root repository commit supplies the root model, manifest and includes, while that historical manifest supplies component pins. Route through the selected context and shared comparison operation, using the accepted current model and captured repository provenance; return the additive comparison provenance under the shared report contract. Standalone and embedded endpoints apply the same semantics.
+
 #### Metadata
   * type: specification
 

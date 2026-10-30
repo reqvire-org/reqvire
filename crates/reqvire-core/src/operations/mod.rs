@@ -219,10 +219,27 @@ pub fn containment_hierarchy(
 }
 
 pub fn change_impact_report(
-    registry: &GraphRegistry,
+    model: &ModelManager,
     git_commit: &str,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<(change_impact::ChangeImpactReport, String, String), ReqvireError> {
+    let registry = &model.graph_registry;
+    let scope = crate::mutation_io::workspace_scope()
+        .or_else(|| model.source_scope().cloned())
+        .map(Ok)
+        .unwrap_or_else(crate::workspace::WorkspaceScope::discover)?;
+    if let Some(repo) = &scope.repo {
+        let (reference, comparison) = crate::repo_impact::historical_model(
+            &scope,
+            repo,
+            git_commit,
+            excluded_filename_patterns,
+        )?;
+        let mut report = change_impact::compute_change_impact(registry, &reference.graph_registry)?;
+        let current_commit = comparison.current.central_commit.clone();
+        report.comparison = Some(comparison);
+        return Ok((report, String::new(), current_commit));
+    }
     let mut reference_model = ModelManager::new();
     match reference_model.parse_and_validate_with_mode(
         Some(git_commit),

@@ -159,7 +159,10 @@ def default_executable(h):
 
 def terminal_input(h):
     h.suite("test-stdin", '''
-python3 -c 'import os; assert os.read(0, 1) == b"", "suite stdin must be EOF"'
+[[ "$(dd bs=1 count=1 status=none | wc -c)" == 0 ]] || {
+    printf 'suite stdin must be EOF\\n' >&2
+    exit 1
+}
 ''')
     master, slave = pty.openpty()
 
@@ -241,23 +244,18 @@ printf '%s %s\\n' "$BASHPID" "$descendant" > "$RUNNER_OBSERVATIONS/ready"
 wait "$descendant"
 '''
     if detached:
-        body = '''python3 - <<'CHILD'
-import os
-from pathlib import Path
-import subprocess
-import sys
-import time
-child = subprocess.Popen([sys.executable, '-c',
-    "import os, signal, time; from pathlib import Path; "
-    "signal.signal(signal.SIGTERM, signal.SIG_IGN if os.environ.get('STUBBORN_CHILD') else signal.SIG_DFL); "
-    "Path(os.environ['RUNNER_OBSERVATIONS'], 'armed').touch(); time.sleep(60)"],
-    start_new_session=True)
-while not Path(os.environ['RUNNER_OBSERVATIONS'], 'armed').exists():
-    assert child.poll() is None
-    time.sleep(0.01)
-Path(os.environ['RUNNER_OBSERVATIONS'], 'ready').write_text(f'{os.getpid()} {child.pid}')
-child.wait()
-CHILD
+        body = '''setsid bash -c '
+if [[ -n "$STUBBORN_CHILD" ]]; then trap "" TERM; fi
+touch "$RUNNER_OBSERVATIONS/armed"
+exec sleep 60
+' &
+child=$!
+while [[ ! -e "$RUNNER_OBSERVATIONS/armed" ]]; do
+    kill -0 "$child"
+    sleep 0.01
+done
+printf '%s %s\\n' "$BASHPID" "$child" > "$RUNNER_OBSERVATIONS/ready"
+wait "$child"
 '''
     h.suite("test-wait", body)
     unrelated = subprocess.Popen(["sleep", "60"], start_new_session=True)

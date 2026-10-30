@@ -806,7 +806,7 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
   * satisfiedBy: [forceAtlasLayoutEngine.test.ts](../../../../explorer/src/workers/forceAtlasLayoutEngine.test.ts)
   * satisfiedBy: [test.sh](../../../../tests/test-explorer-build/test.sh)
   * satisfiedBy: [check-forceatlas-worker.mjs](../../../../tests/test-export-command/check-forceatlas-worker.mjs)
-  * satisfiedBy: [check-store.py](../../../../tests/test-serve-command/scripts/check-store.py)
+  * satisfiedBy: [check-store.sh](../../../../tests/test-serve-command/scripts/check-store.sh)
   * satisfiedBy: [route-check.mjs](../../../../tests/test-serve-command/scripts/route-check.mjs)
   * verify: [SPA Explorer Shell and Project Store](../../../Interfaces/WebExplorer/Capabilities.md#spa-explorer-shell-and-project-store)
 ---
@@ -855,7 +855,7 @@ This test verifies that the serve command starts an HTTP server for the embedded
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [startup-check.py](../../../../tests/test-serve-command/scripts/startup-check.py)
+  * satisfiedBy: [startup-check.sh](../../../../tests/test-serve-command/scripts/startup-check.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
   * verify: [Serve Command](../../../Interfaces/WebExplorer/Capabilities.md#serve-command)
   * verify: [Serve Command Embedded MCP Endpoint](../../../Interfaces/WebExplorer/Capabilities.md#serve-command-embedded-mcp-endpoint)

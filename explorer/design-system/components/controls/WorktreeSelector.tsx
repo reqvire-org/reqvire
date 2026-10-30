@@ -19,11 +19,11 @@ const triggerClass = css`
   gap: var(--space-5);
   width: 100%;
   min-width: 0;
-  height: var(--control-lg);
-  padding: 0 var(--space-6);
+  height: var(--control-height-lg);
+  padding: 0 var(--control-padding-lg);
   border: var(--border-w) solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: var(--bg-surface);
+  background: var(--bg-field);
   color: var(--text-strong);
   font: inherit;
   font-weight: var(--weight-medium);
@@ -42,22 +42,22 @@ const nameClass = css`
   white-space: nowrap;
 `;
 const compactTriggerClass = css`
-  height: var(--control-sm);
+  height: var(--control-height-sm);
   gap: var(--space-4);
-  padding-inline: var(--space-4);
+  padding-inline: var(--control-padding-sm);
   border-color: transparent;
   background: transparent;
 `;
 const menuClass = css`
   position: absolute;
-  z-index: var(--z-popover);
+  z-index: var(--z-dropdown);
   top: calc(100% + var(--space-2));
   left: 0;
   right: 0;
   padding: var(--space-3);
   border: var(--border-w) solid var(--border-default);
   border-radius: var(--radius-lg);
-  background: var(--bg-overlay);
+  background: var(--bg-raised);
   box-shadow: var(--shadow-lg);
 `;
 const headingClass = css`
@@ -77,7 +77,7 @@ const compactMenuClass = css`
   }
 `;
 const listClass = css`
-  max-height: min(50vh, calc(var(--control-lg) * 7));
+  max-height: min(50vh, calc(var(--control-height-lg) * 7));
   overflow-y: auto;
   overscroll-behavior: contain;
   margin: 0;
@@ -88,13 +88,13 @@ const optionClass = css`
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  padding: var(--space-5);
+  padding: var(--control-padding-sm);
   border-radius: var(--radius-sm);
   cursor: pointer;
   &[data-active="true"] { background: var(--bg-sunken); }
   &[aria-selected="true"] { background: var(--accent-subtle); }
   &[aria-selected="true"] > svg { color: var(--accent); }
-  &[aria-disabled="true"] { color: var(--text-muted); cursor: default; }
+  &[aria-disabled="true"] { color: var(--text-disabled); cursor: default; }
   svg { flex: 0 0 auto; width: var(--icon-sm); height: var(--icon-sm); }
 `;
 const optionTextClass = css`

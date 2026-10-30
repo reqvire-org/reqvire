@@ -1,0 +1,84 @@
+{
+  "valid": [
+    [
+      "ASK",
+      "ASK { <https://people.example/alice> a item:Item }",
+      ""
+    ],
+    [
+      "DESCRIBE",
+      "DESCRIBE <https://people.example/alice>",
+      ""
+    ],
+    [
+      "CONSTRUCT",
+      "CONSTRUCT { ?s item:name ?o } WHERE { ?s item:name ?o }",
+      "\n#### Produces\n  * property: item:name\n  * property: <https://example.org/items#name>\n"
+    ],
+    [
+      "SELECT",
+      "SELECT ?s FROM <https://data.example/absent> WHERE { SERVICE SILENT <https://service.invalid/sparql> { ?s a item:Item } FILTER(<https://extension.example/function>(?s)) }",
+      ""
+    ]
+  ],
+  "invalid": [
+    [
+      "ASK { ?s a item:Missing }",
+      ""
+    ],
+    [
+      "ASK { ?s item:Item ?o }",
+      ""
+    ],
+    [
+      "SELECT ?s WHERE { ?s (item:name/item:missing) ?o }",
+      ""
+    ],
+    [
+      "CONSTRUCT { ?s item:missing ?o } WHERE { ?s item:name ?o }",
+      ""
+    ],
+    [
+      "SELECT ?s WHERE { FILTER EXISTS { ?s a item:Missing } }",
+      ""
+    ],
+    [
+      "SELECT ?s WHERE { VALUES ?s { \"x\"^^item:Missing } }",
+      ""
+    ],
+    [
+      "ASK { ?s a item:Item }",
+      "\n#### Produces\n  * property: item:name\n"
+    ],
+    [
+      "CONSTRUCT { ?s item:name ?o } WHERE { ?s item:name ?o }",
+      "\n#### Produces\n  * property: item:Item\n"
+    ],
+    [
+      "CONSTRUCT {} WHERE {}",
+      "\n#### Produces\n  * family: item:Item\n"
+    ],
+    [
+      "CONSTRUCT {} WHERE {}",
+      "\n#### Produces\n  * other: item:Item\n"
+    ],
+    [
+      "CONSTRUCT {} WHERE {}",
+      "\n#### Produces\n"
+    ],
+    [
+      "INSERT DATA { <urn:x> a item:Item }",
+      ""
+    ]
+  ],
+  "document": "PREFIX item: <https://example.org/items#>\nSELECT ?s WHERE { ?s item:name \"\"\"line one\r\n#### Concept References\r\nliteral text\r\nline two\"\"\" }\n",
+  "construct": "PREFIX item: <https://example.org/items#>\n# <https://example.org/items#name>\nCONSTRUCT { ?s item:name \"\"\"<https://example.org/items#name>\n#### Produces\n  * property: item:name\n\"\"\" } WHERE { ?s item:name ?n }",
+  "child": "\n### Child Vocabulary\n\n#### Metadata\n  * type: ontology\n\n#### Relations\n  * derivedFrom: [Item Ontology](#item-ontology)\n\n#### Ontology\n```turtle\n@prefix item: <https://example.org/items#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\nitem:Child a owl:Class .\n```\n---\n",
+  "external_ttl": "@prefix ext: <https://imports.example/vocab#> .\n@prefix reqvire: <https://www.reqvire.org/ontology#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n<https://imports.example/vocab> a owl:Ontology .\next:Record a owl:Class .\next:Unused a owl:Class .\next:value a owl:DatatypeProperty .\next:output a owl:ObjectProperty .\n<urn:imported-query> a reqvire:SemanticQuery ; reqvire:queryName \"Item Lookup\" ; reqvire:queryText \"ASK {}\" .\n",
+  "ext_section": "\n#### External Ontology\n  * prefix: ext\n  * namespace: https://imports.example/vocab#\n  * resource: https://imports.example/vocab\n  * source: external.ttl\n  * format: turtle\n",
+  "runtime_queries": [
+    "BASE <https://people.example/>\nASK { <alice> a <https://example.org/items#Item> }",
+    "SELECT ?s FROM NAMED <urn:dataset> WHERE { GRAPH <urn:graph> { SERVICE <https://unavailable.invalid/query> { ?s ?p ?o } } }",
+    "SELECT (\"\"\"first\n#### Ontology\n### Not an element\n---\nlast\"\"\" AS ?text) WHERE {}"
+  ]
+}

@@ -64,8 +64,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--control-sm);
-  height: var(--control-sm);
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
   padding: 0;
   border: var(--border-w) solid var(--color-showcase-border);
   border-radius: var(--radius-xs);
@@ -594,7 +594,7 @@
 .ux-showcase-shell-nav-placeholder,
 .ux-showcase-shell-badge-placeholder {
   display: inline-block;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-sunken);
 }
 
@@ -718,7 +718,7 @@
 }
 
 .ux-showcase-shell-placeholder--search {
-  height: var(--control-md);
+  height: var(--control-height-md);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
 }
@@ -765,7 +765,7 @@
 
 .ux-showcase-shell-placeholder--action {
   width: var(--space-32);
-  height: var(--control-sm);
+  height: var(--control-height-sm);
   background: var(--bg-surface);
 }
 

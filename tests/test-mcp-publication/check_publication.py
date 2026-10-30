@@ -46,18 +46,15 @@ for mode in ('mcp', 'serve'):
             (state / 'scenario.json').write_text('{}')
             bins = directory / 'bin'
             bins.mkdir()
-            shutil.copy2(suite / 'fixtures/gh-double.py', bins / 'gh')
+            shutil.copy2(suite / 'fixtures/gh-double.sh', bins / 'gh')
             (bins / 'gh').chmod(0o755)
             # The real git binary handles all commands. Network transports are redirected
             # to one local bare fixture; any other network URL is rejected by the wrapper.
             real_git = shutil.which('git')
-            (bins / 'git').write_text('#!/usr/bin/python3\n' +
-                'import os, sys\nargs = sys.argv[1:]\n' +
-                f'args = [{str(remote)!r} if a == "https://github.com/test/project.git" and ("push" in args or "ls-remote" in args) else a for a in args]\n' +
-                'if ("push" in args or "ls-remote" in args) and any(a.startswith(("https://", "ssh://", "git@")) for a in args): sys.exit(99)\n' +
-                f'os.execv({real_git!r}, [{real_git!r}, *args])\n')
+            shutil.copy2(suite / 'fixtures/git-double.sh', bins / 'git')
             (bins / 'git').chmod(0o755)
-            env = {'PATH': str(bins) + os.pathsep + os.environ['PATH'], 'REQVIRE_GH_TEST_STATE': str(state)}
+            env = {'PATH': str(bins) + os.pathsep + os.environ['PATH'], 'REQVIRE_GH_TEST_STATE': str(state),
+                   'REQVIRE_GIT_TEST_REMOTE': str(remote), 'REQVIRE_GIT_TEST_BINARY': real_git}
             with helpers.Server(binary, root, output, mode, mode, mutations=True,
                                 extra_args=['--enable-github'], environment=env) as server:
                 tools = server.rpc('tools/list', {})['tools']

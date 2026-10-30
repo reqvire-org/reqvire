@@ -5,9 +5,9 @@ const baseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  height: var(--control-sm);
-  padding: 0 var(--space-7);
-  border-radius: var(--radius-pill);
+  height: var(--control-height-sm);
+  padding: 0 var(--control-padding-sm);
+  border-radius: var(--radius-full);
   cursor: var(--ds-chip-cursor, pointer);
   white-space: nowrap;
   transition:
@@ -45,16 +45,9 @@ const skinX = css`
 
   &[aria-pressed="true"],
   &.is-active {
-    color: var(--slate-0);
-    background: var(--slate-900);
-    border-color: var(--slate-900);
-  }
-
-  [data-theme="dark"] &[aria-pressed="true"],
-  [data-theme="dark"] &.is-active {
-    color: var(--slate-900);
-    background: var(--slate-0);
-    border-color: var(--slate-0);
+    color: var(--slate-1);
+    background: var(--slate-12);
+    border-color: var(--slate-12);
   }
 `;
 

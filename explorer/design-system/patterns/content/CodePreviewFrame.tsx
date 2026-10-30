@@ -92,8 +92,8 @@ const baseUX = css`
   }
 
   .ux-source-code-preview__kind {
-    border-radius: var(--radius-pill);
-    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--control-padding-sm);
     font-weight: var(--weight-bold);
   }
 
@@ -110,7 +110,7 @@ const baseUX = css`
     align-items: center;
     gap: var(--space-3);
     border-radius: var(--radius-md);
-    padding: 0 var(--space-4);
+    padding: 0 var(--control-padding-sm);
     cursor: pointer;
     font-size: var(--text-caption);
     font-weight: var(--weight-bold);

@@ -97,6 +97,14 @@ for (const [kind, base] of [["served", servedUrl], ["exported", exportedUrl]]) {
         if (!button) throw new Error(`Missing action: ${label}`); button.click();
       }, label);
     }
+    async function pressArrow(key) {
+      // Native events are cancelable, so the row respects the navigation
+      // handler's preventDefault instead of toggling the same node twice.
+      await rpc("Page.bringToFront");
+      const params = { key, code: key, windowsVirtualKeyCode: key === "ArrowLeft" ? 37 : 39 };
+      await rpc("Input.dispatchKeyEvent", { type: "keyDown", ...params });
+      await rpc("Input.dispatchKeyEvent", { type: "keyUp", ...params });
+    }
     async function run(label, check) { console.error(`START ${label}`); await check(); console.log(`${label}: PASS`); }
 
     await run(`${kind} URL precedence and explicit whole-model dashboard`, async () => {
@@ -104,16 +112,18 @@ for (const [kind, base] of [["served", servedUrl], ["exported", exportedUrl]]) {
       assert.deepEqual(await evaluate(() => [...document.querySelectorAll('[data-capability-id]')].map(row => [row.getAttribute("aria-label"), Number(row.getAttribute("aria-level"))])),
         [["Alpha Root", 2], ["Alpha Left", 3], ["Shared Branch", 4], ["Alpha Right", 3], ["Empty Branch", 3], ["Beta Root", 2]]);
       const before = await evaluate(() => history.length);
-      await evaluate(() => { const root = document.querySelector('[data-coverage-whole-model]'); root.focus(); root.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true })); });
+      await evaluate(() => document.querySelector('[data-coverage-whole-model]').focus());
+      await pressArrow("ArrowLeft");
       await waitFor(() => document.querySelectorAll('[aria-label="Coverage capabilities"] [role="treeitem"]').length === 1);
       assert.equal(await evaluate(() => history.length), before);
       assert.equal(await evaluate(() => document.querySelector('[data-coverage-whole-model]').getAttribute("aria-selected")), "true");
-      await evaluate(() => document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })));
+      await pressArrow("ArrowRight");
       await waitFor(() => Boolean(document.querySelector('[data-capability-id][aria-label="Alpha Root"]')));
-      await evaluate(() => { const root = document.querySelector('[data-capability-id][aria-label="Alpha Root"]'); root.focus(); root.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true })); });
+      await evaluate(() => document.querySelector('[data-capability-id][aria-label="Alpha Root"]').focus());
+      await pressArrow("ArrowLeft");
       await waitFor(() => !document.querySelector('[data-capability-id][aria-label="Shared Branch"]'));
       assert.equal(await evaluate(() => history.length), before);
-      await evaluate(() => document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })));
+      await pressArrow("ArrowRight");
       await select("Alpha Root");
       await open(`${base}/?theme=dark${hash("Shared Branch")}`); await scope("Shared Branch");
       assert.equal(await evaluate(() => new URL(location.href).searchParams.get("theme")), "dark");

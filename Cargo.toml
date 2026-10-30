@@ -6,6 +6,10 @@ members = [
 ]
 resolver = "2"
 
+[profile.dev]
+incremental = false
+debug = "line-tables-only"
+
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
 pedantic = { level = "allow", priority = -1 }
@@ -14,7 +18,7 @@ unwrap_used = "warn"
 clone_on_ref_ptr = "warn"
 
 [workspace.package]
-version = "1.4.0"
+version = "1.4.1"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"

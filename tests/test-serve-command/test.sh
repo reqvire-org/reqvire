@@ -51,7 +51,7 @@ TEST_PORT="$(available_port)"
 SERVER_BIN="${REAL_REQVIRE_BIN:-$REQVIRE_BIN}"
 
 # Check initialization before listener startup, including rejected admission.
-python3 "$TEST_SCRIPT_DIR/scripts/startup-check.py" "$REQVIRE_BIN" "$TEST_DIR/output/startup"
+bash "$TEST_SCRIPT_DIR/scripts/startup-check.sh" "$REQVIRE_BIN" "$TEST_DIR/output/startup"
 diff -u "$TEST_SCRIPT_DIR/expected/startup-checks.txt" "$TEST_DIR/output/startup/checks.txt"
 
 # Start serve command in background with non-default host and port
@@ -134,7 +134,7 @@ if [ "$STORE_CODE" != "200" ]; then
 fi
 
 "$REQVIRE_BIN" traces --output "$TEST_DIR/output/traces.json"
-python3 "$TEST_DIR/scripts/check-store.py" "$STORE_FILE" --traces-json "$TEST_DIR/output/traces.json"
+bash "$TEST_DIR/scripts/check-store.sh" "$STORE_FILE" --traces-json "$TEST_DIR/output/traces.json"
 
 # Exercise the compiled bundle and its real browser URL serialization, using
 # the same temporary Git workspace and golden-file comparisons as other E2Es.

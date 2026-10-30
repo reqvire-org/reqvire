@@ -7,29 +7,24 @@ REPO_ROOT="$(cd "$TEST_SCRIPT_DIR/../.." && pwd)"
 normalize_turtle_bnodes() {
   local input="$1"
   local output="$2"
-  python3 - "$input" "$output" <<'PY'
-import re
-import sys
-
-source, target = sys.argv[1], sys.argv[2]
-mapping = {}
-counter = 0
-pattern = re.compile(r'_:([A-Za-z][A-Za-z0-9_-]*)')
-
-def replace(match):
-    global counter
-    label = match.group(1)
-    if label not in mapping:
-        counter += 1
-        mapping[label] = f"_:b{counter}"
-    return mapping[label]
-
-with open(source, "r", encoding="utf-8") as handle:
-    content = handle.read()
-
-with open(target, "w", encoding="utf-8") as handle:
-    handle.write(pattern.sub(replace, content).rstrip() + "\n")
-PY
+  awk '
+    {
+      rest=$0; line=""
+      while (match(rest, /_:[A-Za-z][A-Za-z0-9_-]*/)) {
+        label=substr(rest,RSTART+2,RLENGTH-2)
+        if (!(label in mapping)) mapping[label]="_:b" ++counter
+        line=line substr(rest,1,RSTART-1) mapping[label]
+        rest=substr(rest,RSTART+RLENGTH)
+      }
+      lines[NR]=line rest
+      if (lines[NR] !~ /^[[:space:]]*$/) last=NR
+    }
+    END {
+      if (!last) { print ""; exit }
+      sub(/[[:space:]]+$/, "", lines[last])
+      for (i=1;i<=last;i++) print lines[i]
+    }
+  ' "$input" > "$output"
 }
 
 GENERATED_RUNTIME_DIR="$(mktemp -d -t reqvire-runtime-artifacts-XXXXXX)"

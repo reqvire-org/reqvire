@@ -7,7 +7,7 @@ const baseUX = css`
   align-items: center;
   gap: var(--space-3);
   height: var(--ds-typebadge-h, calc(var(--space-8) + var(--space-2)));
-  padding: 0 var(--space-5);
+  padding: 0 var(--control-padding-sm);
   border-radius: var(--radius-sm);
   font-size: var(--text-micro);
   font-weight: var(--weight-medium);

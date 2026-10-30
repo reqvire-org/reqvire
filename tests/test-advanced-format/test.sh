@@ -300,8 +300,8 @@ if [ $JSON_FORMAT_EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
-# Check if output is valid JSON
-if ! python3 -m json.tool < json_format_output.txt > /dev/null 2>&1; then
+# Require exactly one valid JSON value, including false or null.
+if ! jq -s -e 'length == 1' json_format_output.txt > /dev/null 2>&1; then
     echo "FAIL: Format command --json output is not valid JSON"
     echo "Output:"
     cat json_format_output.txt

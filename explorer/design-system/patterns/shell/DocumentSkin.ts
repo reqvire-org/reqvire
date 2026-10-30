@@ -20,7 +20,7 @@ const documentSkin = css`
     &::-webkit-scrollbar-track, *::-webkit-scrollbar-track { background: var(--scroll-track); }
     &::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb {
       background-color: var(--scroll-thumb);
-      border-radius: var(--radius-pill);
+      border-radius: var(--radius-full);
       border: var(--border-w-heavy) solid transparent;
       background-clip: content-box;
     }

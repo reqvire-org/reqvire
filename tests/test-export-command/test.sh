@@ -47,7 +47,7 @@ if ! grep -q "reqvireProjectStore" "$EXPORT_DIR/assets/project-store.js"; then
     exit 1
 fi
 
-python3 "$TEST_SCRIPT_DIR/../test-serve-command/scripts/check-store.py" "$EXPORT_DIR/assets/project-store.js" \
+bash "$TEST_SCRIPT_DIR/../test-serve-command/scripts/check-store.sh" "$EXPORT_DIR/assets/project-store.js" \
     --requirement-text "Test Requirement" --evidence-text "export command evidence"
 
 node "$TEST_SCRIPT_DIR/check-forceatlas-worker.mjs" "$EXPORT_DIR" > "$TEST_DIR/forceatlas-worker.txt"

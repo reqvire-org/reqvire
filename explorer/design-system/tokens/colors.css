@@ -13,50 +13,100 @@
 
 @layer base {
   :root {
+    /* 12-step ramps; the dark theme redefines them under the same names. */
+    --slate-1: oklch(1 0 0);
+    --slate-2: oklch(0.9785 0.004531 258.3);
+    --slate-3: oklch(0.9573 0.007433 260.7);
+    --slate-4: oklch(0.9322 0.01089 256.7);
+    --slate-5: oklch(0.8959 0.01515 260.7);
+    --slate-6: oklch(0.8204 0.02077 257.5);
+    --slate-7: oklch(0.667 0.02958 260.3);
+    --slate-8: oklch(0.5505 0.02294 250.6);
+    --slate-9: oklch(0.4578 0.02906 259.8);
+    --slate-10: oklch(0.3728 0.02693 259.2);
+    --slate-11: oklch(0.2868 0.02483 258.4);
+    --slate-12: oklch(0.2286 0.02212 257.3);
+    --warm-1: oklch(1 0 0);
+    --warm-2: oklch(0.985 0.004107 91.45);
+    --warm-3: oklch(0.9733 0.006963 88.64);
+    --warm-4: oklch(0.958 0.008257 91.48);
+    --warm-5: oklch(0.9286 0.0128 86.83);
+    --warm-6: oklch(0.8987 0.01454 84.59);
+    --warm-7: oklch(0.8652 0.01759 84.59);
+    --warm-8: oklch(0.78 0.02 85);
+    --warm-9: oklch(0.66 0.02 85);
+    --warm-10: oklch(0.56 0.02 85);
+    --warm-11: oklch(0.46 0.02 85);
+    --warm-12: oklch(0.3 0.02 85);
+    --color-accent-1: oklch(0.995 0.001323 17.58);
+    --color-accent-2: oklch(0.9697 0.01531 7.481);
+    --color-accent-3: oklch(0.9419 0.03006 7.518);
+    --color-accent-4: oklch(0.8933 0.05647 5.931);
+    --color-accent-5: oklch(0.8053 0.1141 8.693);
+    --color-accent-6: oklch(0.7173 0.1718 11.46);
+    --color-accent-7: oklch(0.645 0.2154 16.44);
+    --color-accent-8: oklch(0.6154 0.2187 17.01);
+    --color-accent-9: oklch(0.5858 0.222 17.58);
+    --color-accent-10: oklch(0.5143 0.1978 16.93);
+    --color-accent-11: oklch(0.4546 0.1713 13.7);
+    --color-accent-12: oklch(0.25 0.09992 17.58);
+    --color-red-1: oklch(0.995 0.000912 27.33);
+    --color-red-2: oklch(0.9428 0.0277 27.33);
+    --color-red-3: oklch(0.8905 0.05448 27.33);
+    --color-red-4: oklch(0.8383 0.08127 27.33);
+    --color-red-5: oklch(0.7861 0.1081 27.33);
+    --color-red-6: oklch(0.7338 0.1348 27.33);
+    --color-red-7: oklch(0.6816 0.1616 27.33);
+    --color-red-8: oklch(0.6293 0.1884 27.33);
+    --color-red-9: oklch(0.5771 0.2152 27.33);
+    --color-red-10: oklch(0.4681 0.1757 27.33);
+    --color-red-11: oklch(0.359 0.1363 27.33);
+    --color-red-12: oklch(0.25 0.09684 27.33);
+    --color-green-1: oklch(0.995 0.00691 152.9);
+    --color-green-2: oklch(0.9474 0.02461 152.9);
+    --color-green-3: oklch(0.8998 0.04231 152.9);
+    --color-green-4: oklch(0.8522 0.06001 152.9);
+    --color-green-5: oklch(0.8045 0.0777 152.9);
+    --color-green-6: oklch(0.7569 0.0954 152.9);
+    --color-green-7: oklch(0.7093 0.1131 152.9);
+    --color-green-8: oklch(0.6617 0.1308 152.9);
+    --color-green-9: oklch(0.6141 0.1485 152.9);
+    --color-green-10: oklch(0.4927 0.1206 152.9);
+    --color-green-11: oklch(0.3714 0.09272 152.9);
+    --color-green-12: oklch(0.25 0.06482 152.9);
+    --color-amber-1: oklch(0.995 0.005312 84.7);
+    --color-amber-2: oklch(0.9663 0.02405 84.7);
+    --color-amber-3: oklch(0.9375 0.04278 84.7);
+    --color-amber-4: oklch(0.9088 0.06152 84.7);
+    --color-amber-5: oklch(0.8801 0.08026 84.7);
+    --color-amber-6: oklch(0.8514 0.09899 84.7);
+    --color-amber-7: oklch(0.8226 0.1177 84.7);
+    --color-amber-8: oklch(0.7939 0.1365 84.7);
+    --color-amber-9: oklch(0.7652 0.1552 84.7);
+    --color-amber-10: oklch(0.5935 0.1207 84.7);
+    --color-amber-11: oklch(0.4217 0.08629 84.7);
+    --color-amber-12: oklch(0.25 0.05184 84.7);
+    --color-blue-1: oklch(0.995 0.000854 253.9);
+    --color-blue-2: oklch(0.9521 0.02136 253.9);
+    --color-blue-3: oklch(0.9092 0.04387 253.9);
+    --color-blue-4: oklch(0.8663 0.06637 253.9);
+    --color-blue-5: oklch(0.8234 0.08888 253.9);
+    --color-blue-6: oklch(0.7805 0.1134 253.9);
+    --color-blue-7: oklch(0.7376 0.1359 253.9);
+    --color-blue-8: oklch(0.6947 0.1584 253.9);
+    --color-blue-9: oklch(0.6518 0.1809 253.9);
+    --color-blue-10: oklch(0.5179 0.1477 253.9);
+    --color-blue-11: oklch(0.3839 0.1146 253.9);
+    --color-blue-12: oklch(0.25 0.08141 253.9);
+
     --color-showcase-canvas: #fafafa;
     --color-showcase-ink: #444444;
     --color-showcase-border: #dddddd;
-    /* ── oklch runtime primitives ─────────────────────────────────
-       Mirrors @theme but as real CSS custom properties so
-       getPropertyValue() and color-mix() in CSS can read them.   */
 
-    /* Slate ramp */
-    --color-slate-0:   oklch(100% 0 0);
-    --color-slate-25:  oklch(99.09% 0.0029 264.54);
-    --color-slate-50:  oklch(97.85% 0.0045 258.32);
-    --color-slate-100: oklch(95.73% 0.0074 260.73);
-    --color-slate-150: oklch(93.22% 0.0109 256.7);
-    --color-slate-200: oklch(89.59% 0.0151 260.73);
-    --color-slate-300: oklch(82.04% 0.0208 257.48);
-    --color-slate-400: oklch(70.94% 0.0291 260.3);
-    --color-slate-500: oklch(56.31% 0.0309 260.27);
-    --color-slate-600: oklch(45.78% 0.0291 259.78);
-    --color-slate-700: oklch(37.28% 0.0269 259.15);
-    --color-slate-800: oklch(28.68% 0.0248 258.35);
-    --color-slate-900: oklch(22.86% 0.0221 257.28);
-    --color-slate-950: oklch(17.74% 0.0178 263.96);
-
-    /* Warm surfaces */
-    --color-warm-0:   var(--color-slate-0);
-    --color-warm-25:  oklch(98.5% 0.0041 91.45);
-    --color-warm-50:  oklch(97.33% 0.007 88.64);
-    --color-warm-100: oklch(95.8% 0.0083 91.48);
-    --color-warm-150: oklch(92.86% 0.0128 86.83);
-    --color-warm-200: oklch(89.87% 0.0145 84.59);
-    --color-warm-300: oklch(86.52% 0.0176 84.59);
-
-    /* Brand accent */
-    --color-rose-50:  oklch(96.97% 0.0153 7.48);
-    --color-rose-100: oklch(94.19% 0.0301 7.52);
-    --color-rose-200: oklch(89.33% 0.0565 5.93);
-    --color-rose-400: oklch(71.73% 0.1718 11.46);
-    --color-rose-500: oklch(64.5% 0.2154 16.44);
-    --color-rose-600: oklch(58.58% 0.222 17.58);
-    --color-rose-700: oklch(51.43% 0.1978 16.93);
-    --color-rose-800: oklch(45.46% 0.1713 13.7);
-
-    /* Shared red paint for status and shape roles. */
-    --color-red-600: oklch(57.71% 0.2152 27.33);
+    /* Fixed in every theme: ink for shadows and labels on light fills, paper for glyphs on
+       colored fills. */
+    --color-ink: #0d1119;
+    --color-paper: #ffffff;
 
     /* Element type solid fills */
     --color-capability:  oklch(88.48% 0.0546 243.39);
@@ -82,73 +132,14 @@
     --color-rdf-datatype:    oklch(74.73% 0.1295 81.69);
     --color-rdf-restriction: oklch(86.9%  0.0198 252.89);
     --color-rdf-classexpr:   oklch(92.88% 0.0126 255.51);
-    --color-rdf-nodeshape:   var(--color-red-600);
-    --color-rdf-propshape:   var(--color-rose-700);
+    --color-rdf-nodeshape: oklch(0.5771 0.2152 27.33);
+    --color-rdf-propshape: oklch(0.5143 0.1978 16.93);
     --color-rdf-resource:    oklch(70.38% 0.123  182.5);
     --color-rdf-shacl:       var(--color-semantic-contract);
-
-    /* Status */
-    --color-success: oklch(61.41% 0.1485 152.91);
-    --color-warning: oklch(76.52% 0.1552 84.7);
-    --color-danger:  var(--color-red-600);
-    --color-info:    oklch(65.18% 0.1809 253.92);
 
     /* Edge */
     --color-edge-default: oklch(83.02% 0.0189 258.36);
     --color-edge-bind:  oklch(65.82% 0.169  248.81);
-
-    /* Dark semantic primitives */
-    --color-dark-canvas:         oklch(18.97% 0.0206 258.33);
-    --color-dark-surface:        oklch(21.97% 0.0247 256.46);
-    --color-dark-raised:         oklch(24.54% 0.0282 257.53);
-    --color-dark-overlay:        oklch(27.4%  0.0297 256.85);
-    --color-dark-sunken:         oklch(17.56% 0.0192 255.78);
-    --color-dark-hover:          oklch(26.99% 0.0298 256.85);
-    --color-dark-active:         oklch(30.56% 0.0334 255.78);
-    --color-dark-rail:           oklch(20.15% 0.0193 252.12);
-    --color-dark-edge-default:   oklch(38.72% 0.0309 257.68);
-    --color-dark-text-strong:    oklch(96.85% 0.0079 253.85);
-    --color-dark-text-body:      oklch(91.31% 0.0144 254.61);
-    --color-dark-text-secondary: oklch(77.2%  0.0265 255.59);
-    --color-dark-text-muted:     oklch(63.28% 0.0324 257.78);
-    --color-dark-text-faint:     oklch(51.38% 0.0288 257.68);
-    --color-dark-border-subtle:  oklch(29.34% 0.0299 254.7);
-    --color-dark-border-default: oklch(32.81% 0.0297 252.59);
-    --color-dark-border-strong:  oklch(39.04% 0.0387 257.29);
-    --color-dark-scroll-thumb:   oklch(34.89% 0.0339 257.1);
-
-    /* ── Neutral ramp hex aliases — safe for JS / getPropertyValue ─ */
-    --slate-0:   #ffffff;
-    --slate-25:  #fbfcfe;
-    --slate-50:  #f6f8fb;
-    --slate-100: #eef1f6;
-    --slate-150: #e4e9f0;
-    --slate-200: #d7dde7;
-    --slate-300: #bcc5d2;
-    --slate-400: #97a2b4;
-    --slate-500: #6b7688;
-    --slate-600: #4e5868;
-    --slate-700: #38414f;
-    --slate-800: #232b37;
-    --slate-900: #161d27;
-    --slate-950: #0d1119;
-
-    --warm-0:   var(--slate-0);
-    --warm-25:  #fbfaf7;
-    --warm-50:  #f8f6f1;
-    --warm-100: #f3f1eb;
-    --warm-150: #ebe7de;
-    --warm-200: #e2ddd3;
-    --warm-300: #d8d2c6;
-
-    --rose-50:   #fff1f3;
-    --rose-100:  #ffe4e8;
-    --rose-200:  #fecdd6;
-    --rose-400:  #fb6f88;
-    --rose-500:  #f43f5e;
-    --rose-600:  #e11d48;
-    --rose-700:  #be123c;
-    --rose-800:  #9f1239;
 
     /* ── Element-type semantic hues ────────────────────────────────
        Solid fills:  oklch via primitive — normalizeCssColor() in
@@ -216,7 +207,7 @@
     --color-role-rdf-concept:     var(--color-rdf-concept);
     --color-role-rdf-concept-scheme: var(--color-rdf-concept-scheme);
     --color-role-concept-reference: var(--color-concept-reference);
-    --color-role-concept-reference-ink: color-mix(in oklch, var(--color-role-concept-reference) 58%, var(--slate-950));
+    --color-role-concept-reference-ink: color-mix(in oklch, var(--color-role-concept-reference) 58%, var(--color-ink));
     --color-role-concept-reference-tint: color-mix(in oklch, var(--color-role-concept-reference) 18%, var(--bg-surface));
     --color-role-rdf-individual:  var(--color-rdf-individual);
     --color-role-rdf-datatype:    var(--color-rdf-datatype);
@@ -233,76 +224,90 @@
     --color-role-rdf-shacl-border:     color-mix(in srgb, var(--color-role-rdf-shacl) 34%, var(--border-default));
 
     /* ── Status ─────────────────────────────────────────────────── */
-    --success: var(--color-success);
-    --warning: var(--color-warning);
-    --danger:  var(--color-danger);
-    --info:    var(--color-info);
-    --success-tint: color-mix(in oklch, var(--success) 15%, var(--bg-surface));
-    --warning-tint: color-mix(in oklch, var(--warning) 15%, var(--bg-surface));
-    --danger-tint:  color-mix(in oklch, var(--danger)  15%, var(--bg-surface));
-    --info-tint:    color-mix(in oklch, var(--info)    15%, var(--bg-surface));
+    --success: var(--color-green-9);
+    --warning: var(--color-amber-9);
+    --danger: var(--color-red-9);
+    --info: var(--color-blue-9);
+    --success-bg: color-mix(in oklch, var(--success) 15%, var(--bg-surface));
+    --warning-bg: color-mix(in oklch, var(--warning) 15%, var(--bg-surface));
+    --danger-bg:  color-mix(in oklch, var(--danger)  15%, var(--bg-surface));
+    --info-bg:    color-mix(in oklch, var(--info)    15%, var(--bg-surface));
     --success-border: color-mix(in srgb, var(--success) 34%, var(--border-default));
     --warning-border: color-mix(in srgb, var(--warning) 34%, var(--border-default));
     --danger-border:  color-mix(in srgb, var(--danger)  34%, var(--border-default));
     --info-border:    color-mix(in srgb, var(--info)    34%, var(--border-default));
+    --success-fg: var(--color-paper);
+    --warning-fg: var(--color-ink);
+    --danger-fg: var(--color-paper);
+    --info-fg: var(--color-paper);
+    --success-text: var(--color-green-11);
+    --warning-text: var(--color-amber-11);
+    --danger-text: var(--color-red-11);
+    --info-text: var(--color-blue-11);
 
     /* ── Graph edge colors ───────────────────────────────────────── */
     --color-role-edge-default: var(--color-edge-default);
     --color-role-edge-derive:  var(--color-requirement);
     --color-role-edge-satisfy: var(--color-verification);
-    --color-role-edge-trace:   var(--color-slate-400);
+    --color-role-edge-trace: oklch(0.7094 0.0291 260.3);
     --color-role-edge-bind:  var(--color-edge-bind);
 
     /* ── Accent state surfaces ──────────────────────────────────── */
     --accent-bg-hover:   color-mix(in srgb, var(--accent) 5%, transparent);
-    --accent-bg-selected: var(--rose-50);
+    --accent-bg-selected: var(--color-accent-2);
 
     /* ── Semantic surface / text / border aliases ────────────────── */
-    --bg-canvas:      var(--warm-25);
-    --bg-surface:     var(--warm-0);
-    --bg-raised:      var(--warm-0);
-    --bg-overlay:     var(--warm-0);
-    --bg-sunken:      var(--warm-100);
+    --bg-canvas: var(--warm-2);
+    --bg-surface: var(--warm-1);
+    --bg-raised: var(--warm-1);
+    --bg-overlay: var(--warm-1);
+    --bg-sunken: var(--warm-4);
     --bg-hover:       var(--accent-bg-hover);
-    --bg-active:      var(--warm-150);
-    --bg-rail:        var(--warm-25);
+    --bg-active: var(--warm-5);
+    --bg-rail: var(--warm-2);
+    --bg-field: var(--bg-surface);
+    --bg-disabled: var(--bg-sunken);
+    --bg-skeleton: var(--warm-5);
     --bg-floating:    color-mix(in srgb, var(--bg-overlay) 94%, transparent);
-    --bg-scrim:       color-mix(in srgb, var(--slate-950) 48%, transparent);
+    --bg-scrim:       color-mix(in srgb, var(--color-ink) 48%, transparent);
 
     --bg-selected:      var(--accent-bg-selected);
-    --border-selected:  var(--rose-600);
-    --ring-selected:    rgba(225,29,72,0.28);
+    --border-selected: var(--color-accent-9);
+    --ring-selected: color-mix(in oklab, var(--color-accent-9) 28%, transparent);
 
-    --text-strong:    var(--slate-900);
-    --text-body:      var(--slate-800);
-    --text-secondary: var(--slate-600);
-    --text-muted:     var(--slate-500);
-    --text-faint:     var(--slate-400);
-    --text-inverse:   var(--slate-0);
-    --text-link:      var(--rose-600);
-    --text-code:      var(--slate-700);
+    --text-strong: var(--slate-12);
+    --text-body: var(--slate-11);
+    --text-secondary: var(--slate-9);
+    --text-muted: var(--slate-8);
+    --text-faint: var(--slate-7);
+    --text-inverse: var(--slate-1);
+    --text-link: var(--color-accent-9);
+    --text-code: var(--slate-10);
+    --text-disabled: var(--slate-7);
     --text-separator: color-mix(in srgb, var(--text-muted) 70%, transparent);
     --text-disabled-decoration: color-mix(in srgb, var(--text-faint), transparent 35%);
 
-    --border-subtle:  var(--warm-200);
-    --border-default: var(--warm-300);
-    --border-strong:  var(--slate-300);
+    --border-subtle: var(--warm-6);
+    --border-default: var(--warm-7);
+    --border-strong: var(--slate-7);
     --border-panel:   color-mix(in srgb, var(--border-subtle) 65%, transparent);
-    --border-focus:   var(--rose-600);
-    --control-swatch-ring: color-mix(in srgb, var(--slate-950) 8%, transparent);
-    --color-role-element-icon-ring: color-mix(in srgb, var(--slate-950) 18%, transparent);
-    --color-role-element-icon-ring-inverse: color-mix(in srgb, var(--slate-0) 10%, transparent);
+    --border-focus: var(--color-accent-9);
+    --border-disabled: var(--border-subtle);
+    --control-swatch-ring: color-mix(in srgb, var(--color-ink) 8%, transparent);
+    --color-role-element-icon-ring: color-mix(in srgb, var(--color-ink) 18%, transparent);
+    --color-role-element-icon-ring-inverse: color-mix(in srgb, var(--color-paper) 10%, transparent);
 
-    --accent:         var(--rose-600);
-    --accent-hover:   var(--rose-700);
-    --accent-active:  var(--rose-800);
-    --accent-fg:      #ffffff;
+    --accent: var(--color-accent-9);
+    --accent-hover: var(--color-accent-10);
+    --accent-active: var(--color-accent-11);
+    --accent-fg: var(--color-paper);
     --accent-subtle:  var(--accent-bg-selected);
-    --accent-ring:    rgba(225,29,72,0.32);
+    --accent-text: var(--color-accent-11);
+    --accent-ring: color-mix(in oklab, var(--color-accent-9) 32%, transparent);
 
-    --focus-ring:     rgba(225,29,72,0.38);
+    --focus-ring: color-mix(in oklab, var(--color-accent-9) 38%, transparent);
 
-    --scroll-thumb:   var(--slate-300);
+    --scroll-thumb: var(--slate-6);
     --scroll-track:   transparent;
 
   }
@@ -313,6 +318,91 @@
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
+      --slate-1: oklch(0.1897 0.02064 258.3);
+      --slate-2: oklch(0.2197 0.02475 256.5);
+      --slate-3: oklch(0.274 0.0297 256.8);
+      --slate-4: oklch(0.3281 0.02973 252.6);
+      --slate-5: oklch(0.3904 0.03869 257.3);
+      --slate-6: oklch(0.5278 0.03533 258.9);
+      --slate-7: oklch(0.6494 0.03218 257.8);
+      --slate-8: oklch(0.772 0.02649 255.6);
+      --slate-9: oklch(0.8446 0.02117 254.9);
+      --slate-10: oklch(0.9131 0.0144 254.6);
+      --slate-11: oklch(0.9685 0.00794 253.9);
+      --slate-12: oklch(1 0 0);
+      --warm-1: oklch(0.1756 0.01917 255.8);
+      --warm-2: oklch(0.1897 0.02064 258.3);
+      --warm-3: oklch(0.2015 0.01929 252.1);
+      --warm-4: oklch(0.2197 0.02475 256.5);
+      --warm-5: oklch(0.2454 0.02816 257.5);
+      --warm-6: oklch(0.274 0.0297 256.8);
+      --warm-7: oklch(0.2934 0.02986 254.7);
+      --warm-8: oklch(0.3056 0.03338 255.8);
+      --warm-9: oklch(0.3281 0.02973 252.6);
+      --warm-10: oklch(0.3489 0.03389 257.1);
+      --warm-11: oklch(0.3904 0.03869 257.3);
+      --warm-12: oklch(0.3872 0.03091 257.7);
+      --color-accent-1: oklch(0.175 0.01014 13.43);
+      --color-accent-2: oklch(0.2533 0.04435 13.93);
+      --color-accent-3: oklch(0.3317 0.07856 14.43);
+      --color-accent-4: oklch(0.41 0.1128 14.93);
+      --color-accent-5: oklch(0.4884 0.147 15.44);
+      --color-accent-6: oklch(0.5667 0.1812 15.94);
+      --color-accent-7: oklch(0.645 0.2154 16.44);
+      --color-accent-8: oklch(0.6821 0.1922 14.93);
+      --color-accent-9: oklch(0.7192 0.169 13.43);
+      --color-accent-10: oklch(0.8097 0.1061 11.64);
+      --color-accent-11: oklch(0.8508 0.08234 9.706);
+      --color-accent-12: oklch(0.8918 0.05856 7.773);
+      --color-red-1: oklch(0.175 0.01291 27.33);
+      --color-red-2: oklch(0.2253 0.0382 27.33);
+      --color-red-3: oklch(0.2755 0.06348 27.33);
+      --color-red-4: oklch(0.3258 0.08877 27.33);
+      --color-red-5: oklch(0.376 0.1141 27.33);
+      --color-red-6: oklch(0.4263 0.1393 27.33);
+      --color-red-7: oklch(0.4766 0.1646 27.33);
+      --color-red-8: oklch(0.5268 0.1899 27.33);
+      --color-red-9: oklch(0.5771 0.2152 27.33);
+      --color-red-10: oklch(0.7031 0.1504 27.33);
+      --color-red-11: oklch(0.829 0.08563 27.33);
+      --color-red-12: oklch(0.955 0.02084 27.33);
+      --color-green-1: oklch(0.175 0.00891 152.9);
+      --color-green-2: oklch(0.2299 0.02636 152.9);
+      --color-green-3: oklch(0.2848 0.04381 152.9);
+      --color-green-4: oklch(0.3397 0.06126 152.9);
+      --color-green-5: oklch(0.3945 0.0787 152.9);
+      --color-green-6: oklch(0.4494 0.09615 152.9);
+      --color-green-7: oklch(0.5043 0.1136 152.9);
+      --color-green-8: oklch(0.5592 0.1311 152.9);
+      --color-green-9: oklch(0.6141 0.1485 152.9);
+      --color-green-10: oklch(0.7277 0.1213 152.9);
+      --color-green-11: oklch(0.8414 0.09405 152.9);
+      --color-green-12: oklch(0.955 0.06682 152.9);
+      --color-amber-1: oklch(0.175 0.009312 84.7);
+      --color-amber-2: oklch(0.2488 0.02755 84.7);
+      --color-amber-3: oklch(0.3226 0.04578 84.7);
+      --color-amber-4: oklch(0.3963 0.06402 84.7);
+      --color-amber-5: oklch(0.4701 0.08226 84.7);
+      --color-amber-6: oklch(0.5439 0.1005 84.7);
+      --color-amber-7: oklch(0.6177 0.1187 84.7);
+      --color-amber-8: oklch(0.6914 0.137 84.7);
+      --color-amber-9: oklch(0.7652 0.1552 84.7);
+      --color-amber-10: oklch(0.8285 0.1187 84.7);
+      --color-amber-11: oklch(0.8917 0.08229 84.7);
+      --color-amber-12: oklch(0.955 0.04584 84.7);
+      --color-blue-1: oklch(0.175 0.01085 253.9);
+      --color-blue-2: oklch(0.2346 0.03211 253.9);
+      --color-blue-3: oklch(0.2942 0.05337 253.9);
+      --color-blue-4: oklch(0.3538 0.07462 253.9);
+      --color-blue-5: oklch(0.4134 0.09588 253.9);
+      --color-blue-6: oklch(0.473 0.1171 253.9);
+      --color-blue-7: oklch(0.5326 0.1384 253.9);
+      --color-blue-8: oklch(0.5922 0.1596 253.9);
+      --color-blue-9: oklch(0.6518 0.1809 253.9);
+      --color-blue-10: oklch(0.7529 0.1277 253.9);
+      --color-blue-11: oklch(0.8539 0.07257 253.9);
+      --color-blue-12: oklch(0.955 0.0214 253.9);
+
       --color-role-capability-ink:    #90caf9;
       --color-role-requirement-ink:   #b39ddb;
       --color-role-contract-ink:      #ffb74d;
@@ -326,49 +416,129 @@
       --color-role-edge-default: #3a4555;
 
       --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
-      --accent-bg-selected: rgba(251,113,133,0.18);
+      --accent-bg-selected: color-mix(in oklab, var(--color-accent-9) 18%, transparent);
 
-      --bg-canvas:   #0e141d;
-      --bg-surface:  #131b26;
-      --bg-raised:   #18212e;
-      --bg-overlay:  #1e2836;
-      --bg-sunken:   #0b1119;
+      --bg-surface: var(--warm-4);
+      --bg-raised: var(--warm-5);
+      --bg-overlay: var(--warm-6);
+      --bg-sunken: var(--warm-1);
       --bg-hover:    var(--accent-bg-hover);
-      --bg-active:   #243040;
-      --bg-rail:     #10171f;
+      --bg-active: var(--warm-8);
+      --bg-rail: var(--warm-3);
 
       --bg-selected:     var(--accent-bg-selected);
-      --border-selected: var(--rose-500);
-      --ring-selected:   rgba(251,113,133,0.45);
+      --border-selected: var(--color-accent-7);
+      --ring-selected: color-mix(in oklab, var(--color-accent-9) 45%, transparent);
 
-      --text-strong:    #f1f5fa;
-      --text-body:      #dce3ec;
-      --text-secondary: #aab6c6;
-      --text-muted:     #7e8b9e;
-      --text-faint:     #5d6878;
-      --text-inverse:   #0e141d;
-      --text-link:      #fda4af;
-      --text-code:      #c3cdda;
+      --text-strong: var(--slate-11);
+      --text-body: var(--slate-10);
+      --text-secondary: var(--slate-8);
+      --text-muted: var(--slate-7);
+      --text-faint: var(--slate-6);
+      --text-link: var(--color-accent-10);
+      --text-code: var(--slate-9);
 
-      --border-subtle:  #222d3b;
-      --border-default: #2a3644;
-      --border-strong:  #38465a;
-      --border-focus:   var(--rose-500);
+      --border-subtle: var(--warm-7);
+      --border-default: var(--warm-9);
+      --border-strong: var(--slate-6);
+      --border-focus: var(--color-accent-7);
 
-      --accent:        #fb7185;
-      --accent-hover:  #fda4af;
-      --accent-active: #ffccd4;
-      --accent-fg:     #ffffff;
+      --accent-active: var(--color-accent-12);
       --accent-subtle: var(--accent-bg-selected);
-      --accent-ring:   rgba(251,113,133,0.50);
+      --accent-ring: color-mix(in oklab, var(--color-accent-9) 50%, transparent);
 
-      --focus-ring:    rgba(251,113,133,0.55);
-      --scroll-thumb:  #2f3b4c;
+      --focus-ring: color-mix(in oklab, var(--color-accent-9) 55%, transparent);
+      --scroll-thumb: var(--warm-10);
 
     }
   }
 
   :root[data-theme="dark"], :root.dark {
+    --slate-1: oklch(0.1897 0.02064 258.3);
+    --slate-2: oklch(0.2197 0.02475 256.5);
+    --slate-3: oklch(0.274 0.0297 256.8);
+    --slate-4: oklch(0.3281 0.02973 252.6);
+    --slate-5: oklch(0.3904 0.03869 257.3);
+    --slate-6: oklch(0.5278 0.03533 258.9);
+    --slate-7: oklch(0.6494 0.03218 257.8);
+    --slate-8: oklch(0.772 0.02649 255.6);
+    --slate-9: oklch(0.8446 0.02117 254.9);
+    --slate-10: oklch(0.9131 0.0144 254.6);
+    --slate-11: oklch(0.9685 0.00794 253.9);
+    --slate-12: oklch(1 0 0);
+    --warm-1: oklch(0.1756 0.01917 255.8);
+    --warm-2: oklch(0.1897 0.02064 258.3);
+    --warm-3: oklch(0.2015 0.01929 252.1);
+    --warm-4: oklch(0.2197 0.02475 256.5);
+    --warm-5: oklch(0.2454 0.02816 257.5);
+    --warm-6: oklch(0.274 0.0297 256.8);
+    --warm-7: oklch(0.2934 0.02986 254.7);
+    --warm-8: oklch(0.3056 0.03338 255.8);
+    --warm-9: oklch(0.3281 0.02973 252.6);
+    --warm-10: oklch(0.3489 0.03389 257.1);
+    --warm-11: oklch(0.3904 0.03869 257.3);
+    --warm-12: oklch(0.3872 0.03091 257.7);
+    --color-accent-1: oklch(0.175 0.01014 13.43);
+    --color-accent-2: oklch(0.2533 0.04435 13.93);
+    --color-accent-3: oklch(0.3317 0.07856 14.43);
+    --color-accent-4: oklch(0.41 0.1128 14.93);
+    --color-accent-5: oklch(0.4884 0.147 15.44);
+    --color-accent-6: oklch(0.5667 0.1812 15.94);
+    --color-accent-7: oklch(0.645 0.2154 16.44);
+    --color-accent-8: oklch(0.6821 0.1922 14.93);
+    --color-accent-9: oklch(0.7192 0.169 13.43);
+    --color-accent-10: oklch(0.8097 0.1061 11.64);
+    --color-accent-11: oklch(0.8508 0.08234 9.706);
+    --color-accent-12: oklch(0.8918 0.05856 7.773);
+    --color-red-1: oklch(0.175 0.01291 27.33);
+    --color-red-2: oklch(0.2253 0.0382 27.33);
+    --color-red-3: oklch(0.2755 0.06348 27.33);
+    --color-red-4: oklch(0.3258 0.08877 27.33);
+    --color-red-5: oklch(0.376 0.1141 27.33);
+    --color-red-6: oklch(0.4263 0.1393 27.33);
+    --color-red-7: oklch(0.4766 0.1646 27.33);
+    --color-red-8: oklch(0.5268 0.1899 27.33);
+    --color-red-9: oklch(0.5771 0.2152 27.33);
+    --color-red-10: oklch(0.7031 0.1504 27.33);
+    --color-red-11: oklch(0.829 0.08563 27.33);
+    --color-red-12: oklch(0.955 0.02084 27.33);
+    --color-green-1: oklch(0.175 0.00891 152.9);
+    --color-green-2: oklch(0.2299 0.02636 152.9);
+    --color-green-3: oklch(0.2848 0.04381 152.9);
+    --color-green-4: oklch(0.3397 0.06126 152.9);
+    --color-green-5: oklch(0.3945 0.0787 152.9);
+    --color-green-6: oklch(0.4494 0.09615 152.9);
+    --color-green-7: oklch(0.5043 0.1136 152.9);
+    --color-green-8: oklch(0.5592 0.1311 152.9);
+    --color-green-9: oklch(0.6141 0.1485 152.9);
+    --color-green-10: oklch(0.7277 0.1213 152.9);
+    --color-green-11: oklch(0.8414 0.09405 152.9);
+    --color-green-12: oklch(0.955 0.06682 152.9);
+    --color-amber-1: oklch(0.175 0.009312 84.7);
+    --color-amber-2: oklch(0.2488 0.02755 84.7);
+    --color-amber-3: oklch(0.3226 0.04578 84.7);
+    --color-amber-4: oklch(0.3963 0.06402 84.7);
+    --color-amber-5: oklch(0.4701 0.08226 84.7);
+    --color-amber-6: oklch(0.5439 0.1005 84.7);
+    --color-amber-7: oklch(0.6177 0.1187 84.7);
+    --color-amber-8: oklch(0.6914 0.137 84.7);
+    --color-amber-9: oklch(0.7652 0.1552 84.7);
+    --color-amber-10: oklch(0.8285 0.1187 84.7);
+    --color-amber-11: oklch(0.8917 0.08229 84.7);
+    --color-amber-12: oklch(0.955 0.04584 84.7);
+    --color-blue-1: oklch(0.175 0.01085 253.9);
+    --color-blue-2: oklch(0.2346 0.03211 253.9);
+    --color-blue-3: oklch(0.2942 0.05337 253.9);
+    --color-blue-4: oklch(0.3538 0.07462 253.9);
+    --color-blue-5: oklch(0.4134 0.09588 253.9);
+    --color-blue-6: oklch(0.473 0.1171 253.9);
+    --color-blue-7: oklch(0.5326 0.1384 253.9);
+    --color-blue-8: oklch(0.5922 0.1596 253.9);
+    --color-blue-9: oklch(0.6518 0.1809 253.9);
+    --color-blue-10: oklch(0.7529 0.1277 253.9);
+    --color-blue-11: oklch(0.8539 0.07257 253.9);
+    --color-blue-12: oklch(0.955 0.0214 253.9);
+
     --color-role-capability-ink:    #90caf9;
     --color-role-requirement-ink:   #b39ddb;
     --color-role-contract-ink:      #ffb74d;
@@ -382,44 +552,39 @@
     --color-role-edge-default: #3a4555;
 
     --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
-    --accent-bg-selected: rgba(251,113,133,0.18);
+    --accent-bg-selected: color-mix(in oklab, var(--color-accent-9) 18%, transparent);
 
-    --bg-canvas:   #0e141d;
-    --bg-surface:  #131b26;
-    --bg-raised:   #18212e;
-    --bg-overlay:  #1e2836;
-    --bg-sunken:   #0b1119;
+    --bg-surface: var(--warm-4);
+    --bg-raised: var(--warm-5);
+    --bg-overlay: var(--warm-6);
+    --bg-sunken: var(--warm-1);
     --bg-hover:    var(--accent-bg-hover);
-    --bg-active:   #243040;
-    --bg-rail:     #10171f;
+    --bg-active: var(--warm-8);
+    --bg-rail: var(--warm-3);
 
     --bg-selected:     var(--accent-bg-selected);
-    --border-selected: var(--rose-500);
-    --ring-selected:   rgba(251,113,133,0.45);
+    --border-selected: var(--color-accent-7);
+    --ring-selected: color-mix(in oklab, var(--color-accent-9) 45%, transparent);
 
-    --text-strong:    #f1f5fa;
-    --text-body:      #dce3ec;
-    --text-secondary: #aab6c6;
-    --text-muted:     #7e8b9e;
-    --text-faint:     #5d6878;
-    --text-inverse:   #0e141d;
-    --text-link:      #fda4af;
-    --text-code:      #c3cdda;
+    --text-strong: var(--slate-11);
+    --text-body: var(--slate-10);
+    --text-secondary: var(--slate-8);
+    --text-muted: var(--slate-7);
+    --text-faint: var(--slate-6);
+    --text-link: var(--color-accent-10);
+    --text-code: var(--slate-9);
 
-    --border-subtle:  #222d3b;
-    --border-default: #2a3644;
-    --border-strong:  #38465a;
-    --border-focus:   var(--rose-500);
+    --border-subtle: var(--warm-7);
+    --border-default: var(--warm-9);
+    --border-strong: var(--slate-6);
+    --border-focus: var(--color-accent-7);
 
-    --accent:        #fb7185;
-    --accent-hover:  #fda4af;
-    --accent-active: #ffccd4;
-    --accent-fg:     #ffffff;
+    --accent-active: var(--color-accent-12);
     --accent-subtle: var(--accent-bg-selected);
-    --accent-ring:   rgba(251,113,133,0.50);
+    --accent-ring: color-mix(in oklab, var(--color-accent-9) 50%, transparent);
 
-    --focus-ring:    rgba(251,113,133,0.55);
-    --scroll-thumb:  #2f3b4c;
+    --focus-ring: color-mix(in oklab, var(--color-accent-9) 55%, transparent);
+    --scroll-thumb: var(--warm-10);
 
   }
 }

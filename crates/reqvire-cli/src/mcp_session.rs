@@ -582,7 +582,7 @@ impl MutationSession {
         };
         Ok(session)
     }
-    pub(crate) fn exclusions(&self) -> &ExclusionSet {
+    pub(crate) const fn exclusions(&self) -> &ExclusionSet {
         &self.exclusions
     }
     pub fn model(&self) -> Arc<ModelManager> {

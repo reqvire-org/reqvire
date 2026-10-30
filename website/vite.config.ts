@@ -4,6 +4,7 @@ import { copyFile } from "node:fs/promises"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
+import type {} from "vite-react-ssg"
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

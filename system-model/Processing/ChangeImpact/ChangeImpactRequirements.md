@@ -13,7 +13,7 @@ Change impact detection encompasses:
 
 When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
-Change impact compares a base workspace snapshot with the current workspace snapshot. The current single-repository Git commit option is a convenience for materializing the base snapshot from one repository; it does not make Git root the identifier root. All detected paths, relocations, relation targets, contract dependency targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
+Change impact compares a base workspace snapshot with the current workspace snapshot. In ordinary Git mode, the Git commit option materializes the base snapshot from one eligible worktree. In Repo mode, comparison reconstructs the complete baseline composition from the selected historical manifest inputs and their pinned component commits. Git provenance does not redefine the workspace identifier root. All detected paths, relocations, relation targets, contract dependency targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
 
 **Contract Element Changes:**
 - Contract element content changes (hash changes) shall propagate change impact through the model to both binding and reference consumers through their distinct dependency relationships
@@ -56,6 +56,37 @@ WHEN a referencing requirement is reached through multiple impact paths, the sys
   * definedBy: [Contract Reference Change Impact Specification](Specifications.md#contract-reference-change-impact-specification)
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
   * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
+---
+
+### Cross-Repository Change Impact Reporting
+
+When comparing complete workspace compositions, the system SHALL identify model changes and propagate review impact across repository boundaries while reporting each side's source provenance.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Repo Change Impact Baseline Specification](Specifications.md#repo-change-impact-baseline-specification)
+
+#### Relations
+  * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
+  * satisfiedBy: [repo_impact.rs](../../../crates/reqvire-core/src/repo_impact.rs)
+---
+
+### Manifest-Based Change Impact Baselines
+
+When comparing a manifest-defined workspace, the system SHALL use one selected workspace-root repository commit to reconstruct its model, historical manifest inputs and pinned component revisions without modifying the active workspace. If that commit cannot identify a selected manifest input's history, the system SHALL reject the comparison with the affected path rather than request another baseline revision or guess a composition.
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
+
+#### Relations
+  * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [repo_impact.rs](../../../crates/reqvire-core/src/repo_impact.rs)
 ---
 
 ### Requirements Change Propagation

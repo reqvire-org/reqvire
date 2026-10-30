@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Component Capability",
+    "new_location": "repositories/moved/Model.md#component-capability",
+    "old_location": "repositories/component/Model.md#component-capability"
+  },
+  {
+    "name": "Component Requirement",
+    "new_location": "repositories/moved/Model.md#component-requirement",
+    "old_location": "repositories/component/Model.md#component-requirement"
+  },
+  {
+    "name": "Component Specification",
+    "new_location": "repositories/moved/Model.md#component-specification",
+    "old_location": "repositories/component/Model.md#component-specification"
+  }
+]

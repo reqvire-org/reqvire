@@ -1,4 +1,4 @@
-import { type TargetedMouseEvent, type HTMLAttributes, type ComponentChildren, type Ref } from "preact";
+import { type TargetedMouseEvent, type TargetedKeyboardEvent, type HTMLAttributes, type ComponentChildren, type Ref } from "preact";
 import { css, cx } from "@linaria/atomic";
 import { Badge } from "../core/Badge";
 
@@ -11,8 +11,8 @@ const baseUX = css`
   align-items: center;
   gap: var(--ds-treeitem-gap, var(--space-4));
   padding-block: 0;
-  padding-inline-end: var(--ds-treeitem-pr, var(--space-6));
-  padding-inline-start: calc(var(--ds-treeitem-pl-base, var(--space-5)) + var(--ds-treeitem-depth-indent, var(--space-0)));
+  padding-inline-end: var(--ds-treeitem-pr, var(--control-padding-sm));
+  padding-inline-start: calc(var(--ds-treeitem-pl-base, var(--control-padding-sm)) + var(--ds-treeitem-depth-indent, var(--space-0)));
   border-left: var(--ds-treeitem-border-l, var(--border-w-thick) solid transparent);
   border-radius: var(--ds-treeitem-radius, 0);
   font-size: var(--text-sm);
@@ -197,12 +197,23 @@ export function TreeItem({
   onSelect,
   className = "",
   onClick,
+  onKeyDown,
   ...props
 }: TreeItemProps) {
   const depthClass = `ds-treeitem--depth-${Math.min(Math.max(0, depth), 6)}`;
   const select = (event: TargetedMouseEvent<HTMLDivElement>) => {
     onClick?.(event);
     if (!event.defaultPrevented) onSelect?.();
+  };
+  // A tree item works from the keyboard: Enter or Space selects, the arrows open and close it.
+  const keyDown = (event: TargetedKeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (event.key === "Enter" || event.key === " ") onSelect?.();
+    else if (event.key === "ArrowRight" && expandable && !open) onToggle?.();
+    else if (event.key === "ArrowLeft" && expandable && open) onToggle?.();
+    else return;
+    event.preventDefault();
   };
 
   return (
@@ -219,11 +230,22 @@ export function TreeItem({
         selected ? "is-selected" : undefined,
         className,
       )}
+      role="treeitem"
+      tabIndex={0}
+      aria-level={depth + 1}
+      aria-selected={selected}
+      aria-expanded={expandable ? open : undefined}
       {...props}
       onClick={select}
+      onKeyDown={keyDown}
     >
+      {/* A pointer shortcut; the row's arrow keys do the same from the keyboard. */}
       <span
         className="ds-treeitem__twist"
+        role={expandable ? "button" : undefined}
+        tabIndex={expandable ? -1 : undefined}
+        aria-label={expandable ? (open ? "Collapse" : "Expand") : undefined}
+        aria-hidden={expandable ? undefined : true}
         onClick={(event) => {
           event.stopPropagation();
           onToggle?.();

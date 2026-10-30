@@ -11,8 +11,8 @@ export interface IconButtonProps extends Omit<(ButtonHTMLAttributes<HTMLButtonEl
 
 const baseUX = css`
   display: inline-flex;
-  width: var(--control-md);
-  height: var(--control-md);
+  width: var(--control-height-md);
+  height: var(--control-height-md);
   align-items: center;
   justify-content: center;
   border: var(--border-w) solid transparent;
@@ -36,7 +36,6 @@ const baseUX = css`
   }
 
   &:disabled {
-    opacity: 0.45;
     pointer-events: none;
   }
 `;
@@ -59,6 +58,11 @@ const skinX = css`
     background: var(--accent-subtle);
     color: var(--accent);
   }
+
+  &:disabled {
+    background: transparent;
+    color: var(--text-disabled);
+  }
 `;
 
 const ghostSkinX = css`
@@ -69,8 +73,8 @@ const ghostSkinX = css`
 `;
 
 const smUX = css`
-  width: var(--control-sm);
-  height: var(--control-sm);
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
 
   svg {
     width: var(--icon-sm);

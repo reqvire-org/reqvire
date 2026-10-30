@@ -189,6 +189,37 @@ This test verifies that the smart filtering correctly handles new elements in ch
   * verify: [Requirements Change Propagation](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#requirements-change-propagation)
 ---
 
+### Cross-Repository Impact Report Verification
+
+Verifies that repository boundaries preserve the complete model comparison and its auditable review paths.
+
+#### Details
+
+##### Acceptance Criteria
+- A changed component contract reaches the referencing requirement in a separate documentation repository, its inspection verification and page source. Reference-edge provenance remains distinct and the verification is reported once.
+- Text and JSON reports identify the relevant Central, manifest and component commits. Project and manifest-input provenance is sorted and workspace-relative.
+- Source links use the owning repository and correct side's commit; component paths are never rendered as Central blob links. Unsupported web remotes retain workspace-relative links.
+- Added and removed projects produce the corresponding element additions and removals.
+- A project path move without content changes yields stable-name relocations without false additions, removals or content changes.
+- CLI, standalone MCP and embedded MCP yield equivalent shared report data.
+- CLI and MCP expose one baseline revision selector. MCP discovery advertises `git_commit` and omits the removed separate manifest selector; no component selector is introduced.
+
+##### Test Criteria
+Run the Bash Repo workspace suite and compare its PASS inventory, normalized provenance and relocation JSON with the committed golden files. Use jq for structured report assertions and diff for deterministic comparisons. Repeated comparisons of unchanged snapshots MUST be deterministic. Runtime vocabulary and shape exports MUST retain the workspace-snapshot and repository-selection declarations.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
+  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-runtime-ontology-artifact/test.sh)
+  * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI/Commands.md#cli-change-impact-report-command)
+  * verify: [MCP Quality Traceability Tools](../../../Interfaces/MCP/Tools.md#mcp-quality-traceability-tools)
+  * verify: [Cross-Repository Change Impact Reporting](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#cross-repository-change-impact-reporting)
+---
+
 ### Element Content Extraction Test
 
 This test verifies that the system correctly extracts element content for change impact detection.
@@ -252,6 +283,36 @@ This test verifies that the change impact report correctly computes and displays
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-scope/test.sh)
   * verify: [Change Impact Detection](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#change-impact-detection)
+---
+
+### Repo Change Impact Baseline Verification
+
+Verifies complete historical composition reconstruction and read isolation using real local Repo clients.
+
+#### Details
+
+##### Acceptance Criteria
+- The sole selected workspace-root repository commit supplies its model, manifest and includes. Historical component commits come from that manifest. Current files do not substitute for deleted historical includes.
+- Independent native manifest history is rejected with the affected path and guidance to select a manifest tracked in the workspace-root repository. CLI, standalone MCP and embedded MCP preserve source state and accepted context on that error. A tracked workspace-root manifest remains usable when unrelated native manifest history exists.
+- Missing historical component objects and mutable baseline revisions produce project-specific errors without a partial report.
+- Base-only projects remain discoverable from retained local objects after their live checkout is removed.
+- Ordinary ambiguous multi-worktree comparisons retain their existing rejection.
+- Successful and failed reads preserve repository HEADs, indexes, refs, working bytes, manifest inputs and source-selection Repo administration; operational trace logs are outside the source-state comparison.
+- Standalone and embedded MCP preserve the accepted model revision, pending changes and write availability. Accepted pending additions remain in current comparison inputs even after external working-file edits.
+
+##### Test Criteria
+Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; independent-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
+  * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
+  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
+  * verify: [Manifest-Based Change Impact Baselines](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#manifest-based-change-impact-baselines)
 ---
 
 ### Structural Change Reports Verification

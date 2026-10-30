@@ -76,20 +76,20 @@ const colorTokenSkinX = css`
   .ds-token-segment[data-color-token="--bg-selected"] { --ds-token-color: var(--bg-selected); }
   &[data-color-token="--success"],
   .ds-token-segment[data-color-token="--success"] { --ds-token-color: var(--success); }
-  &[data-color-token="--success-tint"],
-  .ds-token-segment[data-color-token="--success-tint"] { --ds-token-color: var(--success-tint); }
+  &[data-color-token="--success-bg"],
+  .ds-token-segment[data-color-token="--success-bg"] { --ds-token-color: var(--success-bg); }
   &[data-color-token="--warning"],
   .ds-token-segment[data-color-token="--warning"] { --ds-token-color: var(--warning); }
-  &[data-color-token="--warning-tint"],
-  .ds-token-segment[data-color-token="--warning-tint"] { --ds-token-color: var(--warning-tint); }
+  &[data-color-token="--warning-bg"],
+  .ds-token-segment[data-color-token="--warning-bg"] { --ds-token-color: var(--warning-bg); }
   &[data-color-token="--danger"],
   .ds-token-segment[data-color-token="--danger"] { --ds-token-color: var(--danger); }
-  &[data-color-token="--danger-tint"],
-  .ds-token-segment[data-color-token="--danger-tint"] { --ds-token-color: var(--danger-tint); }
+  &[data-color-token="--danger-bg"],
+  .ds-token-segment[data-color-token="--danger-bg"] { --ds-token-color: var(--danger-bg); }
   &[data-color-token="--info"],
   .ds-token-segment[data-color-token="--info"] { --ds-token-color: var(--info); }
-  &[data-color-token="--info-tint"],
-  .ds-token-segment[data-color-token="--info-tint"] { --ds-token-color: var(--info-tint); }
+  &[data-color-token="--info-bg"],
+  .ds-token-segment[data-color-token="--info-bg"] { --ds-token-color: var(--info-bg); }
   &[data-color-token="--text-strong"],
   .ds-token-segment[data-color-token="--text-strong"] { --ds-token-color: var(--text-strong); }
   &[data-color-token="--text-body"],
@@ -297,7 +297,7 @@ const segmentedMeterUX = css`
   width: 100%;
   height: var(--space-5);
   overflow: hidden;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-full);
   background: var(--bg-sunken);
   svg { display: block; width: 100%; height: 100%; }
   rect { fill: var(--ds-token-color); stroke: var(--bg-surface); stroke-width: var(--border-w); }

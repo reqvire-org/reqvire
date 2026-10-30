@@ -376,10 +376,10 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.change_impact",
-            "Analyze change impact against a git commit.",
+            "Analyze change impact against a Git commit or a complete historical Repo composition.",
             object_schema(vec![(
                 "git_commit",
-                json!({ "type": "string", "default": "HEAD" }),
+                json!({ "type": "string", "default": "HEAD", "description": "Base Git commit; in Repo mode its tree supplies the root model, manifest and includes, whose pins select component commits." }),
             )]),
         ),
     ];

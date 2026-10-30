@@ -1,0 +1,44 @@
+# Elements
+
+### Documentation Capability
+
+Explain the public component behavior.
+
+#### Metadata
+  * type: capability
+---
+
+### API Guide Requirement
+
+The system SHALL document the selected public component behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Component Specification](/repositories/component/Model.md#component-specification)
+
+#### Relations
+  * specify: [Documentation Capability](#documentation-capability)
+  * satisfiedBy: [Guide](Guide.txt)
+---
+
+### Documentation Review Objective
+
+Review the guide against the public contract.
+
+#### Metadata
+  * type: verification-objective
+---
+
+### Documentation Inspection
+
+Inspect the guide for agreement with the selected public contract.
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * derivedFrom: [Documentation Review Objective](#documentation-review-objective)
+  * verify: [API Guide Requirement](#api-guide-requirement)
+---

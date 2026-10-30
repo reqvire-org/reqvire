@@ -152,7 +152,7 @@ const shellBaseUX = css`
     align-items: center;
     min-height: var(--space-8);
     border-radius: var(--radius-sm);
-    padding: 0 var(--space-4);
+    padding: 0 var(--control-padding-sm);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
   }
@@ -165,7 +165,7 @@ const shellBaseUX = css`
     gap: var(--space-3);
     border: 0;
     border-radius: var(--radius-sm);
-    padding: 0 var(--space-3);
+    padding: 0 var(--control-padding-sm);
     cursor: pointer;
     text-align: left;
   }
@@ -200,7 +200,7 @@ const shellBaseUX = css`
   .ux-thesaurus-node {
     display: flex;
     min-width: 0;
-    min-height: var(--control-lg);
+    min-height: var(--control-height-lg);
     align-items: center;
     gap: var(--space-4);
     border-radius: var(--radius-md);
@@ -314,7 +314,7 @@ const shellBaseUX = css`
     justify-content: center;
     margin-left: auto;
     border: var(--border-w) solid var(--border-subtle);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     padding: 0;
     cursor: pointer;
     font-size: var(--text-caption);
@@ -353,7 +353,7 @@ const shellBaseUX = css`
     width: 100%;
     height: var(--border-w-thick);
     margin-top: var(--space-2);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-full);
     background: var(--color-role-concept);
     content: "";
   }

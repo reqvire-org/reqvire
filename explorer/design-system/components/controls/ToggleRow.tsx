@@ -10,9 +10,9 @@ const baseUX = css`
   justify-content: var(--ds-togglerow-jc, flex-start);
   gap: var(--ds-togglerow-gap, var(--space-6));
   width: 100%;
-  height: var(--ds-togglerow-h, var(--control-md));
-  min-height: var(--ds-togglerow-min-h, var(--ds-togglerow-h, var(--control-md)));
-  padding: var(--ds-togglerow-p, 0 var(--space-7));
+  height: var(--ds-togglerow-h, var(--control-height-md));
+  min-height: var(--ds-togglerow-min-h, var(--ds-togglerow-h, var(--control-height-md)));
+  padding: var(--ds-togglerow-p, 0 var(--control-padding-md));
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-align: left;
@@ -54,10 +54,10 @@ const baseUX = css`
     display: var(--ds-togglerow-meta-display, inline-flex);
     align-items: var(--ds-togglerow-meta-ai, center);
     justify-content: var(--ds-togglerow-meta-jc, center);
-    min-width: var(--ds-togglerow-meta-min-w, var(--control-xs));
-    height: var(--ds-togglerow-meta-h, var(--control-xs));
-    padding: var(--ds-togglerow-meta-p, 0 var(--space-3));
-    border-radius: var(--ds-togglerow-meta-radius, var(--radius-pill));
+    min-width: var(--ds-togglerow-meta-min-w, var(--control-height-xs));
+    height: var(--ds-togglerow-meta-h, var(--control-height-xs));
+    padding: var(--ds-togglerow-meta-p, 0 var(--control-padding-sm));
+    border-radius: var(--ds-togglerow-meta-radius, var(--radius-full));
     font-size: var(--text-micro);
     font-weight: var(--ds-togglerow-meta-fw, var(--weight-semibold));
     font-variant-numeric: tabular-nums;
@@ -118,7 +118,7 @@ const skinX = css`
   }
 
   &.is-off .ds-togglerow__swatch {
-    background: var(--ds-togglerow-off-swatch-bg, var(--slate-300)) !important;
+    background: var(--ds-togglerow-off-swatch-bg, var(--slate-6)) !important;
     border-color: var(--ds-togglerow-off-swatch-border) !important;
   }
 
@@ -140,9 +140,9 @@ const skinX = css`
 `;
 
 const skinLineX = css`
-  --ds-togglerow-h: var(--ds-togglerow-line-h, var(--control-sm));
-  --ds-togglerow-min-h: var(--ds-togglerow-line-min-h, var(--control-sm));
-  --ds-togglerow-p: var(--ds-togglerow-line-p, 0 var(--space-2));
+  --ds-togglerow-h: var(--ds-togglerow-line-h, var(--control-height-sm));
+  --ds-togglerow-min-h: var(--ds-togglerow-line-min-h, var(--control-height-sm));
+  --ds-togglerow-p: var(--ds-togglerow-line-p, 0 var(--control-padding-sm));
   --ds-togglerow-swatch-w: var(--ds-togglerow-line-swatch-w, calc(var(--space-8) + var(--space-1)));
   --ds-togglerow-swatch-h: 0;
 

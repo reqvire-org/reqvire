@@ -112,22 +112,30 @@ fn add(content: &str, dry_run: bool) -> Value {
 }
 
 case!(head_refresh_uses_normal_loading_after_guard, {
-    fs::write("impl.txt", "baseline").unwrap();
+    fs::write("impl.txt", "baseline").expect("write artifact baseline");
     git_test(&["add", "."]);
     git_test(&["commit", "-qm", "artifact baseline"]);
     let server = fixture(false);
-    let mut session = server.session.lock().unwrap();
+    let mut session = server.session.lock().expect("unit session lock");
     let accepted = session.head.clone();
     let original_model = session.model();
     let revision = session.model_revision.clone();
-    let retained_read = session.capture_read("reqvire.search").unwrap();
-    fs::write("impl.txt", "external artifact").unwrap();
+    let retained_read = session
+        .capture_read("reqvire.search")
+        .expect("capture accepted read");
+    fs::write("impl.txt", "external artifact").expect("write external artifact");
     git_test(&["add", "."]);
     git_test(&["commit", "-qm", "external artifact"]);
-    assert_eq!(session.refresh_head(true).unwrap()["outcome"], "checked");
+    assert_eq!(
+        session.refresh_head(true).expect("check refreshed HEAD")["outcome"],
+        "checked"
+    );
     assert_eq!(session.head, accepted);
     assert!(Arc::ptr_eq(&original_model, &session.model()));
-    assert_eq!(session.refresh_head(false).unwrap()["outcome"], "refreshed");
+    assert_eq!(
+        session.refresh_head(false).expect("refresh HEAD")["outcome"],
+        "refreshed"
+    );
     assert!(!Arc::ptr_eq(&original_model, &session.model()));
     assert_eq!(session.model_revision, revision);
     assert_eq!(
@@ -136,18 +144,22 @@ case!(head_refresh_uses_normal_loading_after_guard, {
     );
     assert!(session.pending_paths.is_empty());
     let refreshed = session.model();
-    assert_eq!(session.refresh_head(false).unwrap()["outcome"], "unchanged");
+    assert_eq!(
+        session.refresh_head(false).expect("repeat refresh")["outcome"],
+        "unchanged"
+    );
     assert!(Arc::ptr_eq(&refreshed, &session.model()));
+    drop(session);
     retained_read
         .execute(|| {
             assert_eq!(
-                reqvire::mutation_io::read_to_string("impl.txt").unwrap(),
+                reqvire::mutation_io::read_to_string("impl.txt").expect("captured artifact"),
                 "baseline"
             );
             assert_eq!(retained_read.metadata["accepted_head"], accepted);
             Ok(json!({}))
         })
-        .unwrap();
+        .expect("execute retained read");
 });
 
 fn git_test(args: &[&str]) -> String {

@@ -110,7 +110,7 @@ const searchResultsBaseUX = css`
     gap: var(--space-6);
     width: 100%;
     box-sizing: border-box;
-    padding: var(--space-5) var(--space-6);
+    padding: var(--space-5) var(--control-padding-sm);
     cursor: pointer;
     text-align: left;
     text-decoration: none;
