@@ -356,11 +356,29 @@ function mermaidTokenColor(token: DesignSystemColorToken): string {
   throw new Error(`Missing Mermaid-safe CSS token value for ${token}`);
 }
 
+const absoluteColorCache = new Map<string, string>();
+
 function normalizeCssColor(value: string | undefined): string | null {
   if (!value || typeof document === "undefined") return null;
+  const normalized = value.trim();
+  // Absolute sRGB colors need no DOM probe during graph redraws.
+  const direct = colorToHex(normalized);
+  if (direct) return direct;
+  // Numeric absolute colors (including the OKLCH ramps) have no inherited
+  // context. Resolve tokens on every call, but convert each value only once.
+  const cacheable = /^(?:oklch|oklab|lab|lch|hsl|hsla|hwb|rgb|rgba)\([-+0-9.eE%\s/,]+\)$/i.test(normalized);
+  const cached = cacheable ? absoluteColorCache.get(normalized) : undefined;
+  if (cached) return cached;
+  const remember = (color: string) => {
+    if (cacheable) {
+      if (absoluteColorCache.size >= 512) absoluteColorCache.clear();
+      absoluteColorCache.set(normalized, color);
+    }
+    return color;
+  };
   const probe = document.createElement("span");
   probe.style.color = "";
-  probe.style.color = value.trim();
+  probe.style.color = normalized;
   if (!probe.style.color) return null;
 
   const parent = document.body ?? document.documentElement;
@@ -369,7 +387,7 @@ function normalizeCssColor(value: string | undefined): string | null {
   probe.remove();
 
   const hex = colorToHex(computed);
-  if (hex) return hex;
+  if (hex) return remember(hex);
 
   if (/\bjsdom\b/i.test(window.navigator?.userAgent ?? "")) return null;
 
@@ -383,14 +401,19 @@ function normalizeCssColor(value: string | undefined): string | null {
     ctx.fillStyle = computed;
     ctx.fillRect(0, 0, 1, 1);
     const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    return remember(`#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`);
   } catch {
     return null;
   }
 }
 
 function colorToHex(color: string): string | null {
-  const match = color.match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+))?\s*\)$/i);
+  if (/^#(?:[a-f0-9]{3,4}|[a-f0-9]{6}|[a-f0-9]{8})$/i.test(color)) {
+    const raw = color.slice(1).toLowerCase();
+    const hex = raw.length < 5 ? [...raw].map(part => part + part).join("") : raw;
+    return `#${hex.length === 8 && hex.endsWith("ff") ? hex.slice(0, 6) : hex}`;
+  }
+  const match = color.match(/^rgba?\(\s*((?:\d*\.)?\d+)\s*,\s*((?:\d*\.)?\d+)\s*,\s*((?:\d*\.)?\d+)(?:\s*,\s*((?:\d*\.)?\d+))?\s*\)$/i);
   if (!match) return null;
 
   const [r, g, b] = match.slice(1, 4).map((part) => {

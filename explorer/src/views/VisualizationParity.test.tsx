@@ -251,6 +251,45 @@ describe("native visualization parity views", () => {
     } finally { view.unmount(); computedStyle.mockRestore(); canvasContext.mockRestore(); }
   });
 
+  it("updates hover colors without per-element DOM probes and still observes palette changes", async () => {
+    let background = "oklch(0.900001 0 0)";
+    const normalizedBackgrounds = new Map([
+      [background, "rgb(240, 240, 240)"], ["oklch(0.100001 0 0)", "rgb(16, 16, 16)"],
+    ]);
+    const originalStyle = window.getComputedStyle.bind(window);
+    const computedStyle = vi.spyOn(window, "getComputedStyle").mockImplementation(element => element === document.documentElement
+      ? { getPropertyValue: (token: string) => token === "--bg-canvas" ? background : "#112233" } as unknown as CSSStyleDeclaration
+      : element instanceof HTMLElement && normalizedBackgrounds.has(element.style.color)
+        ? { color: normalizedBackgrounds.get(element.style.color) } as CSSStyleDeclaration : originalStyle(element));
+    const nodes = Array.from({ length: 300 }, (_, i) => ({
+      id: `n${i}`, identifier: `n${i}`, label: `Node ${i}`, file_path: "fixture.md", element_type: "requirement",
+    }));
+    const edges = nodes.slice(1, 50).map(node => ({ source: "n0", target: node.id, label: "derive", kind: "relation" }));
+    const view = renderWithStore(<KnowledgeGraphView frameTestId="model-graph" />, { ...devFixture, knowledge_graph: { nodes, edges } });
+    let appendChild: ReturnType<typeof vi.spyOn> | undefined;
+    try {
+      await waitFor(() => expect(mockSigmaConstruct).toHaveBeenCalledOnce());
+      const graph = mockSigmaConstruct.mock.calls[0][0] as Graph;
+      const settings = mockSigmaConstruct.mock.calls[0][1] as {
+        nodeReducer: (id: string, attributes: Record<string, unknown>) => Record<string, unknown>;
+        edgeReducer: (id: string, attributes: Record<string, unknown>) => Record<string, unknown>;
+      };
+      appendChild = vi.spyOn(document.body, "appendChild");
+      act(() => mockSigmaHandlers.get("enterNode")!({ node: "n0" }));
+      const reduce = () => {
+        graph.forEachNode((id, attributes) => settings.nodeReducer(id, attributes));
+        graph.forEachEdge((id, attributes) => settings.edgeReducer(id, attributes));
+        return settings.nodeReducer("n299", graph.getNodeAttributes("n299")).color;
+      };
+      const light = reduce();
+      background = "oklch(0.100001 0 0)";
+      const dark = reduce();
+      expect(light).not.toBe(dark);
+      expect(settings.nodeReducer("n1", graph.getNodeAttributes("n1")).color).toBe("#112233");
+      expect(appendChild).toHaveBeenCalledTimes(2);
+    } finally { appendChild?.mockRestore(); view.unmount(); computedStyle.mockRestore(); }
+  });
+
   it("reads a new construction palette on context replacement and keeps live focus-edge resolution", async () => {
     let requirement = "#112233", derive = "#445566";
     const tokenRead = vi.fn((token: string) => token === "--color-role-requirement" ? requirement : token === "--color-role-edge-derive" ? derive : "");
