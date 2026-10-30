@@ -82,6 +82,25 @@ reqvire --manifest .repo/manifests/review.xml search --json`}</CodeBlock>
           Component branches need not share Central&apos;s branch name. See the MCP Server
           guide for private branch checkouts and component-first commits.
         </p>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
+          Website and Documentation Repositories
+        </h3>
+        <p className="text-zinc-600 mb-4">
+          A server/client monorepo can share a Repo composition with separate
+          website and documentation repositories. Declare each repository as a
+          project so its model and local evidence participate in traceability
+          and historical impact review. A remote URL alone does not make a
+          repository&apos;s model or history available for analysis.
+        </p>
+        <p className="text-zinc-600">
+          Give documentation obligations their own requirements, with Contract
+          References to the server or client contracts they describe. Link page
+          sources with <code>satisfiedBy</code> and attach concrete verifications.
+          A contract change can then reach the documentation requirement, its
+          verification and its eligible page source across repository boundaries.
+          References carry review dependencies; use Contract Bindings when a
+          requirement has an independent implementation obligation.
+        </p>
       </Section>
 
       <Section title="Core Commands">
@@ -325,8 +344,11 @@ reqvire coverage --from "Shared Branch" --json`}</CodeBlock>
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded mx-1">
             --git-commit
           </code>
-          option materializes the base snapshot from the current eligible Git
-          worktree; it is not a multi-repository commit selector.
+          option selects the base commit, defaulting to HEAD. Ordinary Git mode
+          requires one eligible worktree. In Repo mode it selects Central&apos;s
+          base commit; the historical manifest supplies each component&apos;s
+          own revision. A collection of independent worktrees without a Repo
+          composition remains ambiguous.
         </p>
         <CodeBlock>{`reqvire change-impact
 reqvire change-impact --git-commit origin/main
@@ -335,6 +357,42 @@ reqvire change-impact --git-commit origin/main --json --output reports/impact.js
 reqvire search --filter-risk high,critical --filter-status review
 reqvire traces --output reports/traces.json
 reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
+          Historical Impact across Repositories
+        </h3>
+        <p className="text-zinc-600 mb-4">
+          Compare complete base and current compositions, including projects
+          added, removed or moved between them. Historical component revisions
+          must be full commit object IDs, and all required Git objects must be
+          available locally. Reqvire reads historical files without changing
+          active checkouts and never fetches or runs Repo sync.
+        </p>
+        <CodeBlock>{`# Manifest and its includes are versioned in Central
+reqvire --manifest default.xml change-impact --git-commit origin/main --json
+
+# Repo's selected manifest has its own Git repository
+# Each ref resolves in its owning repository: Central, then manifest checkout.
+reqvire change-impact --git-commit origin/main \\
+  --base-manifest-commit origin/main --json --output reports/impact.json`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          When the manifest has separate Git history, supply
+          <code> --base-manifest-commit</code> explicitly. Central&apos;s commit
+          cannot identify that history. Every include and overlay also needs
+          identifiable historical ownership. Missing history, mutable baseline
+          pins or unavailable project commits fail the comparison with a
+          diagnostic; no partial baseline is reported. The extra selector is
+          rejected for Central-owned manifests and ordinary Git mode.
+        </p>
+        <p className="text-zinc-600 mt-4">
+          Repo JSON reports add <code>comparison</code> with
+          <code> workspace_mode: "repo"</code> and <code>base</code> /
+          <code> current</code> records. Each includes Central&apos;s commit,
+          versioned manifest inputs and project identities, paths and commits.
+          Text reports include the same composition summary. Source links use
+          the owning repository and the relevant side&apos;s commit; model paths
+          remain relative to Central. Current commit provenance does not mean
+          pending working changes have been committed.
+        </p>
         <div className="mt-5">
           <BulletList
             items={[
@@ -342,6 +400,7 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
               "Review bound contracts and child requirements before treating a change as isolated.",
               "Use traces to find verification evidence that must be rerun or hardened.",
               "Use coverage to confirm affected obligations still have implementation or evidence links.",
+              "Traverse change_impact_tree as well as the smart-filtered report roots. An invalidated verification needs evidence review; the report does not assert that its test failed.",
             ]}
           />
         </div>
@@ -546,6 +605,13 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           reports, and uploads the report folder as an artifact. Fetch full git
           history when change-impact needs to compare the workspace against the
           pull request base branch in the eligible Git worktree.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          For a Repo composition, also prepare the declared checkouts and all
+          historical pinned objects, including retained history for removed
+          projects, before running reports. Select the base manifest commit
+          when its history is separate. The single-repository example below
+          does not perform that preparation.
         </p>
         <CodeBlock>{`name: Reqvire PR Checks
 

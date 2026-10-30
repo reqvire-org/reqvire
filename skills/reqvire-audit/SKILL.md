@@ -33,11 +33,13 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Run from the intended effective workspace root, or pass that root with `--workspace`. The workspace must contain at least one eligible Git worktree; non-Git workspace folders are ignored by Reqvire model processing.
 
+For historical impact, ordinary Git mode requires one eligible worktree. A distributed model needs a versioned Google Repo composition rooted at Central, with declared projects and locally available history. Repo baselines select Central and manifest history separately when they have different Git owners; see Change Impact before choosing refs.
+
 ## Reference Documents
 
 - [Analyze Model](references/AnalyzeModel.md) — comprehensive model structure analysis, validation, and recommendations
 - [Analyze Coverage](references/AnalyzeCoverage.md) — verification and implementation coverage gap analysis
-- [Change Impact](references/ChangeImpact.md) — change propagation analysis using eligible Git worktree commit history
+- [Change Impact](references/ChangeImpact.md) — change propagation analysis using ordinary Git or complete historical Repo compositions
 - [Lint](references/Lint.md) — lint, fix, and find redundant verify relations
 
 ## When to Use Each Reference

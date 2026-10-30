@@ -29,11 +29,22 @@ Analyze how changes to requirements propagate through the model.
 
 3. **Run change impact analysis:**
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${BASE_COMMIT}
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${BASE_COMMIT} --json --output /tmp/impact.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit="$BASE_COMMIT"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
    ```
 
-   `--git-commit` materializes the base snapshot from the current eligible Git worktree. It is not a multi-repository commit selector; reported paths and identifiers remain relative to the effective workspace root.
+   Ordinary Git mode requires one eligible worktree; `--git-commit` selects its base, defaulting to HEAD. A plain aggregate with multiple independent worktrees remains ambiguous.
+
+   **Repo composition:** Run at Central, with an initialized Repo workspace and declared projects prepared locally. `--git-commit` selects Central's base only. Reconstruct the baseline from its historical manifest and each component's full commit ID; do not apply the Central ref separately in components. For a Central-owned manifest, use the selected `--manifest` location with the commands above. For a separately versioned native manifest, explicitly select its owning Git repository's baseline too:
+
+   ```bash
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact \
+     --git-commit="$BASE_COMMIT" --base-manifest-commit="$MANIFEST_BASE_COMMIT" --json --output /tmp/impact.json
+   ```
+
+   Choose `MANIFEST_BASE_COMMIT` from the manifest repository's own history for the intended product baseline. Omitting it in that mode reports `base_manifest_commit_required`; supplying it in ordinary Git mode or for a Central-owned manifest is invalid. Every include/overlay needs identifiable historical ownership. Mutable baseline project pins report `repo_impact_base_unlocked`; missing project objects report `repo_impact_base_unavailable`. Removed projects may use retained local Repo object storage. Do not drop unavailable projects or reuse current XML to produce a partial comparison. Reqvire never fetches, syncs or changes active checkouts during analysis.
+
+   **Mutation-enabled MCP:** Use `reqvire.change_impact` with the same selected `branch`, `git_commit` and, when required, `base_manifest_commit`. The current side is the accepted model, captured composition and accepted pending edits, including embedded MCP. External changes are not imported by this read. A baseline error preserves the accepted revision, pending edits and write availability.
 
 4. **Analyze the results:**
 
@@ -44,6 +55,8 @@ Analyze how changes to requirements propagate through the model.
    - `relocated[]` - Relocated elements (same name, different path)
    - `impact_scope[]` - Per-branch scope roots (common parent requirements covering all impacted elements)
    - `invalidated_verifications[]` - Verifications that need re-review
+
+   Repo reports also include `comparison.workspace_mode: "repo"` and `comparison.base` / `comparison.current`. Each side records `central_commit`, sorted `manifest_inputs` with `path` / owning `commit`, and `projects` with `name`, workspace-relative `path`, repository identity `repository` and resolved `commit`. Inspect each owning repository's diff using these selections, including added, removed and moved projects. Commit provenance does not imply pending bytes are committed; inspect context/pending-state evidence separately. Source links use the relevant side's owning repository and commit, with workspace-relative fallbacks for unsupported remotes.
 
    The top-level `added` and `changed` arrays are smart-filtered report roots, not a complete change inventory: changes already reached through another root remain inside its `change_impact_tree`. Traverse those trees and compare the Git diff and current element inventory before concluding that no elements were added or changed. Native ontology and concept changes can produce a broad review set. An invalidated verification needs evidence review; it is not an assertion that its test has failed.
 
@@ -87,6 +100,7 @@ Analyze how changes to requirements propagate through the model.
 ## Change Propagation Rules
 
 - **Contract → Binding or reference consumer**: Both dependency kinds propagate content changes for review; only bindings affect implementation fulfillment. Inspect both structured edge kinds in the impact report.
+- **Cross-repository documentation**: Include website/docs repositories as declared Repo projects. Documentation requirements use Contract References to product contracts, concrete verifications and eligible `satisfiedBy` page sources. Contract changes can reach all three across repository boundaries. A remote URL alone does not make an external model or history available.
 - **Parent → Child**: Parent changes propagate to all derived children
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates

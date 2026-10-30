@@ -610,6 +610,45 @@ reqvire --manifest .repo/manifests/review.xml mcp --enable-mutations`}</CodeBloc
           and per-project pending paths. No project selector or separate model
           namespace is needed.
         </p>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
+          Historical Change Impact
+        </h3>
+        <p className="text-zinc-600 mb-4">
+          <code>reqvire.change_impact</code> compares complete Repo compositions
+          using the same baseline rules as the CLI. <code>git_commit</code>
+          selects Central&apos;s base commit, defaulting to its accepted HEAD.
+          Historical manifests supply full commit IDs for the components; the
+          Central ref is never applied independently to them. For a native
+          manifest with separate Git history, also supply
+          <code> base_manifest_commit</code> in that owning repository:
+        </p>
+        <CodeBlock>{`{
+  "name": "reqvire.change_impact",
+  "arguments": {
+    "branch": "model/review",
+    "git_commit": "origin/main",
+    "base_manifest_commit": "origin/main"
+  }
+}`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Omit <code>base_manifest_commit</code> for Central-owned manifests and
+          ordinary Git mode, where it is rejected. Missing native manifest
+          history reports <code>base_manifest_commit_required</code>; mutable
+          historical project pins report <code>repo_impact_base_unlocked</code>,
+          and unavailable project objects report
+          <code> repo_impact_base_unavailable</code>. Inputs must be versioned
+          and locally available; analysis never fetches or syncs.
+        </p>
+        <p className="text-zinc-600">
+          In mutation-enabled contexts, including embedded MCP, the current side
+          is the selected branch&apos;s accepted model, captured composition and
+          accepted pending edits. An impact request does not import external
+          file or manifest changes. Baseline failures preserve that model,
+          revision, pending changes and write availability. The report&apos;s
+          <code> comparison</code> records base/current Central commits,
+          manifest inputs and project provenance. Inspect pending-state metadata
+          separately: recorded commits do not imply pending bytes are committed.
+        </p>
       </Section>
 
       <Section title="GitHub Publication">

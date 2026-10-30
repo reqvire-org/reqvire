@@ -76,6 +76,7 @@ Workspace policy:
 - The effective workspace root must contain at least one eligible Git worktree; otherwise there is no local SOI model-processing scope.
 - Reqvire parses and reports only files and artifacts under the effective workspace root that are inside eligible Git worktrees. Non-Git workspace folders are ignored.
 - Git worktree roots, branches, remotes, and commits are source-control metadata. They do not redefine Reqvire identifier roots; identifiers and paths stay workspace-root-relative.
+- For a distributed model, use an initialized Google Repo composition at Central's Git worktree root. Central and declared projects share one model; undeclared repositories are excluded. Install Git, Python 3 and Repo, and explicitly prepare local checkouts/objects before analysis. `--manifest` changes the manifest location, not its format or Git ownership; Reqvire never fetches or syncs.
 
 To check:
 
@@ -496,7 +497,7 @@ coverage [--json]
 migrate [--fix] [--json]
 
 # Analysis
-change-impact --git-commit=<hash> [--json]
+change-impact [--git-commit=<ref>] [--base-manifest-commit=<ref>] [--json]
 traces [--output <file>] [--filter-name=".*Pattern.*"]
 resources [--output <file>]
 containment [--short] [--output <file>]
@@ -504,7 +505,7 @@ containment [--short] [--output <file>]
 serve [--port 8080]
 ```
 
-`change-impact --git-commit=<hash>` compares the current workspace snapshot to a base snapshot materialized from the current eligible Git worktree. It is not a multi-repository commit selector; paths and identifiers remain workspace-root-relative.
+`change-impact` defaults to HEAD. Ordinary Git mode requires one eligible worktree; an aggregate without a Repo composition remains ambiguous. In Repo mode `--git-commit` selects Central's base, while the historical manifest pins each component by full commit ID. A separately versioned native manifest requires `--base-manifest-commit` (MCP `base_manifest_commit`); omit it for Central-owned manifests and ordinary Git mode. Missing local history fails without fetching or changing checkouts. Paths remain workspace-root-relative. See [Creating Tasks](references/CreatingTasks.md#step-1-analyze-change-impact) for baseline selection and provenance review.
 
 **Common flags:** Availability depends on the command. Commands with text and JSON output require `--json` with `--output <file>`. JSON-only `model`, `containment`, `resources`, and `traces` emit JSON to stdout by default and accept `--output <file>` directly. Use `--short` and `--dry-run` only where supported.
 
