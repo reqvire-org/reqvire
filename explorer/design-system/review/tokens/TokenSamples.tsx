@@ -77,6 +77,8 @@ const sampleStyle = css`
   &[data-effect="spacing"] { width: min(var(--ux-token-sample-value), 100%); max-width: 100%; height: var(--space-5); background: var(--accent); border-radius: var(--radius-xs); }
   &[data-effect="shadow"] { width: 100%; height: var(--space-32); background: var(--bg-surface); border-radius: var(--radius-sm); box-shadow: var(--ux-token-sample-value); }
   &[data-effect="radius"] { width: var(--space-32); height: var(--space-32); border: var(--border-w) solid var(--border-default); border-radius: var(--ux-token-sample-value); }
+  /* Column counts draw that many columns: stripes with a gap, filling the row. */
+  &[data-effect="column-count"] { display: block; width: 100%; height: var(--space-8); column-count: var(--ux-token-sample-value); background: repeating-linear-gradient(to right, var(--accent) 0 calc((100% + var(--space-2)) / var(--ux-token-sample-value) - var(--space-2)), transparent 0 calc((100% + var(--space-2)) / var(--ux-token-sample-value))); }
 `;
 
 function Sample({ token, property, children, className, ...props }: { token: TokenSampleName; property: string; children?: ComponentChildren; className?: string; "data-effect": string; "aria-hidden"?: "true" }) {
@@ -115,9 +117,9 @@ export function TokenSamples({ title, samples, kind, text, compactText, multilin
           {mode === "text" && <Sample token={token} property={property} data-effect={mode} className="ux-token-contexts" aria-hidden="true"><span className="ux-token-light">{compactText}</span><span className="ux-token-dark">{compactText}</span></Sample>}
           <code className="ux-token-name">{token}{mode === "spacing" ? ` — ${value}` : ""}</code>
           {["size", "font", "weight", "leading", "tracking"].includes(mode) && <Sample token={token} property={property} data-effect={mode}>{mode === "leading" ? multilineText : text}</Sample>}
-          {["spacing", "shadow", "radius"].includes(mode) && <Sample token={token} property={property} data-effect={mode} aria-hidden="true" />}
+          {["spacing", "shadow", "radius", "column-count"].includes(mode) && <Sample token={token} property={property} data-effect={mode} aria-hidden="true" />}
           {mode === "grid-template-columns" && <Sample token={token} property={property} data-effect={mode}><span>{compactText}</span><span>{compactText}</span></Sample>}
-          {!["color", "text", "size", "font", "weight", "leading", "tracking", "spacing", "shadow", "radius", "grid-template-columns"].includes(mode) && <Sample token={token} property={property} data-effect={mode}>{compactText}</Sample>}
+          {!["color", "text", "size", "font", "weight", "leading", "tracking", "spacing", "shadow", "radius", "column-count", "grid-template-columns"].includes(mode) && <Sample token={token} property={property} data-effect={mode}>{compactText}</Sample>}
           {(mode === "value" || kind === "value") && <span className="ux-token-note">{value || "Conditional or unset"}</span>}
         </summary>
         <p className="ux-token-value">{value || "Conditional or unset"}</p>
