@@ -70,6 +70,8 @@ When comparing complete workspace compositions, the system SHALL identify model 
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [change_impact.rs](../../../crates/reqvire-core/src/change_impact.rs)
+  * satisfiedBy: [repo_impact.rs](../../../crates/reqvire-core/src/repo_impact.rs)
 ---
 
 ### Manifest-Based Change Impact Baselines
@@ -84,6 +86,7 @@ When comparing a manifest-defined workspace, the system SHALL reconstruct the co
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * satisfiedBy: [repo_impact.rs](../../../crates/reqvire-core/src/repo_impact.rs)
 ---
 
 ### Requirements Change Propagation

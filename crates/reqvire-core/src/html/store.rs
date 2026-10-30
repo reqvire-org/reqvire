@@ -1421,7 +1421,7 @@ fn enrich_resource_sources(resources: &mut BTreeMap<String, ProjectStoreResource
             continue;
         }
         let absolute_path = project_root.join(source_path);
-        if !crate::mutation_io::file_size(&absolute_path).is_some_and(|size| size <= 512 * 1024) {
+        if crate::mutation_io::file_size(&absolute_path).is_none_or(|size| size > 512 * 1024) {
             continue;
         }
         if let Ok(source_text) = crate::mutation_io::read_to_string(&absolute_path) {

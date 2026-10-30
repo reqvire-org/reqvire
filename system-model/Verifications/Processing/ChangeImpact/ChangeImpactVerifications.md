@@ -212,6 +212,7 @@ Run the Bash Repo workspace suite and compare its PASS inventory, normalized pro
 
 #### Relations
   * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
+  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-runtime-ontology-artifact/test.sh)
   * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI/Commands.md#cli-change-impact-report-command)
@@ -307,6 +308,8 @@ Run the Repo workspace suite through its Bash entry point. All impact outcomes i
 
 #### Relations
   * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
+  * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
+  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
   * verify: [Manifest-Based Change Impact Baselines](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#manifest-based-change-impact-baselines)

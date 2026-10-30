@@ -1,5 +1,6 @@
-//! Records the actual filesystem observations consumed by a synchronous model
-//! build. The parser and semantic loader use the same reads with or without an
+//! Records filesystem observations consumed by a synchronous model build.
+//!
+//! The parser and semantic loader use the same reads with or without an
 //! observation guard; historical and uncached builds do not create cache entries.
 
 use std::cell::RefCell;

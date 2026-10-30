@@ -376,10 +376,13 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.change_impact",
-            "Analyze change impact against a git commit.",
+            "Analyze change impact against a Git commit or a complete historical Repo composition.",
             object_schema(vec![(
                 "git_commit",
                 json!({ "type": "string", "default": "HEAD" }),
+            ), (
+                "base_manifest_commit",
+                    json!({ "type": "string", "minLength": 1, "description": "Historical commit in Repo's separate manifest repository; required when Central does not own the selected manifest." }),
             )]),
         ),
     ];

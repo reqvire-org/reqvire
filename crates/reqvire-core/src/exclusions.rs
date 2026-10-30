@@ -34,6 +34,11 @@ impl ExclusionSet {
         if crate::mutation_io::active() {
             return self.clone();
         }
+        self.rebuilt()
+    }
+
+    /// Rebuild policy from the active historical files, retaining caller rules.
+    pub(crate) fn rebuilt(&self) -> Self {
         let mut current = crate::config::get_excluded_filename_patterns_glob_set();
         current.globs.extend(self.additional.iter().cloned());
         current.additional = self.additional.clone();

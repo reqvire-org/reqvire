@@ -424,6 +424,7 @@ impl Context {
             if self.metadata()["head_stale"] == true {
                 let mut worker = self.worker.lock().expect("worktree lock poisoned");
                 let result = self.refresh_head_locked(&mut worker, false)?;
+                drop(worker);
                 if result["outcome"] == "blocked" {
                     return Err(error(format!(
                         "HEAD refresh blocked: {}",
@@ -725,7 +726,7 @@ impl Worktrees {
     /// Public selectors use branch names; worker and cache identity stays private.
     fn resolve_branch(&self, branch: Option<&str>) -> Result<Arc<Context>, ReqvireError> {
         let contexts = self.contexts.read().expect("context registry poisoned");
-        match branch {
+        let result = match branch {
             Some(branch) => contexts
                 .values()
                 .find(|context| context.branch == branch)
@@ -742,7 +743,9 @@ impl Worktrees {
                     .collect::<Vec<_>>()
                     .join(", ")
             ))),
-        }
+        };
+        drop(contexts);
+        result
     }
     fn browser_existing_context(&self, branch: Option<&str>) -> Result<Arc<Context>, ReqvireError> {
         if let Some(branch) = branch {

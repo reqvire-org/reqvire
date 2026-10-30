@@ -30,7 +30,9 @@ thread_local! {
     static CONTEXT: RefCell<Option<Context>> = const { RefCell::new(None) };
 }
 /// A synchronous request scope; never retain this across an await.
-pub struct SnapshotGuard;
+pub struct SnapshotGuard {
+    previous: Option<Context>,
+}
 impl SnapshotFiles {
     pub fn enter(&self, model: Option<Arc<ModelManager>>) -> SnapshotGuard {
         CONTEXT.with(|slot| {
@@ -44,10 +46,34 @@ impl SnapshotFiles {
                 capture: false,
             });
         });
-        SnapshotGuard
+        SnapshotGuard { previous: None }
+    }
+
+    /// Temporarily replace a request's view for an isolated historical model
+    /// build. Dropping the guard restores the accepted view, including overlays.
+    pub(crate) fn enter_historical(&self) -> SnapshotGuard {
+        let previous = CONTEXT.with(|slot| {
+            slot.replace(Some(Context {
+                files: self.clone(),
+                overlay: BTreeMap::new(),
+                changed: BTreeSet::new(),
+                removed_directories: BTreeSet::new(),
+                model: None,
+                capture: false,
+            }))
+        });
+        SnapshotGuard { previous }
     }
 }
 impl SnapshotGuard {
+    /// Suspend the accepted file view while resolving an isolated temporary
+    /// composition. The caller must only read its staged historical inputs.
+    pub(crate) fn suspend() -> Self {
+        Self {
+            previous: CONTEXT.with(|slot| slot.borrow_mut().take()),
+        }
+    }
+
     pub fn removed_directories(&self) -> BTreeSet<PathBuf> {
         CONTEXT.with(|slot| {
             slot.borrow()
@@ -91,7 +117,7 @@ impl SnapshotGuard {
 }
 impl Drop for SnapshotGuard {
     fn drop(&mut self) {
-        CONTEXT.with(|slot| *slot.borrow_mut() = None);
+        CONTEXT.with(|slot| *slot.borrow_mut() = self.previous.take());
     }
 }
 pub fn active() -> bool {
@@ -373,6 +399,43 @@ mod tests {
                 "read entry must not clone the file map"
             );
         });
+    }
+
+    #[test]
+    fn historical_views_restore_accepted_files_model_and_pending_overlay() {
+        let (_directory, accepted) = fixture();
+        let path = accepted.root.join("a.txt");
+        let model = Arc::new(ModelManager::new());
+        let scope = accepted.enter(Some(Arc::clone(&model)));
+        write(&path, b"pending accepted bytes").expect("prepare accepted overlay");
+        let mut historical = accepted.clone();
+        Arc::make_mut(&mut historical.files)
+            .insert(path.clone(), Arc::new(b"historical bytes".to_vec()));
+        {
+            let _view = historical.enter_historical();
+            assert_eq!(read(&path).expect("historical read"), b"historical bytes");
+            assert!(super::model().is_none());
+        }
+        assert_eq!(
+            read(&path).expect("accepted read"),
+            b"pending accepted bytes"
+        );
+        assert!(Arc::ptr_eq(
+            &super::model().expect("accepted model"),
+            &model
+        ));
+        {
+            let _suspended = SnapshotGuard::suspend();
+            assert!(!active());
+        }
+        assert_eq!(
+            read(&path).expect("restored overlay"),
+            b"pending accepted bytes"
+        );
+        let (prepared, changed) = scope.prepared().expect("accepted preparation retained");
+        assert_eq!(changed, BTreeSet::from([path.clone()]));
+        assert_eq!(prepared.files[&path].as_slice(), b"pending accepted bytes");
+        assert_eq!(accepted.files[&path].as_slice(), b"accepted");
     }
 
     #[test]

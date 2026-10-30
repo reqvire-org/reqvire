@@ -657,7 +657,7 @@ case!(historical_build_does_not_consume_or_populate_live_cache, {
         .expect("candidate: expected success");
     assert!(content(&historical).contains("alpha"));
     assert!(content(&current).contains("omega"));
-    crate::operations::change_impact_report(&current.graph_registry, "HEAD", &patterns(&[]))
+    crate::operations::change_impact_report(&current, "HEAD", None, &patterns(&[]))
         .expect("candidate: expected success");
     assert!(content(&load().expect("load valid test model")).contains("omega"));
     assert_eq!(

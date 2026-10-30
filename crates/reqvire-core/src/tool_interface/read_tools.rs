@@ -410,8 +410,9 @@ pub fn change_impact_tool(
     let git_commit = string_arg(args, "git_commit").unwrap_or_else(|| "HEAD".to_string());
     let model = crate::operations::load_model(excluded_filename_patterns)?;
     let (report, base_url, current_commit) = crate::operations::change_impact_report(
-        &model.graph_registry,
+        &model,
         &git_commit,
+        string_arg(args, "base_manifest_commit").as_deref(),
         excluded_filename_patterns,
     )?;
     parse_json_string(report.to_json_string(&base_url, &current_commit, &git_commit))

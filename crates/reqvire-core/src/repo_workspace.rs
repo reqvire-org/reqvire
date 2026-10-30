@@ -30,7 +30,9 @@ fn failure(message: impl Into<String>) -> ReqvireError {
 pub fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
     let out = Command::new("git")
         .current_dir(root)
+        .args(["-c", "protocol.allow=never"])
         .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
         .stdin(Stdio::null())
         .args(args)
         .output()?;
@@ -58,12 +60,23 @@ pub struct RepoProject {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ManifestSource {
+    /// Owning Git worktree, relative to Central (empty for Central itself).
+    pub root: PathBuf,
+    pub commit: String,
+    pub tracked: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepoWorkspace {
     pub selection: PathBuf,
     pub manifest: PathBuf,
     pub projects: Vec<RepoProject>,
     pub resolved_xml: String,
     pub inputs: BTreeMap<PathBuf, Vec<u8>>,
+    pub central_commit: String,
+    pub central_repository: String,
+    pub manifest_sources: BTreeMap<PathBuf, ManifestSource>,
 }
 
 pub fn selected_manifest(root: &Path) -> Result<Option<PathBuf>, ReqvireError> {
@@ -217,8 +230,18 @@ impl RepoWorkspace {
     }
 
     pub fn resolve(root: &Path, manifest: PathBuf) -> Result<Self, ReqvireError> {
+        Self::resolve_with_repo(root, manifest, &root.join(".repo/repo"))
+    }
+
+    /// Resolve isolated historical inputs through the same initialized Repo
+    /// implementation, without copying or changing the client's administration.
+    pub(crate) fn resolve_with_repo(
+        root: &Path,
+        manifest: PathBuf,
+        repo_code: &Path,
+    ) -> Result<Self, ReqvireError> {
         let load = || {
-            if !root.join(".repo/repo/main.py").is_file() {
+            if !repo_code.join("main.py").is_file() {
                 return Err(failure("Initialized local Repo metadata is unavailable; explicitly initialize the Repo client before selecting its manifest"));
             }
             let temporary = tempfile::tempdir()?;
@@ -240,11 +263,13 @@ impl RepoWorkspace {
             let out = Command::new("python3")
                 .current_dir(root)
                 .env("GIT_TERMINAL_PROMPT", "0")
+                .env("PYTHONDONTWRITEBYTECODE", "1")
                 .stdin(Stdio::null())
                 .args(["-c", REPO_RESOLUTION])
                 .arg(root.join(".repo"))
                 .arg(&selected)
                 .arg(root.join(&manifest))
+                .arg(repo_code)
                 .output()?;
             if !out.status.success() {
                 return Err(failure(format!(
@@ -271,6 +296,11 @@ impl RepoWorkspace {
                 }
                 inputs.insert(path, bytes);
             }
+            let config = PathBuf::from(".repo/manifests.git/config");
+            inputs.insert(
+                config.clone(),
+                model_inputs::read_to_string(&root.join(config))?.into_bytes(),
+            );
             let resolved_xml = output.xml;
             if tags(&resolved_xml)?
                 .iter()
@@ -306,6 +336,9 @@ impl RepoWorkspace {
                 projects,
                 resolved_xml,
                 inputs,
+                central_commit: String::new(),
+                central_repository: String::new(),
+                manifest_sources: BTreeMap::new(),
             })
         };
         load().map_err(|e| failure(format!("Manifest {}: {e}", manifest.display())))
@@ -313,6 +346,40 @@ impl RepoWorkspace {
 
     pub fn load(root: &Path, manifest: PathBuf) -> Result<Self, ReqvireError> {
         let mut resolved = Self::resolve(root, manifest)?;
+        resolved.central_commit = git_text(root, &["rev-parse", "--verify", "HEAD"])?;
+        resolved.central_repository =
+            git_text(root, &["remote", "get-url", "origin"]).unwrap_or_default();
+        for path in resolved.manifest_input_paths() {
+            let source = root.join(&path);
+            let owner = PathBuf::from(git_text(
+                source.parent().unwrap_or(root),
+                &["rev-parse", "--show-toplevel"],
+            )?);
+            let relative = source
+                .strip_prefix(&owner)
+                .map_err(|e| failure(e.to_string()))?;
+            let tracked = git_text(
+                &owner,
+                &[
+                    "ls-files",
+                    "--error-unmatch",
+                    "--",
+                    &relative.to_string_lossy(),
+                ],
+            )
+            .is_ok();
+            resolved.manifest_sources.insert(
+                path,
+                ManifestSource {
+                    root: owner
+                        .strip_prefix(root)
+                        .map_err(|e| failure(e.to_string()))?
+                        .to_owned(),
+                    commit: git_text(&owner, &["rev-parse", "--verify", "HEAD"])?,
+                    tracked,
+                },
+            );
+        }
         for project in &mut resolved.projects {
             let mut check = || {
                 let checkout = root.join(&project.path);
@@ -338,6 +405,18 @@ impl RepoWorkspace {
             })?;
         }
         Ok(resolved)
+    }
+
+    pub(crate) fn manifest_input_paths(&self) -> Vec<PathBuf> {
+        self.inputs
+            .keys()
+            .filter(|path| {
+                **path != Path::new(".repo/manifests.git/config")
+                    && !(**path == Path::new(".repo/manifest.xml")
+                        && self.selection != self.manifest)
+            })
+            .cloned()
+            .collect()
     }
 
     /// Canonical Repo export preserves the resolved composition. Change only
@@ -549,7 +628,7 @@ struct ResolvedManifest {
 const REPO_RESOLUTION: &str = r#"
 import json, os, sys
 from xml.dom import minidom
-sys.path.insert(0, os.path.join(sys.argv[1], 'repo'))
+sys.path.insert(0, sys.argv[4])
 from manifest_xml import RepoClient
 client = RepoClient(sys.argv[1])
 native = sys.argv[2] == '--active-repo-manifest'
@@ -573,7 +652,7 @@ if native:
     entry = capture(selected)
     document = minidom.parse(selected)
     nodes = [n for n in document.documentElement.childNodes if n.nodeType == n.ELEMENT_NODE]
-    if len(nodes) == 1 and nodes[0].tagName == 'include':
+    if os.path.abspath(selected) == os.path.abspath(client.manifestFile) and len(nodes) == 1 and nodes[0].tagName == 'include':
         entry = capture(os.path.join(client.manifestProject.worktree, nodes[0].getAttribute('name')))
     manifest = os.path.relpath(entry, root)
     config = os.path.join(sys.argv[1], 'manifests.git', 'config')
@@ -598,32 +677,35 @@ mod tests {
 
     #[test]
     fn default_selection_loads_repo_entry_without_a_root_manifest() {
-        let temporary = tempfile::tempdir().unwrap();
+        let temporary = tempfile::tempdir().expect("temporary workspace");
         let root = temporary.path();
-        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         let entry = "<manifest><include name=\"default.xml\"/></manifest>\n";
-        std::fs::write(root.join(".repo/manifest.xml"), entry).unwrap();
-        std::fs::write(root.join(".repo/manifests/default.xml"), "<manifest/>\n").unwrap();
+        std::fs::write(root.join(".repo/manifest.xml"), entry).expect("selection wrapper");
+        std::fs::write(root.join(".repo/manifests/default.xml"), "<manifest/>\n")
+            .expect("manifest input");
 
-        let selected = selected_manifest(root).unwrap().unwrap();
-        let loaded = std::fs::read_to_string(root.join(selected)).unwrap();
+        let selected = selected_manifest(root)
+            .expect("manifest selection")
+            .expect("selected path");
+        let loaded = std::fs::read_to_string(root.join(selected)).expect("selection content");
         assert_eq!(loaded, entry);
     }
 
     #[test]
     fn override_selects_an_alternate_repo_manifest_location() {
-        let temporary = tempfile::tempdir().unwrap();
+        let temporary = tempfile::tempdir().expect("temporary workspace");
         let root = temporary.path();
-        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         let alternate = std::path::Path::new(".repo/manifests/alternate.xml");
         let manifest = "<manifest/>\n";
-        std::fs::write(root.join(alternate), manifest).unwrap();
+        std::fs::write(root.join(alternate), manifest).expect("alternate manifest");
 
         let selected = selected_manifest_at(root, Some(alternate))
-            .unwrap()
-            .unwrap();
+            .expect("manifest selection")
+            .expect("selected path");
         assert_eq!(
-            std::fs::read_to_string(root.join(selected)).unwrap(),
+            std::fs::read_to_string(root.join(selected)).expect("selected content"),
             manifest
         );
     }
@@ -631,17 +713,19 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn default_selection_loads_the_legacy_repo_entry_symlink() {
-        let temporary = tempfile::tempdir().unwrap();
+        let temporary = tempfile::tempdir().expect("temporary workspace");
         let root = temporary.path();
-        std::fs::create_dir_all(root.join(".repo/manifests")).unwrap();
+        std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         let manifest = "<manifest/>\n";
-        std::fs::write(root.join(".repo/manifests/default.xml"), manifest).unwrap();
+        std::fs::write(root.join(".repo/manifests/default.xml"), manifest).expect("manifest input");
         std::os::unix::fs::symlink("manifests/default.xml", root.join(".repo/manifest.xml"))
-            .unwrap();
+            .expect("legacy selection symlink");
 
-        let selected = selected_manifest(root).unwrap().unwrap();
+        let selected = selected_manifest(root)
+            .expect("manifest selection")
+            .expect("selected path");
         assert_eq!(
-            std::fs::read_to_string(root.join(selected)).unwrap(),
+            std::fs::read_to_string(root.join(selected)).expect("selected content"),
             manifest
         );
     }

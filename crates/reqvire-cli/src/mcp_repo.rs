@@ -236,6 +236,17 @@ impl MutationSession {
         }
         let bytes = repo.workspace.pinned_xml()?;
         repo.workspace.resolved_xml = String::from_utf8(bytes).map_err(|e| error(e.to_string()))?;
+        if !native {
+            // Central checkpoints flatten the resolved manifest. Prior include
+            // files remain source assets, but no longer select this composition.
+            let manifest = &repo.workspace.manifest;
+            repo.workspace.inputs.retain(|path, _| {
+                path == manifest || path == Path::new(".repo/manifests.git/config")
+            });
+            repo.workspace
+                .manifest_sources
+                .retain(|path, _| path == manifest);
+        }
         let mut scope = self
             .files
             .workspace
@@ -266,6 +277,23 @@ impl MutationSession {
         };
         match result {
             Ok(mut value) => {
+                repo.workspace.central_commit.clone_from(&self.head);
+                for source in repo.workspace.manifest_sources.values_mut() {
+                    if source.root.as_os_str().is_empty() {
+                        source.commit.clone_from(&self.head);
+                    }
+                }
+                let mut scope = self
+                    .files
+                    .workspace
+                    .as_deref()
+                    .expect("workspace provenance")
+                    .clone();
+                scope.repo = Some(Arc::new(repo.workspace.clone()));
+                self.files.workspace = Some(Arc::new(scope));
+                self.committed_files
+                    .workspace
+                    .clone_from(&self.files.workspace);
                 repo.outcomes
                     .push(json!({"name":"central","commit":self.head,
                     "outcome":if native && central.is_empty() {"no_op"} else {"completed"}}));

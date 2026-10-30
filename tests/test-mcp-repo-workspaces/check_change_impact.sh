@@ -119,11 +119,11 @@ impact_provenance() {
 }
 
 impact_start_server() {
-    local mode=$1 selection=$2 attempt options=()
+    local mode=$1 selection=$2 attempt options=() server_options=()
     [[ "$selection" == native ]] || options+=(--manifest default.xml)
-    [[ "$mode" != serve ]] || options+=(--enable-mcp)
+    [[ "$mode" != serve ]] || server_options+=(--enable-mcp)
     (cd "$central" && exec "$REQVIRE_BIN" "${options[@]}" "$mode" \
-        --host 127.0.0.1 --port 0 --enable-mutations) > "$native_case/server.log" 2>&1 &
+        --host 127.0.0.1 --port 0 --enable-mutations "${server_options[@]}") > "$native_case/server.log" 2>&1 &
     impact_pid=$!
     trap 'kill "$impact_pid" 2>/dev/null || true; wait "$impact_pid" 2>/dev/null || true' EXIT
     for ((attempt=0; attempt<200; attempt++)); do
@@ -205,6 +205,16 @@ impact_native() {
     impact_cli native --base-manifest-commit "$manifest_base" --json
     impact_graph "$native_case/impact.out"
     impact_provenance '.repo/manifests/'
+    cp "$native_case/impact.out" "$native_case/native-default-impact.json"
+    # A versioned native entry containing only an include remains a manifest
+    # input; only Repo's generated selection wrapper is omitted from provenance.
+    impact_state > "$native_case/before-explicit-native.txt"
+    (cd "$central" && "$REQVIRE_BIN" --manifest .repo/manifests/default.xml change-impact \
+        --git-commit "$impact_base" --base-manifest-commit "$manifest_base" --json) \
+        > "$native_case/native-explicit-impact.json"
+    impact_state > "$native_case/after-explicit-native.txt"
+    diff -u "$native_case/before-explicit-native.txt" "$native_case/after-explicit-native.txt"
+    diff -u "$native_case/native-default-impact.json" "$native_case/native-explicit-impact.json"
 }
 
 impact_native_required() {
@@ -226,7 +236,18 @@ impact_include() {
 
 impact_bad_base() {
     local kind=$1 revision=0000000000000000000000000000000000000000 code=repo_impact_base_unavailable
-    if [[ "$kind" == unlocked ]]; then revision=main; code=repo_impact_base_unlocked; fi
+    if [[ "$kind" == unlocked ]]; then
+        revision=main; code=repo_impact_base_unlocked
+    else
+        # This commit exists only in the remote. A read must neither fetch it
+        # nor mistake a remote repository for retained local Repo object storage.
+        local tree
+        tree=$(git -C "$native_case/remotes/component" rev-parse "$alpha^{tree}")
+        revision=$(git -C "$native_case/remotes/component" commit-tree "$tree" -p "$alpha" -m 'Remote-only historical revision')
+        if git -C "$central/repositories/component" cat-file -e "$revision^{commit}" 2>/dev/null; then
+            echo 'Remote-only fixture commit is already available locally'; return 1
+        fi
+    fi
     cp "$central/parts/projects.xml" "$native_case/valid-pins.xml"
     sed -i "s/$omega/$revision/" "$central/parts/projects.xml"
     impact_base=$(impact_commit "$central" 'Historical invalid or unlocked project selection')
@@ -284,8 +305,21 @@ impact_pending() {
         '{branch:"main",file:"repositories/component/Added.md",content:$content}')
     impact_rpc reqvire.add_element "$args" "$native_case/add-result.json"
     impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
+    cp "$central/repositories/component/Added.md" "$native_case/accepted-added.txt"
+    cp "$central/default.xml" "$native_case/accepted-manifest.txt"
     printf 'External invalid model must not be imported.\n' > "$central/repositories/component/Added.md"
+    printf 'External invalid manifest must not be imported.\n' > "$central/default.xml"
     impact_state > "$native_case/before-state.txt"
+    # A failed historical read must preserve accepted data and write admission.
+    if impact_rpc reqvire.change_impact '{"branch":"main","git_commit":"0000000000000000000000000000000000000000"}' "$native_case/failed-impact-result.json"; then
+        echo 'Unavailable historical commit unexpectedly succeeded'; return 1
+    fi
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-failed.json"
+    jq -S '.result.structuredContent.context | {model_revision,accepted_head,pending_changes,writes_available}' \
+        "$native_case/status-before.json" > "$native_case/accepted-before.json"
+    jq -S '.result.structuredContent.context | {model_revision,accepted_head,pending_changes,writes_available}' \
+        "$native_case/status-failed.json" > "$native_case/accepted-failed.json"
+    diff -u "$native_case/accepted-before.json" "$native_case/accepted-failed.json"
     args=$(jq -n --arg base "$impact_base" '{branch:"main",git_commit:$base}')
     local result=0
     impact_rpc reqvire.change_impact "$args" "$native_case/impact-result.json" || result=1
@@ -301,6 +335,18 @@ impact_pending() {
     [[ "$result" == 0 ]] || { cat "$native_case/impact-result.json"; return 1; }
     jq -e 'any(.result.structuredContent.added[]; .element_id | endswith("repositories/component/Added.md#added-capability"))' \
         "$native_case/impact-result.json"
+    cp "$native_case/accepted-added.txt" "$central/repositories/component/Added.md"
+    cp "$native_case/accepted-manifest.txt" "$central/default.xml"
+    impact_rpc reqvire.git.commit '{"branch":"main","message":"Save accepted Repo impact fixture"}' "$native_case/commit-result.json"
+    # Default HEAD follows the newly accepted Central checkpoint, including
+    # the current set of selecting inputs after Central manifest flattening.
+    impact_state > "$native_case/before-saved-impact.txt"
+    impact_rpc reqvire.change_impact '{"branch":"main"}' "$native_case/saved-impact-result.json"
+    impact_state > "$native_case/after-saved-impact.txt"
+    diff -u "$native_case/before-saved-impact.txt" "$native_case/after-saved-impact.txt"
+    jq -e '.result.structuredContent |
+      .added == [] and .removed == [] and .changed == [] and .relocated == [] and
+      .comparison.base == .comparison.current' "$native_case/saved-impact-result.json"
 }
 
 run_impact_cases() {

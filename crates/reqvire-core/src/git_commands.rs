@@ -16,13 +16,14 @@ pub struct GitReader<'a, F> {
 pub struct TreeFile {
     pub bytes: std::sync::Arc<Vec<u8>>,
     pub executable: bool,
+    pub symlink: bool,
 }
 
 impl<'a, F> GitReader<'a, F>
 where
     F: FnMut(&[&str], Option<&[u8]>) -> Result<Vec<u8>, ReqvireError>,
 {
-    pub fn new(root: &'a Path, run: F) -> Self {
+    pub const fn new(root: &'a Path, run: F) -> Self {
         Self { root, run }
     }
 
@@ -77,6 +78,24 @@ where
         if paths.is_empty() {
             return Ok(BTreeMap::new());
         }
+        self.selected_files_at_commit(commit, Some(paths), false)
+    }
+
+    /// Read a complete tree for isolated historical reconstruction. Symlink
+    /// bytes are declarations; the caller must resolve them inside this tree.
+    pub(crate) fn files_at_commit(
+        &mut self,
+        commit: &str,
+    ) -> Result<BTreeMap<PathBuf, TreeFile>, ReqvireError> {
+        self.selected_files_at_commit(commit, None, true)
+    }
+
+    fn selected_files_at_commit(
+        &mut self,
+        commit: &str,
+        paths: Option<&BTreeSet<PathBuf>>,
+        with_symlinks: bool,
+    ) -> Result<BTreeMap<PathBuf, TreeFile>, ReqvireError> {
         let tree = (self.run)(&["ls-tree", "-r", "-z", "--full-tree", commit], None)?;
         let mut entries = BTreeMap::new();
         for entry in tree.split(|b| *b == 0).filter(|e| !e.is_empty()) {
@@ -94,17 +113,22 @@ where
                 .next()
                 .ok_or_else(|| git_error("Missing tree object ID"))?;
             let path = self.root.join(path);
-            if paths.contains(&path) {
-                if kind != "blob" || !matches!(mode, "100644" | "100755") {
+            if paths.is_none_or(|paths| paths.contains(&path)) {
+                if paths.is_none() && kind == "commit" && mode == "160000" {
+                    continue; // Undeclared submodules are outside the composition.
+                }
+                if kind != "blob"
+                    || !(matches!(mode, "100644" | "100755") || (with_symlinks && mode == "120000"))
+                {
                     return Err(git_error(format!(
                         "Changed nonregular artifact {} requires full admission",
                         path.display()
                     )));
                 }
-                entries.insert(path, (mode == "100755", oid.to_owned()));
+                entries.insert(path, (mode == "100755", mode == "120000", oid.to_owned()));
             }
         }
-        let oids: BTreeSet<_> = entries.values().map(|(_, oid)| oid.clone()).collect();
+        let oids: BTreeSet<_> = entries.values().map(|(_, _, oid)| oid.clone()).collect();
         let mut blobs = BTreeMap::new();
         if !oids.is_empty() {
             let input = oids.iter().map(|s| format!("{s}\n")).collect::<String>();
@@ -134,12 +158,13 @@ where
         }
         Ok(entries
             .into_iter()
-            .map(|(path, (executable, oid))| {
+            .map(|(path, (executable, symlink, oid))| {
                 (
                     path,
                     TreeFile {
                         bytes: std::sync::Arc::clone(&blobs[&oid]),
                         executable,
+                        symlink,
                     },
                 )
             })
