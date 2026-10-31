@@ -4,6 +4,7 @@
 # failure. Reuse the suite's actual Repo clients, local remotes and fixture setup.
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$TEST_SCRIPT_DIR/check_native_repo.sh"
+composition_server_options=()
 
 impact_commit() {
     git -C "$1" add .
@@ -37,6 +38,8 @@ EOF
     cp "$central/parts/projects.xml" "$(dirname "$native")/parts/projects.xml"
     impact_commit "$(dirname "$native")" 'Current manifest inputs' > /dev/null
     (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
+    git -C "$central/repositories/component" checkout -q -B main "$omega"
+    git -C "$central/repositories/docs" checkout -q -B main "$docs_commit"
     # Keep Central's web identity distinct from component file remotes. Reports
     # must not invent Central blob URLs for component-owned paths.
     git -C "$central" remote set-url origin https://github.com/reqvire-test/central.git
@@ -120,6 +123,7 @@ impact_start_server() {
     local mode=$1 selection=$2 attempt options=() server_options=()
     [[ "$selection" == native ]] || options+=(--manifest default.xml)
     [[ "$mode" != serve ]] || server_options+=(--enable-mcp)
+    server_options+=("${composition_server_options[@]}")
     (cd "$central" && exec "$REQVIRE_BIN" "${options[@]}" "$mode" \
         --host 127.0.0.1 --port 0 --enable-mutations "${server_options[@]}") > "$native_case/server.log" 2>&1 &
     impact_pid=$!
@@ -186,7 +190,7 @@ impact_mcp() {
         "$native_case/status-after.json" > "$native_case/accepted-after.json"
     diff -u "$native_case/accepted-before.json" "$native_case/accepted-after.json"
     if [[ "$selection" == native ]]; then
-        [[ "$result" != 0 ]] || { echo 'Independent manifest history was silently guessed'; return 1; }
+        [[ "$result" != 0 ]] || { echo 'Unrecorded manifest history was silently guessed'; return 1; }
         grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact-result.json"
         impact_cli native --json && return 1
         grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
@@ -202,10 +206,10 @@ impact_mcp() {
 }
 
 impact_native() {
-    if impact_cli native --json; then echo 'Independent manifest history was silently guessed'; return 1; fi
+    if impact_cli native --json; then echo 'Unrecorded manifest history was silently guessed'; return 1; fi
     grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
     grep -Fq .repo/manifests/ "$native_case/impact.diagnostic"
-    grep -Fq 'tracked in the workspace-root repository' "$native_case/impact.diagnostic"
+    grep -Fq composition "$native_case/impact.diagnostic"
     impact_state > "$native_case/before-explicit-native.txt"
     if (cd "$central" && "$REQVIRE_BIN" --manifest .repo/manifests/default.xml change-impact \
         --git-commit "$impact_base" --json) > "$native_case/explicit-native.out" 2>&1; then
@@ -311,11 +315,13 @@ impact_pending() {
     args=$(jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
         '{branch:"main",file:"repositories/component/Added.md",content:$content}')
     impact_rpc reqvire.add_element "$args" "$native_case/add-result.json"
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
     cp "$central/repositories/component/Added.md" "$native_case/accepted-added.txt"
     cp "$central/default.xml" "$native_case/accepted-manifest.txt"
     printf 'External invalid model must not be imported.\n' > "$central/repositories/component/Added.md"
     printf 'External invalid manifest must not be imported.\n' > "$central/default.xml"
+    # Capture availability after independent external drift. The impact request
+    # must preserve that state rather than hide source-guard diagnostics.
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
     impact_state > "$native_case/before-state.txt"
     # A failed historical read must preserve accepted data and write admission.
     if impact_rpc reqvire.change_impact '{"branch":"main","git_commit":"0000000000000000000000000000000000000000"}' "$native_case/failed-impact-result.json"; then
@@ -345,10 +351,10 @@ impact_pending() {
     cp "$native_case/accepted-added.txt" "$central/repositories/component/Added.md"
     cp "$native_case/accepted-manifest.txt" "$central/default.xml"
     impact_rpc reqvire.git.commit '{"branch":"main","message":"Save accepted Repo impact fixture"}' "$native_case/commit-result.json"
-    # Default HEAD follows the newly accepted Central checkpoint, including
+    # Explicit HEAD follows the newly accepted root checkpoint, including
     # the current set of selecting inputs after Central manifest flattening.
     impact_state > "$native_case/before-saved-impact.txt"
-    impact_rpc reqvire.change_impact '{"branch":"main"}' "$native_case/saved-impact-result.json"
+    impact_rpc reqvire.change_impact '{"branch":"main","git_commit":"HEAD"}' "$native_case/saved-impact-result.json"
     impact_state > "$native_case/after-saved-impact.txt"
     diff -u "$native_case/before-saved-impact.txt" "$native_case/after-saved-impact.txt"
     jq -e '.result.structuredContent |
@@ -373,9 +379,9 @@ provenance cli/repo-impact-provenance-and-links
 text cli/repo-impact-text
 mcp mcp/repo-impact-parity-and-isolation
 serve serve/repo-impact-parity-and-isolation
-foreign_manifest cli/repo-impact-independent-manifest-history-rejected
-foreign_mcp mcp/repo-impact-independent-manifest-history-rejected
-foreign_serve serve/repo-impact-independent-manifest-history-rejected
+foreign_manifest cli/repo-impact-unrecorded-manifest-history-rejected
+foreign_mcp mcp/repo-impact-unrecorded-manifest-history-rejected
+foreign_serve serve/repo-impact-unrecorded-manifest-history-rejected
 selector cli/repo-impact-single-baseline-selector
 include cli/repo-impact-historical-includes
 missing cli/repo-impact-missing-base-commit

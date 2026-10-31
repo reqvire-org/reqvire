@@ -1781,6 +1781,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     assert!(secondary.runtime().is_err());
     assert_eq!(original.metadata()["available"], true);
 
+    let pre_admission_head = original.metadata()["head"].clone();
     arm();
     let pending = tokio::spawn(http_rpc(
         app.clone(),
@@ -1814,13 +1815,18 @@ os.execv({git},[{git},*sys.argv[1:]])
     assert!(reopened.get("worktree_id").is_none());
     assert_ne!(reopened["head"], accepted["head"]);
     assert_eq!(reopened["available"], true);
-    let pending = response("replaced worker read", pending).await;
-    assert_eq!(pending["result"]["isError"], true, "{pending}");
+    let pending = response("read spanning validated admission", pending).await;
+    assert_ne!(pending["result"]["isError"], true, "{pending}");
+    assert_eq!(
+        pending["result"]["_meta"]["reqvire/context"]["accepted_head"],
+        pre_admission_head
+    );
     assert_eq!(
         pending["result"]["_meta"]["reqvire/context"]["branch"],
         before["branch"]
     );
-    assert!(original.runtime().is_err());
+    assert!(original.runtime().is_ok());
+    assert_eq!(original.metadata()["head"], reopened["head"]);
 }
 
 #[cfg(unix)]

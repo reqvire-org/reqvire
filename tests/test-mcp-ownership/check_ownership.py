@@ -223,7 +223,7 @@ def recovery_reads(mode):
             check(f"{prefix}/status-resources-semantics", status["context"]["recovery_required"]
                   and resource["_meta"]["reqvire/context"]["recovery_required"] and semantic["boolean"])
             blocked = [server.raw_tool("reqvire.add_element", file="Model.md", content=content, dry_run=True),
-                       server.raw_tool("reqvire.format", fix=False), server.raw_tool("reqvire.change_impact"),
+                       server.raw_tool("reqvire.format", fix=False), server.raw_tool("reqvire.change_impact", git_commit="HEAD"),
                        server.raw_tool("reqvire.git.commit", message="forbidden"),
                        server.raw_tool("reqvire.git.reconcile", attempted_commit=head, dry_run=False)]
             check(f"{prefix}/unsafe-operations-blocked", all(r.get("isError") is True and "recovery" in str(r) for r in blocked)

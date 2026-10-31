@@ -110,6 +110,8 @@
   --color-showcase-canvas: var(--ads-if-light, var(--color-showcase-canvas-light))var(--ads-if-dark, var(--color-showcase-canvas-dark));
   --color-showcase-ink: var(--ads-if-light, var(--color-showcase-ink-light))var(--ads-if-dark, var(--color-showcase-ink-dark));
   --focus-ring: var(--ads-if-light, var(--focus-ring-light))var(--ads-if-dark, var(--focus-ring-dark));
+  --info: var(--ads-if-light, var(--info-light))var(--ads-if-dark, var(--info-dark));
+  --info-fg: var(--ads-if-light, var(--info-fg-light))var(--ads-if-dark, var(--info-fg-dark));
   --ring-selected: var(--ads-if-light, var(--ring-selected-light))var(--ads-if-dark, var(--ring-selected-dark));
   --scroll-thumb: var(--ads-if-light, var(--scroll-thumb-light))var(--ads-if-dark, var(--scroll-thumb-dark));
   --shadow-lg: var(--ads-if-light, var(--shadow-lg-light))var(--ads-if-dark, var(--shadow-lg-dark));
@@ -129,6 +131,8 @@
   --slate-10: var(--ads-if-light, var(--slate-10-light))var(--ads-if-dark, var(--slate-10-dark));
   --slate-11: var(--ads-if-light, var(--slate-11-light))var(--ads-if-dark, var(--slate-11-dark));
   --slate-12: var(--ads-if-light, var(--slate-12-light))var(--ads-if-dark, var(--slate-12-dark));
+  --success: var(--ads-if-light, var(--success-light))var(--ads-if-dark, var(--success-dark));
+  --success-fg: var(--ads-if-light, var(--success-fg-light))var(--ads-if-dark, var(--success-fg-dark));
   --text-body: var(--ads-if-light, var(--text-body-light))var(--ads-if-dark, var(--text-body-dark));
   --text-code: var(--ads-if-light, var(--text-code-light))var(--ads-if-dark, var(--text-code-dark));
   --text-faint: var(--ads-if-light, var(--text-faint-light))var(--ads-if-dark, var(--text-faint-dark));

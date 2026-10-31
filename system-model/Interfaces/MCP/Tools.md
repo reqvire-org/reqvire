@@ -45,7 +45,7 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
 
 ### MCP Branch Model Sessions
 
-WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository through one MCP endpoint, including manifest-defined Repo workspaces.
+WHILE mutation mode is enabled, the system SHALL manage independently owned model branches through one MCP endpoint, with the same public branch operations for a single repository and a manifest-defined composition of repositories.
 
 #### Details
 Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
@@ -57,7 +57,7 @@ Worktree administration is an explicit repository operation. It preserves the or
   * type: requirement
 
 #### Relations
-  * specify: [MCP Worktree Model Management](../InterfacesFeature.md#mcp-worktree-model-management)
+  * specify: [MCP Branch Composition Management](../InterfacesFeature.md#mcp-branch-composition-management)
 ---
 
 ### MCP Branch Closing
@@ -82,7 +82,7 @@ WHEN a client requests removal of a clean server-created worktree, the system SH
 
 ### MCP Branch Creation
 
-WHEN a client requests a new model branch from an explicit base, the system SHALL create and validate an isolated Git worktree before returning an owned context for that branch.
+WHEN a client requests a new model branch from an explicit base, the system SHALL prepare and validate an isolated branch composition using that base's root revision, historical manifest selection, and each declared component's own pinned commit, without switching existing user checkouts.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
@@ -133,6 +133,7 @@ The child worker-session requirement implements the MCP side of this boundary. E
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Composition Checkpoint Specification](../../ModelStructure/RepoWorkspaces.md#workspace-composition-checkpoint-specification)
   * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
@@ -240,7 +241,7 @@ When mutation mode is disabled, the system SHALL retain lint inspection and reje
 WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to its authorized owning repository remotes.
 
 #### Details
-Automatic commits remain an independent, default-disabled option. The context transaction owns component-first commit ordering and the Central manifest checkpoint in Repo mode. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+Automatic commits remain an independent, default-disabled option. The context transaction commits changed components, then actual manifest-owner changes, then the workspace-root composition checkpoint in Repo mode. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -254,7 +255,7 @@ Automatic commits remain an independent, default-disabled option. The context tr
 
 ### MCP Accepted Change Commit
 
-WHEN a client explicitly requests a commit in an owned context, the system SHALL commit only that context's accepted uncommitted model changes and advance its expected HEAD after successful Git publication.
+WHEN a client explicitly requests a commit in an owned context, the system SHALL checkpoint only that context's accepted changes and selected composition metadata, including an explicitly requested initial composition checkpoint, and advance its expected HEAD after successful Git publication.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -291,6 +292,7 @@ WHEN a client requests publication of a committed owned branch, the system SHALL
   * definedBy: [MCP Branch Push Specification](Specifications.md#mcp-branch-push-specification)
   * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
   * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+  * satisfiedBy: [mcp_repo_publication.rs](../../../crates/reqvire-cli/src/mcp_repo_publication.rs)
 ---
 
 ### MCP Commit Outcome Reconciliation
@@ -355,7 +357,7 @@ WHEN a repository publication operation executes, the system SHALL constrain it 
 
 ### MCP Pull Request Commenting
 
-WHEN a client requests a comment on a pull request in the pinned repository, the system SHALL publish the supplied body to that pull request and return the confirmed comment identity.
+WHEN a client requests a comment on a pull request in the pinned root repository or an explicitly selected declared repository owner, the system SHALL publish the supplied body to that pull request and return the confirmed comment identity.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -372,11 +374,12 @@ WHEN a client requests a comment on a pull request in the pinned repository, the
   * definedBy: [MCP Pull Request Commenting Specification](Specifications.md#mcp-pull-request-commenting-specification)
   * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
   * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+  * satisfiedBy: [mcp_repo_publication.rs](../../../crates/reqvire-cli/src/mcp_repo_publication.rs)
 ---
 
 ### MCP Pull Request Creation
 
-WHEN a client requests a pull request for a pushed owned branch with an explicit base, the system SHALL create or identify a matching pull request within the pinned repository.
+WHEN a client requests a pull request for a pushed owned branch with an explicit base, the system SHALL create or identify matching linked pull requests for changed declared repository owners and the workspace root, using each explicit target and preserving confirmed partial outcomes.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -393,6 +396,7 @@ WHEN a client requests a pull request for a pushed owned branch with an explicit
   * definedBy: [MCP Pull Request Creation Specification](Specifications.md#mcp-pull-request-creation-specification)
   * derivedFrom: [MCP Model Change Publication](#mcp-model-change-publication)
   * satisfiedBy: [mcp_github.rs](../../../crates/reqvire-cli/src/mcp_github.rs)
+  * satisfiedBy: [mcp_repo_publication.rs](../../../crates/reqvire-cli/src/mcp_repo_publication.rs)
 ---
 
 ### MCP Model Evidence Tools
@@ -588,10 +592,10 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned Central worktrees. Declared component checkouts may be detached at their selected commits, with their own cleanliness and ownership checks.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned Central worktrees. Declared component checkouts may supply clean detached preparation baselines, but authoring commits require named component and participating manifest-owner branches.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
-- The MCP server SHALL preserve the previous accepted model after rejected or failed mutations and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Only the dedicated checked HEAD-refresh operation may adopt an eligible external HEAD on the same branch; it cannot bypass ownership or transaction recovery.
+- The MCP server SHALL preserve the previous accepted model after rejected candidates or failed persistence and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Guarded branch.refresh may admit eligible artifact changes; explicit branch.open may fully validate a prepared committed model or composition. Neither may bypass ownership, accepted pending work or transaction recovery. A later Repo checkpoint failure retains already accepted pending edits and confirmed owner commits, without claiming a completed checkpoint.
 - The MCP server shall make observed model revision visible to clients for read responses.
 - The MCP server shall keep post-mutation model state synchronized before serving dependent reads.
 

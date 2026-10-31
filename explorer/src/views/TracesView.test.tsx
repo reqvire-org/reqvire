@@ -21,7 +21,9 @@ vi.mock("../workers/flowLayoutEngine", () => ({ flowLayoutEngine: layoutEngine }
 vi.mock("@xyflow/react", async importOriginal => {
   const original = await importOriginal<typeof import("@xyflow/react")>();
   const instance = { setViewport: vi.fn(), zoomIn: vi.fn(), zoomOut: vi.fn(), zoomTo: vi.fn() };
-  return { ...original, Handle: () => null, ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
+  // Cards render outside a ReactFlowProvider here; they read the viewport zoom at 100%.
+  const store = { transform: [0, 0, 1] };
+  return { ...original, Handle: () => null, useStore: (selector: (state: typeof store) => unknown) => selector(store), ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
     nodes: { id: string; type: string; data: unknown }[];
     edges: { id: string; source: string; target: string; label: string }[];
     nodeTypes: Record<string, ComponentType<{ data: unknown }>>;

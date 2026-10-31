@@ -32,6 +32,7 @@ pub mod operations;
 pub mod parser;
 pub(crate) mod rdf_store;
 pub mod relation;
+pub mod repo_composition;
 pub mod repo_impact;
 pub mod repo_workspace;
 pub mod report;

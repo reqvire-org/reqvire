@@ -50,22 +50,45 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
       <Section title="Multi-repository Models">
         <p className="text-zinc-600 mb-4">
           Google Repo&apos;s active manifest selects the component repositories
-          and revisions. Central is the workspace root; declared component
+          and revisions. The owning Git checkout is the workspace root; declared component
           checkouts contribute to the same model. No duplicate manifest is
-          required in Central. Element paths stay
-          relative to Central, even when an element belongs to a component.
+          required there. Element paths stay workspace-relative,
+          even when an element belongs to a component.
         </p>
         <BulletList items={[
-          "Install Git, Python 3, and Google Repo. Initialize the Repo client at Central's Git worktree root, then explicitly sync the component repositories before using Reqvire.",
-          "Repo's .repo/manifest.xml, manifest checkout, includes and local overlays are the default source of project pins. Standalone manifests also work. Declare unique, non-overlapping project paths inside Central and locally available revisions; each checkout must match its declared identity and revision.",
-          "Exclude .repo/ and component checkout directories from Central's Git tracking. Declared component Git inputs remain visible to Reqvire even when Central ignores their directories.",
-          "Repo's manifest checkout keeps its existing Git versioning and commit history. Use --manifest only when the manifest file is at a different location. The flag changes neither the manifest format nor its Git ownership. Invalid selections fail; Reqvire never silently falls back or fetches missing commits.",
+          "Install Git, Python 3, and Google Repo. Initialize and synchronize Repo from the workspace-root Git checkout. The manifest source can share its Git repository or use a separate one; that choice does not change Reqvire's default location.",
+          "Repo's .repo/manifest.xml selects native XML, includes and overlays. Declare unique, non-overlapping project paths inside the workspace and prepare local revisions. Each checkout must match its declared identity and pin.",
+          "Ignore /.repo/ and component checkout directories in the outer repository. Components and the manifest checkout still version their own files. Ignoring administration does not make the manifest unversioned.",
+          "Version selecting XML in its actual owners. The root .reqvire-composition.json records their exact revisions for historical replay, without copying XML. An explicit MCP commit can initialize this association. Use --manifest only for an optional alternate location.",
           "CLI, MCP and Explorer use the same combined source scope. Workspace .reqvireignore rules apply globally; each repository's Git ignores apply within its ownership boundary. Undeclared repositories and Repo metadata are excluded. Repo submanifests are not supported.",
         ]} />
-        <CodeBlock>{`# Central ignores /.repo/ and /repositories/.
-git clone https://github.com/example/central.git central
-cd central
-repo init -u https://github.com/example/manifests.git -b main -m default.xml
+        <p className="text-zinc-600 mb-4">
+          In this example, <code>default.xml</code> is already published on the
+          server/client repository&apos;s <code>product-composition</code> branch.
+          Its normal code branch needs no XML copy. Use your existing manifest
+          repository and source branch when they differ.
+        </p>
+        <CodeBlock>{`<manifest>
+  <remote name="github" fetch="https://github.com/YOUR_ORG/" />
+  <default remote="github" revision="main" />
+  <project name="website" path="repositories/website" revision="WEBSITE_COMMIT_SHA" />
+  <project name="user-docs" path="repositories/user-docs" revision="DOCS_COMMIT_SHA" />
+</manifest>`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Publish this source manifest on the chosen source branch first.
+          Replace the two revision placeholders with full commit IDs. Repo
+          combines the remote&apos;s fetch prefix with each project name to locate
+          the website and user-docs Git repositories; path selects each local
+          checkout directory. The server/client checkout ignores
+          <code> /.repo/</code> and <code>/repositories/</code>, while the manifest
+          checkout still tracks its own XML.
+        </p>
+        <CodeBlock>{`# The server/client checkout ignores /.repo/ and /repositories/.
+git clone https://github.com/example/server-client.git
+cd server-client
+MANIFEST_REPOSITORY_URL=https://github.com/example/server-client.git
+MANIFEST_BRANCH=product-composition
+repo init -u "$MANIFEST_REPOSITORY_URL" -b "$MANIFEST_BRANCH" -m default.xml
 repo sync
 
 # Follow Repo's active manifest
@@ -76,11 +99,16 @@ reqvire serve --enable-mcp --enable-mutations
 reqvire --manifest .repo/manifests/review.xml search --json`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Inspection does not require clean content. Mutation startup requires
-          clean committed Central and component checkouts and Git author identity.
-          New branch contexts preserve the selected manifest inputs in private
-          Repo state or in their owning Git worktree.
-          Component branches need not share Central&apos;s branch name. See the MCP Server
-          guide for private branch checkouts and component-first commits.
+          clean committed owning checkouts and Git author identity.
+          Repo sync may leave components at detached pins. Use
+          <code> reqvire.branch.create</code> before authoring, or prepare named
+          component branches yourself. Starting MCP does not create branches.
+          Explicit MCP branch creation reads the requested base composition and
+          prepares the requested named branch in every declared component at its
+          own pin. Initial pins stay unchanged; worktrees are managed internally.
+          See the MCP Server guide for checkpoint initialization and coordinated
+          publication. Installation instructions are in the{" "}
+          <a href="https://gerrit.googlesource.com/git-repo/+/refs/heads/main/README.md" className="text-sky-700 underline">official Repo README</a>.
         </p>
         <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
           Website and Documentation Repositories
@@ -100,6 +128,45 @@ reqvire --manifest .repo/manifests/review.xml search --json`}</CodeBlock>
           verification and its eligible page source across repository boundaries.
           References carry review dependencies; use Contract Bindings when a
           requirement has an independent implementation obligation.
+        </p>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
+          Admitting External Repository Work
+        </h3>
+        <p className="text-zinc-600 mb-4">
+          Work in the selected branch context&apos;s <code>workspace_root</code>.
+          Resolve pending MCP edits before preparing external commits. Commit
+          the desired component changes, update their exact revision pins in
+          the selecting XML, then commit those XML changes in their actual owner.
+          Update the root association before explicitly opening that branch again.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          This example starts with an existing composition record and a flat
+          native <code>.repo/manifests/default.xml</code>. Its source inventory
+          and owner identities stay unchanged. After committing website work:
+        </p>
+        <CodeBlock>{`WEBSITE_COMMIT=$(git -C repositories/website rev-parse HEAD)
+# Set the website project's revision in .repo/manifests/default.xml
+# to WEBSITE_COMMIT, preserving the other project declarations.
+git -C .repo/manifests diff -- default.xml
+git -C .repo/manifests add -- default.xml
+git -C .repo/manifests commit -m "Pin website changes"
+
+MANIFEST_COMMIT=$(git -C .repo/manifests rev-parse HEAD)
+jq --arg commit "$MANIFEST_COMMIT" \\
+  '(.sources[] | select(.owner == ".repo/manifests") | .commit) = $commit' \\
+  .reqvire-composition.json > .reqvire-composition.json.tmp
+mv .reqvire-composition.json.tmp .reqvire-composition.json
+git add -- .reqvire-composition.json
+git commit -m "Record updated product composition"`}</CodeBlock>
+        <p className="text-zinc-600 mt-4">
+          Keep all owners clean and their checkouts at the recorded pins, then
+          call <code>reqvire.branch.open</code> with the same model branch.
+          Admission validates the complete composition; failure retains the
+          accepted model. For includes, overlays or multiple manifest owners,
+          commit each changed source in its actual owner and record each owner&apos;s
+          commit. If selected sources or owners change, update the complete
+          source inventory too. Repo sync does not update the root JSON, and
+          ordinary MCP commit does not import external component work.
         </p>
       </Section>
 
@@ -344,16 +411,21 @@ reqvire coverage --from "Shared Branch" --json`}</CodeBlock>
           <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded mx-1">
             --git-commit
           </code>
-          option selects the base commit, defaulting to HEAD. Ordinary Git mode
+          option explicitly overrides the available PR baseline. Without an
+          override, Reqvire uses the actual target&apos;s local merge-base from CI
+          or a confirmed MCP PR workflow. Without review context, it requests a
+          baseline. Explicit HEAD reviews pending changes. Ordinary Git mode
           requires one eligible worktree. In Repo mode it selects the
-          workspace-root repository&apos;s base commit, including its model,
-          manifest and includes; that historical manifest supplies each component&apos;s
+          workspace-root repository&apos;s base commit and manifest-owner revision
+          association; that historical manifest supplies each component&apos;s
           own revision. A collection of independent worktrees without a Repo
           composition remains ambiguous.
         </p>
         <CodeBlock>{`reqvire change-impact
-reqvire change-impact --git-commit origin/main
-reqvire change-impact --git-commit origin/main --json --output reports/impact.json
+# Review only pending changes:
+reqvire change-impact --git-commit HEAD
+# Or supply the actual selected PR merge-base:
+reqvire change-impact --git-commit "$PR_BASE_COMMIT" --json --output reports/impact.json
 
 reqvire search --filter-risk high,critical --filter-status review
 reqvire traces --output reports/traces.json
@@ -368,17 +440,17 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           available locally. Reqvire reads historical files without changing
           active checkouts and never fetches or runs Repo sync.
         </p>
-        <CodeBlock>{`# The root model, manifest and includes share one Git history.
-# The historical manifest pins each component to its own commit.
-reqvire --manifest default.xml change-impact --git-commit origin/main \\
+        <CodeBlock>{`# Native .repo/manifest.xml is selected automatically.
+# The root baseline identifies native owner revisions and component pins.
+reqvire change-impact --git-commit "$PR_BASE_COMMIT" \\
   --json --output reports/impact.json`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           One selected commit identifies the complete baseline. Keep the
-          manifest and its includes versioned in the workspace-root repository;
-          use global <code>--manifest</code> to select that file. If the selected
-          native manifest has independent Git history, the comparison reports
-          <code> repo_impact_manifest_history_unavailable</code> with its path
-          and guidance to select a tracked workspace-root manifest. Missing
+          XML and includes versioned in their actual Git owners. The root
+          composition record associates their commits with the selected root
+          revision; independent manifest history is supported. Missing associations
+          or unversioned required inputs report
+          <code> repo_impact_manifest_history_unavailable</code> with the affected path. Missing
           objects or mutable historical project pins also fail explicitly;
           Reqvire never guesses another revision or reports a partial baseline.
         </p>
@@ -497,7 +569,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           with automatic commits disabled.
         </p>
         <p className="text-zinc-600 mb-4">
-          Branch-selected MCP calls use tool contract version 4. Open or create the branch
+          Branch-selected MCP calls use tool contract version 5. Open or create the branch
           first, then use <code>branch</code> on model reads, edits, commits,
           refresh and publication. Use <code>from_branch</code> to resolve a
           relative creation base. With multiple open contexts, explicitly select

@@ -123,12 +123,12 @@ rdf() {
 }
 impact() {
     replace 'Error responses contain a code and message.' 'Error responses contain a code, message, and details.'
-    data change-impact | jq -e 'tostring|contains("contract_references") and contains("Documentation Test") and contains("evidence/documentation.txt")' >/dev/null
+    data change-impact --git-commit HEAD | jq -e 'tostring|contains("contract_references") and contains("Documentation Test") and contains("evidence/documentation.txt")' >/dev/null
 }
 reverse_impact() {
     parsed
     replace 'The system SHALL document error responses.' 'The system SHALL document all error responses.'
-    data change-impact | jq -e 'all(..|objects;.name!="Contract Owner" and .name!="Error Response Specification")' >/dev/null
+    data change-impact --git-commit HEAD | jq -e 'all(..|objects;.name!="Contract Owner" and .name!="Error Response Specification")' >/dev/null
 }
 same_hierarchy() { replace '  * specify: [Contract Consumer](#contract-consumer)' '  * derivedFrom: [Contract Owner](#contract-owner)'; parsed; }
 link_unlink() {
@@ -219,14 +219,14 @@ pure_relocation() {
     parsed
     run mv 'Error Response Specification' specifications/Shared.md >/dev/null
     assert_refs Documentation '["specifications/Shared.md#error-response-specification"]'
-    data change-impact | jq -e 'all(.changed|..|objects;.name!="Documentation")' >/dev/null
+    data change-impact --git-commit HEAD | jq -e 'all(.changed|..|objects;.name!="Documentation")' >/dev/null
 }
 changed_references() {
     run link Documentation referenceContract 'Other Specification' >/dev/null
-    data change-impact | jq '.changed' | row Documentation | jq -e '.changed_contract_references==["specifications/Model.md#other-specification"]' >/dev/null
+    data change-impact --git-commit HEAD | jq '.changed' | row Documentation | jq -e '.changed_contract_references==["specifications/Model.md#other-specification"]' >/dev/null
     commit
     run unlink Documentation 'Other Specification' >/dev/null
-    data change-impact | jq '.changed' | row Documentation | jq -e '.changed_contract_references==["specifications/Model.md#other-specification"]' >/dev/null
+    data change-impact --git-commit HEAD | jq '.changed' | row Documentation | jq -e '.changed_contract_references==["specifications/Model.md#other-specification"]' >/dev/null
 }
 collect_once() {
     replace '  * specify: [Contract Consumer](#contract-consumer)' '  * derivedFrom: [Contract Owner](#contract-owner)'
@@ -238,7 +238,7 @@ descendant_impact() {
     run add "$model" < "$case_output/input.txt" >/dev/null
     commit
     replace 'Error responses contain a code and message.' 'Error responses contain a code, message, and details.'
-    data change-impact | jq -e 'tostring|contains("Detailed Documentation")' >/dev/null
+    data change-impact --git-commit HEAD | jq -e 'tostring|contains("Detailed Documentation")' >/dev/null
 }
 valid_override() { input_data valid_override; run add "$model" --override < "$case_output/input.txt" >/dev/null; assert_refs Documentation '["specifications/Model.md#other-specification"]'; }
 relation_conflict() {
@@ -254,7 +254,7 @@ rejected_cycle() {
     run --reject validate > "$case_output/cycle-second.txt"
     diff -u "$case_output/cycle-first.txt" "$case_output/cycle-second.txt"
     run --reject coverage --json | circular_error
-    run --reject change-impact --json | circular_error
+    run --reject change-impact --git-commit HEAD --json | circular_error
 }
 own_documentation_contract() {
     replace '  * satisfiedBy: [documentation.txt]' $'  * definedBy: [Documentation Specification](#documentation-specification)\n  * satisfiedBy: [documentation.txt]'
@@ -467,7 +467,7 @@ convergent_impact() {
     run validate >/dev/null
     commit
     replace 'Error responses contain a code and message.' 'Error responses contain a code, message, and details.'
-    data change-impact | jq -e '
+    data change-impact --git-commit HEAD | jq -e '
       [.changed[].name]==["Error Response Specification"] and
       [.invalidated_verifications[].target_text]==["Documentation Test"] and
       (.changed[0].change_impact_tree as $tree |

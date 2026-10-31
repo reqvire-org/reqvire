@@ -124,7 +124,57 @@ reqvire:projectPath a owl:DatatypeProperty ;
   rdfs:domain reqvire:ManifestProject ; rdfs:range xsd:string .
 reqvire:projectRevision a owl:DatatypeProperty ;
   rdfs:domain reqvire:ManifestProject ; rdfs:range xsd:string .
+
+reqvire:ModelBranchComposition a owl:Class ;
+  rdfs:comment "A logical authoring branch composed of repository-specific branch and revision selections." .
+reqvire:GitBranch a owl:Class ;
+  rdfs:comment "A named branch owned by one Git repository; equal names in different repositories identify distinct branches." .
+reqvire:RepositoryBranchSelection a owl:Class ;
+  rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
+  rdfs:comment "A repository revision selection associated with a named authoring branch." .
+reqvire:CompositionCheckpoint a owl:Class ;
+  rdfs:comment "Committed provenance associating a root model revision with the manifest-owner revisions selecting its component commits." .
+reqvire:ManifestRevisionSelection a owl:Class ;
+  rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
+  rdfs:comment "A versioned manifest source selected from its actual owning Git history." .
+reqvire:CoordinatedPullRequestSet a owl:Class ;
+  rdfs:comment "Repository-specific pull requests reviewing one composed model change." .
+reqvire:RepositoryPullRequest a owl:Class .
+reqvire:ReviewBaseline a owl:Class ;
+  rdfs:comment "The root comparison revision selected for a review, independently of the branch creation base." .
+reqvire:contextBranchComposition a owl:ObjectProperty ;
+  rdfs:domain reqvire:WorktreeContext ; rdfs:range reqvire:ModelBranchComposition .
+reqvire:compositionBranchSelection a owl:ObjectProperty ;
+  rdfs:domain reqvire:ModelBranchComposition ; rdfs:range reqvire:RepositoryBranchSelection .
+reqvire:selectionBranch a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepositoryBranchSelection ; rdfs:range reqvire:GitBranch .
+reqvire:branchRepository a owl:ObjectProperty ;
+  rdfs:domain reqvire:GitBranch ; rdfs:range reqvire:GitRepository .
+reqvire:branchName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GitBranch ; rdfs:range xsd:string .
+reqvire:compositionCheckpoint a owl:ObjectProperty ;
+  rdfs:domain reqvire:ModelBranchComposition ; rdfs:range reqvire:CompositionCheckpoint .
+reqvire:checkpointRootCommit a owl:ObjectProperty ;
+  rdfs:domain reqvire:CompositionCheckpoint ; rdfs:range reqvire:GitCommit .
+reqvire:checkpointManifestSelection a owl:ObjectProperty ;
+  rdfs:domain reqvire:CompositionCheckpoint ; rdfs:range reqvire:ManifestRevisionSelection .
+reqvire:pullRequestSetMember a owl:ObjectProperty ;
+  rdfs:domain reqvire:CoordinatedPullRequestSet ; rdfs:range reqvire:RepositoryPullRequest .
+reqvire:pullRequestRepository a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepositoryPullRequest ; rdfs:range reqvire:GitRepository .
+reqvire:reviewBaselineCommit a owl:ObjectProperty ;
+  rdfs:domain reqvire:ReviewBaseline ; rdfs:range reqvire:GitCommit .
+reqvire:compositionReviewBaseline a owl:ObjectProperty ;
+  rdfs:domain reqvire:ModelBranchComposition ; rdfs:range reqvire:ReviewBaseline .
 ```
+
+#### Composition Competency Questions
+- Which named repository branches participate in one model branch?
+- Which manifest-owner commits make a root checkpoint reproducible?
+- Which component commits were selected by a historical manifest rather than by the live checkout?
+- Which repository PRs review a coordinated change, and which root commit is its review baseline?
+
+Equal branch names do not imply identical repository identity. Checkpoint ownership and review baselines are structural provenance, while JSON fields, operation order, and admission rules remain requirement-owned contracts.
 
 #### Metadata
   * type: ontology

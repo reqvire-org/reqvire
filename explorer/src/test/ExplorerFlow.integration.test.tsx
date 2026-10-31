@@ -36,6 +36,13 @@ function expectCardsFit(region: HTMLElement) {
 }
 
 // Directly dispatched test events bypass browser hit testing. Check the wrapper too.
+// Card footer controls appear only at zooms where they render at least 24px.
+async function zoomToActualSize(region: HTMLElement) {
+  await waitFor(() => expect((within(region).getByRole("button", { name: "100%" }) as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(within(region).getByRole("button", { name: "100%" }));
+  await waitFor(() => expect(viewport(region).zoom).toBe(1));
+}
+
 function expectPointerTarget(card: HTMLElement) {
   const wrapper = card.closest<HTMLElement>(".react-flow__node");
   expect(wrapper).not.toBeNull();
@@ -256,8 +263,10 @@ describe("Explorer flow integration", () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Ontology Projection Verification/ }));
     const card = await screen.findByRole("article", { name: "Property Projection" });
+    await zoomToActualSize(screen.getByRole("region", { name: "Verification trace flow" }));
     fireEvent.click(screen.getByRole("button", { name: /collapse ancestors of Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("article", { name: "Property Resolution" })).toBeNull());
+    await zoomToActualSize(screen.getByRole("region", { name: "Verification trace flow" }));
     fireEvent.click(screen.getByRole("button", { name: "Focus path through Property Projection" }));
     fireEvent.click(screen.getByRole("button", { name: "Expand flow" }));
     const overlay = screen.getByRole("dialog", { name: "Expanded verification trace flow" });
@@ -450,8 +459,10 @@ describe("Explorer flow integration", () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Ontology Projection Verification/ }));
     await screen.findByRole("article", { name: "Property Projection" });
+    await zoomToActualSize(screen.getByRole("region", { name: "Verification trace flow" }));
     fireEvent.click(screen.getByRole("button", { name: /collapse ancestors of Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("article", { name: "Property Resolution" })).toBeNull());
+    await zoomToActualSize(screen.getByRole("region", { name: "Verification trace flow" }));
     fireEvent.click(screen.getByRole("button", { name: "Focus path through Property Projection" }));
     const horizontal = screen.getByRole("article", { name: "Property Projection" }).parentElement?.getAttribute("style");
     fireEvent.click(screen.getByRole("button", { name: "Top to bottom" }));
@@ -472,6 +483,7 @@ describe("Explorer flow integration", () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Split and Merge Trace Verification/ }));
     const source = await screen.findByRole("article", { name: "Source Parsing" });
+    await zoomToActualSize(screen.getByRole("region", { name: "Verification trace flow" }));
     expectPointerTarget(source);
     const sibling = screen.getByRole("article", { name: "Reference Resolution" });
     const merge = screen.getByRole("article", { name: "Normalized Model" });

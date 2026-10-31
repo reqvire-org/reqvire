@@ -321,7 +321,7 @@ Verify combined Repo model publication through the existing Explorer runtime and
 #### Relations
   * derivedFrom: [Web Explorer Interface Verification Objective](#web-explorer-interface-verification-objective)
   * satisfiedBy: [browser-repo.mjs](../../../../tests/test-mcp-repo-workspaces/browser-repo.mjs)
-  * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [check_repo_workspaces.sh](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
   * verify: [Explorer Worktree Runtime Isolation](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-runtime-isolation)
   * verify: [Explorer Worktree Selection](../../../Interfaces/WebExplorer/Capabilities.md#explorer-worktree-selection)
 ---

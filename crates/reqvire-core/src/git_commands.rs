@@ -1,10 +1,73 @@
 use crate::error::ReqvireError;
 use rustc_hash::FxHashMap;
 use std::collections::{BTreeMap, BTreeSet};
+use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex};
+
+/// Core Git execution for local metadata and immutable objects.
+///
+/// Callers that
+/// need bounded writes/cancellation supply their own runner to GitReader.
+/// Neither lazy object fetching nor any Git transport is permitted here.
+pub fn run_local(
+    directory: &Path,
+    args: &[&str],
+    input: Option<&[u8]>,
+) -> Result<Vec<u8>, ReqvireError> {
+    let mut command = Command::new("git");
+    command
+        .current_dir(directory)
+        .args(["-c", "protocol.allow=never"])
+        .args(args)
+        .env("GIT_TERMINAL_PROMPT", "0")
+        .env("GIT_NO_LAZY_FETCH", "1")
+        .env("GIT_ALLOW_PROTOCOL", "")
+        .stdin(if input.is_some() {
+            Stdio::piped()
+        } else {
+            Stdio::null()
+        });
+    let output = if let Some(input) = input {
+        let mut process = command
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
+        let mut stdin = process
+            .stdin
+            .take()
+            .ok_or_else(|| git_error("Missing Git object input"))?;
+        let bytes = input.to_vec();
+        let writer = std::thread::spawn(move || stdin.write_all(&bytes));
+        let output = process.wait_with_output()?;
+        writer
+            .join()
+            .map_err(|_| git_error("Git object writer failed"))??;
+        output
+    } else {
+        command.output()?
+    };
+    if !output.status.success() {
+        return Err(git_error(format!(
+            "Git in {}: {}",
+            directory.display(),
+            String::from_utf8_lossy(&output.stderr).trim()
+        )));
+    }
+    Ok(output.stdout)
+}
+
+pub fn local_bytes(directory: &Path, args: &[&str]) -> Result<Vec<u8>, ReqvireError> {
+    run_local(directory, args, None)
+}
+
+pub fn local_text(directory: &Path, args: &[&str]) -> Result<String, ReqvireError> {
+    String::from_utf8(local_bytes(directory, args)?)
+        .map(|text| text.trim_end_matches(['\r', '\n']).to_owned())
+        .map_err(|e| git_error(e.to_string()))
+}
 
 /// Read-only Git plumbing with the caller's execution policy. MCP supplies its
 /// bounded, binary-safe runner; repository parsing stays in this shared layer.
@@ -261,6 +324,9 @@ pub fn get_repository_base_url() -> Result<String, ReqvireError> {
 
 /// Retrieves the current commit hash from the repository.
 pub fn get_commit_hash() -> Result<String, ReqvireError> {
+    if let Some((head, _)) = crate::mutation_io::git_identity() {
+        return Ok(head);
+    }
     let mut cached = COMMIT_HASH.lock().expect("mutex not poisoned");
     if let Some(ref hash) = *cached {
         return Ok(hash.clone());
@@ -292,6 +358,9 @@ pub fn get_commit_hash() -> Result<String, ReqvireError> {
 
 /// Retrieves the current Git branch name.
 pub fn get_branch_name() -> Result<String, ReqvireError> {
+    if let Some((_, branch)) = crate::mutation_io::git_identity() {
+        return Ok(branch);
+    }
     let mut cached = BRANCH_NAME.lock().expect("mutex not poisoned");
     if let Some(ref branch) = *cached {
         return Ok(branch.clone());
@@ -499,4 +568,70 @@ pub fn ls_tree_commit_in_folder(
             commit, folder
         )
     })
+}
+
+#[cfg(test)]
+mod local_reader_tests {
+    use super::*;
+
+    #[test]
+    fn shared_reader_round_trips_binary_objects_and_modes() {
+        let directory = tempfile::tempdir().expect("Git reader fixture");
+        let root = directory.path();
+        local_bytes(root, &["init", "--quiet"]).expect("Git reader fixture");
+        local_bytes(root, &["config", "user.name", "Git reader test"]).expect("Git reader fixture");
+        local_bytes(root, &["config", "user.email", "reader@example.invalid"])
+            .expect("Git reader fixture");
+        let payload: Vec<u8> = (0..262_144).map(|n| (n % 256) as u8).collect();
+        let oid = String::from_utf8(
+            run_local(root, &["hash-object", "-w", "--stdin"], Some(&payload))
+                .expect("Git reader fixture"),
+        )
+        .expect("Git reader fixture");
+        let oid = oid.trim();
+        for (name, mode) in [("payload.bin", "100644"), ("executable.bin", "100755")] {
+            local_bytes(
+                root,
+                &[
+                    "update-index",
+                    "--add",
+                    "--cacheinfo",
+                    &format!("{mode},{oid},{name}"),
+                ],
+            )
+            .expect("Git reader fixture");
+        }
+        let tree = local_text(root, &["write-tree"]).expect("Git reader fixture");
+        let commit = local_text(root, &["commit-tree", &tree, "-m", "binary fixture"])
+            .expect("Git reader fixture");
+        let paths = BTreeSet::from([root.join("payload.bin"), root.join("executable.bin")]);
+        let mut calls = Vec::new();
+        let files = GitReader::new(root, |args: &[&str], input| {
+            calls.push(args.first().copied().unwrap_or_default().to_owned());
+            run_local(root, args, input)
+        })
+        .regular_files_at_commit(&commit, &paths)
+        .expect("Git reader fixture");
+        assert_eq!(calls, ["ls-tree", "cat-file"]);
+        assert_eq!(*files[&root.join("payload.bin")].bytes, payload);
+        assert_eq!(
+            files[&root.join("payload.bin")].bytes,
+            files[&root.join("executable.bin")].bytes
+        );
+        assert!(!files[&root.join("payload.bin")].executable);
+        assert!(files[&root.join("executable.bin")].executable);
+    }
+
+    #[test]
+    fn local_runner_disallows_transports_even_for_file_remotes() {
+        let directory = tempfile::tempdir().expect("Git reader fixture");
+        local_bytes(directory.path(), &["init", "--quiet"]).expect("Git reader fixture");
+        let remote = format!("file://{}", directory.path().display());
+        let error = local_bytes(directory.path(), &["ls-remote", &remote])
+            .expect_err("transports disabled");
+        assert!(
+            error.to_string().contains("transport 'file' not allowed"),
+            "{error}"
+        );
+    }
 }

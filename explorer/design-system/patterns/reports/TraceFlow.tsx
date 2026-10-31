@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "preact/hooks";
 import { css, cx } from "@linaria/atomic";
 import {
-  BaseEdge, Handle, MarkerType, Position, ReactFlow, getViewportForBounds,
+  BaseEdge, Handle, MarkerType, Position, ReactFlow, getViewportForBounds, useStore,
   type Edge, type EdgeProps, type Node, type NodeProps, type ReactFlowInstance,
 } from "@xyflow/react";
 import { flowCanvasClasses } from "../graphs/FlowCanvasSkin/FlowCanvasSkin";
@@ -240,8 +240,14 @@ function TraceEdge({ id, data, label, markerStart, markerEnd }: EdgeProps<FlowEd
 }
 const EDGE_TYPES = { trace: TraceEdge };
 
+// Footer controls are --control-height-sm (28px) in graph space. Below this zoom they
+// would render under the 24px pointer-target minimum (WCAG 2.5.8), so overview zooms
+// show cards without them; zooming in (or 100%) brings them back.
+const MIN_CONTROL_ZOOM = 24 / 28;
+
 function TraceNode({ data }: NodeProps<FlowNode>) {
   const { element } = data;
+  const controlsShown = useStore(state => state.transform[2] >= MIN_CONTROL_ZOOM);
   return <article className="ux-trace-flow-node nodrag nopan" aria-label={element.name}
     data-focused={data.focused} data-dimmed={data.dimmed}
     onMouseEnter={() => data.onPreview(true)} onMouseLeave={() => data.onPreview(false)}
@@ -262,9 +268,9 @@ function TraceNode({ data }: NodeProps<FlowNode>) {
       onClick={event => { event.preventDefault(); data.onOpenSource(element); }}>
       <Icon name="file-text" size={13} /><span>{element.file.split("/").pop()}</span>
       </a>
-      <IconButton size="sm" tone="ghost" aria-label={`Focus path through ${element.name}`} title="Focus path"
-        aria-pressed={data.focused} onClick={data.onFocusPath}><Icon name="target" /></IconButton>
-      {data.parentCount > 0 && <Button size="sm" tone="ghost" aria-expanded={!data.collapsed}
+      {controlsShown && <IconButton size="sm" tone="ghost" aria-label={`Focus path through ${element.name}`} title="Focus path"
+        aria-pressed={data.focused} onClick={data.onFocusPath}><Icon name="target" /></IconButton>}
+      {controlsShown && data.parentCount > 0 && <Button size="sm" tone="ghost" aria-expanded={!data.collapsed}
         aria-label={`${data.parentCount} ${data.parentCount === 1 ? "parent" : "parents"}: ${data.collapsed ? "expand" : "collapse"} ancestors of ${element.name}`}
         iconLeft={<Icon name={data.collapsed ? "chevron-right" : "chevron-down"} size={13} />}
         onClick={data.onToggle}>

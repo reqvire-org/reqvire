@@ -24,7 +24,7 @@ impl WorkspaceScope {
             }
         }
         if let Some(manifest) = crate::repo_workspace::selected_manifest(&root)? {
-            let owner = crate::repo_workspace::git_text(&root, &["rev-parse", "--show-toplevel"])?;
+            let owner = crate::git_commands::local_text(&root, &["rev-parse", "--show-toplevel"])?;
             if Path::new(&owner).canonicalize()? != root {
                 return Err(ReqvireError::PathError(
                     "Repo mode requires Central's Git worktree at the workspace root".into(),
@@ -102,6 +102,16 @@ impl WorkspaceScope {
         }
     }
 
+    pub fn comparison_git_root(&self) -> Result<&PathBuf, ReqvireError> {
+        if self.git_worktrees.len() != 1 {
+            return Err(ReqvireError::GitCommandError(format!(
+                "Git commit comparison requires exactly one eligible Git worktree; found {}",
+                self.git_worktrees.len()
+            )));
+        }
+        Ok(&self.git_worktrees[0])
+    }
+
     pub fn is_eligible_path(&self, path: &Path) -> bool {
         let absolute = absolute_logical_path(path);
         if self.repo.is_some() {
@@ -144,7 +154,7 @@ impl WorkspaceScope {
     pub fn owned_files(&self) -> Result<Vec<PathBuf>, ReqvireError> {
         let mut files = std::collections::BTreeSet::new();
         for owner in &self.git_worktrees {
-            let paths = crate::repo_workspace::git_text(
+            let paths = crate::git_commands::local_text(
                 owner,
                 &[
                     "ls-files",

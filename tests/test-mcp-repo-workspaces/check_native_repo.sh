@@ -54,23 +54,22 @@ native_cli_names() {
 }
 
 native_server_names() {
-    local mode=$1 callback=${2:-} port server_pid ready=false
-    # Python is used only to allocate the server's listening port.
-    port=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1])')
+    local mode=$1 callback=${2:-} server_url server_pid ready=false
     local options=()
     if [[ "$mode" == serve ]]; then options+=(--enable-mcp); fi
     (
         cd "$central"
-        exec "$REQVIRE_BIN" "$mode" --host 127.0.0.1 --port "$port" \
+        exec "$REQVIRE_BIN" "$mode" --host 127.0.0.1 --port 0 \
             --enable-mutations "${options[@]}"
     ) > "$native_case/$mode-server.log" 2>&1 &
     server_pid=$!
     trap "kill $server_pid 2>/dev/null || true; wait $server_pid 2>/dev/null || true" EXIT
     for ((attempt=0; attempt<200; attempt++)); do
-        if curl -fsS --max-time 1 -D "$native_case/$mode-headers" \
+        server_url=$(sed -n 's@.*\(http://127\.0\.0\.1:[0-9][0-9]*/mcp\).*@\1@p' "$native_case/$mode-server.log" | head -n 1)
+        if [[ -n "$server_url" ]] && curl -fsS --max-time 1 -D "$native_case/$mode-headers" \
             -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
             -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"native-repo-e2e","version":"1"}}}' \
-            "http://127.0.0.1:$port/mcp" > "$native_case/$mode-initialize.json" 2>/dev/null; then
+            "$server_url" > "$native_case/$mode-initialize.json" 2>/dev/null; then
             ready=true
             break
         fi
@@ -84,7 +83,7 @@ native_server_names() {
         -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
         -H "Mcp-Session-Id: $session" \
         -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"reqvire.search","arguments":{"branch":"main"}}}' \
-        "http://127.0.0.1:$port/mcp" > "$native_case/$mode-search.json"
+        "$server_url" > "$native_case/$mode-search.json"
     jq -e '.result.isError != true' "$native_case/$mode-search.json" >/dev/null
     jq '[.result.structuredContent.files[].elements[].name] | sort' \
         "$native_case/$mode-search.json" > "$native_case/$mode-names.json"
@@ -99,7 +98,7 @@ native_rpc() {
     curl -fsS --max-time 30 \
         -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
         -H "Mcp-Session-Id: $session" --data-binary "@$1" \
-        "http://127.0.0.1:$port/mcp" > "$2"
+        "$server_url" > "$2"
     jq -e '.result.isError != true and .error == null' "$2" >/dev/null || { cat "$2"; return 1; }
 }
 
@@ -114,17 +113,63 @@ native_pin_mutation() {
     native_rpc "$native_case/commit.json" "$native_case/commit-result.json"
 }
 
+native_prepare_authoring() {
+    local owner source relative owner_relative commit repository branch owner_identity root_identity
+    local records="$native_case/manifest-sources.jsonl"
+    : > "$records"
+    for owner in "$central/.repo/manifests" "$central/.repo/local_manifests"; do
+        [[ -d "$owner" ]] || continue
+        if [[ "$(git -C "$owner" rev-parse --show-toplevel 2>/dev/null)" != "$owner" ]]; then
+            git -C "$owner" init -qb main
+            git -C "$owner" remote add origin "file://$native_case/remotes/$(basename "$owner")"
+        fi
+        branch=main
+        owner_identity=$(git -C "$owner" remote get-url origin)
+        root_identity=$(git -C "$central" remote get-url origin)
+        if [[ "${owner_identity#file://}" == "${root_identity#file://}" ]]; then
+            branch=reqvire/manifests/main
+        fi
+        git -C "$owner" checkout -q -B "$branch"
+        git -C "$owner" add .
+        if ! git -C "$owner" diff --cached --quiet; then
+            git -C "$owner" -c commit.gpgSign=false commit -qm 'Prepare versioned native authoring inputs'
+        fi
+    done
+    git -C "$central/repositories/component" checkout -q -B main "$alpha"
+    for source in "$native" "$central/.repo/manifests/parts/projects.xml" "$central/.repo/local_manifests/pins.xml"; do
+        [[ -f "$source" ]] || continue
+        owner=$(git -C "$(dirname "$source")" rev-parse --show-toplevel)
+        relative=${source#"$owner"/}
+        owner_relative=${owner#"$central"/}
+        commit=$(git -C "$owner" rev-parse HEAD)
+        repository=$(git -C "$owner" remote get-url origin)
+        jq -cn --arg path "${source#"$central"/}" --arg owner "$owner_relative" \
+            --arg source "$relative" --arg commit "$commit" --arg repository "$repository" \
+            '{path:$path,owner:$owner,source:$source,commit:$commit,repository:$repository}' >> "$records"
+    done
+    jq -s '{schema_version:1,selection:".repo/manifest.xml",manifest:".repo/manifests/default.xml",
+        sources:sort_by(.path)}' "$records" > "$central/.reqvire-composition.json"
+    git -C "$central" add .reqvire-composition.json
+    if ! git -C "$central" diff --cached --quiet; then
+        git -C "$central" -c commit.gpgSign=false commit -qm 'Record native authoring composition'
+    fi
+}
+
 native_repo_pin_checkpoint() {
     cp "$central/.repo/manifest.xml" "$native_case/expected-wrapper.xml"
     cp "$native" "$native_case/expected-includes.xml"
     central_head=$(git -C "$central" rev-parse HEAD)
+    manifest_head=$(git -C "$central/.repo/manifests" rev-parse HEAD)
     native_pin_mutation
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
     jq -e --arg saved "$saved" '.result.structuredContent.context.projects[] | select(.name == "component") | .revision == $saved' \
         "$native_case/commit-result.json" >/dev/null
     test "$saved" != "$alpha"
     test "$(git -C "$central/repositories/component" rev-parse HEAD^)" = "$alpha"
-    test "$(git -C "$central" rev-parse HEAD)" = "$central_head"
+    test "$(git -C "$central" rev-parse HEAD)" != "$central_head"
+    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" != "$manifest_head"
+    test -z "$(git -C "$central/.repo/manifests" status --porcelain)"
+    test -z "$(git -C "$central/.repo/local_manifests" status --porcelain)"
     diff -u "$native_case/expected-wrapper.xml" "$central/.repo/manifest.xml"
     diff -u "$native_case/expected-includes.xml" "$native"
     grep -q "revision=\"$saved\"" "$central/.repo/manifests/parts/projects.xml"
@@ -204,6 +249,7 @@ active_repo_manifest() {
     mv "$central/.repo/manifest.xml" "$native_case/generated-wrapper.xml"
     ln -s manifests/default.xml "$central/.repo/manifest.xml"
     native_cli_names
+    native_prepare_authoring
     native_server_names serve
     # The CLI and embedded server cover the legacy symlink. Use the generated
     # entry for the shared MCP loading/pin-save sequence below.
@@ -228,6 +274,7 @@ active_repo_manifest() {
     test ! -e "$central/default.xml"
     test -z "$(git -C "$central" status --porcelain)"
     git -C "$central/repositories/component" checkout -q --detach "$alpha"
+    native_prepare_authoring
     native_server_names mcp active_repo_session
 }
 
@@ -240,10 +287,12 @@ standalone_repo_manifest() {
     mv "$native_case/download.xml" "$native_case/expected-manifest.xml"
     (cd "$central" && repo manifest -o "$native_case/repo-manifest.xml")
     native_cli_names
+    native_prepare_authoring
     native_server_names serve
     diff -u "$native_case/expected-manifest.xml" "$native"
     test ! -e "$central/default.xml"
     test -z "$(git -C "$central" status --porcelain)"
+    native_prepare_authoring
     native_server_names mcp standalone_repo_session
 }
 

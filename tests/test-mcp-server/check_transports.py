@@ -386,8 +386,8 @@ def mutation(binary, folder):
     with Stdio(binary, root, folder / "stdio", "--enable-mutations") as server:
         compare(expected, mutation_catalogs(server), "mutation catalog parity")
         before = (root / "Model.md").read_bytes()
-        require(call(server, "reqvire.tool_contract")["tool_contract_version"] == "4",
-                "branch tools require tool contract version 4")
+        require(call(server, "reqvire.tool_contract")["tool_contract_version"] == "5",
+                "composition tools require tool contract version 5")
         branch = next(row["branch"] for row in call(server, "reqvire.branch.list")["worktrees"]
                       if row.get("original"))
         for operation, args in (

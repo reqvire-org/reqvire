@@ -69,8 +69,15 @@ remotes. Full browser coverage needs a browser:
 cd explorer
 bun --bun x --no-install playwright install --with-deps chromium --only-shell
 cd ..
-REQVIRE_TEST_BROWSER=/absolute/path/to/chrome-headless-shell ./tests/run_all.sh
+REQVIRE_BIN="$PWD/target/debug/reqvire" \
+  REQVIRE_TEST_BROWSER=/absolute/path/to/chrome-headless-shell ./tests/run_all.sh
 ```
+
+These commands explicitly select the debug binary built by `make build`.
+Without `REQVIRE_BIN`, the runner uses `target/release/reqvire`; use `make e2e`
+to rebuild that binary before running the full suite. Each run prints and
+copies its selected executable, so a later rebuild does not update a run
+already in progress.
 
 For the public website:
 

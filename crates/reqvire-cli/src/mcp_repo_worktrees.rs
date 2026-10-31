@@ -3,6 +3,7 @@
 use crate::{mcp_process::git, mcp_session::require_clean};
 use reqvire::{
     error::ReqvireError,
+    repo_composition::{owner_cache_key, CompositionRecord},
     repo_workspace::{normalize_url, resolve_revision, RepoProject, RepoWorkspace},
 };
 use std::{
@@ -26,33 +27,58 @@ fn cache_path(common: &Path, project: &RepoProject) -> PathBuf {
         )))
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
-struct NativeManifestSnapshot {
-    head: String,
-    manifest: PathBuf,
-    inputs: std::collections::BTreeMap<PathBuf, Vec<u8>>,
-}
-
-fn manifest_cache(root: &Path, common: &Path, selection: &Path) -> Result<PathBuf, ReqvireError> {
-    let branch = git(root, &["symbolic-ref", "--quiet", "HEAD"])?;
-    Ok(common
-        .join("reqvire-repo-manifests")
-        .join(reqvire::utils::hash_content(&format!(
-            "{branch}:{}",
-            selection.display()
-        ))))
-}
-
 fn prepare_native_manifest(
     source: &Path,
     target: &Path,
-    common: &Path,
+    _common: &Path,
     view: &RepoWorkspace,
+    creating: bool,
 ) -> Result<(), ReqvireError> {
     let metadata = target.join(".repo");
-    let manifests = metadata.join("manifests");
-    let origin = source.join(".repo/manifests");
-    if origin.join(".git").exists() {
+    let head = git(target, &["rev-parse", "HEAD"])?;
+    let record = match CompositionRecord::at_commit(target, &head, &view.selection)? {
+        Some(record) => record,
+        None if head == view.central_commit => CompositionRecord::capture(view)?,
+        None => return Err(error(format!(
+            "Native manifest composition at {head} is unavailable; record its owning revisions in .reqvire-composition.json before preparing this branch"
+        ))),
+    };
+    let branch = git(target, &["symbolic-ref", "--short", "HEAD"])?;
+    let mut owners = std::collections::BTreeSet::new();
+    for selected in &record.sources {
+        if selected.owner.as_os_str().is_empty() || !owners.insert(selected.owner.clone()) {
+            continue;
+        }
+        let objects = record.object_source(source, view, selected)?;
+        let owner_branch = if !selected.repository.is_empty()
+            && normalize_url(&selected.repository) == normalize_url(&view.central_repository)
+        {
+            format!("reqvire/manifests/{branch}")
+        } else {
+            branch.clone()
+        };
+        if creating
+            && git(
+                &objects,
+                &[
+                    "show-ref",
+                    "--verify",
+                    &format!("refs/heads/{owner_branch}"),
+                ],
+            )
+            .is_ok()
+        {
+            return Err(error(format!(
+                "Manifest owner {} branch {owner_branch} already exists",
+                selected.owner.display()
+            )));
+        }
+        let destination = target.join(&selected.owner);
+        fs::create_dir_all(
+            destination
+                .parent()
+                .ok_or_else(|| error("Manifest owner has no parent"))?,
+        )?;
         git(
             target,
             &[
@@ -61,81 +87,53 @@ fn prepare_native_manifest(
                 "--shared",
                 "--no-checkout",
                 "--",
-                path_text(&origin)?,
-                path_text(&manifests)?,
+                path_text(&objects)?,
+                path_text(&destination)?,
             ],
         )?;
-        fs::rename(manifests.join(".git"), metadata.join("manifests.git"))?;
-        fs::write(manifests.join(".git"), "gitdir: ../manifests.git\n")?;
-    } else {
-        fs::create_dir_all(&manifests)?;
+        if selected.owner == Path::new(".repo/manifests") {
+            fs::rename(destination.join(".git"), metadata.join("manifests.git"))?;
+            fs::write(destination.join(".git"), "gitdir: ../manifests.git\n")?;
+        }
+        if !selected.repository.is_empty() {
+            git(
+                &destination,
+                &["remote", "set-url", "origin", &selected.repository],
+            )?;
+        }
         git(
-            target,
+            &destination,
             &[
-                "init",
+                "checkout",
                 "--quiet",
-                "--bare",
-                path_text(&metadata.join("manifests.git"))?,
+                "-B",
+                &owner_branch,
+                selected
+                    .commit
+                    .as_deref()
+                    .expect("validated owner revision"),
             ],
         )?;
     }
-    let mut snapshot = NativeManifestSnapshot {
-        head: git(target, &["rev-parse", "HEAD"])?,
-        manifest: view.manifest.clone(),
-        inputs: view.inputs.clone(),
-    };
-    let cached = manifest_cache(target, common, &view.selection)?;
-    if cached.is_file() {
-        let retained: NativeManifestSnapshot = serde_json::from_slice(&fs::read(cached)?)
-            .map_err(|e| error(format!("Invalid retained Repo manifest: {e}")))?;
-        if retained.head == snapshot.head {
-            snapshot = retained;
-        }
-    }
-    let entry = snapshot
-        .inputs
-        .get(Path::new(".repo/manifest.xml"))
-        .cloned();
-    for (path, bytes) in snapshot.inputs {
-        if !path.starts_with(".repo")
-            || path
-                .components()
-                .any(|c| !matches!(c, std::path::Component::Normal(_)))
-        {
-            return Err(error(
-                "Native Repo manifest input is outside Repo administration",
-            ));
-        }
-        if path == Path::new(".repo/manifest.xml") {
-            continue;
-        }
+    for (path, bytes) in record.historical_inputs(source, &head, view)? {
         let destination = target.join(path);
-        fs::create_dir_all(
-            destination
-                .parent()
-                .ok_or_else(|| error("Manifest input has no parent"))?,
-        )?;
-        fs::write(destination, bytes)?;
+        if fs::read(&destination).ok().as_deref() != Some(bytes.as_slice()) {
+            return Err(error(format!(
+                "Prepared manifest {} differs from its recorded owner tree",
+                destination.display()
+            )));
+        }
     }
-    if snapshot.manifest == Path::new(".repo/manifest.xml") {
-        fs::write(
-            metadata.join("manifest.xml"),
-            entry
-                .as_ref()
-                .ok_or_else(|| error("Native Repo entry input is unavailable"))?,
-        )?;
-    } else {
-        let selected = snapshot
-            .manifest
-            .strip_prefix(".repo/manifests")
-            .map(Path::to_path_buf)
-            .unwrap_or_else(|_| target.join(&snapshot.manifest));
-        let selected = quick_xml::escape::escape(path_text(&selected)?);
-        fs::write(
-            metadata.join("manifest.xml"),
-            format!("<manifest><include name=\"{selected}\"/></manifest>\n"),
-        )?;
-    }
+    let selected = record
+        .manifest
+        .strip_prefix(".repo/manifests")
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|_| target.join(&record.manifest));
+    let selected = quick_xml::escape::escape(path_text(&selected)?);
+    fs::write(
+        metadata.join("manifest.xml"),
+        format!("<manifest><include name=\"{selected}\"/></manifest>\n"),
+    )?;
     Ok(())
 }
 
@@ -144,6 +142,7 @@ pub fn prepare(
     target: &Path,
     common: &Path,
     manifest: &Path,
+    creating: bool,
 ) -> Result<(), ReqvireError> {
     if target.join(".repo").exists() {
         return Ok(());
@@ -166,7 +165,7 @@ pub fn prepare(
     )?;
     let manifests = metadata.join("manifests");
     if source_view.uses_repo_managed_inputs() {
-        prepare_native_manifest(source, target, common, &source_view)?;
+        prepare_native_manifest(source, target, common, &source_view, creating)?;
     } else {
         git(
             target,
@@ -233,6 +232,19 @@ pub fn prepare(
             return Err(error(format!("Manifest {}, project {}: selected objects are unavailable locally; no fetch was attempted", manifest.display(), project.path.display())));
         };
         let destination = target.join(&project.path);
+        let branch = git(target, &["symbolic-ref", "--short", "HEAD"])?;
+        if creating
+            && git(
+                &objects,
+                &["show-ref", "--verify", &format!("refs/heads/{branch}")],
+            )
+            .is_ok()
+        {
+            return Err(error(format!(
+                "Project {} branch {branch} already exists",
+                project.path.display()
+            )));
+        }
         fs::create_dir_all(
             destination
                 .parent()
@@ -256,7 +268,10 @@ pub fn prepare(
             &destination,
             &["remote", "set-url", &project.remote, &project.fetch_url],
         )?;
-        git(&destination, &["checkout", "--quiet", "--detach", &commit])?;
+        git(
+            &destination,
+            &["checkout", "--quiet", "-B", &branch, &commit],
+        )?;
     }
     RepoWorkspace::load(target, manifest.to_owned())?;
     Ok(())
@@ -294,22 +309,48 @@ pub fn retain(root: &Path, common: &Path, manifest: &Path) -> Result<RepoWorkspa
             )));
         }
     }
-    if view.uses_repo_managed_inputs() {
-        let snapshot = NativeManifestSnapshot {
-            head: git(root, &["rev-parse", "HEAD"])?,
-            manifest: view.manifest.clone(),
-            inputs: view.inputs.clone(),
-        };
-        let destination = manifest_cache(root, common, &view.selection)?;
-        fs::create_dir_all(
-            destination
-                .parent()
-                .ok_or_else(|| error("Manifest cache has no parent"))?,
+    let mut owners = std::collections::BTreeSet::new();
+    for selected in view.manifest_sources.values() {
+        if selected.root.as_os_str().is_empty() || !owners.insert(selected.root.clone()) {
+            continue;
+        }
+        let checkout = root.join(&selected.root);
+        require_clean(&checkout)?;
+        let cache = common
+            .join("reqvire-manifest-objects")
+            .join(owner_cache_key(&selected.repository, &selected.root));
+        if !cache.exists() {
+            fs::create_dir_all(
+                cache
+                    .parent()
+                    .ok_or_else(|| error("Manifest cache has no parent"))?,
+            )?;
+            git(common, &["init", "--quiet", "--bare", path_text(&cache)?])?;
+        }
+        if !selected.repository.is_empty() {
+            git(
+                &cache,
+                &["config", "remote.origin.url", &selected.repository],
+            )?;
+        }
+        let reference = format!("refs/reqvire/retained/{}", selected.commit);
+        git(
+            &cache,
+            &[
+                "fetch",
+                "--quiet",
+                "--no-tags",
+                "--",
+                path_text(&checkout)?,
+                &format!("{}:{reference}", selected.commit),
+            ],
         )?;
-        fs::write(
-            destination,
-            serde_json::to_vec(&snapshot).map_err(|e| error(e.to_string()))?,
-        )?;
+        if git(&cache, &["rev-parse", "--verify", &reference])? != selected.commit {
+            return Err(error(format!(
+                "Cannot retain manifest owner {} before removal",
+                selected.root.display()
+            )));
+        }
     }
     Ok(view)
 }

@@ -218,6 +218,99 @@ pub fn containment_hierarchy(
     ContainmentHierarchy::build(registry, short)
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ReviewBaseline {
+    pub commit: String,
+    pub source: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<String>,
+    #[serde(skip)]
+    pub reference: String,
+}
+
+/// Select a local review baseline before comparison; analysis never discovers
+/// PR metadata through network calls and never guesses the default branch.
+pub fn review_baseline(
+    model: &ModelManager,
+    explicit: Option<&str>,
+) -> Result<ReviewBaseline, ReqvireError> {
+    let scope = crate::mutation_io::workspace_scope()
+        .or_else(|| model.source_scope().cloned())
+        .map(Ok)
+        .unwrap_or_else(crate::workspace::WorkspaceScope::discover)?;
+    let root = &scope.root;
+    if scope.repo.is_none() {
+        scope.comparison_git_root()?;
+    }
+    let head = scope
+        .repo
+        .as_ref()
+        .map(|r| Ok(r.central_commit.clone()))
+        .unwrap_or_else(git_commands::get_commit_hash)?;
+    if let Some(reference) = explicit {
+        if reference.trim().is_empty() {
+            return Err(ReqvireError::ProcessError(
+                "Review baseline is empty".into(),
+            ));
+        }
+        let commit = if reference == "HEAD" {
+            head
+        } else {
+            git_commands::local_text(
+                root,
+                &[
+                    "rev-parse",
+                    "--verify",
+                    "--end-of-options",
+                    &format!("{reference}^0"),
+                ],
+            )?
+        };
+        return Ok(ReviewBaseline {
+            reference: if reference == "HEAD" && scope.repo.is_none() {
+                commit.clone()
+            } else {
+                reference.to_owned()
+            },
+            commit,
+            source: "explicit",
+            target: None,
+        });
+    }
+    let environment = std::env::var("GITHUB_BASE_REF")
+        .ok()
+        .filter(|v| !v.trim().is_empty());
+    let branch = git_commands::get_branch_name()?;
+    let configured = git_commands::local_text(
+        root,
+        &[
+            "config",
+            "--local",
+            "--get",
+            &format!("branch.{branch}.reqvireReviewBase"),
+        ],
+    )
+    .ok()
+    .filter(|v| !v.trim().is_empty());
+    let (target, source) = if let Some(target) = environment {
+        (target, "pr_environment")
+    } else if let Some(target) = configured {
+        (target, "pr_target")
+    } else {
+        return Err(ReqvireError::ProcessError("review_baseline_required: select the actual PR baseline with --git-commit / git_commit, or explicitly select HEAD to review pending changes; no PR review target is available locally".into()));
+    };
+    let target_commit = [target.clone(), format!("refs/remotes/origin/{target}")].iter()
+        .find_map(|reference| git_commands::local_text(root, &["rev-parse", "--verify", "--end-of-options", &format!("{reference}^{{commit}}")]).ok())
+        .ok_or_else(|| ReqvireError::ProcessError(format!("PR target {target} is unavailable locally; prepare its objects or select an explicit baseline; no fetch was attempted")))?;
+    let commit = git_commands::local_text(root, &["merge-base", &head, &target_commit])?;
+    Ok(ReviewBaseline {
+        reference: commit.clone(),
+        commit,
+        source,
+        target: Some(target),
+    })
+}
+
 pub fn change_impact_report(
     model: &ModelManager,
     git_commit: &str,

@@ -21,7 +21,7 @@ Use `reqvire.format` with `fix: false` for a read-only preview, or `fix: true` t
 
 CLI retains validation, lint inspection, coverage, discovery/reports, artifact exports, managed-query inspection, server startup, and `migrate` preview/`--fix`. Incompatible source must be migrated through CLI before validated MCP startup. There is no MCP `validate` or `migrate` tool and no validation-bypass recovery server.
 
-For mutation-enabled branch sessions, tool contract version 4 uses exact local `branch` on context-bound MCP tools and prompts, and percent-encoded `?branch=...` on MCP resources. Open/create branches explicitly; use `from_branch` for an admitted source of a relative creation base. Keep the same branch across reads, previews and applies. Opaque worktree IDs remain private runtime/cache identity; public responses and Explorer URLs/routes use branches. Inspect discovery/version before using this contract with an older build.
+For mutation-enabled branch sessions, tool contract version 5 uses exact local `branch` on context-bound MCP tools and prompts, and percent-encoded `?branch=...` on MCP resources. Open/create branches explicitly; use `from_branch` for an admitted source of a relative creation base. The same operations apply to single repositories and declared Repo compositions. Keep the same branch across reads, previews and applies. Worktrees and opaque IDs remain private implementation details. Inspect discovery/version before using this contract with an older build.
 
 ## Environment Setup
 
@@ -33,7 +33,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Run from the intended effective workspace root, or pass that root with `--workspace`. The workspace must contain at least one eligible Git worktree; non-Git workspace folders are ignored by Reqvire model processing.
 
-For historical impact, ordinary Git mode requires one eligible worktree. A distributed model needs a versioned Google Repo composition, declared projects and locally available history. One workspace-root repository commit identifies its model, historical manifest and component pins. Select a manifest tracked in that repository; independent manifest history cannot supply a complete baseline from that commit. See Change Impact before choosing a ref.
+For historical impact, ordinary Git mode requires one eligible worktree. A distributed model uses native `.repo/manifest.xml`, versioned manifest owners, exact pins and locally available history. A root composition record associates the selected root revision with manifest-owner commits; no duplicate root XML or routine override is required. Independent owner history is supported. Omitted baselines use available PR review context; otherwise ask for the intended baseline. Explicit HEAD reviews pending changes. See Change Impact before choosing a ref.
 
 ## Reference Documents
 

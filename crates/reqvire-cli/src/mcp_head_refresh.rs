@@ -13,6 +13,104 @@ pub(super) fn observe_policy(root: &Path) {
 }
 
 impl MutationSession {
+    pub fn composition_base(&self, reference: &str) -> Result<Value, ReqvireError> {
+        let scope = self
+            .files
+            .workspace
+            .as_ref()
+            .expect("accepted workspace scope");
+        let repo = scope
+            .repo
+            .as_ref()
+            .ok_or_else(|| error("No declared repository composition"))?;
+        let (_, comparison) =
+            reqvire::repo_impact::historical_model(scope, repo, reference, &self.exclusions)?;
+        Ok(serde_json::to_value(comparison.base)?)
+    }
+
+    /// Explicit full admission keeps the live owner and old accepted snapshot
+    /// until the prepared candidate has passed all checks.
+    pub fn readmit(&mut self) -> Result<Value, ReqvireError> {
+        if self.recovery_error.is_some() || self.recovery_attempt.is_some() {
+            return Err(error(
+                "Composition admission cannot bypass recorded commit recovery",
+            ));
+        }
+        if !self.pending_paths.is_empty() {
+            return Err(error(
+                "Commit or resolve accepted pending changes before composition admission",
+            ));
+        }
+        let observed = GitObservation::read(&self.root)?;
+        if observed.checkout.branch.as_deref() != Some(&self.branch)
+            || observed.checkout.head.is_none()
+            || observed.dirty
+            || git_operation_in_progress(&self.root)?
+        {
+            return Err(error("Composition admission requires the clean committed owned branch and no in-progress Git operation"));
+        }
+        let head = observed.checkout.head.expect("checked named commit");
+        let exclusions = self.exclusions.refreshed();
+        let loaded = load_snapshot(&self.root, &self.branch, &head, &exclusions, self.options)?;
+        let scope = loaded
+            .files
+            .workspace
+            .as_ref()
+            .expect("loaded workspace scope");
+        if (scope.git_worktrees.len() != 1 && scope.repo.is_none())
+            || scope.git_worktrees[0] != self.root
+        {
+            return Err(error("Composition admission requires one owning root worktree and explicitly declared components"));
+        }
+        if let Some(workspace) = scope
+            .repo
+            .as_ref()
+            .filter(|workspace| workspace.uses_repo_managed_inputs())
+        {
+            let record = reqvire::repo_composition::CompositionRecord::at_commit(&self.root, &head, &workspace.selection)?
+                .ok_or_else(|| error("Prepared native composition needs a committed .reqvire-composition.json revision association before explicit admission"))?;
+            record.matches_workspace(workspace)?;
+        }
+        let mut next_repo = loaded
+            .files
+            .workspace
+            .as_ref()
+            .and_then(|scope| scope.repo.as_ref())
+            .map(|workspace| {
+                repo::RepoSession::replacement(&self.root, workspace, self.repo.as_ref())
+            })
+            .transpose()?;
+        if !loaded.inputs.is_current() {
+            return Err(error(
+                "Composition inputs changed during validated admission",
+            ));
+        }
+        if let Some(next) = &next_repo {
+            next.check(&self.root)?;
+        }
+        let checkout = GitCheckout::read(&self.root)?;
+        if checkout.branch.as_deref() != Some(&self.branch)
+            || checkout.head.as_deref() != Some(&head)
+        {
+            return Err(error("Branch or HEAD changed during composition admission"));
+        }
+        if let (Some(next), Some(previous)) = (&mut next_repo, &mut self.repo) {
+            next.retain_previous_locks(previous);
+        }
+        self.repo = next_repo;
+        self.files = loaded.files;
+        self.committed_files = self.files.clone();
+        self.model = loaded.model;
+        self.model_revision = loaded.model_revision;
+        self.inputs = loaded.inputs;
+        self.exclusions = exclusions;
+        self.head = head;
+        reqvire::model_cache::invalidate();
+        Ok(
+            json!({"outcome":"admitted","accepted_head":self.head,"model_revision":self.model_revision}),
+        )
+    }
+
     fn input_blockers(&self, exclusions: &ExclusionSet) -> Vec<Value> {
         let mut blockers = Vec::new();
         let path_label = |p: &Path| {
@@ -81,7 +179,9 @@ impl MutationSession {
         if let Some(repo) = &self.repo {
             if repo.check(&self.root).is_err()
                 || repo.workspace.inputs.iter().any(|(path, bytes)| {
-                    std::fs::read(self.root.join(path)).ok().as_deref() != Some(bytes.as_slice())
+                    path != Path::new(".repo/manifests.git/config")
+                        && std::fs::read(self.root.join(path)).ok().as_deref()
+                            != Some(bytes.as_slice())
                 })
             {
                 return Ok(Self::rejected(result, state_block("manifest_or_project_changed", "Restore the accepted Repo selection or use full validated worktree admission.")));

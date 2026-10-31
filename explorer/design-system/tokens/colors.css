@@ -318,10 +318,12 @@
     --color-role-rdf-shacl-border:     color-mix(in srgb, var(--color-role-rdf-shacl) 34%, var(--border-default));
 
     /* ── Status ─────────────────────────────────────────────────── */
-    --success: var(--color-green-9);
+    --success-light: var(--color-green-10-light);
+    --success-dark: var(--color-green-9);
     --warning: var(--color-amber-9);
     --danger: var(--color-red-9);
-    --info: var(--color-blue-9);
+    --info-light: var(--color-blue-10-light);
+    --info-dark: var(--color-blue-9);
     --success-bg: color-mix(in oklch, var(--success) 15%, var(--bg-surface));
     --warning-bg: color-mix(in oklch, var(--warning) 15%, var(--bg-surface));
     --danger-bg:  color-mix(in oklch, var(--danger)  15%, var(--bg-surface));
@@ -330,10 +332,12 @@
     --warning-border: color-mix(in srgb, var(--warning) 34%, var(--border-default));
     --danger-border:  color-mix(in srgb, var(--danger)  34%, var(--border-default));
     --info-border:    color-mix(in srgb, var(--info)    34%, var(--border-default));
-    --success-fg: var(--color-paper);
+    --success-fg-light: var(--color-paper);
+    --success-fg-dark: var(--color-ink);
     --warning-fg: var(--color-ink);
     --danger-fg: var(--color-paper);
-    --info-fg: var(--color-paper);
+    --info-fg-light: var(--color-paper);
+    --info-fg-dark: var(--color-ink);
     --success-text: var(--color-green-11);
     --warning-text: var(--color-amber-11);
     --danger-text: var(--color-red-11);
@@ -391,7 +395,7 @@
     --text-muted-dark: var(--slate-7-dark);
     --text-faint-dark: var(--slate-6-dark);
     --text-inverse: var(--slate-1);
-    --text-link-light: var(--color-accent-9-light);
+    --text-link-light: var(--color-accent-10-light);
     --text-code-light: var(--slate-10-light);
     --text-link-dark: var(--color-accent-10-dark);
     --text-code-dark: var(--slate-9-dark);
@@ -401,7 +405,7 @@
 
     --border-subtle-light: var(--warm-6-light);
     --border-default-light: var(--warm-7-light);
-    --border-strong-light: var(--slate-7-light);
+    --border-strong-light: var(--slate-8-light);
     --border-subtle-dark: var(--warm-7-dark);
     --border-default-dark: var(--warm-9-dark);
     --border-strong-dark: var(--slate-6-dark);

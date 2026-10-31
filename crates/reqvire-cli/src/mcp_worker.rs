@@ -345,6 +345,21 @@ pub fn run() -> Result<(), ReqvireError> {
         let mut session = session.blocking_write();
         let mut response = match operation {
             "status" => json!({}),
+            "composition_base" => {
+                match session.composition_base(request["reference"].as_str().unwrap_or("")) {
+                    Ok(value) => json!({"result":value}),
+                    Err(failure) => json!({"error":failure.to_string()}),
+                }
+            }
+            "readmit" => match session.readmit() {
+                Ok(value) => {
+                    exclusions = session.exclusions().clone();
+                    let mut response = json!({"result":value});
+                    runtime_result(&session, &options, &mut response);
+                    response
+                }
+                Err(failure) => json!({"error":failure.to_string()}),
+            },
             "refresh_head" => {
                 match session.refresh_head(request["dry_run"].as_bool().unwrap_or(false)) {
                     Ok(value) => {

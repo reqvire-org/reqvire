@@ -75,7 +75,7 @@ def branch_contract(server, mode, original, child):
     contextual = [schema for name, schema in tools.items()
                   if name not in ('reqvire.tool_contract', 'reqvire.branch.list')]
     check(f'{mode}/branch-selector-catalog',
-          server.tool('reqvire.tool_contract')['tool_contract_version'] == '4'
+          server.tool('reqvire.tool_contract')['tool_contract_version'] == '5'
           and all('branch' in schema['properties'] and 'worktree_id' not in schema['properties']
                   and 'from_worktree_id' not in schema['properties'] for schema in contextual)
           and 'from_branch' in tools['reqvire.branch.create']['properties']

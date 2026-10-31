@@ -311,12 +311,12 @@ pub enum Commands {
 
     /// Analyze change impact and provide report
     #[clap(
-        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
+        override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Override the PR baseline; use HEAD for pending changes\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)"
     )]
     ChangeImpact {
-        /// Base Git commit (includes the historical manifest in Repo mode) [default: HEAD]
-        #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
-        git_commit: String,
+        /// Override the PR baseline; use HEAD explicitly for pending changes
+        #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
+        git_commit: Option<String>,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
@@ -1287,19 +1287,25 @@ pub async fn handle_command(
             git_commit,
             output,
         }) => {
+            let baseline = operations::review_baseline(&model_manager, git_commit.as_deref())?;
             let (report, base_url, current_commit) = operations::change_impact_report(
                 &model_manager,
-                &git_commit,
+                &baseline.reference,
                 excluded_filename_patterns,
             )?;
 
             if json {
-                let json_str = report.to_json_string(&base_url, &current_commit, &git_commit);
-                handle_json_output(&json_str, &output)?;
+                let mut value: serde_json::Value = serde_json::from_str(&report.to_json_string(
+                    &base_url,
+                    &current_commit,
+                    &baseline.commit,
+                ))?;
+                value["baseline_selection"] = serde_json::to_value(baseline)?;
+                handle_json_output(&serde_json::to_string_pretty(&value)?, &output)?;
             } else {
                 println!(
                     "{}",
-                    report.to_text(&base_url, &current_commit, &git_commit)
+                    report.to_text(&base_url, &current_commit, &baseline.commit)
                 );
             }
 

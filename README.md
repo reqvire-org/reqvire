@@ -112,28 +112,31 @@ Reqvire follows Repo's active `.repo/manifest.xml`, its manifest checkout and
 local overlays, including standalone manifests. No duplicate root manifest is
 needed. Use `--manifest` only to select another manifest file location; its
 format, Git ownership and history stay the same. Keep `.repo/` and component
-checkout directories ignored by Central Git. All declared projects must be local, inside
-Central, at the selected revisions, and match their declared repository identity.
+checkout directories ignored by the outer Git repository. Manifest sources
+remain tracked in their actual owners. All declared projects must be local,
+inside the workspace, at the selected revisions, and match their repository identity.
 Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
 
 ```bash
-# From an already initialized and synced Central checkout
+# From an already initialized and synchronized workspace-root checkout
 reqvire validate                         # default: .repo/manifest.xml
-reqvire --manifest .repo/manifests/review.xml validate
-reqvire --manifest .repo/manifests/review.xml serve --enable-mcp --enable-mutations
+reqvire serve --enable-mcp --enable-mutations
 ```
 
-CLI, MCP and Explorer share the combined model and Central-relative identifiers.
+CLI, MCP and Explorer share the combined model and workspace-relative identifiers.
 Workspace `.reqvireignore` rules remain global; each repository's Git ignores
 apply to its own files. A selected manifest failure is an error, and Reqvire
 never fetches missing projects or revisions implicitly.
 
-MCP's `branch` argument selects the owning worktree. Native Repo contexts keep
-private manifest inputs and component checkouts. Mutations save files in their
-owning repositories; component commits update the selected manifest's pins.
-Repo-managed inputs retain their manifest project's Git publication workflow;
-files belonging to Central are checkpointed with Central. Optional GitHub publication pushes required
-component commits before Central. See the
+The same MCP branch tools manage one repository or a declared composition.
+Explicit branch creation uses the requested root base's composition and creates
+named component branches at their own pins. Commits save changed components,
+advance and commit pins in actual manifest owners, then commit the root revision
+association in `.reqvire-composition.json`. This record contains references,
+without copying XML into the root. Explicit GitHub publication pushes dependencies
+before the root and can create linked PRs for changed owners in one call, with
+explicit per-repository bases. Change impact uses available PR context or one
+explicit baseline override; select `HEAD` for pending changes. See the
 [User Guide](https://www.reqvire.org/user-guide) and
 [MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.
 
@@ -246,24 +249,30 @@ Enable mutation tools:
 reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ```
 
-After committing implementation or evidence changes outside MCP, call
+After eligible workspace-root implementation or evidence commits with unchanged
+declared composition, call
 `reqvire.branch.refresh` with the selected `branch`. It checks and
 guards the captured branch commit and reloads through normal validated loading
 without creating a commit; `dry_run: true` checks only. Changes to currently eligible
-model documents and their consumed semantic inputs require full validated admission
-instead. Ignore-file changes are allowed; current rules determine eligibility and
+model documents, their consumed semantic inputs, or a changed repository
+composition require explicit full validated admission with `reqvire.branch.open`
+instead. Prepare clean committed owners, exact pins and the root composition
+association first; pending accepted edits and recovery block admission.
+An external component commit also needs that composition admission, even when
+it changes only ordinary implementation or evidence files.
+Ignore-file changes are allowed; current rules determine eligibility and
 the model loaded after refresh. Mutation-enabled
 Explorer uses HEAD mode on branch selection and provides **Refresh HEAD** for
 the selected context. Blocked refreshes retain the accepted view and identify
 the inputs or Git state that need attention.
 
-Tool contract version 4 uses exact local branch names for context-bound MCP
+Tool contract version 5 uses exact local branch names for context-bound MCP
 tools and prompts, and percent-encoded `?branch=...` for MCP resources. Open an
 existing branch with `reqvire.branch.open`, or create one with
 `reqvire.branch.create`; use `from_branch` to select the source for a relative
 base. An optional branch may be omitted with one loaded context; multiple
 contexts require it. Branch names are the public interface. Opaque worktree IDs are private runtime/cache identity; public responses, picker, browser URLs and HTTP routes use branch names.
-Version 4 exposes `reqvire.branch.list`, `reqvire.branch.create`,
+Version 5 retains `reqvire.branch.list`, `reqvire.branch.create`,
 `reqvire.branch.open`, `reqvire.branch.close`, and `reqvire.branch.refresh`.
 Closing a managed context preserves its Git branch and commits. Previous
 `reqvire.worktree.*` tool names and obsolete MCP ID selectors are unavailable;

@@ -1,4 +1,6 @@
 //! Context routing and Git worktree administration. Model state stays in fixed-root workers.
+#[path = "mcp_repo_publication.rs"]
+mod repo_publication;
 use crate::{
     live_store::LiveStore, mcp_github::GithubAccess, mcp_process::git, mcp_session::lock_file,
     mcp_worker::WorkerOptions,
@@ -220,6 +222,8 @@ pub struct Context {
     worker: Mutex<Option<Arc<Worker>>>,
     published: RwLock<Published>,
     alive: Arc<AtomicBool>,
+    change_base: RwLock<Option<String>>,
+    github_dependencies: Mutex<Option<BTreeMap<PathBuf, GithubAccess>>>,
 }
 impl Context {
     fn refresh_head_locked(
@@ -502,7 +506,6 @@ pub struct Worktrees {
     browser_branches: Mutex<BTreeMap<String, String>>,
     admin: Mutex<()>,
     github: GithubAccess,
-    github_components: BTreeMap<PathBuf, GithubAccess>,
     tool_catalog: SessionToolCatalog,
 }
 struct WorktreePolicy {
@@ -588,19 +591,32 @@ impl Worktrees {
             reqvire::utils::hash_content(&common.to_string_lossy())
         ));
         let mut github = GithubAccess::check(&root, enable_github, remote);
-        let mut github_components = BTreeMap::new();
         if github.available() && manifest.is_some() {
             let scope = reqvire::workspace::WorkspaceScope::discover_from(root.clone())?;
-            for project in &scope.repo.as_ref().expect("Repo source scope").projects {
-                let access = GithubAccess::check(&root.join(&project.path), true, &project.remote);
+            let repo = scope.repo.as_ref().expect("Repo source scope");
+            let mut owners: BTreeMap<_, _> = repo
+                .projects
+                .iter()
+                .map(|p| (p.path.clone(), p.remote.clone()))
+                .collect();
+            for source in repo
+                .manifest_sources
+                .values()
+                .filter(|s| !s.root.as_os_str().is_empty())
+            {
+                owners
+                    .entry(source.root.clone())
+                    .or_insert_with(|| "origin".into());
+            }
+            for (path, remote) in owners {
+                let access = GithubAccess::check(&root.join(&path), true, &remote);
                 if !access.available() {
                     github.disable(format!(
-                        "Component {} publication is unavailable: {}",
-                        project.path.display(),
+                        "Repository {} publication is unavailable: {}",
+                        path.display(),
                         access.status()
                     ));
                 }
-                github_components.insert(project.path.clone(), access);
             }
         }
         if enable_github {
@@ -625,7 +641,6 @@ impl Worktrees {
             admin: Mutex::new(()),
             tool_catalog: SessionToolCatalog::new(github.available()),
             github,
-            github_components,
         });
         manager.admit(root, original, true, false)?;
         Ok(manager)
@@ -698,6 +713,16 @@ impl Worktrees {
             workers.push(Arc::downgrade(&worker));
         }
         let branch = text(&ready["status"], "branch")?.to_string();
+        let change_base = git(
+            &root,
+            &[
+                "config",
+                "--local",
+                "--get",
+                &format!("branch.{branch}.reqvireCompositionBase"),
+            ],
+        )
+        .ok();
         let context = Arc::new(Context {
             id: id.clone(),
             root,
@@ -705,6 +730,8 @@ impl Worktrees {
             original,
             managed,
             read_only: self.read_only,
+            change_base: RwLock::new(change_base),
+            github_dependencies: Mutex::new(None),
             alive: Arc::clone(&worker.alive),
             worker: Mutex::new(Some(worker)),
             published: RwLock::new(Published {
@@ -950,13 +977,32 @@ impl Worktrees {
                 return Err(error("Branch already exists"));
             }
             // Idempotence does not import disk changes. A failed context must be explicitly readmitted.
-            if context.request(&json!({"operation":"status"})).is_ok()
-                && context.metadata()["available"] == true
-                && context.metadata()["head_stale"] != true
+            let live = context.request(&json!({"operation":"status"})).is_ok();
+            let metadata = context.metadata();
+            if live && metadata["recovery_required"] == true {
+                return Err(error(format!(
+                    "Branch {branch} requires recovery before admission: {}",
+                    metadata["diagnostic"]
+                        .as_str()
+                        .unwrap_or("unresolved Git outcome")
+                )));
+            }
+            if live
+                && metadata["available"] == true
+                && metadata["head_stale"] != true
+                && (self.read_only || metadata["writes_available"] != false)
             {
                 if self.explorer && context.metadata()["explorer_available"] != true {
                     context.request(&json!({"operation":"runtime"}))?;
                 }
+                return Ok(context.metadata());
+            }
+            if live {
+                context.request(&json!({"operation":"readmit"}))?;
+                *context
+                    .github_dependencies
+                    .lock()
+                    .expect("dependency publication cache poisoned") = None;
                 return Ok(context.metadata());
             }
         }
@@ -1083,6 +1129,7 @@ impl Worktrees {
                     &root,
                     &self.common,
                     manifest,
+                    create,
                 ) {
                     return Err(self.creation_failure(
                         failure,
@@ -1106,6 +1153,23 @@ impl Worktrees {
             Ok(context) => {
                 let mut value = context.metadata();
                 value["base_commit"] = json!(base_commit);
+                if create {
+                    *context
+                        .change_base
+                        .write()
+                        .expect("composition base poisoned") = Some(base_commit.clone());
+                    if let Err(failure) = git(
+                        &root,
+                        &[
+                            "config",
+                            "--local",
+                            &format!("branch.{branch}.reqvireCompositionBase"),
+                            &base_commit,
+                        ],
+                    ) {
+                        value["warning"] = json!(format!("Branch prepared, but its publication base could not be retained: {failure}"));
+                    }
+                }
                 Ok(value)
             }
             Err(failure) => Err(if created {
@@ -1594,15 +1658,19 @@ impl Worktrees {
                 {
                     return Err(error("Commit pending accepted changes before publication"));
                 }
-                if name == "reqvire.git.push" {
-                    for project in status["projects"].as_array().into_iter().flatten() {
-                        let path = PathBuf::from(text(project, "path")?);
-                        let access = self.github_components.get(&path).ok_or_else(|| error("Saved manifest project is outside the startup publication inventory"))?;
-                        access
-                            .push_dependency(&context.root.join(&path), text(project, "commit")?)?;
-                    }
+                let value = self.publish_composition(
+                    &context,
+                    worker.as_mut().expect("context gate"),
+                    name,
+                    &args,
+                    &status,
+                )?;
+                let failed = matches!(value["outcome"].as_str(), Some("failed" | "unknown"));
+                let mut response = success(value);
+                if failed {
+                    response["isError"] = json!(true);
                 }
-                success(self.github.execute(&context.root, name, &args, &status)?)
+                response
             } else {
                 let response=context.request_locked(worker.as_mut().expect("validated worktree context invariant"),&json!({"operation":"rpc","method":"tools/call","params":{"name":name,"arguments":args}}))?;
                 if let Some(failure) = response.get("rpc_error") {
@@ -1630,8 +1698,13 @@ impl Worktrees {
             if result["isError"] == true && result["structuredContent"]["outcome"].is_null() {
                 result["structuredContent"]["outcome"] = json!("failed");
             }
-            result["structuredContent"]["repository"] = self.github.status()["repository"].clone();
-            result["structuredContent"]["remote"] = json!(self.github.remote);
+            if result["structuredContent"]["repository"].is_null() {
+                result["structuredContent"]["repository"] =
+                    self.github.status()["repository"].clone();
+            }
+            if result["structuredContent"]["remote"].is_null() {
+                result["structuredContent"]["remote"] = json!(self.github.remote);
+            }
             result["structuredContent"]["branch"] = metadata["branch"].clone();
             result["structuredContent"]["attempted_commit"] = metadata["head"].clone();
             if let Some(number) = args.get("pr_number") {
@@ -1648,6 +1721,7 @@ impl Worktrees {
         let mut contract = json!({"mcp_protocol_version":reqvire::tool_interface::MCP_PROTOCOL_VERSION,"tool_contract_version":reqvire::tool_interface::TOOL_CONTRACT_VERSION,"mutation_tools_enabled":true,"size_estimates_enabled":self.with_size_estimates});
         contract["tools"] = json!(self.definitions());
         contract["capabilities"]["worktree_contexts"] = json!(true);
+        contract["capabilities"]["composition_management"] = json!(true);
         contract["capabilities"]["automatic_commits"] = json!(self.enable_commits);
         contract["github"] = self.github.status();
         contract
@@ -1770,8 +1844,8 @@ fn publication_definitions() -> Vec<Value> {
         ),
         definition(
             "reqvire.github.pr.create",
-            "Create a same-repository PR from the already pushed owned branch to an explicit base.",
-            json!({"branch":branch_selector(),"base":{"type":"string","minLength":1},"title":{"type":"string","minLength":1},"body":{"type":"string"},"draft":{"type":"boolean"}}),
+            "Create or reuse linked PRs for the pushed root and changed composition owners, with explicit targets.",
+            json!({"branch":branch_selector(),"base":{"type":"string","minLength":1},"title":{"type":"string","minLength":1},"body":{"type":"string"},"draft":{"type":"boolean"},"repository_bases":{"type":"object","additionalProperties":{"type":"string","minLength":1},"description":"Explicit PR targets keyed by declared non-root repository path, including native manifest owners."}}),
             &["base", "title", "body"],
             false,
             true,
@@ -1779,7 +1853,7 @@ fn publication_definitions() -> Vec<Value> {
         definition(
             "reqvire.github.pr.comment",
             "Add a new comment to a PR in the pinned repository; no automatic retry.",
-            json!({"branch":branch_selector(),"pr_number":{"type":"integer","minimum":1},"body":{"type":"string","minLength":1}}),
+            json!({"branch":branch_selector(),"pr_number":{"type":"integer","minimum":1},"body":{"type":"string","minLength":1},"repository_path":{"type":"string","description":"Declared repository owner path; omit for the workspace-root repository."}}),
             &["pr_number", "body"],
             false,
             true,
@@ -1921,6 +1995,8 @@ mod tests {
             original: true,
             managed: false,
             read_only: false,
+            change_base: RwLock::new(None),
+            github_dependencies: Mutex::new(None),
             worker: Mutex::new(None),
             alive: Arc::new(AtomicBool::new(true)),
             published: RwLock::new(Published {
@@ -2896,13 +2972,14 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
                 && !read.to_string().contains("Other Subject")
         );
         assert!(Arc::ptr_eq(&accepted, &context.runtime().unwrap()));
-        let reopened = call(
+        let reopened = rejected(
             &manager,
             "reqvire.branch.open",
             json!({"branch":"recovery"}),
         );
-        assert_eq!(reopened["branch"], id);
+        assert!(reopened.to_string().contains("requires recovery"));
         assert_eq!(context.metadata()["recovery_required"], true);
+        assert!(Arc::ptr_eq(&accepted, &context.runtime().unwrap()));
         let resource = manager
             .handle(
                 "resources/read",
@@ -3107,7 +3184,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         assert!(!local_definitions().iter().any(|tool| tool["name"]
             .as_str()
             .is_some_and(|name| name.starts_with("reqvire.worktree."))));
-        assert_eq!(reqvire::tool_interface::TOOL_CONTRACT_VERSION, "4");
+        assert_eq!(reqvire::tool_interface::TOOL_CONTRACT_VERSION, "5");
     }
 
     #[test]
@@ -3122,7 +3199,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
         let id = child["branch"].as_str().unwrap();
         let contract = call(&manager, "reqvire.tool_contract", json!({}));
         assert_eq!(contract["capabilities"]["worktree_contexts"], true);
-        assert_eq!(contract["tool_contract_version"], "4");
+        assert_eq!(contract["tool_contract_version"], "5");
         assert!(contract["tools"]
             .as_array()
             .unwrap()
