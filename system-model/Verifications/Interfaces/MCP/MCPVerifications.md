@@ -837,6 +837,64 @@ Verify the successful and rejected paths of mcp accepted change commit.
   * verify: [MCP Commit Outcome Reconciliation](../../../Interfaces/MCP/Tools.md#mcp-commit-outcome-reconciliation)
 ---
 
+### MCP Branch Closing Verification
+
+Verify the successful and rejected paths of mcp managed worktree removal.
+
+#### Details
+- Remove a clean managed context selected by branch with both commit policies and verify its branch/commits remain. Confirm original and other contexts still answer unchanged, while calls to the removed branch fail until explicit reopening.
+- Reject original/external worktrees, foreign ownership, unknown/unopened branches, removed ID selectors, accepted uncommitted changes, external modified/staged/untracked files, and changed HEAD without deletion.
+- Hold an operation during removal and assert orderly draining and rejection of new calls; inject Git removal failure and verify explicit stopped/residual status. Shutdown must preserve every worktree and pending file.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * verify: [MCP Branch Closing](../../../Interfaces/MCP/Tools.md#mcp-branch-closing)
+---
+
+### MCP Branch Creation Verification
+
+Verify the successful and rejected paths of mcp worktree creation.
+
+#### Details
+- Create two branches from a committed owned branch, local `main`, and a locally known remote-tracking ref. Assert exact base SHAs, separate roots/workers, unchanged source checkouts, and no Git network calls.
+- Select a relative base with `from_branch`, independently of destination `branch`, and assert the created base commit matches that admitted source. Reject removed `from_worktree_id`, unknown/unopened source branches, unknown/non-commit bases, missing or ambiguous context-relative selection, invalid/duplicate branch names, dirty source state in either commit mode, foreign repositories, path overlap/symlink escape, and ownership conflicts with no source changes.
+- Reproduce a valid source whose selected base has an invalid model. Inject worker/startup/worktree creation failure and verify no usable context is exposed; cleanup affects only new unchanged assets, with explicit residual-state reporting if cleanup is unsafe.
+- Verify uncommitted accepted and external edits are never silently copied, committed, stashed, or discarded.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * verify: [MCP Branch Creation](../../../Interfaces/MCP/Tools.md#mcp-branch-creation)
+---
+
+### MCP Branch Opening and Inventory Verification
+
+Verify the successful and rejected paths of mcp worktree opening and inventory.
+
+#### Details
+- List original, managed, external, unregistered, and unavailable worktrees without side effects. Open an existing clean branch with and without an existing worktree; repeated opening returns the same healthy context and does not create duplicate checkouts.
+- Hold the repository-administration lock while reopening a healthy registered branch. Verify it returns the identical context without admission, while an unopened branch is rejected without changing registrations or checkouts; opening the new branch succeeds after lock release.
+- Repeat administration failure with an unopenable lock path; assert no published context or model/HEAD/index change and reuse after repair. Use shared lock-acquisition fault injection for denied/unsupported OS failures across branch, worktree and administration paths, checking that they preserve the file and report the correct diagnostic category. Failed creation cleanup must preserve both the initiating error and any lock error explaining retained paths.
+- Reject unknown/detached branches, dirty index/files/untracked files, invalid models, missing Git identity, overlapping roots, and another process's ownership. Verify pre-existing worktrees survive failures unchanged.
+- Stop/restart with committed work and with pending accepted changes; confirm no implicit branch nesting or loss of files, clean reopening, and rejection of dirty reopening. Inventory must distinguish unavailable contexts from healthy sessions.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [mcp_session.rs](../../../../crates/reqvire-cli/src/mcp_session.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * verify: [MCP Branch Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-branch-opening-and-inventory)
+---
+
 ### MCP Branch Push Verification
 
 Verify the successful and rejected paths of mcp branch push.
@@ -853,6 +911,34 @@ Verify the successful and rejected paths of mcp branch push.
   * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
   * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
   * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
+---
+
+### MCP Branch Refresh Verification
+
+Verify the shared HEAD-refresh operation through real MCP transports and owned workers before claiming support for external branch-tip adoption.
+
+#### Details
+- Reuse one loaded HTTP context for reversible input-protection, Git-state and refresh-lifecycle checks. Restore only disposable physical inputs to the accepted baseline between variations, without reopening the context or rebuilding its model. Assert unchanged server/context identity and model-build count through read/rejection checks. Separate servers only for stdio, embedded serving and the automatic-commit startup policy; reuse the Explorer selection contexts for backend isolation checks.
+- Discover `reqvire.branch.refresh` with `branch`, no `worktree_id`, `dry_run: false` default and state-mutation classification. Exercise actual branch-selected HTTP and stdio calls without a fake tool, permissive stub or unknown-tool-as-protection shortcut. Embedded execution is covered by the Explorer verification of the same operation; returned public context identity is the branch; opaque IDs remain private.
+- Commit ordinary implementation/evidence content, non-model documentation, an excluded model-looking example and unreferenced RDF. Refresh and amend the same branch, retaining context identity, model/semantic revision and ownership while advancing accepted HEAD and displayed artifact provenance. Require one normal validated model load per eligible apply and no model load for a rejected guard, preview or unchanged HEAD. Repeat for an idempotent no-op and successfully execute a later MCP mutation with automatic commits disabled.
+- Check-only preview must leave accepted state and Git unchanged. Change a protected model input between preview and apply and require apply to recheck and block.
+- Reject changed/removed/renamed model sources, new and empty recognised documents, new single-element headers and ordinary Markdown converted into model content. Check old/new classification independently of the accepted element registry. A real policy rejection must carry the expected blocker and path; an unavailable-tool response fails verification.
+- Reject loaded External Ontology changes, changes to a dual implementation/semantic source and a new repository-root source shadowing a recorded document-relative fallback. Detect already consumed ignored/out-of-tree source drift independently of endpoint diff. Reject missing renamed evidence targets while allowing edited evidence content.
+- In the same loaded HTTP workflow, allow added/changed/removed root ignore files. Combine a policy update with changes to a now-excluded model file and a semantic source whose declaring owner is now excluded; require successful normal loading and the updated membership/revision. Preview must not adopt the policy. Verify subsequent MCP operations use the adopted exclusions, policy-only re-inclusion loads unchanged documents, and later edits to re-included model files block. Separately unexclude and modify a model file in the same commit and require a model-path blocker under current rules. Reuse the existing server/context rather than adding an exclusion-policy process matrix.
+- Reject pending accepted changes, staged/unstaged/nonignored untracked edits, branch changes, detached state, in-progress Git operations and unresolved recovery. Preserve recorded commit-outcome reconciliation as the only recovery exception. Verify both automatic-commit policies without creating a commit during refresh.
+- Refresh one context with two admitted contexts and assert independent HEAD, snapshots, pending state and availability. Rejections preserve files, index, refs, accepted model, accepted HEAD and publication. Compare physical state before/after both accepted and rejected calls.
+- Verify that successful refresh uses the same loading function as startup and the ordinary worker runtime/publication path. A captured old read remains coherent across that normal reload. Reuse existing loading/runtime failure tests; do not add a refresh-specific prepare/adopt protocol, transfer-failure matrix or concurrent-Git race suite.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-head-refresh/test.sh)
+  * verify: [MCP Branch Refresh](../../../Interfaces/MCP/HeadRefresh.md#mcp-branch-refresh)
 ---
 
 ### MCP GitHub Tool Availability Verification
@@ -874,24 +960,6 @@ Verify the successful and rejected paths of mcp github tool availability.
   * satisfiedBy: [mcp_github.rs](../../../../crates/reqvire-cli/src/mcp_github.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * verify: [MCP GitHub Tool Availability](../../../Interfaces/MCP/Tools.md#mcp-github-tool-availability)
----
-
-### MCP Managed Worktree Removal Verification
-
-Verify the successful and rejected paths of mcp managed worktree removal.
-
-#### Details
-- Remove a clean managed context selected by branch with both commit policies and verify its branch/commits remain. Confirm original and other contexts still answer unchanged, while calls to the removed branch fail until explicit reopening.
-- Reject original/external worktrees, foreign ownership, unknown/unopened branches, removed ID selectors, accepted uncommitted changes, external modified/staged/untracked files, and changed HEAD without deletion.
-- Hold an operation during removal and assert orderly draining and rejection of new calls; inject Git removal failure and verify explicit stopped/residual status. Shutdown must preserve every worktree and pending file.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * verify: [MCP Managed Worktree Removal](../../../Interfaces/MCP/Tools.md#mcp-managed-worktree-removal)
 ---
 
 ### MCP Publication Scope and Recovery Verification
@@ -996,11 +1064,11 @@ Verify that the existing Central branch context owns a complete isolated Repo vi
   * satisfiedBy: [check_repo_workspaces.py](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
   * satisfiedBy: [central-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/central-renamed.md.txt)
   * satisfiedBy: [component-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/component-renamed.md.txt)
-  * verify: [MCP Managed Worktree Removal](../../../Interfaces/MCP/Tools.md#mcp-managed-worktree-removal)
+  * verify: [MCP Branch Closing](../../../Interfaces/MCP/Tools.md#mcp-branch-closing)
+  * verify: [MCP Branch Creation](../../../Interfaces/MCP/Tools.md#mcp-branch-creation)
+  * verify: [MCP Branch Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-branch-opening-and-inventory)
   * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
   * verify: [MCP Worktree Context Isolation](../../../Interfaces/MCP/Tools.md#mcp-worktree-context-isolation)
-  * verify: [MCP Worktree Creation](../../../Interfaces/MCP/Tools.md#mcp-worktree-creation)
-  * verify: [MCP Worktree Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-worktree-opening-and-inventory)
 ---
 
 ### MCP Worktree Context Isolation Verification
@@ -1011,7 +1079,7 @@ Verify that MCP worker sessions implement the shared context boundary on success
 - Start with two worktrees containing identical relative paths and element names but different model content. Interleave reads, CRUD, coverage, collect, semantic prefixes/exports/SPARQL, resources, and model-bearing prompts; assert the selected content, revisions, Git HEAD, and accepted pending changes never cross contexts.
 - Reject omitted branch selectors with multiple registered contexts and unknown/unopened/removed/unavailable branches; allow optional omission for one context. Assert server-scoped discovery/listing remains callable and no request changes a global selection. Require public MCP context/inventory outputs and Explorer routing to use branches; keep IDs private to workers/caches.
 - Inspect serialized HTTP responses for omitted, unknown and removed branch selectors on schema-valid read and serialized tool calls: assert `result.isError`, structured tool identity and selector diagnostics, with no JSON-RPC error or substituted context. Assert invalid/empty selectors and removed `worktree_id`/`from_worktree_id` inputs use `-32602`, including mixed old/new selectors; resource/prompt failures remain protocol errors. Repeat existing commit-mode evidence, retain explicit-branch success and single-context omission, and verify rejection leaves models and Git unchanged.
-- In the existing standalone/embedded worktree lifecycles, inspect every advertised context tool, including optional GitHub publication schemas, for `branch` rather than ID selectors and tool contract version 3. Exercise an exact branch with slash/Unicode/plus/percent characters through tools, encoded resources and prompts. Keep resource templates and returned prompt instructions branch-selected while public response provenance identifies the branch and accepted revision. Unknown resource fields, duplicate/malformed encoding, obsolete ID queries and missing multi-context selection must fail without fallback. Reuse loaded contexts and schema inspection instead of adding a tool/transport cross-product or new servers.
+- In the existing standalone/embedded worktree lifecycles, inspect every advertised context tool, including optional GitHub publication schemas, for `branch` rather than ID selectors and tool contract version 4. Exercise an exact branch with slash/Unicode/plus/percent characters through tools, encoded resources and prompts. Keep resource templates and returned prompt instructions branch-selected while public response provenance identifies the branch and accepted revision. Unknown resource fields, duplicate/malformed encoding, obsolete ID queries and missing multi-context selection must fail without fallback. Reuse loaded contexts and schema inspection instead of adding a tool/transport cross-product or new servers.
 - Verify independent worker processes, fixed roots, exclusion rules, semantic initialization, and mutation gates. Hold one worker mutation and read/write the other; then prove reads within the held context cannot observe partial persistence.
 - Test ownership contention across MCP processes, external HEAD changes, invalid/dirty startup, worker crash, reopening, and both commit modes. Failure in one worker must leave the other usable.
 - Force persistence plus rollback failure in both commit modes, including captured external semantic inputs. Assert supported model/status/resource/semantic reads retain exactly the accepted model/revision and expose recovery-required state, disabled writes and the original diagnostic. Change disk files and Git availability afterward; neither may replace the accepted snapshot or produce a false clean-state observation.
@@ -1020,6 +1088,8 @@ Verify that MCP worker sessions implement the shared context boundary on success
 - Require the automatic-commit failure diagnostic to identify the accepted HEAD and exact attempted commit that became the branch tip.
 - Reject further mutations (including previews and format), explicit commits, worktree removal, live change-impact analysis, and push/PR/comment publication before their side effects. Keep discovery callable. Confirm another context remains usable, reopening the live context does not clear recovery, and worker death makes even accepted reads unavailable. Cover adapter failure injection plus production worker/process and in-process HTTP routing; do not describe socket-restricted checks as external HTTP passes.
 - Exercise standalone and embedded endpoints. Each mutation refreshes only its context's Explorer runtime, and browser context selection does not redirect MCP calls. Verify resource URI/template and prompt selector schemas, isolation of cache keys, and unchanged read-only refresh behavior; do not advertise unsupported subscriptions.
+
+- Inspect discovery for exactly the five branch lifecycle names and no previous `reqvire.worktree.*` tools. Call every removed tool name and require an unknown-tool protocol rejection with unchanged refs, index, source files and context inventory. Exercise the renamed list/create/open/close/refresh operations through the existing standalone and embedded transport lifecycles; retain existing selectors, permission gates and branch-preserving close protections.
 
 #### Metadata
   * type: test-verification
@@ -1031,74 +1101,6 @@ Verify that MCP worker sessions implement the shared context boundary on success
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * verify: [MCP Worktree Worker Sessions](../../../Interfaces/MCP/Tools.md#mcp-worktree-worker-sessions)
----
-
-### MCP Worktree Creation Verification
-
-Verify the successful and rejected paths of mcp worktree creation.
-
-#### Details
-- Create two branches from a committed owned branch, local `main`, and a locally known remote-tracking ref. Assert exact base SHAs, separate roots/workers, unchanged source checkouts, and no Git network calls.
-- Select a relative base with `from_branch`, independently of destination `branch`, and assert the created base commit matches that admitted source. Reject removed `from_worktree_id`, unknown/unopened source branches, unknown/non-commit bases, missing or ambiguous context-relative selection, invalid/duplicate branch names, dirty source state in either commit mode, foreign repositories, path overlap/symlink escape, and ownership conflicts with no source changes.
-- Reproduce a valid source whose selected base has an invalid model. Inject worker/startup/worktree creation failure and verify no usable context is exposed; cleanup affects only new unchanged assets, with explicit residual-state reporting if cleanup is unsafe.
-- Verify uncommitted accepted and external edits are never silently copied, committed, stashed, or discarded.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * verify: [MCP Worktree Creation](../../../Interfaces/MCP/Tools.md#mcp-worktree-creation)
----
-
-### MCP Worktree HEAD Refresh Verification
-
-Verify the shared HEAD-refresh operation through real MCP transports and owned workers before claiming support for external branch-tip adoption.
-
-#### Details
-- Reuse one loaded HTTP context for reversible input-protection, Git-state and refresh-lifecycle checks. Restore only disposable physical inputs to the accepted baseline between variations, without reopening the context or rebuilding its model. Assert unchanged server/context identity and model-build count through read/rejection checks. Separate servers only for stdio, embedded serving and the automatic-commit startup policy; reuse the Explorer selection contexts for backend isolation checks.
-- Discover `reqvire.worktree.refresh_head` with `branch`, no `worktree_id`, `dry_run: false` default and state-mutation classification. Exercise actual branch-selected HTTP and stdio calls without a fake tool, permissive stub or unknown-tool-as-protection shortcut. Embedded execution is covered by the Explorer verification of the same operation; returned public context identity is the branch; opaque IDs remain private.
-- Commit ordinary implementation/evidence content, non-model documentation, an excluded model-looking example and unreferenced RDF. Refresh and amend the same branch, retaining context identity, model/semantic revision and ownership while advancing accepted HEAD and displayed artifact provenance. Require one normal validated model load per eligible apply and no model load for a rejected guard, preview or unchanged HEAD. Repeat for an idempotent no-op and successfully execute a later MCP mutation with automatic commits disabled.
-- Check-only preview must leave accepted state and Git unchanged. Change a protected model input between preview and apply and require apply to recheck and block.
-- Reject changed/removed/renamed model sources, new and empty recognised documents, new single-element headers and ordinary Markdown converted into model content. Check old/new classification independently of the accepted element registry. A real policy rejection must carry the expected blocker and path; an unavailable-tool response fails verification.
-- Reject loaded External Ontology changes, changes to a dual implementation/semantic source and a new repository-root source shadowing a recorded document-relative fallback. Detect already consumed ignored/out-of-tree source drift independently of endpoint diff. Reject missing renamed evidence targets while allowing edited evidence content.
-- In the same loaded HTTP workflow, allow added/changed/removed root ignore files. Combine a policy update with changes to a now-excluded model file and a semantic source whose declaring owner is now excluded; require successful normal loading and the updated membership/revision. Preview must not adopt the policy. Verify subsequent MCP operations use the adopted exclusions, policy-only re-inclusion loads unchanged documents, and later edits to re-included model files block. Separately unexclude and modify a model file in the same commit and require a model-path blocker under current rules. Reuse the existing server/context rather than adding an exclusion-policy process matrix.
-- Reject pending accepted changes, staged/unstaged/nonignored untracked edits, branch changes, detached state, in-progress Git operations and unresolved recovery. Preserve recorded commit-outcome reconciliation as the only recovery exception. Verify both automatic-commit policies without creating a commit during refresh.
-- Refresh one context with two admitted contexts and assert independent HEAD, snapshots, pending state and availability. Rejections preserve files, index, refs, accepted model, accepted HEAD and publication. Compare physical state before/after both accepted and rejected calls.
-- Verify that successful refresh uses the same loading function as startup and the ordinary worker runtime/publication path. A captured old read remains coherent across that normal reload. Reuse existing loading/runtime failure tests; do not add a refresh-specific prepare/adopt protocol, transfer-failure matrix or concurrent-Git race suite.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [mcp_session_tests.rs](../../../../crates/reqvire-cli/src/mcp_session_tests.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * satisfiedBy: [check_refresh.py](../../../../tests/test-mcp-head-refresh/check_refresh.py)
-  * satisfiedBy: [test.sh](../../../../tests/test-mcp-head-refresh/test.sh)
-  * verify: [MCP Worktree HEAD Refresh](../../../Interfaces/MCP/HeadRefresh.md#mcp-worktree-head-refresh)
----
-
-### MCP Worktree Opening and Inventory Verification
-
-Verify the successful and rejected paths of mcp worktree opening and inventory.
-
-#### Details
-- List original, managed, external, unregistered, and unavailable worktrees without side effects. Open an existing clean branch with and without an existing worktree; repeated opening returns the same healthy context and does not create duplicate checkouts.
-- Hold the repository-administration lock while reopening a healthy registered branch. Verify it returns the identical context without admission, while an unopened branch is rejected without changing registrations or checkouts; opening the new branch succeeds after lock release.
-- Repeat administration failure with an unopenable lock path; assert no published context or model/HEAD/index change and reuse after repair. Use shared lock-acquisition fault injection for denied/unsupported OS failures across branch, worktree and administration paths, checking that they preserve the file and report the correct diagnostic category. Failed creation cleanup must preserve both the initiating error and any lock error explaining retained paths.
-- Reject unknown/detached branches, dirty index/files/untracked files, invalid models, missing Git identity, overlapping roots, and another process's ownership. Verify pre-existing worktrees survive failures unchanged.
-- Stop/restart with committed work and with pending accepted changes; confirm no implicit branch nesting or loss of files, clean reopening, and rejection of dirty reopening. Inventory must distinguish unavailable contexts from healthy sessions.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [mcp_session.rs](../../../../crates/reqvire-cli/src/mcp_session.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
-  * verify: [MCP Worktree Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-worktree-opening-and-inventory)
 ---
 
 ### MCP Resource Interface Verification

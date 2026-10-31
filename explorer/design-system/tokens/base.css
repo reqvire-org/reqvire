@@ -3,7 +3,9 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  :root { color-scheme: light; }
+  /* A themed section (data-theme on any element) paints its own canvas and text, since
+     inherited colors were resolved outside it. themes.generated.css sets color-scheme. */
+  [data-theme] { background: var(--bg-canvas); color: var(--text-body); }
   body {
     margin: 0;
     font-family: var(--font-sans);
@@ -20,10 +22,6 @@
   button { font-family: inherit; }
   ::selection { background: var(--accent-subtle); color: var(--text-strong); }
   :focus-visible { outline: var(--focus-w) solid var(--border-focus); outline-offset: var(--focus-offset); }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { color-scheme: dark; }
-  }
-  :root[data-theme="dark"], :root.dark { color-scheme: dark; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: var(--dur-reduced-motion) !important;

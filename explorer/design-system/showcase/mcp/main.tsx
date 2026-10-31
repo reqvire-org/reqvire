@@ -7,7 +7,8 @@ export function mountScenario(Scenario: ComponentType, container: HTMLElement) {
   const classes = documentClasses().split(" ").filter(name => !document.body.classList.contains(name));
   document.body.classList.add(...classes);
   try {
-    render(<ShowcaseRegion regions={["app"]}><ShowcaseRegion regions={["body"]}><Scenario /></ShowcaseRegion></ShowcaseRegion>, container);
+    // The preview body scrolls, so it is a keyboard-focusable, labelled region.
+    render(<ShowcaseRegion regions={["app"]}><ShowcaseRegion regions={["body"]} as="section" aria-label="Scenario preview" tabIndex={0}><Scenario /></ShowcaseRegion></ShowcaseRegion>, container);
   } catch (error) {
     document.body.classList.remove(...classes);
     throw error;

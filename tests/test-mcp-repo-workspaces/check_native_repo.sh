@@ -140,7 +140,7 @@ native_repo_pin_checkpoint() {
 }
 
 native_worktree_mutation() {
-    jq -n '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.worktree.create",arguments:{branch:"native-topic",from_branch:"main",base_ref:"main"}}}' > "$native_case/create.json"
+    jq -n '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.branch.create",arguments:{branch:"native-topic",from_branch:"main",base_ref:"main"}}}' > "$native_case/create.json"
     native_rpc "$native_case/create.json" "$native_case/create-result.json"
     local child saved
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/create-result.json")
@@ -153,9 +153,9 @@ native_worktree_mutation() {
     native_rpc "$native_case/commit.json" "$native_case/commit-result.json"
     saved=$(git -C "$child/repositories/component" rev-parse HEAD)
     test "$saved" != "$alpha"
-    jq -n '{jsonrpc:"2.0",id:6,method:"tools/call",params:{name:"reqvire.worktree.remove",arguments:{branch:"native-topic"}}}' > "$native_case/remove.json"
+    jq -n '{jsonrpc:"2.0",id:6,method:"tools/call",params:{name:"reqvire.branch.close",arguments:{branch:"native-topic"}}}' > "$native_case/remove.json"
     native_rpc "$native_case/remove.json" "$native_case/remove-result.json"
-    jq -n '{jsonrpc:"2.0",id:7,method:"tools/call",params:{name:"reqvire.worktree.open",arguments:{branch:"native-topic"}}}' > "$native_case/open.json"
+    jq -n '{jsonrpc:"2.0",id:7,method:"tools/call",params:{name:"reqvire.branch.open",arguments:{branch:"native-topic"}}}' > "$native_case/open.json"
     native_rpc "$native_case/open.json" "$native_case/open-result.json"
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/open-result.json")
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$saved"

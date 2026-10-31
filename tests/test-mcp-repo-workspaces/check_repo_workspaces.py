@@ -356,7 +356,7 @@ def declared_sources_only():
 def branch_revisions(shared):
     f, server = shared('explicit-commit')
     original = f.files(), f.git_state()
-    child = server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
+    child = server.tool('reqvire.branch.create', branch='topic', from_branch='main', base_ref='review')
     target = Path(child['workspace_root'])
     assert child['base_commit'] == f.review, 'base_ref did not select Central'
     project = target / 'repositories/component'
@@ -367,8 +367,8 @@ def branch_revisions(shared):
     assert 'alpha' in json.dumps(server.tool('reqvire.read_element', branch='main', name='Component Specification'))
     assert (f.files(), f.git_state()) == original, 'Branch creation altered the original project checkout'
     assert 'topic' not in git(f.component, 'branch', '--format=%(refname:short)').splitlines(), 'Invented component branch'
-    server.tool('reqvire.worktree.remove', branch='topic')
-    reopened = server.tool('reqvire.worktree.open', branch='topic')
+    server.tool('reqvire.branch.close', branch='topic')
+    reopened = server.tool('reqvire.branch.open', branch='topic')
     restored = Path(reopened['workspace_root']) / 'repositories/component'
     assert git(restored, 'rev-parse', 'HEAD') == f.omega, 'Reopening lost the retained manifest selection'
     assert 'omega' in json.dumps(server.tool('reqvire.read_element', branch='topic', name='Component Specification'))
@@ -494,7 +494,7 @@ def explorer(shared):
     assert 'Added Capability' in [e['name'] for e in json.loads(body)['store']['elements']]
     assert server.http('/api/project-store/manifest?branch=main')[1] != baseline, 'Accepted component mutation was not published'
     server.tool('reqvire.git.commit', branch='main', message='Save browser fixture')
-    server.tool('reqvire.worktree.create', branch='topic', from_branch='main', base_ref='review')
+    server.tool('reqvire.branch.create', branch='topic', from_branch='main', base_ref='review')
     # Use the shared real-browser lifecycle and the existing picker. No UI or
     # store replacement hides a missing combined backend publication.
     browser = command(f.central, 'bun', str(SUITE / 'browser-repo.mjs'), server.base,

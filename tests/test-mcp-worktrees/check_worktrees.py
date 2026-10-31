@@ -52,14 +52,34 @@ def protocol_error(server, method, params):
 def branch_contract(server, mode, original, child):
     """Inspect every selector once, then exercise routing on the two loaded models."""
     tools = {t['name']: t['inputSchema'] for t in server.rpc('tools/list', {})['tools']}
+    check(f'{mode}/branch-lifecycle-tool-names',
+          {name for name in tools if name.startswith('reqvire.branch.')} == {
+              'reqvire.branch.list', 'reqvire.branch.create', 'reqvire.branch.open',
+              'reqvire.branch.close', 'reqvire.branch.refresh'}
+          and not any(name.startswith('reqvire.worktree.') for name in tools))
+    roots = [pathlib.Path(row['workspace_root']) for row in (original, child)]
+    def repository_state():
+        return [(git(root, 'show-ref'), git(root, 'ls-files', '--stage'),
+                 git(root, 'diff', 'HEAD'), (root / 'Model.md').read_bytes()) for root in roots]
+    before = repository_state()
+    inventory = server.tool('reqvire.branch.list')
+    obsolete_rejected = all(protocol_error(server, 'tools/call',
+        {'name': 'reqvire.worktree.' + operation, 'arguments': args}) for operation, args in (
+            ('list', {}),
+            ('create', {'branch': 'obsolete-must-not-exist', 'base_ref': 'main'}),
+            ('open', {'branch': child['branch']}),
+            ('remove', {'branch': child['branch']}),
+            ('refresh_head', {'branch': child['branch']})))
+    check(f'{mode}/obsolete-tool-names-rejected', obsolete_rejected
+          and repository_state() == before and server.tool('reqvire.branch.list') == inventory)
     contextual = [schema for name, schema in tools.items()
-                  if name not in ('reqvire.tool_contract', 'reqvire.worktree.list')]
+                  if name not in ('reqvire.tool_contract', 'reqvire.branch.list')]
     check(f'{mode}/branch-selector-catalog',
-          server.tool('reqvire.tool_contract')['tool_contract_version'] == '3'
+          server.tool('reqvire.tool_contract')['tool_contract_version'] == '4'
           and all('branch' in schema['properties'] and 'worktree_id' not in schema['properties']
                   and 'from_worktree_id' not in schema['properties'] for schema in contextual)
-          and 'from_branch' in tools['reqvire.worktree.create']['properties']
-          and 'branch' in tools['reqvire.worktree.remove']['required'])
+          and 'from_branch' in tools['reqvire.branch.create']['properties']
+          and 'branch' in tools['reqvire.branch.close']['required'])
     check(f'{mode}/obsolete-selector-rejected', all(protocol_error(server, 'tools/call',
           {'name': 'reqvire.search', 'arguments': args}) for args in (
               {'worktree_id': child['branch']},
@@ -177,7 +197,7 @@ for embedded in (False, True):
                 if embedded:
                     server.__enter__()
                     definitions = server.rpc('tools/list', {})['tools']
-                    check(f'{mode}/mutation-tools-hidden', not any(d['name'] in ('reqvire.add_element', 'reqvire.worktree.create', 'reqvire.git.commit') for d in definitions))
+                    check(f'{mode}/mutation-tools-hidden', not any(d['name'] in ('reqvire.add_element', 'reqvire.branch.create', 'reqvire.git.commit') for d in definitions))
                     try:
                         rejected = server.raw_tool('reqvire.add_element', file='Model.md', content='invalid').get('isError') is True
                     except RuntimeError:
@@ -234,15 +254,15 @@ for mode in ('mcp', 'serve'):
             initial = git(root, 'rev-parse', 'HEAD')
             git(root, 'branch', 'unopened')
             with helpers.Server(binary, root, output, mode, mode, mutations=True) as server:
-                inventory = server.tool('reqvire.worktree.list')['worktrees']
+                inventory = server.tool('reqvire.branch.list')['worktrees']
                 original_row = next(row for row in inventory if row.get('original'))
                 origin, origin_branch = original_row['branch'], original_row['branch']
-                created = server.tool('reqvire.worktree.create', branch='feature/κ+%', base_ref='main')
+                created = server.tool('reqvire.branch.create', branch='feature/κ+%', base_ref='main')
                 child = created['branch']
                 child_branch = created['branch']
                 check(f'{mode}/create-isolated-context', child != origin and created['base_commit'] == initial
                       and git(root, 'branch', '--show-current') == 'main')
-                same = server.tool('reqvire.worktree.open', branch='feature/κ+%')
+                same = server.tool('reqvire.branch.open', branch='feature/κ+%')
                 check(f'{mode}/open-idempotent', same['branch'] == child)
                 branch_contract(server, mode, original_row, created)
                 ambiguous = server.raw_tool('reqvire.search')
@@ -270,7 +290,7 @@ for mode in ('mcp', 'serve'):
                 semantic = server.tool('reqvire.semantic.sparql', branch=child_branch,
                     query='ASK { ?s <https://www.reqvire.org/ontology#elementName> "Other Subject" }')
                 check(f'{mode}/semantic-isolation', semantic['boolean'] is True)
-                pending = server.raw_tool('reqvire.worktree.remove', branch=child_branch)
+                pending = server.raw_tool('reqvire.branch.close', branch=child_branch)
                 check(f'{mode}/dirty-removal-rejected', pending.get('isError') is True)
                 child_root = pathlib.Path(created['workspace_root'])
                 (child_root / 'unrelated.txt').write_text('external staged work')
@@ -287,7 +307,7 @@ for mode in ('mcp', 'serve'):
                 check(f'{mode}/commit-noop', noop['outcome'] == 'no_op')
                 git(child_root, 'reset', '-q', 'HEAD', '--', 'unrelated.txt')
                 (child_root / 'unrelated.txt').unlink()
-                protected = server.raw_tool('reqvire.worktree.remove', branch=origin_branch)
+                protected = server.raw_tool('reqvire.branch.close', branch=origin_branch)
                 check(f'{mode}/original-protected', protected.get('isError') is True)
                 if mode == 'serve':
                     dirty_root = pathlib.Path(temp) / 'dirty'
@@ -333,7 +353,7 @@ for mode in ('mcp', 'serve'):
                     check('serve/browser-worktree-selection', browser_run.returncode == 0, browser_run.stdout + browser_run.stderr)
                     status, _ = server.http('/api/project-store?branch=unknown')
                     check('serve/unknown-runtime-rejected', status in (404, 410, 503))
-                server.tool('reqvire.worktree.remove', branch=child_branch)
+                server.tool('reqvire.branch.close', branch=child_branch)
                 removed = server.raw_tool('reqvire.search', branch=child_branch)
                 remaining = server.raw_tool('reqvire.search', branch=origin_branch)
                 check(f'{mode}/remove-keeps-branch', not child_root.exists()

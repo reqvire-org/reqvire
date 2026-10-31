@@ -73,8 +73,9 @@ const skinX = css`
   background: var(--ds-elemicon-color, var(--color-role-other));
   box-shadow: inset 0 0 0 var(--border-w) var(--color-role-element-icon-ring);
 
+  /* Role fills are the same in every theme, so glyphs use the fixed ink for light fills. */
   .ds-elemicon__glyph {
-    color: var(--text-strong);
+    color: var(--color-ink);
   }
 
   &.ds-elemicon--hub {
@@ -157,7 +158,7 @@ export function ElementIcon({
   );
 
   return (
-    <span className={classes} data-element-role={role} title={title ?? type ?? role} aria-label={type ?? role} {...props}>
+    <span className={classes} data-element-role={role} title={title ?? type ?? role} role="img" aria-label={type ?? role} {...props}>
       {isCapability ? <span className="ds-elemicon__pip" /> : null}
       {!isCapability && resolvedGlyph ? <span className="ds-elemicon__glyph">{resolvedGlyph}</span> : null}
     </span>

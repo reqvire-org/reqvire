@@ -489,7 +489,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           In mutation-enabled serving, branch selection defaults to HEAD mode:
           selecting an admitted context checks and adopts an eligible external
           branch tip without replacing its worker. Use Refresh HEAD to do the same
-          for the displayed context, or call <code>reqvire.worktree.refresh_head</code>
+          for the displayed context, or call <code>reqvire.branch.refresh</code>
           with its exact local <code>branch</code>. Apply is the default; use
           <code> dry_run: true</code> for a check-only preview. Clean implementation
           commits and same-branch amendments retain model semantics while updating
@@ -497,7 +497,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           with automatic commits disabled.
         </p>
         <p className="text-zinc-600 mb-4">
-          Branch-selected MCP calls use tool contract version 3. Open or create the branch
+          Branch-selected MCP calls use tool contract version 4. Open or create the branch
           first, then use <code>branch</code> on model reads, edits, commits,
           refresh and publication. Use <code>from_branch</code> to resolve a
           relative creation base. With multiple open contexts, explicitly select
@@ -520,7 +520,7 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           operations also block it. Explorer keeps the accepted view and commit
           label, shows the affected paths and observed commit, and disables writes
           for an external HEAD mismatch. Resolve the diagnostic or explicitly
-          readmit changed model inputs through <code>reqvire.worktree.open</code>.
+          readmit changed model inputs through <code>reqvire.branch.open</code>.
           Polling observes staleness without automatically adopting external commits.
         </p>
       </Section>

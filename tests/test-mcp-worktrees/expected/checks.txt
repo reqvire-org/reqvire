@@ -44,6 +44,8 @@ PASS read-only-mcp/branch-worktree-created-on-demand
 PASS read-only-mcp/prepared-worktree-persists
 PASS mcp/create-isolated-context
 PASS mcp/open-idempotent
+PASS mcp/branch-lifecycle-tool-names
+PASS mcp/obsolete-tool-names-rejected
 PASS mcp/branch-selector-catalog
 PASS mcp/obsolete-selector-rejected
 PASS mcp/branch-resources-and-prompts
@@ -59,6 +61,8 @@ PASS mcp/original-protected
 PASS mcp/remove-keeps-branch
 PASS serve/create-isolated-context
 PASS serve/open-idempotent
+PASS serve/branch-lifecycle-tool-names
+PASS serve/obsolete-tool-names-rejected
 PASS serve/branch-selector-catalog
 PASS serve/obsolete-selector-rejected
 PASS serve/branch-resources-and-prompts

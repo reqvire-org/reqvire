@@ -400,9 +400,9 @@ def main():
                         drivers.insert(0, ("browser-check.mjs", "browser.txt", str(fixtures / "Added.md")))
                     for driver, expected_file, extra in drivers:
                         if driver == "browser-navigation.mjs":
-                            inventory = served.tool("reqvire.worktree.list")
+                            inventory = served.tool("reqvire.branch.list")
                             original = next(row for row in inventory["worktrees"] if row.get("original"))
-                            other = served.tool("reqvire.worktree.create", branch="coverage-links", base_ref="HEAD")
+                            other = served.tool("reqvire.branch.create", branch="coverage-links", base_ref="HEAD")
                             (output / "browser-contexts.json").write_text(json.dumps({
                                 "original": original["branch"], "other": other["branch"],
                                 "roots": {original["branch"]: original["workspace_root"], other["branch"]: other["workspace_root"]},
@@ -430,7 +430,7 @@ def main():
                     for path, content in originals.items():
                         path.write_bytes(content)
                     if other is not None:
-                        served.tool("reqvire.worktree.remove", branch=other["branch"])
+                        served.tool("reqvire.branch.close", branch=other["branch"])
             check("browser-served-exported-and-live-coverage", browser_checks)
 
         with McpServer(args.binary, root, output) as server:

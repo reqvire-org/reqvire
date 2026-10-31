@@ -145,7 +145,7 @@ Mixed model and implementation workflows can adopt eligible external commits on 
 
 #### Relations
   * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
-  * specifiedBy: [MCP Worktree Model Sessions](MCP/Tools.md#mcp-worktree-model-sessions)
+  * specifiedBy: [MCP Branch Model Sessions](MCP/Tools.md#mcp-branch-model-sessions)
 ---
 
 ### Public Documentation Website Interface

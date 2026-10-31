@@ -50,7 +50,6 @@
   --radius-full: 999px;
 
   /* Control heights (dense product) */
-  --control-height-xs: 22px;   /* count pills */
   --control-height-sm: var(--space-14);   /* compact buttons, chips */
   --control-height-md: 34px;   /* default buttons, inputs, toggles */
   --control-height-lg: var(--space-20);
@@ -59,6 +58,10 @@
   --control-padding-lg: var(--space-8);
   /* Gap between a control's edge and a round part inside it: a switch thumb, a segment track. */
   --control-inset: var(--space-1);
+  /* An item inside a segmented track: the track adds --control-inset on each side. */
+  --control-segment-height: 26px;
+  /* Count pills and small badges: read-only labels, not pointer targets. */
+  --space-count-pill-height: 22px;
 
   /* Icon sizes */
   --icon-xs: var(--text-sm);
@@ -91,6 +94,7 @@
   --grid-margin-md: var(--space-12);
   --grid-margin-lg: var(--space-16);
   --row-height-compact: var(--space-15);   /* compact tree/list row height */
+  --side-pane-legend-row-height: var(--space-14);   /* read-only legend row (swatch + label) */
   --compact-column-min: var(--space-56); /* minimum readable compact metadata/filter column width */
   --space-flow-node-width: var(--space-140); /* shared model and verification flow cards */
   --space-flow-node-height: 164px;

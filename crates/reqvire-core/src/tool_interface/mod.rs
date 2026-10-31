@@ -54,7 +54,7 @@ mod dispatch;
 use dispatch::dispatch_tool;
 
 pub const MCP_PROTOCOL_VERSION: &str = "2025-11-25";
-pub const TOOL_CONTRACT_VERSION: &str = "3";
+pub const TOOL_CONTRACT_VERSION: &str = "4";
 
 pub struct ReqvireToolRegistry<'a> {
     enable_mutations: bool,

@@ -99,8 +99,8 @@ export const paneControlsClass = css`
   --ds-togglerow-label-toe: ellipsis;
   --ds-togglerow-label-ws: nowrap;
   --ds-togglerow-meta-display: inline-flex;
-  --ds-togglerow-meta-min-w: var(--control-height-xs);
-  --ds-togglerow-meta-h: var(--control-height-xs);
+  --ds-togglerow-meta-min-w: var(--space-count-pill-height);
+  --ds-togglerow-meta-h: var(--space-count-pill-height);
   --ds-togglerow-meta-ai: center;
   --ds-togglerow-meta-jc: center;
   --ds-togglerow-meta-p: 0 var(--space-3);
@@ -248,8 +248,8 @@ export const paneNavRowIconClass = css`
 export const paneNavRowCountClass = css`
   box-sizing: border-box;
   display: inline-flex;
-  min-width: var(--control-height-xs);
-  height: var(--control-height-xs);
+  min-width: var(--space-count-pill-height);
+  height: var(--space-count-pill-height);
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
@@ -309,7 +309,7 @@ export const paneLegendRowClass = css`
   display: flex;
   align-items: center;
   gap: var(--space-6);
-  min-height: var(--control-height-sm);
+  min-height: var(--side-pane-legend-row-height);
   padding-top: 0;
   padding-right: var(--space-7);
   padding-bottom: 0;
@@ -332,7 +332,7 @@ export const paneSymbolClass = css`
   border: var(--border-w) solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-sunken);
-  color: var(--text-link);
+  color: var(--accent-text);
   font-size: var(--text-micro);
   font-weight: var(--weight-bold);
   line-height: 1;
@@ -629,7 +629,7 @@ export const baseUX = css`
     justify-content: center;
     flex-shrink: 0;
     min-width: var(--space-10);
-    height: var(--control-height-xs);
+    height: var(--space-count-pill-height);
     border-radius: var(--radius-full);
     border: var(--border-w) solid var(--border-subtle);
     padding-top: 0;
@@ -659,8 +659,8 @@ export const baseUX = css`
     --ds-togglerow-label-toe: ellipsis;
     --ds-togglerow-label-ws: nowrap;
     --ds-togglerow-meta-display: inline-flex;
-    --ds-togglerow-meta-min-w: var(--control-height-xs);
-    --ds-togglerow-meta-h: var(--control-height-xs);
+    --ds-togglerow-meta-min-w: var(--space-count-pill-height);
+    --ds-togglerow-meta-h: var(--space-count-pill-height);
     --ds-togglerow-meta-ai: center;
     --ds-togglerow-meta-jc: center;
     --ds-togglerow-meta-p: 0 var(--space-3);
@@ -813,7 +813,7 @@ export const baseUX = css`
     display: flex;
     align-items: center;
     gap: var(--space-6);
-    min-height: var(--control-height-sm);
+    min-height: var(--side-pane-legend-row-height);
     padding-top: 0;
     padding-right: var(--space-7);
     padding-bottom: 0;

@@ -35,7 +35,6 @@
         const stored = localStorage.getItem(key);
         const dark = stored === "dark" || (!stored && matchMedia("(prefers-color-scheme: dark)").matches);
         document.documentElement.dataset.theme = dark ? "dark" : "light";
-        document.documentElement.classList.toggle("dark", dark);
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>

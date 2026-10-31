@@ -30,25 +30,25 @@ const skinX = css`
 const dangerSkinX = css`
   background: var(--danger-bg);
   border-color: var(--danger-border);
-  color: var(--danger);
+  color: var(--danger-text);
 `;
 
 const warningSkinX = css`
   background: var(--warning-bg);
   border-color: var(--warning-border);
-  color: var(--warning);
+  color: var(--warning-text);
 `;
 
 const successSkinX = css`
   background: var(--success-bg);
   border-color: var(--success-border);
-  color: var(--success);
+  color: var(--success-text);
 `;
 
 const infoSkinX = css`
   background: var(--info-bg);
   border-color: var(--info-border);
-  color: var(--info);
+  color: var(--info-text);
 `;
 
 const variantSkinX: Record<NonNullable<AlertProps["variant"]>, string> = {

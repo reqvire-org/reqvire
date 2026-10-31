@@ -101,9 +101,9 @@ describe("native trace snapshot ownership", () => {
     render(view(withSecondTrace(fixture("Old Requirement")))); await ready();
     expect(layoutEngine).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
     expect(cards()).toHaveLength(2);
-    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Old Requirement"]')!);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a.ux-trace-flow-node-identity[title="Old Requirement"]')!);
     expect(onOpenElement).toHaveBeenLastCalledWith(`${file}#requirement`);
-    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Open source for Old Requirement"]')!);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label$=", source for Old Requirement"]')!);
     expect(window.location.hash).toBe("#/content/system-model/Specifications.md");
     fireEvent.click(screen.getAllByText("Specifications.md")[0]);
     expect(screen.getByTestId("trace-rows")).toBeTruthy();

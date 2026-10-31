@@ -1,4 +1,4 @@
-import { runForceAtlasLayout } from "@ds";
+import { paletteFor, paletteHex, runForceAtlasLayout } from "@ds";
 import { act, fireEvent, render, screen, waitFor } from "@/test/render";
 import { useState } from "preact/hooks";
 import type Graph from "graphology";
@@ -21,6 +21,7 @@ const sigmaState = vi.hoisted(() => ({
   settings: [] as RendererSettings[],
   handlers: [] as Array<Map<string, NodeEventHandler>>,
   refreshes: [] as Array<ReturnType<typeof vi.fn>>,
+  setSettings: [] as Array<ReturnType<typeof vi.fn>>,
   cameras: [] as Array<{ animate: ReturnType<typeof vi.fn>; animatedReset: ReturnType<typeof vi.fn> }>,
   constructs: 0,
   kills: 0,
@@ -82,9 +83,11 @@ vi.mock("sigma", () => ({
       sigmaState.settings.push(settings);
       sigmaState.handlers.push(this.handlers);
       sigmaState.refreshes.push(this.refresh);
+      sigmaState.setSettings.push(this.setSetting);
       sigmaState.cameras.push(this.camera);
     }
     refresh = vi.fn();
+    setSetting = vi.fn();
     kill = vi.fn(() => {
       sigmaState.kills += 1;
     });
@@ -121,6 +124,7 @@ function resetSigmaState() {
   sigmaState.settings.length = 0;
   sigmaState.handlers.length = 0;
   sigmaState.refreshes.length = 0;
+  sigmaState.setSettings.length = 0;
   sigmaState.cameras.length = 0;
   sigmaState.constructs = 0;
   sigmaState.kills = 0;
@@ -401,6 +405,35 @@ describe("OntologiesView", () => {
     setAttribute.mockClear();
     act(() => window.setOntologyGraphFilter?.("role", "semantic-query", true));
     expect(setAttribute).not.toHaveBeenCalled();
+  });
+
+  it("recolors from the palette once on a theme change without rebuilding the renderer", async () => {
+    setupWebGLMock(); resetSigmaState();
+    const container = document.createElement("div");
+    document.body.append(container);
+    const handle = await mountOntologyGraph(container, semanticQueryStore.ontology.graph_data!);
+    try {
+      const graph = sigmaState.graphs[0];
+      const light = paletteFor(container);
+      const query = () => graph.getNodeAttributes(queryId);
+      expect(query().color).toBe(paletteHex(light, "--color-role-ontology"));
+      expect(decodeURIComponent(String(query().image))).toContain(`fill="${paletteHex(light, "--text-strong")}"`);
+      const refresh = sigmaState.refreshes[0];
+      refresh.mockClear();
+      document.documentElement.setAttribute("data-theme", "dark");
+      await waitFor(() => expect(refresh).toHaveBeenCalled());
+      const dark = paletteFor(container);
+      expect(paletteHex(dark, "--text-strong")).not.toBe(paletteHex(light, "--text-strong"));
+      expect(refresh).toHaveBeenCalledOnce();
+      expect(sigmaState.constructs).toBe(1);
+      expect(sigmaState.kills).toBe(0);
+      expect(decodeURIComponent(String(query().image))).toContain(`fill="${paletteHex(dark, "--text-strong")}"`);
+      expect(sigmaState.setSettings[0]).toHaveBeenCalledWith("edgeLabelColor", { color: paletteHex(dark, "--text-strong") });
+      const edges = graph.edges();
+      expect(edges.length).toBeGreaterThan(0);
+      expect(edges.some(id => graph.getEdgeAttribute(id, "color") === paletteHex(dark, "--color-role-edge-default")
+        || graph.getEdgeAttribute(id, "color") === paletteHex(dark, "--text-strong"))).toBe(true);
+    } finally { handle.destroy(); container.remove(); }
   });
 
   it("renders query glyphs and retains vocabulary property links, with a query visibility filter", async () => {

@@ -16,8 +16,13 @@ import {
   MARKDOWN_TABLE_WRAP_CLASS,
   MarkdownFrame,
   RendererNotice,
-  cssVar,
+  observePalette,
+  paletteContext,
+  paletteFor,
+  paletteHex,
   replaceCssVarsForMermaid,
+  type Palette,
+  type PaletteContext,
   type DetailConceptReferenceItem,
   type MarkdownFrameVariant,
 } from "@ds";
@@ -532,7 +537,15 @@ export function MermaidBlock({
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const renderId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const renderCode = useMemo(() => normalizeMermaidForRender(code), [code]);
+  // Colors are baked into the Mermaid source, so a theme change re-renders it.
+  const [paletteKey, setPaletteKey] = useState<PaletteContext>(() => paletteContext(document.documentElement));
+  useEffect(() => {
+    const target = ref.current;
+    if (!target) return undefined;
+    setPaletteKey(paletteContext(target));
+    return observePalette(target, (_palette, context) => setPaletteKey(context));
+  }, []);
+  const renderCode = useMemo(() => normalizeMermaidForRender(code, ref.current ?? undefined), [code, paletteKey]);
   const [renderFailed, setRenderFailed] = useState(false);
 
   useEffect(() => {
@@ -600,8 +613,8 @@ export function MermaidBlock({
   );
 }
 
-function normalizeMermaidForRender(code: string): string {
-  return replaceCssVarsForMermaid(code);
+function normalizeMermaidForRender(code: string, element?: Element): string {
+  return replaceCssVarsForMermaid(code, element);
 }
 
 function renderMermaidSvg(target: HTMLElement, svg: string) {
@@ -980,8 +993,10 @@ function D3HierarchyBlock({
 
   useEffect(() => {
     const svgNode = ref.current;
-    if (!svgNode || !parseResult.ok) return;
-    renderD3Hierarchy(svgNode, parseResult.data, mode);
+    if (!svgNode || !parseResult.ok) return undefined;
+    const data = parseResult.data;
+    renderD3Hierarchy(svgNode, data, mode, paletteFor(svgNode));
+    return observePalette(svgNode, colors => renderD3Hierarchy(svgNode, data, mode, colors));
   }, [mode, parseResult]);
 
   if (!parseResult.ok) {
@@ -1021,6 +1036,7 @@ function renderD3Hierarchy(
   svgNode: SVGSVGElement,
   data: D3HierarchyDatum,
   mode: D3HierarchyMode,
+  colors: Palette,
 ) {
   const width = Math.max(680, svgNode.parentElement?.clientWidth ?? 680);
   const height = mode === "tree" ? 460 : 560;
@@ -1040,12 +1056,12 @@ function renderD3Hierarchy(
         .x((node) => node.y)
         .y((node) => node.x))
       .attr("fill", "none")
-      .attr("stroke", cssVar("--color-role-edge-default"));
+      .attr("stroke", paletteHex(colors, "--color-role-edge-default"));
     const nodes = group.selectAll("g")
       .data(laidOut.descendants())
       .join("g")
       .attr("transform", (node) => `translate(${node.y},${node.x})`);
-    nodes.append("circle").attr("r", 5).attr("fill", cssVar("--accent"));
+    nodes.append("circle").attr("r", 5).attr("fill", paletteHex(colors, "--accent"));
     nodes.append("text")
       .attr("x", 9)
       .attr("dy", "0.32em")
@@ -1069,7 +1085,7 @@ function renderD3Hierarchy(
     .join("path")
     .attr("d", arc)
     .attr("fill", (node) => color(String(node.depth)))
-    .attr("stroke", cssVar("--bg-surface"))
+    .attr("stroke", paletteHex(colors, "--bg-surface"))
     .append("title")
     .text((node) => node.ancestors().reverse().map((ancestor) => ancestor.data.name ?? "node").join(" / "));
   group.append("text")

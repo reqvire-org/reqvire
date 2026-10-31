@@ -19,7 +19,7 @@ const itemBaseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  height: var(--ds-segmented-item-h, calc(var(--control-height-xs) + var(--space-2)));
+  height: var(--ds-segmented-item-h, var(--control-segment-height));
   padding: 0 var(--control-padding-sm);
   border: 0;
   border-radius: var(--radius-sm);

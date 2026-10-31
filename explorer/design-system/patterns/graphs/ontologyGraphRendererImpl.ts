@@ -8,7 +8,7 @@ import { EdgeProgram } from "sigma/rendering";
 import { animateNodes, floatColor } from "sigma/utils";
 import noverlap from "graphology-layout-noverlap";
 import type { OntologyGraphData, OntologyGraphNode } from "./types";
-import { cssVar, ELEMENT_TYPES } from "../../palette";
+import { ELEMENT_TYPES, observePalette, paletteFor, paletteHex } from "../../palette";
 
 export interface OntologyGraphRendererHandle {
   destroy: () => void;
@@ -350,33 +350,42 @@ function createSubclassTriangleEdgeProgram(options = {}) {
         return noopHandle;
     }
 
-    const reqvireSurfaceHover = cssVar('--bg-sunken');
-    const textStrong = cssVar('--text-strong');
-    const textBody = cssVar('--text-body');
-    const textMuted = cssVar('--text-muted');
-    const textInverse = cssVar('--color-paper');
-    const labelOnLight = cssVar('--color-ink');
-    const defaultEdge = cssVar('--color-role-edge-default');
-    const colorBySemanticType = {
-        'semantic-query': { fill: cssVar('--color-role-ontology'), stroke: cssVar('--color-role-ontology-ink'), text: textStrong },
-        class: { fill: cssVar('--color-role-rdf-class'), stroke: textStrong, text: textStrong },
-        'object-property': { fill: cssVar('--color-role-rdf-objprop'), stroke: textBody, text: textStrong },
-        'datatype-property': { fill: cssVar('--color-role-rdf-dtprop'), stroke: textBody, text: textInverse },
-        'rdf-property': { fill: cssVar('--color-role-rdf-rdfprop'), stroke: textBody, text: textInverse },
-        'skos-concept': { fill: cssVar('--color-role-rdf-concept'), stroke: cssVar('--color-role-ontology-ink'), text: textStrong },
-        'named-individual': { fill: cssVar('--color-role-rdf-individual'), stroke: cssVar('--color-role-requirement-ink'), text: textInverse },
-        datatype: { fill: cssVar('--color-role-rdf-datatype'), stroke: cssVar('--color-role-ontology-ink'), text: textStrong },
-        restriction: { fill: cssVar('--color-role-rdf-restriction'), stroke: textStrong, text: textStrong },
-        'class-expression': { fill: cssVar('--color-role-rdf-classexpr'), stroke: textStrong, text: textStrong },
-        'node-shape': { fill: cssVar('--color-role-rdf-nodeshape'), stroke: cssVar('--color-role-rdf-propshape'), text: textInverse },
-        'property-shape': { fill: cssVar('--color-role-rdf-propshape'), stroke: cssVar('--color-role-rdf-nodeshape'), text: textInverse },
-        resource: { fill: reqvireSurfaceHover, stroke: cssVar('--color-role-other-ink'), text: textStrong }
-    };
-    const colorByLayer = {
-        concepts: { fill: cssVar('--color-role-rdf-concept'), stroke: cssVar('--color-role-ontology-ink'), text: textStrong },
-        'reqvire-context': { fill: cssVar('--info'), stroke: cssVar('--info-border'), text: textInverse },
-        'external-source': { fill: cssVar('--color-role-other'), stroke: cssVar('--color-role-other-ink'), text: textStrong }
-    };
+    // One palette per render pass; observePalette swaps it and recolors the graph on a theme
+    // change without rebuilding the renderer (no per-node page reads).
+    let colors = paletteFor(container);
+    const c = token => colors[token] ? paletteHex(colors, token) : `var(${token})`;
+    let reqvireSurfaceHover, textStrong, textBody, textMuted, textInverse, labelOnLight, defaultEdge;
+    let colorBySemanticType, colorByLayer;
+    function readPaletteColors() {
+        reqvireSurfaceHover = c('--bg-sunken');
+        textStrong = c('--text-strong');
+        textBody = c('--text-body');
+        textMuted = c('--text-muted');
+        textInverse = c('--color-paper');
+        labelOnLight = c('--color-ink');
+        defaultEdge = c('--color-role-edge-default');
+        colorBySemanticType = {
+            'semantic-query': { fill: c('--color-role-ontology'), stroke: c('--color-role-ontology-ink'), text: textStrong },
+            class: { fill: c('--color-role-rdf-class'), stroke: textStrong, text: textStrong },
+            'object-property': { fill: c('--color-role-rdf-objprop'), stroke: textBody, text: textStrong },
+            'datatype-property': { fill: c('--color-role-rdf-dtprop'), stroke: textBody, text: textInverse },
+            'rdf-property': { fill: c('--color-role-rdf-rdfprop'), stroke: textBody, text: textInverse },
+            'skos-concept': { fill: c('--color-role-rdf-concept'), stroke: c('--color-role-ontology-ink'), text: textStrong },
+            'named-individual': { fill: c('--color-role-rdf-individual'), stroke: c('--color-role-requirement-ink'), text: textInverse },
+            datatype: { fill: c('--color-role-rdf-datatype'), stroke: c('--color-role-ontology-ink'), text: textStrong },
+            restriction: { fill: c('--color-role-rdf-restriction'), stroke: textStrong, text: textStrong },
+            'class-expression': { fill: c('--color-role-rdf-classexpr'), stroke: textStrong, text: textStrong },
+            'node-shape': { fill: c('--color-role-rdf-nodeshape'), stroke: c('--color-role-rdf-propshape'), text: textInverse },
+            'property-shape': { fill: c('--color-role-rdf-propshape'), stroke: c('--color-role-rdf-nodeshape'), text: textInverse },
+            resource: { fill: reqvireSurfaceHover, stroke: c('--color-role-other-ink'), text: textStrong }
+        };
+        colorByLayer = {
+            concepts: { fill: c('--color-role-rdf-concept'), stroke: c('--color-role-ontology-ink'), text: textStrong },
+            'reqvire-context': { fill: c('--info'), stroke: c('--info-border'), text: textInverse },
+            'external-source': { fill: c('--color-role-other'), stroke: c('--color-role-other-ink'), text: textStrong }
+        };
+    }
+    readPaletteColors();
     const ontologyZIndex = {
         mutedNode: -10,
         base: 0,
@@ -504,6 +513,29 @@ function createSubclassTriangleEdgeProgram(options = {}) {
 
     try { renderOntologyGraph(); }
     catch (error) { layoutOwner.cancel(); renderer?.kill(); throw error; }
+
+    const stopPalette = observePalette(container, next => {
+        colors = next;
+        readPaletteColors();
+        if (!graph || !renderer) return;
+        graph.updateEachNodeAttributes((_nodeId, attributes) => {
+            const palette = nodePalette(attributes);
+            const queryGlyph = attributes.semantic_type === 'semantic-query';
+            const constructGlyph = isConstructGlyphNode(attributes);
+            return Object.assign(attributes, {
+                color: palette.fill,
+                borderColor: palette.stroke,
+                image: queryGlyph ? queryGlyphImage() : constructGlyph ? constructGlyphImage(attributes) : undefined,
+                mutedImage: queryGlyph ? queryGlyphImage(true) : constructGlyph ? constructGlyphImage(attributes, true) : undefined
+            });
+        }, { attributes: ['color', 'borderColor', 'image', 'mutedImage'] });
+        graph.updateEachEdgeAttributes((_edgeId, attributes) => Object.assign(attributes, {
+            color: sigmaEdgeColor(attributes)
+        }), { attributes: ['color'] });
+        renderer.setSetting('labelColor', { color: labelOnLight });
+        renderer.setSetting('edgeLabelColor', { color: textStrong });
+        renderer.refresh();
+    });
 
     function renderOntologyGraph() {
         if (!container) {
@@ -654,7 +686,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
                     result.forceLabel = true;
                 }
                 if (muted) {
-                    result.color = dimColor(attributes.color || cssVar('--color-role-other'), 0.2);
+                    result.color = dimColor(attributes.color || c('--color-role-other'), 0.2);
                     result.label = '';
                     result.forceLabel = false;
                     result.zIndex = ontologyZIndex.mutedNode;
@@ -1109,10 +1141,10 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             return textStrong;
         }
         if (edgeHasConstruct(edgeData, 'disjoint')) {
-            return cssVar('--color-role-rdf-nodeshape');
+            return c('--color-role-rdf-nodeshape');
         }
         if (edgeHasConstruct(edgeData, 'inverse')) {
-            return cssVar('--color-role-rdf-individual');
+            return c('--color-role-rdf-individual');
         }
         return defaultEdge;
     }
@@ -1128,7 +1160,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
             return textStrong;
         }
         if (edgeHasConstruct(edgeData, 'disjoint')) {
-            return cssVar('--color-role-rdf-nodeshape');
+            return c('--color-role-rdf-nodeshape');
         }
         return textMuted;
     }
@@ -1192,7 +1224,7 @@ function createSubclassTriangleEdgeProgram(options = {}) {
     }
 
     function queryGlyphImage(muted = false) {
-        const fill = muted ? dimColor(cssVar('--color-role-ontology'), 0.2) : cssVar('--color-role-ontology');
+        const fill = muted ? dimColor(c('--color-role-ontology'), 0.2) : c('--color-role-ontology');
         const ink = muted ? textMuted : textStrong;
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><circle cx="128" cy="128" r="120" fill="${escapeXml(fill)}"/><text x="128" y="172" font-family="monospace" font-size="144" font-weight="700" text-anchor="middle" fill="${escapeXml(ink)}">${ELEMENT_TYPES['semantic-query'].glyph}</text></svg>`;
         return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -1361,8 +1393,9 @@ ${body}
 
     function dimColor(color, alpha) {
         const foreground = parseCssColor(resolveColorValue(color));
-        const background = parseCssColor(cssVar('--bg-canvas'));
-        if (!foreground || !background) return color;
+        if (!foreground) return color;
+        const [br, bg, bb] = colors['--bg-canvas'].rgba;
+        const background = { r: br, g: bg, b: bb };
         const r = Math.round(foreground.r * alpha + background.r * (1 - alpha));
         const g = Math.round(foreground.g * alpha + background.g * (1 - alpha));
         const b = Math.round(foreground.b * alpha + background.b * (1 - alpha));
@@ -1375,7 +1408,7 @@ ${body}
         if (value.startsWith('var(')) {
             const match = value.match(/^var\((--[a-z0-9-]+)(?:,\s*([^)]+))?\)$/i);
             if (match) {
-                return cssVar(match[1]);
+                return c(match[1]);
             }
         }
         return value;
@@ -2742,6 +2775,7 @@ ${body}
 
     return {
         destroy() {
+            stopPalette();
             layoutOwner.cancel();
             if (suppressStageClearTimer) {
                 window.clearTimeout(suppressStageClearTimer);
