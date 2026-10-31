@@ -12,15 +12,13 @@ Persistent project decisions from the workspace-management discussion on 2026-10
 - `.repo/manifest.xml` is Repo's entry point; resolve its actual source files and Git owners. A native manifest checkout can share Git history with the workspace-root repository or have its own history. Its filesystem location alone does not establish either case.
 - Manifest sources must be versioned in their actual owning Git repositories. Ignoring `/.repo/` in the outer repository does not mean the manifest is unversioned in its owner. Do not add Repo administration to the outer Git tree.
 - The user's example uses the server/client monorepo as the workspace-root repository, with a shared model and separate declared website/documentation repositories. Do not silently substitute a different workspace layout or require a new manifest-only repository.
-- Native discovery/model loading already work. The current workspace-management change adds historical reconstruction, owner-aware manifest checkpoints, and coordinated branch/publication management. Check the plan's verification record before claiming completion or release; the default manifest location was never a missing feature.
+- Native discovery/model loading already work. Workspace management includes historical reconstruction, owner-aware manifest checkpoints, and coordinated branch/publication management. Check current verification evidence before claiming completion or release; the default manifest location was never a missing feature.
 - Public MCP management uses branches; worktrees are internal. Single- and multi-repository use share the same operations, without a repository-mode argument. Explicit branch creation should prepare the requested branch in the root and all declared components from the selected base composition; branch creation alone does not advance pins.
 - The user explicitly approved one coordinated MCP PR-create call producing linked PRs for changed components and the root. Push and PR creation remain explicit operations.
 - Review should use the selected PR's actual baseline, with one explicit Git-baseline override. Do not default examples to `origin/main` or introduce a second manifest-commit flag.
 - Additional `branch.open` reload flags, a separate adopt tool, and refresh modes were discussed but **not approved**. Do not present them as settled decisions.
 - Explicit `branch.open` now performs full validated admission of a prepared changed composition; unchanged contexts remain idempotent. Guarded `branch.refresh` remains artifact-only. Rejected admission preserves the live accepted view, including reads already in flight.
 - Keep the Git executable backend for this iteration. Core local/object reads share `git_commands` and its batched `GitReader`; MCP retains bounded execution for writes, cancellation and uncertain outcomes. A Rust Git-library migration requires a separate measured reason and compatibility work.
-
-The detailed implementation plan, current-code gaps, and remaining design questions are recorded in [Workspace management plan](doc/workspace-management-plan.md). Update the model and verifications before implementing its engineering obligations. The plan describes intended changes; it is not evidence that they are implemented.
 
 ## MBSE Development Workflow
 
