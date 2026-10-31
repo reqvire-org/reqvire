@@ -54,8 +54,8 @@ const baseUX = css`
     display: var(--ds-togglerow-meta-display, inline-flex);
     align-items: var(--ds-togglerow-meta-ai, center);
     justify-content: var(--ds-togglerow-meta-jc, center);
-    min-width: var(--ds-togglerow-meta-min-w, var(--control-height-xs));
-    height: var(--ds-togglerow-meta-h, var(--control-height-xs));
+    min-width: var(--ds-togglerow-meta-min-w, var(--space-count-pill-height));
+    height: var(--ds-togglerow-meta-h, var(--space-count-pill-height));
     padding: var(--ds-togglerow-meta-p, 0 var(--control-padding-sm));
     border-radius: var(--ds-togglerow-meta-radius, var(--radius-full));
     font-size: var(--text-micro);
@@ -102,15 +102,19 @@ const skinX = css`
     border-color: var(--accent);
   }
 
+  /* Off is a state, not disabled: its text keeps readable contrast (muted, not faded);
+     the swatch and icon carry the off look. */
   &.is-off {
-    color: var(--ds-togglerow-off-color);
+    color: var(--ds-togglerow-off-color, var(--text-muted));
     background: var(--ds-togglerow-off-bg, var(--ds-togglerow-bg, transparent));
-    opacity: var(--ds-togglerow-off-opacity, 0.45);
   }
 
   &.is-off:hover {
-    color: var(--ds-togglerow-off-hover-color);
-    opacity: var(--ds-togglerow-off-hover-opacity, 0.45);
+    color: var(--ds-togglerow-off-hover-color, var(--text-body));
+  }
+
+  &.is-off .ds-togglerow__meta {
+    color: var(--text-muted);
   }
 
   &.is-off .ds-togglerow__label {

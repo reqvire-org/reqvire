@@ -10,7 +10,7 @@ import { Button } from "../../components/core/Button";
 import { Spinner } from "../../components/core/Spinner";
 import { GraphCanvasFrame, GraphCanvasSurface, GraphCanvasNotice, GraphRoute } from "../content/GraphCanvasFrame";
 import { useLatestRef } from "../../hooks/useLatestRef";
-import { cssVar, roleColorToken, type DesignSystemColorToken } from "../../palette";
+import { observePalette, paletteFor, paletteHex, roleColorToken, type Palette } from "../../palette";
 
 type GraphEdge = NonNullable<KnowledgeGraphProjection["edges"]>[number] & {
   relCategory?: RelationCategory;
@@ -100,13 +100,13 @@ function nodeSize(node: KnowledgeGraphNode, degreeByNode: Map<string, number>) {
   return Math.min(16, 4 + Math.sqrt(degree + 1) * 1.6);
 }
 
-function dimNodeColor(color: string, alpha: number) {
+function dimNodeColor(color: string, alpha: number, colors: Palette) {
   const foreground = parseHexColor(color);
-  const background = parseHexColor(cssVar("--bg-canvas"));
-  if (!foreground || !background) return color;
-  const r = Math.round(foreground.r * alpha + background.r * (1 - alpha));
-  const g = Math.round(foreground.g * alpha + background.g * (1 - alpha));
-  const b = Math.round(foreground.b * alpha + background.b * (1 - alpha));
+  if (!foreground) return color;
+  const [br, bg, bb] = colors["--bg-canvas"].rgba;
+  const r = Math.round(foreground.r * alpha + br * (1 - alpha));
+  const g = Math.round(foreground.g * alpha + bg * (1 - alpha));
+  const b = Math.round(foreground.b * alpha + bb * (1 - alpha));
   return `#${[r, g, b].map((component) => component.toString(16).padStart(2, "0")).join("")}`;
 }
 
@@ -126,16 +126,17 @@ function parseHexColor(color: string) {
   return [r, g, b].some((component) => Number.isNaN(component)) ? null : { r, g, b };
 }
 
-function sigmaLabelSettings() {
+function sigmaLabelSettings(colors: Palette) {
   return {
-    labelColor: { color: cssVar("--color-ink") },
-    edgeLabelColor: { color: cssVar("--text-muted") },
+    labelColor: { color: paletteHex(colors, "--color-ink") },
+    edgeLabelColor: { color: paletteHex(colors, "--text-muted") },
     labelWeight: "600",
     edgeLabelWeight: "600",
   } as const;
 }
 
-function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknown }, resolve: typeof cssVar = cssVar) {
+function edgeColor(edge: { label?: unknown; kind?: unknown; relCategory?: unknown }, colors: Palette) {
+  const resolve = (token: Parameters<typeof paletteHex>[1]) => paletteHex(colors, token);
   const category = typeof edge.relCategory === "string"
     ? edge.relCategory as RelationCategory
     : relationCategory(edge);
@@ -497,6 +498,21 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
     let isDraggingNode = false;
     let dragMovedNode = false;
     const neighborhoodCache = new Map<string, Set<string>>();
+    let colors = paletteFor(container);
+    const stopPalette = observePalette(container, next => {
+      colors = next;
+      if (!graph || !renderer) return;
+      graph.updateEachNodeAttributes((_id, attributes) => Object.assign(attributes, {
+        color: paletteHex(colors, roleColorToken(String(attributes.reqvireType ?? "other"))),
+      }), { attributes: ["color"] });
+      graph.updateEachEdgeAttributes((_id, attributes) => Object.assign(attributes, {
+        color: edgeColor(attributes, colors),
+      }), { attributes: ["color"] });
+      const labels = sigmaLabelSettings(colors);
+      renderer.setSetting("labelColor", labels.labelColor);
+      renderer.setSetting("edgeLabelColor", labels.edgeLabelColor);
+      renderer.refresh();
+    });
     const setGraphCursor = (cursor: "" | "pointer" | "grabbing") => {
       container.style.cursor = cursor;
       container.querySelectorAll("canvas").forEach((canvas) => {
@@ -520,13 +536,9 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
     try {
       const positionedNodes = nodes.map((node) => ({ ...node }));
       assignInitialPositions(positionedNodes);
-      // Reuse each canonical token within this synchronous construction only.
-      // Interaction reducers continue to resolve the current palette directly.
-      const constructionColors = new Map<DesignSystemColorToken, string>();
-      const constructionColor: typeof cssVar = token => {
-        if (!constructionColors.has(token)) constructionColors.set(token, cssVar(token));
-        return constructionColors.get(token)!;
-      };
+      // One palette per render pass: construction and the reducers look colors up in it,
+      // and a theme change swaps it and redraws (no per-node page reads).
+      colors = paletteFor(container);
       graph = new Graph({ type: "directed", multi: true, allowSelfLoops: true });
       positionedNodes.forEach((node) => {
         const kind = nodeKind(node);
@@ -540,7 +552,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
           x: positioned.x,
           y: positioned.y,
           size: nodeSize(node, degreeByNode),
-          color: constructionColor(roleColorToken(kind)),
+          color: paletteHex(colors, roleColorToken(kind)),
           hidden: !visibleNode(node),
         });
       });
@@ -550,7 +562,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
           type: "arrow",
           label: displayEdgeLabel(edge),
           size: edge.kind === "contract_bindings" || edge.kind === "contract_references" || edge.kind === "concept-reference" ? 0.8 : 1.1,
-          color: edgeColor(edge, constructionColor),
+          color: edgeColor(edge, colors),
           hidden: !visibleEdge(edge),
         });
       });
@@ -634,7 +646,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
         defaultEdgeType: "arrow",
         renderEdgeLabels: true,
         zIndex: true,
-        ...sigmaLabelSettings(),
+        ...sigmaLabelSettings(colors),
         labelDensity: 0.12,
         labelGridCellSize: 80,
         labelRenderedSizeThreshold: 9,
@@ -673,7 +685,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
             }
             result.hidden = false;
             if (hoverRefinesSelection && inSelectionTree && !inHoverTree && !dragged) {
-              result.color = dimNodeColor(String(attributes.color ?? cssVar("--text-faint")), 0.2);
+              result.color = dimNodeColor(String(attributes.color ?? paletteHex(colors, "--text-faint")), 0.2, colors);
               result.label = "";
               result.highlighted = false;
               result.forceLabel = false;
@@ -705,7 +717,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
             result.forceLabel = true;
             result.zIndex = dragged ? 20 : 10;
           } else {
-            result.color = dimNodeColor(String(attributes.color ?? cssVar("--text-faint")), 0.2);
+            result.color = dimNodeColor(String(attributes.color ?? paletteHex(colors, "--text-faint")), 0.2, colors);
             result.label = "";
             result.highlighted = false;
             result.forceLabel = false;
@@ -736,7 +748,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
               return result;
             }
             result.hidden = false;
-            result.color = edgeColor(attributes);
+            result.color = edgeColor(attributes, colors);
             result.size = Math.max(1.1, Number(attributes.size ?? 1) * 1.15);
             result.forceLabel = true;
             return result;
@@ -750,7 +762,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
             result.label = "";
           } else {
             result.hidden = false;
-            result.color = edgeColor(attributes);
+            result.color = edgeColor(attributes, colors);
             result.size = Math.max(1.1, Number(attributes.size ?? 1) * 1.15);
             result.forceLabel = true;
           }
@@ -861,6 +873,7 @@ export function KnowledgeGraphCanvas({ graphData, contextKey, activeTypes, activ
     });
 
     return () => {
+      stopPalette();
       layoutOwner.cancel();
       requestLayoutRef.current = null;
       window.cancelAnimationFrame(frameId);

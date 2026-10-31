@@ -204,7 +204,7 @@ const shellBaseUX = css`
     align-items: center;
     gap: var(--space-4);
     border-radius: var(--radius-md);
-    padding: var(--space-4);
+    padding: var(--space-4) var(--control-padding-lg);
     cursor: pointer;
     text-align: left;
   }
@@ -728,7 +728,7 @@ function ThesaurusSchemeMap({
 
   return (
     <main className="ux-thesaurus-scheme-map" aria-label="Concept scheme map">
-      <div className="ux-thesaurus-scheme-map-canvas" role="img" aria-label={`${schemeLabel} concept map`}>
+      <div className="ux-thesaurus-scheme-map-canvas" role="group" aria-label={`${schemeLabel} concept map`}>
         <ReactFlow
           className={flowCanvasClasses()}
           nodes={layout.nodes}

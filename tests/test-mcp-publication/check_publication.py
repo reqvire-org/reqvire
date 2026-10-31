@@ -67,7 +67,7 @@ for mode in ('mcp', 'serve'):
                 pushed = server.tool('reqvire.git.push')
                 check(f'{mode}/push-exact-head', pushed['commit'] == git(remote, 'rev-parse', 'refs/heads/main') == initial)
                 check(f'{mode}/push-noop', server.tool('reqvire.git.push')['outcome'] == 'no_op')
-                created = server.tool('reqvire.worktree.create', branch='feature', base_ref='main')
+                created = server.tool('reqvire.branch.create', branch='feature', base_ref='main')
                 context = created['branch']
                 content = (fixture / 'fixtures/other.md.txt').read_text().split('# Elements\n\n', 1)[1]
                 server.tool('reqvire.add_element', branch=context, file='Model.md', content=content)
@@ -104,7 +104,7 @@ for mode in ('mcp', 'serve'):
                 names = [tool['name'] for tool in server.rpc('tools/list', {})['tools']]
                 status = server.tool('reqvire.workspace_status')
                 check(f'{mode}/failed-check-disables-only-publication', 'reqvire.git.push' not in names
-                      and 'reqvire.git.commit' in names and 'reqvire.worktree.create' in names
+                      and 'reqvire.git.commit' in names and 'reqvire.branch.create' in names
                       and status['github']['available'] is False)
                 try:
                     server.raw_tool('reqvire.git.push')

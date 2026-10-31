@@ -256,7 +256,7 @@ describe("Explorer flow integration", () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Ontology Projection Verification/ }));
     const card = await screen.findByRole("article", { name: "Property Projection" });
-    fireEvent.click(screen.getByRole("button", { name: "Collapse ancestors of Property Projection" }));
+    fireEvent.click(screen.getByRole("button", { name: /collapse ancestors of Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("article", { name: "Property Resolution" })).toBeNull());
     fireEvent.click(screen.getByRole("button", { name: "Focus path through Property Projection" }));
     fireEvent.click(screen.getByRole("button", { name: "Expand flow" }));
@@ -274,7 +274,7 @@ describe("Explorer flow integration", () => {
     expect(screen.getByRole("region", { name: "Verification trace flow" }).querySelector(".react-flow")).toBe(renderer);
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Expand flow" }));
     fireEvent.click(screen.getByRole("button", { name: "Expand flow" }));
-    fireEvent.click(within(screen.getByRole("dialog", { name: "Expanded verification trace flow" })).getByRole("link", { name: "Open source for Property Projection" }));
+    fireEvent.click(within(screen.getByRole("dialog", { name: "Expanded verification trace flow" })).getByRole("link", { name: /, source for Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(window.location.hash).toContain("#/content/");
   });
@@ -450,7 +450,7 @@ describe("Explorer flow integration", () => {
     render(<MocksPage />);
     fireEvent.click(screen.getByRole("treeitem", { name: /Ontology Projection Verification/ }));
     await screen.findByRole("article", { name: "Property Projection" });
-    fireEvent.click(screen.getByRole("button", { name: "Collapse ancestors of Property Projection" }));
+    fireEvent.click(screen.getByRole("button", { name: /collapse ancestors of Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("article", { name: "Property Resolution" })).toBeNull());
     fireEvent.click(screen.getByRole("button", { name: "Focus path through Property Projection" }));
     const horizontal = screen.getByRole("article", { name: "Property Projection" }).parentElement?.getAttribute("style");
@@ -536,7 +536,7 @@ describe("Explorer flow integration", () => {
     expect(screen.getByText("Test · 2 directly verified · 5 requirements in trace")).toBeTruthy();
     await screen.findByRole("article", { name: "Ontology Projection" });
     expect(screen.getAllByRole("article", { name: "Ontology Projection" })).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: "Collapse ancestors of Property Projection" }));
+    fireEvent.click(screen.getByRole("button", { name: /collapse ancestors of Property Projection$/ }));
     await waitFor(() => expect(screen.queryByRole("article", { name: "Property Resolution" })).toBeNull());
     expect(screen.getByRole("article", { name: "Ontology Projection" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Expand all" }));

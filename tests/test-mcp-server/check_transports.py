@@ -262,7 +262,7 @@ def catalogs(server):
 
 def mutation_catalogs(server):
     discovery = catalogs(server)
-    original = next(row["branch"] for row in call(server, "reqvire.worktree.list")["worktrees"] if row.get("original"))
+    original = next(row["branch"] for row in call(server, "reqvire.branch.list")["worktrees"] if row.get("original"))
     scoped = 0
     for resource in discovery["resources/list"]["resources"]:
         uri = urllib.parse.urlsplit(resource["uri"])
@@ -386,6 +386,23 @@ def mutation(binary, folder):
     with Stdio(binary, root, folder / "stdio", "--enable-mutations") as server:
         compare(expected, mutation_catalogs(server), "mutation catalog parity")
         before = (root / "Model.md").read_bytes()
+        require(call(server, "reqvire.tool_contract")["tool_contract_version"] == "4",
+                "branch tools require tool contract version 4")
+        branch = next(row["branch"] for row in call(server, "reqvire.branch.list")["worktrees"]
+                      if row.get("original"))
+        for operation, args in (
+                ("list", {}),
+                ("create", {"branch": "obsolete-must-not-exist", "base_ref": "main"}),
+                ("open", {"branch": branch}),
+                ("remove", {"branch": branch}),
+                ("refresh_head", {"branch": branch})):
+            rejected = server.raw("tools/call", {"name": "reqvire.worktree." + operation,
+                                                "arguments": args})
+            require(rejected.get("error", {}).get("code") == -32602,
+                    "removed worktree tool was not rejected: " + operation)
+        require(before == (root / "Model.md").read_bytes()
+                and git(root, "rev-parse", "HEAD") == head and git(root, "write-tree") == index,
+                "removed tool changed repository state")
         preview = call(server, "reqvire.add_element", file="Added.md", content=ADD_CONTENT, dry_run=True)
         require(preview["dry_run"] and preview["diffs"], "preview lacks diff")
         require(not (root / "Added.md").exists() and before == (root / "Model.md").read_bytes(), "preview persisted")
@@ -432,7 +449,7 @@ def lifecycle(binary, folder, sig=None):
 def preserved_worktree(binary, folder):
     root = project(folder / "project")
     with Stdio(binary, root, folder / "stdio", "--enable-mutations") as server:
-        created = call(server, "reqvire.worktree.create", branch="stdio-pending", base_ref="main")
+        created = call(server, "reqvire.branch.create", branch="stdio-pending", base_ref="main")
         child = pathlib.Path(created["workspace_root"])
         head, index = git(child, "rev-parse", "HEAD"), git(child, "write-tree")
         call(server, "reqvire.add_element", branch=created["branch"], file="Added.md", content=ADD_CONTENT)

@@ -624,7 +624,7 @@ impl MutationSession {
         if observed.branch.as_deref() != Some(self.branch.as_str())
             || observed.head.as_deref() != Some(self.head.as_str())
         {
-            return Err(error("MCP owned branch or HEAD changed externally; check reqvire.worktree.refresh_head for eligible same-branch artifact commits, or use explicit full validated worktree admission before further mutations"));
+            return Err(error("MCP owned branch or HEAD changed externally; check reqvire.branch.refresh for eligible same-branch artifact commits, or use explicit full validated worktree admission before further mutations"));
         }
         Ok(())
     }

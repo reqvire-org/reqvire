@@ -8,30 +8,6 @@ This objective groups review of public documentation wording, examples, and navi
   * type: verification-objective
 ---
 
-### Website MCP HTTP Configuration Documentation Verification
-
-This inspection verifies that endpoint-host and browser-origin setup examples match MCP startup and transport behavior.
-
-#### Details
-- Review standalone and embedded command examples for repeatable `--allow-origin`, the embedded `--enable-mcp` prerequisite, and valid HTTP(S) origins without paths.
-- Confirm that the page explains additive loopback defaults, exact scheme/host/port matching, and rejection of unlisted origins.
-- Confirm that the page distinguishes browser origin configuration from bind address, endpoint URL, and authentication.
-- Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
-- Build the website and check the examples against command help and the transport verification results.
-- Review mutation examples for default-disabled automatic commits, explicit `--enable-commits`, standalone/embedded prerequisites, unchanged ownership, and resolution of uncommitted changes before a clean restart.
-- Review stdio startup and client configuration across MCP Server, Coding Assistants, User Guide and Integrations: HTTP default, explicit `--transport stdio`, absolute workspace selection, shared permissions, rejected HTTP-only flags, protocol-only stdout and preservation of pending work on shutdown. Compare with the passing native/npm transport and lifecycle acceptance cases.
-- Review full-definition override guidance on MCP Server and User Guide: retained incoming children and consumers, replacement of authored metadata/outgoing declarations, preview/application, cross-file rewrites, invalid-candidate preservation and actual deletion's orphan protection. Compare with the override acceptance matrix.
-
-Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Relations
-  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
-  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
----
-
 ### Website Contract Binding Placement Documentation Verification
 
 This inspection verifies that public documentation explains contract binding placement according to implementation responsibility and inherited obligation scope.
@@ -56,6 +32,114 @@ Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingL
   * verify: [Website Implementation Coverage Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-implementation-coverage-documentation)
   * verify: [Website Requirements and Contracts Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-requirements-and-contracts-documentation)
   * verify: [Website Semantic Model Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-semantic-model-documentation)
+---
+
+### Website Contract Reference Documentation Verification
+
+This inspection verifies that public documentation distinguishes contract implementation obligations from content dependencies and follows the referenced modeling and interface contracts.
+
+#### Details
+Expected checks:
+- Review the modeling-language overview and examples for the canonical Contract Bindings and Contract References subsection names, requirement-only sources, supported owned contract targets, element-wide section exclusivity, and acyclic reference dependencies.
+- Confirm that contract dependency is defined as the umbrella term for bindings and references, and that references propagate change impact without contributing to the contract owner's implementation fulfillment.
+- Review requirements-and-contracts, semantic-model, and workflow guidance for the distinction between implementation obligations and change-impact dependencies. Reference-only consumers do not contribute implementation coverage or evidence to the contract owner.
+- Confirm that verification descriptions identify requirements as targets and capabilities as receiving coverage through roll-up.
+- Review the MCP server page for has_contract_references and filter_contract_references, normalized target matching, filter composition, and a concrete search example consistent with the referenced MCP model-evidence and search-filtering contracts.
+- Confirm that the owning documentation requirements reference the contracts they describe, so contract changes reach documentation through change-impact analysis.
+- Build and inspect the affected rendered routes and check that examples agree with validated model behavior before publication.
+
+Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+  * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
+  * verify: [Website Modeling Language Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-modeling-language-documentation)
+  * verify: [Website Requirements and Contracts Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-requirements-and-contracts-documentation)
+  * verify: [Website Semantic Model Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-semantic-model-documentation)
+---
+
+### Website Explorer Trace Flow Documentation Verification
+
+This inspection verifies the Serve Explorer user guide against the native trace rendering contract.
+
+#### Details
+- Review the rendered guide for verification/file selection, native requirement ancestry and owning capability context, direction and branch controls, element-detail/source navigation, and availability in served and exported Explorer.
+- Review shareable view selections, copied/reloaded links, browser history, explicit-link precedence, unavailable-selection fallback and the worktree spinner/success/error-dismissal flow against the shared selection and worktree contracts.
+- Compare the wording with the Explorer Verification Trace Rendering Specification referenced by the owning website requirement and the compiled production trace integration checks.
+- Build the website and inspect the rendered user-guide route before publication.
+
+Review artifact: [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
+
+#### Metadata
+  * type: inspection-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
+---
+
+### Website MCP HTTP Configuration Documentation Verification
+
+This inspection verifies that endpoint-host and browser-origin setup examples match MCP startup and transport behavior.
+
+#### Details
+- Review standalone and embedded command examples for repeatable `--allow-origin`, the embedded `--enable-mcp` prerequisite, and valid HTTP(S) origins without paths.
+- Confirm that the page explains additive loopback defaults, exact scheme/host/port matching, and rejection of unlisted origins.
+- Confirm that the page distinguishes browser origin configuration from bind address, endpoint URL, and authentication.
+- Review direct-host and reverse-proxy examples for automatic bind-host acceptance, explicit allowed hostnames with optional ports, wildcard listener behavior, and equivalent embedded MCP options.
+- Build the website and check the examples against command help and the transport verification results.
+- Review mutation examples for default-disabled automatic commits, explicit `--enable-commits`, standalone/embedded prerequisites, unchanged ownership, and resolution of uncommitted changes before a clean restart.
+- Review stdio startup and client configuration across MCP Server, Coding Assistants, User Guide and Integrations: HTTP default, explicit `--transport stdio`, absolute workspace selection, shared permissions, rejected HTTP-only flags, protocol-only stdout and preservation of pending work on shutdown. Compare with the passing native/npm transport and lifecycle acceptance cases.
+- Review full-definition override guidance on MCP Server and User Guide: retained incoming children and consumers, replacement of authored metadata/outgoing declarations, preview/application, cross-file rewrites, invalid-candidate preservation and actual deletion's orphan protection. Compare with the override acceptance matrix.
+
+Review artifacts: [McpServer.tsx](../../../../website/src/pages/McpServer.tsx).
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+---
+
+### Website MCP Worktree and Publication Documentation Verification
+
+This review verifies the documented worktree and publication workflow against implemented tool contracts and Explorer behavior before public release.
+
+#### Details
+- Review standalone and embedded startup examples, flag prerequisites/defaults, configured remote selection, failed gh checks, and operation-time permission errors against command help and discovery fixtures.
+- Follow examples from explicit base to worktree creation/opening, context-scoped model reads/mutations, manual commit, push, explicit-base PR creation, and comment. Check same-repository and no-fork rules, no implicit effects, and recovery from uncertain outcomes. Check the documented distinction between accepted snapshot reads, blocked writes/publication, unavailable local file downloads, and repair/restart after mutation recovery failure.
+- Review branch-selected tool/prompt/resource examples, `from_branch` for relative creation bases, version-4 breaking-change guidance, optional single-context selection and required multi-context selection. Explain explicit admission, shared concurrency protections for clients on one branch, percent-encoded resource branch names, rejected obsolete MCP ID inputs, and private runtime/cache identity and public branch-selected responses, picker labels, browser URLs and HTTP routes. Compare examples with executable acceptance cases; source/build checks alone are not runtime evidence.
+- Verify documentation presents one branch picker, metadata-only inventory, and on-demand loading with worktree reuse or creation handled internally. Explain read-only dirty-content support and existing cache freshness, mutation-enabled rejection of dirty targets before first load, normal ownership admission, accepted-snapshot reuse on reselection including accepted uncommitted writes, and worktree preservation on shutdown. The examples must not imply eager loading of all worktrees, cache resets on switching, or a read-only bypass in mutation mode. Clean restart, accepted-only commits, and managed-worktree removal retain their existing rules. Two tabs independently select branches without changing another client's routing or requiring an MCP switching tool.
+- Build and inspect the MCP documentation route only after implementation. Do not mark this planned review completed by adding source-file links as executable evidence.
+- Follow HEAD refresh apply and check-only examples against real discovery. Review accepted/observed provenance, same-branch amendments, protected new documents/semantic resolution, mutable evidence, clean/pending restrictions, default HEAD selection, shared Refresh control and labelled retained-model rejection. Confirm ignore-file edits are allowed, current rules govern eligibility and declaring owners, successful refresh adopts those rules for later tools, preview/rejection retain accepted rules, and policy-only membership changes can change the model revision. Compare the public examples with the passing owning acceptance checks.
+- Check restart guidance distinguishes reusable leftover lock files from live ownership, permission denial and unsupported locking, without advising lock deletion or automatic permission changes.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
+---
+
+### Website Managed Query Documentation Verification
+
+Inspect the native query authoring and CLI/MCP artifact examples against their shared core contracts.
+
+#### Details
+Check Query and optional Produces syntax, explicit ontology use and prefixes, generated identity/form, namespace selection, exact-byte export/hash checks, and downstream runtime behavior. Build the website and compare documented commands with CLI help and managed query verification results.
+
+#### Metadata
+  * type: demonstration-verification
+
+#### Relations
+  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
+  * verify: [Website Ontology Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-ontology-documentation)
 ---
 
 ### Website Scoped Coverage Documentation Verification
@@ -88,88 +172,4 @@ Review artifacts: [Advanced.tsx](../../../../website/src/pages/Advanced.tsx), [U
   * verify: [Website Implementation Coverage Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-implementation-coverage-documentation)
   * verify: [Website Semantic Model Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-semantic-model-documentation)
   * verify: [Website Verification Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-verification-documentation)
----
-
-### Website Contract Reference Documentation Verification
-
-This inspection verifies that public documentation distinguishes contract implementation obligations from content dependencies and follows the referenced modeling and interface contracts.
-
-#### Details
-Expected checks:
-- Review the modeling-language overview and examples for the canonical Contract Bindings and Contract References subsection names, requirement-only sources, supported owned contract targets, element-wide section exclusivity, and acyclic reference dependencies.
-- Confirm that contract dependency is defined as the umbrella term for bindings and references, and that references propagate change impact without contributing to the contract owner's implementation fulfillment.
-- Review requirements-and-contracts, semantic-model, and workflow guidance for the distinction between implementation obligations and change-impact dependencies. Reference-only consumers do not contribute implementation coverage or evidence to the contract owner.
-- Confirm that verification descriptions identify requirements as targets and capabilities as receiving coverage through roll-up.
-- Review the MCP server page for has_contract_references and filter_contract_references, normalized target matching, filter composition, and a concrete search example consistent with the referenced MCP model-evidence and search-filtering contracts.
-- Confirm that the owning documentation requirements reference the contracts they describe, so contract changes reach documentation through change-impact analysis.
-- Build and inspect the affected rendered routes and check that examples agree with validated model behavior before publication.
-
-Review artifacts: [ModelingLanguage.tsx](../../../../website/src/pages/ModelingLanguage.tsx).
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Relations
-  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
-  * verify: [Website Modeling Language Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-modeling-language-documentation)
-  * verify: [Website Requirements and Contracts Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-requirements-and-contracts-documentation)
-  * verify: [Website Semantic Model Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-semantic-model-documentation)
-  * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
-  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
----
-
-### Website Managed Query Documentation Verification
-
-Inspect the native query authoring and CLI/MCP artifact examples against their shared core contracts.
-
-#### Details
-Check Query and optional Produces syntax, explicit ontology use and prefixes, generated identity/form, namespace selection, exact-byte export/hash checks, and downstream runtime behavior. Build the website and compare documented commands with CLI help and managed query verification results.
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Relations
-  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
-  * verify: [Website Ontology Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-ontology-documentation)
----
-
-### Website MCP Worktree and Publication Documentation Verification
-
-This review verifies the documented worktree and publication workflow against implemented tool contracts and Explorer behavior before public release.
-
-#### Details
-- Review standalone and embedded startup examples, flag prerequisites/defaults, configured remote selection, failed gh checks, and operation-time permission errors against command help and discovery fixtures.
-- Follow examples from explicit base to worktree creation/opening, context-scoped model reads/mutations, manual commit, push, explicit-base PR creation, and comment. Check same-repository and no-fork rules, no implicit effects, and recovery from uncertain outcomes. Check the documented distinction between accepted snapshot reads, blocked writes/publication, unavailable local file downloads, and repair/restart after mutation recovery failure.
-- Review branch-selected tool/prompt/resource examples, `from_branch` for relative creation bases, version-3 breaking-change guidance, optional single-context selection and required multi-context selection. Explain explicit admission, shared concurrency protections for clients on one branch, percent-encoded resource branch names, rejected obsolete MCP ID inputs, and private runtime/cache identity and public branch-selected responses, picker labels, browser URLs and HTTP routes. Compare examples with executable acceptance cases; source/build checks alone are not runtime evidence.
-- Verify documentation presents one branch picker, metadata-only inventory, and on-demand loading with worktree reuse or creation handled internally. Explain read-only dirty-content support and existing cache freshness, mutation-enabled rejection of dirty targets before first load, normal ownership admission, accepted-snapshot reuse on reselection including accepted uncommitted writes, and worktree preservation on shutdown. The examples must not imply eager loading of all worktrees, cache resets on switching, or a read-only bypass in mutation mode. Clean restart, accepted-only commits, and managed-worktree removal retain their existing rules. Two tabs independently select branches without changing another client's routing or requiring an MCP switching tool.
-- Build and inspect the MCP documentation route only after implementation. Do not mark this planned review completed by adding source-file links as executable evidence.
-- Follow HEAD refresh apply and check-only examples against real discovery. Review accepted/observed provenance, same-branch amendments, protected new documents/semantic resolution, mutable evidence, clean/pending restrictions, default HEAD selection, shared Refresh control and labelled retained-model rejection. Confirm ignore-file edits are allowed, current rules govern eligibility and declaring owners, successful refresh adopts those rules for later tools, preview/rejection retain accepted rules, and policy-only membership changes can change the model revision. Compare the public examples with the passing owning acceptance checks.
-- Check restart guidance distinguishes reusable leftover lock files from live ownership, permission denial and unsupported locking, without advising lock deletion or automatic permission changes.
-
-#### Metadata
-  * type: demonstration-verification
-
-#### Relations
-  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
-  * verify: [Website Assistant Integration Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-assistant-integration-documentation)
----
-
-### Website Explorer Trace Flow Documentation Verification
-
-This inspection verifies the Serve Explorer user guide against the native trace rendering contract.
-
-#### Details
-- Review the rendered guide for verification/file selection, native requirement ancestry and owning capability context, direction and branch controls, element-detail/source navigation, and availability in served and exported Explorer.
-- Review shareable view selections, copied/reloaded links, browser history, explicit-link precedence, unavailable-selection fallback and the worktree spinner/success/error-dismissal flow against the shared selection and worktree contracts.
-- Compare the wording with the Explorer Verification Trace Rendering Specification referenced by the owning website requirement and the compiled production trace integration checks.
-- Build the website and inspect the rendered user-guide route before publication.
-
-Review artifact: [UserGuide.tsx](../../../../website/src/pages/UserGuide.tsx).
-
-#### Metadata
-  * type: inspection-verification
-
-#### Relations
-  * derivedFrom: [Public Documentation Website Verification Objective](#public-documentation-website-verification-objective)
-  * verify: [Website Command and Workflow Documentation](../../../Interfaces/Website/WebsiteRequirements.md#website-command-and-workflow-documentation)
 ---

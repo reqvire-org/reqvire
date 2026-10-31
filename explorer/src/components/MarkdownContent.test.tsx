@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@/test/render";
+import { paletteFor, paletteHex } from "@ds";
 import { describe, expect, it, vi } from "vitest";
 import {
   MarkdownContent,
@@ -49,6 +50,22 @@ describe("MarkdownContent", () => {
     const renderedCode = renderMermaid.mock.calls[0][1] as string;
     expect(renderedCode).not.toContain("var(--");
     expect(renderedCode).toContain("fill:#bbdefb");
+  });
+
+  it("re-renders Mermaid with the dark palette when the theme changes", async () => {
+    const renderMermaid = mockMermaidRender();
+    render(
+      <MarkdownContent
+        markdown={["```mermaid", "graph TD", "  classDef c stroke:var(--color-role-capability-ink);", "  A:::c", "```"].join("\n")}
+        sourceFilePath="system-model/Capabilities.md"
+      />,
+    );
+    await waitFor(() => expect(renderMermaid).toHaveBeenCalledOnce());
+    expect(renderMermaid.mock.calls[0][1]).toContain(`stroke:${paletteHex(paletteFor(document.documentElement), "--color-role-capability-ink")}`);
+    document.documentElement.setAttribute("data-theme", "dark");
+    await waitFor(() => expect(renderMermaid).toHaveBeenCalledTimes(2));
+    expect(renderMermaid.mock.calls[1][1]).toContain(`stroke:${paletteHex(paletteFor(document.documentElement), "--color-role-capability-ink")}`);
+    expect(renderMermaid.mock.calls[1][1]).not.toBe(renderMermaid.mock.calls[0][1]);
   });
 
   it("mounts Mermaid SVG output that contains HTML label markup", async () => {

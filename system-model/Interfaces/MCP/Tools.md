@@ -43,6 +43,125 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
   * verifiedBy: [MCP Contract Layer Boundary Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-contract-layer-boundary-verification)
 ---
 
+### MCP Branch Model Sessions
+
+WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository through one MCP endpoint, including manifest-defined Repo workspaces.
+
+#### Details
+Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [MCP Worktree Model Management](../InterfacesFeature.md#mcp-worktree-model-management)
+---
+
+### MCP Branch Closing
+
+WHEN a client requests removal of a clean server-created worktree, the system SHALL stop that context and remove only its disposable worktree while retaining the branch and commits.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Branch Closing Specification](Specifications.md#mcp-branch-closing-specification)
+  * derivedFrom: [MCP Branch Model Sessions](#mcp-branch-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Branch Creation
+
+WHEN a client requests a new model branch from an explicit base, the system SHALL create and validate an isolated Git worktree before returning an owned context for that branch.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Branch Creation Specification](Specifications.md#mcp-branch-creation-specification)
+  * derivedFrom: [MCP Branch Model Sessions](#mcp-branch-model-sessions)
+  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Branch Opening and Inventory
+
+WHEN a client selects an existing branch, the system SHALL open an eligible worktree context for that branch without switching any existing checkout and SHALL expose context and ownership information through read-only inventory.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+
+#### Relations
+  * definedBy: [MCP Branch Opening and Inventory Specification](Specifications.md#mcp-branch-opening-and-inventory-specification)
+  * derivedFrom: [MCP Branch Model Sessions](#mcp-branch-model-sessions)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
+### MCP Worktree Context Isolation
+
+WHEN a request addresses a model worktree context, the system SHALL execute it against only that context and preserve independent ownership, accepted state, and caches for every other context.
+
+#### Details
+The child worker-session requirement implements the MCP side of this boundary. Explorer runtime consumers implement the same boundary through Contract Bindings; references alone do not contribute implementation coverage.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Contract Bindings
+  * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
+  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
+
+#### Relations
+  * definedBy: [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * derivedFrom: [MCP Branch Model Sessions](#mcp-branch-model-sessions)
+---
+
+### MCP Worktree Worker Sessions
+
+WHEN an MCP request targets an admitted worktree context, the system SHALL route it to that context's isolated worker and apply the shared context boundary to model reads, mutations, resources, prompts, and repository operations.
+
+IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission or verified reconciliation of its recorded commit outcome.
+
+#### Concept References
+  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * definedBy: [MCP Worktree Worker Sessions Specification](Specifications.md#mcp-worktree-worker-sessions-specification)
+  * derivedFrom: [MCP Worktree Context Isolation](#mcp-worktree-context-isolation)
+  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
+  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
+  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
+---
+
 ### MCP Compatibility Versioning
 
 The system shall expose MCP protocol compatibility and Reqvire tool interface compatibility distinctly from the Reqvire binary version.
@@ -1186,123 +1305,4 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
   * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
----
-
-### MCP Worktree Model Sessions
-
-WHILE mutation mode is enabled, the system SHALL manage independently owned model sessions in worktrees of the startup owning Git repository through one MCP endpoint, including manifest-defined Repo workspaces.
-
-#### Details
-Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [MCP Worktree Model Management](../InterfacesFeature.md#mcp-worktree-model-management)
----
-
-### MCP Managed Worktree Removal
-
-WHEN a client requests removal of a clean server-created worktree, the system SHALL stop that context and remove only its disposable worktree while retaining the branch and commits.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * definedBy: [MCP Managed Worktree Removal Specification](Specifications.md#mcp-managed-worktree-removal-specification)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
----
-
-### MCP Worktree Context Isolation
-
-WHEN a request addresses a model worktree context, the system SHALL execute it against only that context and preserve independent ownership, accepted state, and caches for every other context.
-
-#### Details
-The child worker-session requirement implements the MCP side of this boundary. Explorer runtime consumers implement the same boundary through Contract Bindings; references alone do not contribute implementation coverage.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Contract Bindings
-  * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
-  * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
-
-#### Relations
-  * definedBy: [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
----
-
-### MCP Worktree Worker Sessions
-
-WHEN an MCP request targets an admitted worktree context, the system SHALL route it to that context's isolated worker and apply the shared context boundary to model reads, mutations, resources, prompts, and repository operations.
-
-IF mutation recovery fails while the worker retains a valid accepted snapshot, the system SHALL keep supported reads of that snapshot available with recovery diagnostics and SHALL reject further writes and publication until the context is recovered through normal admission or verified reconciliation of its recorded commit outcome.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * definedBy: [MCP Worktree Worker Sessions Specification](Specifications.md#mcp-worktree-worker-sessions-specification)
-  * derivedFrom: [MCP Worktree Context Isolation](#mcp-worktree-context-isolation)
-  * satisfiedBy: [mcp.rs](../../../crates/reqvire-cli/src/mcp.rs)
-  * satisfiedBy: [mcp_worker.rs](../../../crates/reqvire-cli/src/mcp_worker.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
----
-
-### MCP Worktree Creation
-
-WHEN a client requests a new model branch from an explicit base, the system SHALL create and validate an isolated Git worktree before returning an owned context for that branch.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * definedBy: [MCP Worktree Creation Specification](Specifications.md#mcp-worktree-creation-specification)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * satisfiedBy: [mcp_repo_worktrees.rs](../../../crates/reqvire-cli/src/mcp_repo_worktrees.rs)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
----
-
-### MCP Worktree Opening and Inventory
-
-WHEN a client selects an existing branch, the system SHALL open an eligible worktree context for that branch without switching any existing checkout and SHALL expose context and ownership information through read-only inventory.
-
-#### Concept References
-  * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: requirement
-
-#### Contract References
-  * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
-
-#### Relations
-  * definedBy: [MCP Worktree Opening and Inventory Specification](Specifications.md#mcp-worktree-opening-and-inventory-specification)
-  * derivedFrom: [MCP Worktree Model Sessions](#mcp-worktree-model-sessions)
-  * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
 ---

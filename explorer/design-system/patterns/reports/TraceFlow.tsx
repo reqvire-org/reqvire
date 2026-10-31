@@ -249,15 +249,15 @@ function TraceNode({ data }: NodeProps<FlowNode>) {
     onBlurCapture={event => { if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) data.onPreview(false); }}>
     <Handle type="target" position={data.direction === "DOWN" ? Position.Top : Position.Left} isConnectable={false} />
     <a className="ux-trace-flow-node-identity nodrag nopan" href={element.href ?? `#/elements/${encodeURI(element.id)}`}
-      aria-label={element.name} title={element.name}
+      title={element.name}
       onClick={event => { event.preventDefault(); data.onOpenElement(element.id); }}>
-      <ElementIcon type={data.elementType} size="sm" />
+      <ElementIcon type={data.elementType} size="sm" aria-hidden="true" />
       <span className="ux-trace-flow-node-title">{element.name}</span>
     </a>
     <div className="ux-trace-flow-node-kind">{data.context}</div>
     <div className="ux-trace-flow-node-footer nodrag nopan">
       <a className="ux-trace-flow-node-source" title={element.file}
-      aria-label={`Open source for ${element.name}`}
+      aria-label={`Open ${element.file.split("/").pop()}, source for ${element.name}`}
       href={element.sourceHref ?? `#/content/${element.file}`}
       onClick={event => { event.preventDefault(); data.onOpenSource(element); }}>
       <Icon name="file-text" size={13} /><span>{element.file.split("/").pop()}</span>
@@ -265,7 +265,7 @@ function TraceNode({ data }: NodeProps<FlowNode>) {
       <IconButton size="sm" tone="ghost" aria-label={`Focus path through ${element.name}`} title="Focus path"
         aria-pressed={data.focused} onClick={data.onFocusPath}><Icon name="target" /></IconButton>
       {data.parentCount > 0 && <Button size="sm" tone="ghost" aria-expanded={!data.collapsed}
-        aria-label={`${data.collapsed ? "Expand" : "Collapse"} ancestors of ${element.name}`}
+        aria-label={`${data.parentCount} ${data.parentCount === 1 ? "parent" : "parents"}: ${data.collapsed ? "expand" : "collapse"} ancestors of ${element.name}`}
         iconLeft={<Icon name={data.collapsed ? "chevron-right" : "chevron-down"} size={13} />}
         onClick={data.onToggle}>
         {data.parentCount} {data.parentCount === 1 ? "parent" : "parents"}

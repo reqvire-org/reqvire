@@ -91,7 +91,7 @@ const conceptChipRowUX = css`
 const conceptChipUX = css`
   display: inline-flex;
   align-items: center;
-  min-height: var(--control-height-xs);
+  min-height: var(--space-count-pill-height);
   border-radius: var(--radius-sm);
   padding: 0 var(--control-padding-sm);
   background: var(--color-role-concept-tint);

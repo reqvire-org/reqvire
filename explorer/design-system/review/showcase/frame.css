@@ -237,7 +237,7 @@
 }
 
 .ux-showcase-card-demo__desc {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: var(--text-caption);
 }
 
@@ -562,7 +562,7 @@
 }
 
 .ux-showcase-status--ready {
-  color: var(--success);
+  color: var(--success-text);
 }
 
 /* ---- Product pattern demos -------------------------------------- */

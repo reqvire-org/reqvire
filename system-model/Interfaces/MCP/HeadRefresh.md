@@ -1,6 +1,6 @@
 # Elements
 
-### MCP Worktree HEAD Refresh
+### MCP Branch Refresh
 
 WHEN a client requests HEAD refresh for an owned worktree context, the system SHALL check the observed local branch tip against the accepted model's protected inputs and, if eligible, reload that committed tip through the normal validated model-loading path.
 
@@ -22,22 +22,22 @@ The operation retains context identity and ownership, supports external implemen
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
 
 #### Relations
-  * derivedFrom: [MCP Worktree Model Sessions](Tools.md#mcp-worktree-model-sessions)
-  * definedBy: [MCP Worktree HEAD Refresh Specification](#mcp-worktree-head-refresh-specification)
+  * definedBy: [MCP Branch Refresh Specification](#mcp-branch-refresh-specification)
   * definedBy: [MCP HEAD Refresh Input Protection Specification](#mcp-head-refresh-input-protection-specification)
+  * derivedFrom: [MCP Branch Model Sessions](Tools.md#mcp-branch-model-sessions)
   * satisfiedBy: [mcp_head_refresh.rs](../../../crates/reqvire-cli/src/mcp_head_refresh.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [git_commands.rs](../../../crates/reqvire-core/src/git_commands.rs)
   * satisfiedBy: [model_inputs.rs](../../../crates/reqvire-core/src/model_inputs.rs)
 ---
 
-### MCP Worktree HEAD Refresh Specification
+### MCP Branch Refresh Specification
 
 Defines the typed control operation, eligibility boundary and guarded model reload for adopting an external branch HEAD.
 
 #### Details
 Interface:
-- Expose `reqvire.worktree.refresh_head` on standalone HTTP, stdio and embedded MCP with mutations enabled. It is a context-state mutation, not a read-only tool, and does not require `--enable-commits`.
+- Expose `reqvire.branch.refresh` on standalone HTTP, stdio and embedded MCP with mutations enabled. It is a context-state mutation, not a read-only tool, and does not require `--enable-commits`.
 - Accept `branch` under the shared exact-local-branch context-selection rules and optional `dry_run: boolean`, default `false`. Reject the removed `worktree_id` selector. The branch identifies an already admitted context; it does not switch a checkout or open a worker implicitly. There is no arbitrary path, branch-changing, force or validation-bypass argument. No new shell CLI subcommand is required.
 - Every apply performs the complete eligibility check. `dry_run: true` returns a check result without changing accepted HEAD, captured files, pending paths, semantic state or Explorer publication. A successful preview does not authorize a later changed candidate.
 - Return bounded structured fields `outcome`, `can_refresh`, `dry_run`, `branch`, `previous_head`, `observed_head`, `accepted_head`, `model_revision`, changed-file count and `blockers`; include `publication_revision` when serving. Outcomes are `refreshed`, `unchanged`, `checked` and `blocked`. HEAD fields are commit object IDs, not model revisions.
@@ -57,7 +57,7 @@ Eligibility and execution:
   * type: specification
 
 #### Relations
-  * define: [MCP Worktree HEAD Refresh](#mcp-worktree-head-refresh)
+  * define: [MCP Branch Refresh](#mcp-branch-refresh)
 ---
 
 ### MCP HEAD Refresh Input Protection Specification
@@ -86,4 +86,5 @@ Mutable artifacts and references:
   * type: specification
 
 #### Relations
-  * define: [MCP Worktree HEAD Refresh](#mcp-worktree-head-refresh)
+  * define: [MCP Branch Refresh](#mcp-branch-refresh)
+---

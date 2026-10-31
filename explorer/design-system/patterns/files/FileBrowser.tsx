@@ -711,7 +711,6 @@ export function FileBrowserGrid({
           selected={Boolean(item.selected)}
           role="button"
           tabIndex={0}
-          aria-label={`Open ${item.name}`}
           onClick={() => openFileBrowserItem(item, onOpenFolder, onOpenFile)}
           onKeyDown={(event) => handleFileBrowserCardKeyDown(event, item, onOpenFolder, onOpenFile)}
           className={cx(

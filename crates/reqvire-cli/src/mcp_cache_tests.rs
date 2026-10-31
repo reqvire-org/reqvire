@@ -1348,7 +1348,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         single["result"]["_meta"]["reqvire/context"]["branch"],
         original["branch"]
     );
-    let created = http_rpc(app.clone(), 2, "tools/call", json!({"name":"reqvire.worktree.create","arguments":{"branch":"selector-child","base_ref":"HEAD"}})).await;
+    let created = http_rpc(app.clone(), 2, "tools/call", json!({"name":"reqvire.branch.create","arguments":{"branch":"selector-child","base_ref":"HEAD"}})).await;
     assert!(created.get("error").is_none(), "{created}");
     assert_ne!(created["result"]["isError"], true, "{created}");
     let child = created["result"]["structuredContent"].clone();
@@ -1492,7 +1492,7 @@ async fn owned_http_selector_error_envelopes(commits: bool) {
         app.clone(),
         8,
         "tools/call",
-        json!({"name":"reqvire.worktree.remove","arguments":{"branch":child["branch"]}}),
+        json!({"name":"reqvire.branch.close","arguments":{"branch":child["branch"]}}),
     )
     .await;
     assert_ne!(removed["result"]["isError"], true, "{removed}");
@@ -1744,7 +1744,7 @@ os.execv({git},[{git},*sys.argv[1:]])
     )
     .await;
     assert_ne!(commit["result"]["isError"], true, "{commit}");
-    let branch = http_rpc(app.clone(), 6, "tools/call", json!({"name":"reqvire.worktree.create","arguments":{"branch":"secondary","base_ref":"HEAD"}})).await;
+    let branch = http_rpc(app.clone(), 6, "tools/call", json!({"name":"reqvire.branch.create","arguments":{"branch":"secondary","base_ref":"HEAD"}})).await;
     let id = branch["result"]["structuredContent"]["branch"]
         .as_str()
         .expect("branch created");
@@ -1765,7 +1765,7 @@ os.execv({git},[{git},*sys.argv[1:]])
             app.clone(),
             8,
             "tools/call",
-            json!({"name":"reqvire.worktree.remove","arguments":{"branch":id}}),
+            json!({"name":"reqvire.branch.close","arguments":{"branch":id}}),
         )),
     )
     .await;
@@ -1800,7 +1800,7 @@ os.execv({git},[{git},*sys.argv[1:]])
             app.clone(),
             10,
             "tools/call",
-            json!({"name":"reqvire.worktree.open", "arguments":{"branch":before["branch"]}}),
+            json!({"name":"reqvire.branch.open", "arguments":{"branch":before["branch"]}}),
         )),
     )
     .await;

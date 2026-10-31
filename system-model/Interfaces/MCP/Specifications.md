@@ -56,6 +56,66 @@ The owning requirement's contract references provide the core workflow, selectio
   * type: specification
 ---
 
+### MCP Branch Closing Specification
+
+Contract for closing a managed model branch context.
+
+#### Details
+- In Repo mode pending/clean checks include every owned component checkout. Remove only disposable Repo metadata and checkouts belonging to this Central worktree. Preserve component commits referenced by retained Central manifests in available local Repo object storage or configured remotes; refuse removal before destroying a sole required copy. Reopening the retained Central branch reconstructs its recorded component content.
+- `reqvire.branch.close` MUST require `branch` and is available only with mutations enabled. The original startup worktree, external/pre-existing worktrees, unknown or unopened branches, and worktrees owned by another server MUST be rejected.
+- Serialize removal with context operations, stop accepting new calls, drain in-flight work, and recheck expected HEAD and clean index/files/non-ignored untracked state. Pending accepted changes or external dirtiness MUST block removal. No force option is exposed.
+- Remove the managed worktree through Git and release ownership after worker shutdown and cleanup; preserve its branch and every commit. Subsequent branch-selected calls MUST fail until explicit reopening admits the branch again; a retained branch is not permission to reopen implicitly. Never delete another context's paths or alter its model.
+- On failed cleanup, report whether the context is stopped and which path remains; do not claim successful removal or silently resume writes. Explicit reopening must revalidate and reclaim ownership.
+- Ordinary server shutdown only stops workers and releases ownership; it MUST NOT remove worktrees or their uncommitted changes.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Closing](Tools.md#mcp-branch-closing)
+---
+
+### MCP Branch Creation Specification
+
+Contract for preparing and opening a model branch.
+
+#### Details
+- `reqvire.branch.create` MUST require destination `branch` and `base_ref`; an optional `from_branch` selects an already admitted source branch for resolution of a context-relative base such as `HEAD`. With multiple contexts, context-relative resolution without `from_branch` MUST fail. Destination `branch` does not select the source. Named branches such as `main` and remote-tracking refs such as `origin/main` are explicit bases in the same repository; `base_ref` retains its commit/ref semantics. Reject the removed `from_worktree_id` input.
+- Resolve the base to one commit before creation and return `base_commit`, branch, root and accepted revision. A remote-tracking ref means the locally recorded commit; creation MUST NOT fetch, push, merge, or promise remote freshness.
+- In Repo mode base_ref still resolves one Central commit. Inputs belonging to the Central Git worktree read that commit's component bases. Repo-managed inputs inherit an isolated copy of the source context's selected manifest files and restores a retained native selection when reopening that same context. Prepare separate Repo metadata and project directories using available local objects before full-model admission. Preserve no-fetch creation and fail when a selected revision is unavailable locally. Do not apply base_ref independently to each component or create matching component branches by default.
+- The new branch name MUST be a valid unused Git branch name. Unknown/non-commit bases, a dirty or unavailable selected source context, duplicate branches, detached targets, foreign repositories, and conflicting ownership MUST fail before publishing a context. Pending accepted changes and external changes are not copied to the new branch; the client commits or otherwise resolves them first.
+- Allocate the destination under server-managed storage, outside every context's eligible model inventory; callers MUST NOT supply arbitrary filesystem destinations. Canonical paths and symlinks MUST NOT permit overlap or scanning another context's model files.
+- Create the branch and worktree without checking out another branch in any existing worktree. Start its worker, acquire ownership, and validate its model under the ordinary startup rules before making the context routable.
+- On failure, release newly acquired ownership and compensate only branch/worktree assets created by this request when still unchanged and safe to remove. Never delete pre-existing work or externally modified partial assets; report residual paths/refs for recovery. An invalid or incomplete context MUST NOT be returned as usable.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Creation](Tools.md#mcp-branch-creation)
+---
+
+### MCP Branch Opening and Inventory Specification
+
+Contract for opening and inspecting model branches.
+
+#### Details
+- In Repo mode opening selects the Central branch and prepares its manifest-defined component view through the same isolated admission used by creation. Inventory remains observational and exposes the Central context plus additive project metadata; it does not synchronize checkouts or build models.
+- `reqvire.branch.list` MUST report worktrees in the startup common Git repository, branch/HEAD, ownership, managed/original status, lifecycle state, and whether each branch has a registered context. Public inventory identifies the startup branch with `original_branch` and does not expose opaque IDs. Inventory does not acquire ownership, import external edits into accepted models, or open workers. Unregistered worktrees report unknown ownership (`owned: null`); admission establishes ownership under the existing exclusive-lock checks.
+- `reqvire.branch.open` MUST require an existing local `branch`. Return an already healthy owned context idempotently; otherwise reuse its existing eligible worktree, or create a managed worktree for that existing branch if none exists. This includes worktrees previously prepared for Explorer branch browsing. This operation MUST NOT create a new branch or force a branch into two checkouts.
+- Reusing a healthy registered context MUST NOT acquire the repository-administration lock or repeat admission. New preparation and recovery still require that lock; contention must not bypass ownership or alter the existing registration.
+- Admission requires a named committed branch, clean index/worktree including non-ignored untracked files, configured Git identity, valid model, no conflicting owner, and no overlapping context roots. These rules apply equally to pre-existing and newly created worktrees, whether requested through MCP opening or mutation-enabled Explorer selection. Read-only serving does not acquire mutation ownership or enable mutation tools. Fail without stash/reset/checkout when those conditions do not hold. An existing unregistered dirty worktree cannot be silently adopted or loaded through a read-only fallback in mutation-enabled serving.
+- Preserve pre-existing worktrees on failed admission. Worktrees created by this request follow the creation rollback rules. External/pre-existing worktrees may be opened but MUST remain distinguishable from disposable server-created worktrees.
+- A server restart does not implicitly reclaim all worktrees or invent new branches. It registers its clean startup context; explicit open can reclaim an existing clean branch after ownership is released. Preserve pending changes on shutdown; dirty contexts require user resolution before reopening.
+- Existing accessible ownership/administration lock files MUST permit reacquisition after orderly shutdown or termination of all holders. A still-live holder MUST prevent acquisition even if its parent server exited. Lock failures preserve existing registrations, source model files, index and HEAD; diagnostics follow the shared concurrency contract.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Opening and Inventory](Tools.md#mcp-branch-opening-and-inventory)
+---
+
 ### MCP Branch Push Specification
 
 Contract for mcp branch push.
@@ -246,25 +306,6 @@ Tools MUST be `reqvire.semantic.queries` with optional `iri`, `name`, `namespace
 
 #### Relations
   * define: [MCP Managed Query Artifacts](ManagedQueries.md#mcp-managed-query-artifacts)
----
-
-### MCP Managed Worktree Removal Specification
-
-Contract for mcp managed worktree removal.
-
-#### Details
-- In Repo mode pending/clean checks include every owned component checkout. Remove only disposable Repo metadata and checkouts belonging to this Central worktree. Preserve component commits referenced by retained Central manifests in available local Repo object storage or configured remotes; refuse removal before destroying a sole required copy. Reopening the retained Central branch reconstructs its recorded component content.
-- `reqvire.worktree.remove` MUST require `branch` and is available only with mutations enabled. The original startup worktree, external/pre-existing worktrees, unknown or unopened branches, and worktrees owned by another server MUST be rejected.
-- Serialize removal with context operations, stop accepting new calls, drain in-flight work, and recheck expected HEAD and clean index/files/non-ignored untracked state. Pending accepted changes or external dirtiness MUST block removal. No force option is exposed.
-- Remove the managed worktree through Git and release ownership after worker shutdown and cleanup; preserve its branch and every commit. Subsequent branch-selected calls MUST fail until explicit reopening admits the branch again; a retained branch is not permission to reopen implicitly. Never delete another context's paths or alter its model.
-- On failed cleanup, report whether the context is stopped and which path remains; do not claim successful removal or silently resume writes. Explicit reopening must revalidate and reclaim ownership.
-- Ordinary server shutdown only stops workers and releases ownership; it MUST NOT remove worktrees or their uncommitted changes.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Managed Worktree Removal](Tools.md#mcp-managed-worktree-removal)
 ---
 
 ### MCP Merge Elements Tool Specification
@@ -1273,11 +1314,12 @@ Mutation and maintenance tools:
 - `reqvire.move_asset`
 - `reqvire.remove_asset`
 
-Worktree management tools:
-- `reqvire.worktree.list` (read-only inventory)
-- `reqvire.worktree.create`
-- `reqvire.worktree.open`
-- `reqvire.worktree.remove`
+Branch management tools:
+- `reqvire.branch.list` (read-only inventory)
+- `reqvire.branch.refresh`
+- `reqvire.branch.create`
+- `reqvire.branch.open`
+- `reqvire.branch.close`
 
 Commit and optional publication tools:
 - `reqvire.git.commit` (local, mutation mode)
@@ -1287,6 +1329,8 @@ Commit and optional publication tools:
 - `reqvire.github.pr.comment` (GitHub enabled and available)
 
 Explorer worktree selection is a browser action, not an MCP tool.
+
+Tool contract version 4 exposes branch lifecycle operations as `reqvire.branch.list`, `reqvire.branch.create`, `reqvire.branch.open`, `reqvire.branch.close`, and `reqvire.branch.refresh` in standalone and embedded MCP. Worktrees remain the internal storage and isolation mechanism. Previous `reqvire.worktree.*` tool names are unavailable and MUST NOT be advertised or accepted as compatibility aliases. Preserve existing `branch`, `base_ref`, and `from_branch` selectors, permission gates and operation behavior. Closing a managed context preserves its Git branch and commits and retains the existing clean-state and original/external-worktree protections.
 
 #### Metadata
   * type: specification
@@ -1309,7 +1353,7 @@ Exposure rules:
 - Do not expose a migration tool or a pre-validation maintenance endpoint. Known source migrations run through CLI before normal validated MCP startup.
 - Expose Reqvire workflow prompts through standard MCP prompt methods rather than as MCP tools.
 - CLI flags, modes, and sub-options become typed request fields on one stable MCP operation instead of nested MCP tool names.
-- Worktree, commit, push, PR creation, and PR commenting are distinct typed operations, not CLI aliases. Their availability follows local mutation and GitHub startup gating.
+- Branch management, commit, push, PR creation, and PR commenting are distinct typed operations, not CLI aliases. Their availability follows local mutation and GitHub startup gating.
 - CLI-only transport flags such as `--json` and `--output` are never MCP tool arguments.
 
 #### Metadata
@@ -1335,7 +1379,7 @@ Classification rules:
 - Local `mutation` tools require mutation mode and use MCP annotations `readOnlyHint: false`, `openWorldHint: false`, and conservative `destructiveHint`. Publication tools additionally require successful GitHub enablement and use `openWorldHint: true`; annotation hints do not replace runtime gates.
 
 Read-only tools:
-- `reqvire.worktree.list`
+- `reqvire.branch.list`
 - `reqvire.workspace_status`
 - `reqvire.tool_contract`
 - `reqvire.model_revision`
@@ -1372,9 +1416,10 @@ Conditional mutation tools:
 Both tools default to `fix: false`. Read-only startup schemas permit only false and advertise read-only annotations; mutation-enabled schemas permit true and advertise mutation-capable annotations. Runtime gates reject repair/application without enablement.
 
 Local mutation tools:
-- `reqvire.worktree.create`
-- `reqvire.worktree.open`
-- `reqvire.worktree.remove`
+- `reqvire.branch.refresh`
+- `reqvire.branch.create`
+- `reqvire.branch.open`
+- `reqvire.branch.close`
 - `reqvire.git.commit`
 - `reqvire.git.reconcile`
 - `reqvire.add_element`
@@ -1466,47 +1511,6 @@ The shared context boundary separates model identity, accepted state, and operat
   * define: [MCP Worktree Context Isolation](Tools.md#mcp-worktree-context-isolation)
 ---
 
-### MCP Worktree Creation Specification
-
-Contract for mcp worktree creation.
-
-#### Details
-- `reqvire.worktree.create` MUST require destination `branch` and `base_ref`; an optional `from_branch` selects an already admitted source branch for resolution of a context-relative base such as `HEAD`. With multiple contexts, context-relative resolution without `from_branch` MUST fail. Destination `branch` does not select the source. Named branches such as `main` and remote-tracking refs such as `origin/main` are explicit bases in the same repository; `base_ref` retains its commit/ref semantics. Reject the removed `from_worktree_id` input.
-- Resolve the base to one commit before creation and return `base_commit`, branch, root and accepted revision. A remote-tracking ref means the locally recorded commit; creation MUST NOT fetch, push, merge, or promise remote freshness.
-- In Repo mode base_ref still resolves one Central commit. Inputs belonging to the Central Git worktree read that commit's component bases. Repo-managed inputs inherit an isolated copy of the source context's selected manifest files and restores a retained native selection when reopening that same context. Prepare separate Repo metadata and project directories using available local objects before full-model admission. Preserve no-fetch creation and fail when a selected revision is unavailable locally. Do not apply base_ref independently to each component or create matching component branches by default.
-- The new branch name MUST be a valid unused Git branch name. Unknown/non-commit bases, a dirty or unavailable selected source context, duplicate branches, detached targets, foreign repositories, and conflicting ownership MUST fail before publishing a context. Pending accepted changes and external changes are not copied to the new branch; the client commits or otherwise resolves them first.
-- Allocate the destination under server-managed storage, outside every context's eligible model inventory; callers MUST NOT supply arbitrary filesystem destinations. Canonical paths and symlinks MUST NOT permit overlap or scanning another context's model files.
-- Create the branch and worktree without checking out another branch in any existing worktree. Start its worker, acquire ownership, and validate its model under the ordinary startup rules before making the context routable.
-- On failure, release newly acquired ownership and compensate only branch/worktree assets created by this request when still unchanged and safe to remove. Never delete pre-existing work or externally modified partial assets; report residual paths/refs for recovery. An invalid or incomplete context MUST NOT be returned as usable.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Worktree Creation](Tools.md#mcp-worktree-creation)
----
-
-### MCP Worktree Opening and Inventory Specification
-
-Contract for mcp worktree opening and inventory.
-
-#### Details
-- In Repo mode opening selects the Central branch and prepares its manifest-defined component view through the same isolated admission used by creation. Inventory remains observational and exposes the Central context plus additive project metadata; it does not synchronize checkouts or build models.
-- `reqvire.worktree.list` MUST report worktrees in the startup common Git repository, branch/HEAD, ownership, managed/original status, lifecycle state, and whether each branch has a registered context. Public inventory identifies the startup branch with `original_branch` and does not expose opaque IDs. Inventory does not acquire ownership, import external edits into accepted models, or open workers. Unregistered worktrees report unknown ownership (`owned: null`); admission establishes ownership under the existing exclusive-lock checks.
-- `reqvire.worktree.open` MUST require an existing local `branch`. Return an already healthy owned context idempotently; otherwise reuse its existing eligible worktree, or create a managed worktree for that existing branch if none exists. This includes worktrees previously prepared for Explorer branch browsing. This operation MUST NOT create a new branch or force a branch into two checkouts.
-- Reusing a healthy registered context MUST NOT acquire the repository-administration lock or repeat admission. New preparation and recovery still require that lock; contention must not bypass ownership or alter the existing registration.
-- Admission requires a named committed branch, clean index/worktree including non-ignored untracked files, configured Git identity, valid model, no conflicting owner, and no overlapping context roots. These rules apply equally to pre-existing and newly created worktrees, whether requested through MCP opening or mutation-enabled Explorer selection. Read-only serving does not acquire mutation ownership or enable mutation tools. Fail without stash/reset/checkout when those conditions do not hold. An existing unregistered dirty worktree cannot be silently adopted or loaded through a read-only fallback in mutation-enabled serving.
-- Preserve pre-existing worktrees on failed admission. Worktrees created by this request follow the creation rollback rules. External/pre-existing worktrees may be opened but MUST remain distinguishable from disposable server-created worktrees.
-- A server restart does not implicitly reclaim all worktrees or invent new branches. It registers its clean startup context; explicit open can reclaim an existing clean branch after ownership is released. Preserve pending changes on shutdown; dirty contexts require user resolution before reopening.
-- Existing accessible ownership/administration lock files MUST permit reacquisition after orderly shutdown or termination of all holders. A still-live holder MUST prevent acquisition even if its parent server exited. Lock failures preserve existing registrations, source model files, index and HEAD; diagnostics follow the shared concurrency contract.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Worktree Opening and Inventory](Tools.md#mcp-worktree-opening-and-inventory)
----
-
 ### MCP Worktree Worker Sessions Specification
 
 The MCP worker adapter implements the shared worktree context boundary for protocol requests and model operations.
@@ -1517,7 +1521,7 @@ The MCP worker adapter implements the shared worktree context boundary for proto
 - Unless a tool explicitly requires `branch`, omission is allowed only when exactly one context is registered. With multiple contexts, omission MUST fail with the available branch names; unknown, unopened, removed, stopped or unavailable branches MUST fail without fallback or automatic admission. A branch selector is an exact name in the startup common Git repository, not a path, ref expression, remote-tracking ref or `HEAD` alias. Branch names with slashes, Unicode, plus signs or percent signs retain their exact Git identity. Only the explicit create/open workflows admit contexts.
 - Resolve each request to one context before dispatch and retain that context for its operation and response; later removal or readmission cannot redirect an in-flight request. Multiple clients selecting the same branch share its context and existing serialization/revision checks; a branch selector does not grant per-client exclusivity. Renamed/deleted branches do not redirect an accepted context; the existing branch/HEAD guards still control writes. Reading accepted state does not implicitly adopt the current Git tip. Client selection MUST NOT mutate server-global active-branch state or follow another client's Explorer selection.
 - For schema-valid `tools/call` requests, context-resolution failures MUST retain the tool-execution error envelope (`isError: true` with structured Reqvire error data) for both concurrent reads and serialized operations. Schema-invalid selectors remain JSON-RPC invalid-parameter errors. Resource and prompt resolution failures remain protocol errors. When resolution fails, do not attach another context's identity or model evidence.
-- `reqvire.tool_contract` and `reqvire.worktree.list` are server-scoped. Worktree creation/opening use explicit repository branch/base selectors. Every context-bound response and error MUST identify the selected context when resolution succeeded; successful model evidence also identifies its captured model revision.
+- `reqvire.tool_contract` and `reqvire.branch.list` are server-scoped. Worktree creation/opening use explicit repository branch/base selectors. Every context-bound response and error MUST identify the selected context when resolution succeeded; successful model evidence also identifies its captured model revision.
 - Resources and model-bearing prompts MUST route by the same `branch` selector. Context-qualified MCP resource URIs MUST carry the percent-encoded branch in a query parameter; unqualified URIs work only with a single context. Prompt arguments and resource templates MUST advertise `branch`, and returned prompt guidance MUST retain the selected branch on subsequent tool calls. Reject removed ID selectors and malformed, duplicate or unknown query fields. Resource caches and subscriptions still distinguish internal context identity even when branch names are reopened or relative identifiers/model fingerprints coincide.
 - Resource-read response `_meta` context identity and recovery diagnostics MUST survive the MCP transport serialization boundary as well as internal dispatch.
 - Each context MUST use an isolated worker process with a fixed workspace root and reuse Reqvire core parsing, validation, reports, mutations, and semantic stores. The manager MUST NOT switch process-global working directories or construct a parallel model engine. Existing Workspace Scope semantics apply inside each worker, not to a union of managed worktrees.
