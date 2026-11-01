@@ -32,37 +32,41 @@ Use Reqvire to:
 - inspect traceability, coverage, and change impact
 - expose structured engineering context to AI workflows without exporting a separate model
 
-## Latest Changes
+## What's new in 1.5.0
 
-**Breaking change: model authoring now uses MCP.** Reqvire's typed MCP tools are
-the supported interface for creating and editing system models. Accepted
-mutations validate the candidate model and automatically persist canonical
-formatting. Start `reqvire mcp --enable-mutations` to enable authoring,
-formatting application, and safe lint repair.
+- **MCP model authoring (breaking change).** Typed MCP tools replace CLI authoring
+  commands and their previews. Accepted mutations validate the model and persist
+  canonical formatting. Start `reqvire mcp --enable-mutations` to author models.
+  Use `reqvire.format` for formatting and `reqvire.lint` with `fix: true` for safe
+  lint repair. Inspection remains available without mutation permission.
+- **Branch-based MCP tools (breaking change).** Tool contract version 5 uses
+  `reqvire.branch.list`, `reqvire.branch.create`, `reqvire.branch.open`,
+  `reqvire.branch.close`, and `reqvire.branch.refresh` for both single repositories
+  and multi-repository workspaces. Previous `reqvire.worktree.*` names are no
+  longer supported; clients must inspect contract compatibility.
+- **Multi-repository fixes and improvements.** Repo's native `.repo/manifest.xml`
+  selects the combined model. MCP prepares coordinated named branches, commits
+  changed components, advances and commits manifest pins in their actual owners,
+  and records the root composition checkpoint. Explicit push publishes dependencies
+  before the root; explicit PR creation produces linked PRs with per-repository targets.
+- **Change impact analysis across repositories.** Comparisons reconstruct the
+  selected composition from recorded manifest revisions and component pins.
+  Available PR context selects the target's merge-base; otherwise supply an
+  explicit baseline. Select `HEAD` for pending changes. Analysis never fetches
+  or synchronizes repositories. See [multi-repository models](#multi-repository-models).
 
-The CLI authoring commands `add`, `rm`, `mv`, `rename`, `merge`, `mv-file`,
-`mv-folder`, `link`, `unlink`, `relink`, `mv-asset`, and `rm-asset` have been
-removed, including their previews. CLI `format` moves to the MCP tool
-`reqvire.format`; CLI `lint --fix` moves to `reqvire.lint` with `fix: true`.
-Formatting preview and lint inspection are available through MCP in read-only
-mode; applying either requires mutations to be enabled.
-
-The CLI continues to provide validation, lint inspection, discovery, coverage,
-reports, exports, managed-query inspection, and server startup. Migration
-remains a **CLI-only operation** so incompatible models can be upgraded before
-the MCP server passes startup validation.
-
-For older workspaces, preview supported breaking model updates with:
+The CLI retains validation, lint inspection, discovery, coverage, reports,
+exports, managed-query inspection, and server startup. Migration remains
+CLI-only so older models can be upgraded before MCP startup validation:
 
 ```bash
 reqvire migrate
 reqvire migrate --fix
 ```
 
-`reqvire migrate` is dry-run by default; `--fix` applies deterministic migrations
-such as legacy document header cleanup, verification-objective holder creation,
-contract relation cleanup, and migration of legacy contract section headings to
-`Contract Bindings`.
+`reqvire migrate` previews supported model migrations by default; `--fix` applies
+them, including legacy headers, verification-objective holders, contract relations
+and legacy contract section headings.
 
 ---
 
