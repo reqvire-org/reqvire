@@ -25,7 +25,7 @@ await withBrowser(profile, async browser => {
       if (init?.body && typeof init.body === 'string') {
         try {
           const call = JSON.parse(init.body);
-          if (call.method === 'tools/call' && call.params?.name === 'reqvire.worktree.refresh_head') window.refreshCalls.push(call.params.arguments);
+          if (call.method === 'tools/call' && call.params?.name === 'reqvire.branch.refresh') window.refreshCalls.push(call.params.arguments);
         } catch { /* Asset requests do not have JSON-RPC bodies. */ }
       }
       return fetch(url, init);

@@ -1,3 +1,168 @@
+// Renderer colors for Canvas, WebGL and SVG drawing. Read a palette once per render or
+// context change with paletteFor(element), look colors up inside per-item loops, and
+// redraw from observePalette(element, callback). Nothing here inserts DOM nodes.
+import {
+  brands,
+  contexts,
+  defaultContext,
+  palette,
+  systemThemes,
+  themes,
+  type ColorToken,
+  type Palette,
+  type PaletteColor,
+  type PaletteContext,
+} from "./tokens/themes.generated";
+
+export type { ColorToken, Palette, PaletteColor, PaletteContext };
+
+const themeSelector = themes.map((name) => `[data-theme="${name}"]`).join(", ");
+const brandSelector = brands.map((name) => `[data-brand="${name}"]`).join(", ");
+const darkScheme = "(prefers-color-scheme: dark)";
+
+/** The nearest ancestor (or the element itself) matching a selector, crossing shadow roots. */
+function closest(element: Element, selector: string): Element | null {
+  let node: Element | null = element;
+  while (node) {
+    const found = node.closest(selector);
+    if (found) return found;
+    const root = node.getRootNode();
+    node = typeof ShadowRoot !== "undefined" && root instanceof ShadowRoot ? root.host : null;
+  }
+  return null;
+}
+
+function systemTheme(): string | null {
+  // Like the generated sheet, the OS scheme applies only to a root without data-theme.
+  if (!systemThemes || typeof matchMedia !== "function" || document.documentElement.hasAttribute("data-theme")) return null;
+  return matchMedia(darkScheme).matches ? systemThemes.dark : systemThemes.light;
+}
+
+/** The palette context an element renders in: its nearest declared data-theme and data-brand,
+ * else the OS color scheme (with followSystemTheme) or the default theme and brand. */
+export function paletteContext(element: Element): PaletteContext {
+  const theme = closest(element, themeSelector)?.getAttribute("data-theme") ?? systemTheme() ?? themes[0];
+  const brand = brandSelector ? closest(element, brandSelector)?.getAttribute("data-brand") : null;
+  const key = brand && brand !== (brands as readonly string[])[0] ? `${brand}/${theme}` : theme;
+  return (contexts as readonly string[]).includes(key) ? (key as PaletteContext) : defaultContext;
+}
+
+/** Every color token resolved for the element's context. Read it once per render, outside
+ * per-node and per-edge loops; it is a static object, so lookups cost nothing. */
+export function paletteFor(element: Element): Palette {
+  return palette[paletteContext(element)];
+}
+
+// Colors outside the palette, normalized once by one offscreen 2D context.
+const cacheSize = 256;
+const colors = new Map<string, PaletteColor | null>();
+let context2d: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null | undefined;
+
+type Subscriber = { element: Element; callback: (palette: Palette, context: PaletteContext) => void; context: PaletteContext };
+const subscribers = new Set<Subscriber>();
+let observer: MutationObserver | null = null;
+let media: MediaQueryList | null = null;
+
+function refresh(records?: MutationRecord[]) {
+  let changed = false;
+  for (const subscriber of subscribers) {
+    if (!subscribers.has(subscriber)) continue; // unsubscribed by an earlier callback
+    // Only an attribute change on the element or an ancestor can change its context.
+    if (records && subscriber.element.getRootNode() === document && !records.some((record) => record.target === subscriber.element || record.target.contains(subscriber.element))) continue;
+    const context = paletteContext(subscriber.element);
+    if (context === subscriber.context) continue;
+    subscriber.context = context;
+    changed = true;
+    subscriber.callback(palette[context], context);
+  }
+  if (changed) colors.clear();
+}
+const onMedia = () => refresh();
+
+/** Calls back with the new palette whenever the element's effective context changes: a
+ * data-theme or data-brand change on it or an ancestor, or the OS color scheme with
+ * followSystemTheme. Returns the unsubscribe function. One shared observer serves all. */
+export function observePalette(element: Element, callback: (palette: Palette, context: PaletteContext) => void): () => void {
+  const subscriber: Subscriber = { element, callback, context: paletteContext(element) };
+  subscribers.add(subscriber);
+  if (!observer && typeof MutationObserver === "function") {
+    observer = new MutationObserver((records) => refresh(records));
+    observer.observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ["data-theme", "data-brand"] });
+  }
+  if (!media && systemThemes && typeof matchMedia === "function") {
+    media = matchMedia(darkScheme);
+    media.addEventListener("change", onMedia);
+  }
+  return () => {
+    subscribers.delete(subscriber);
+    if (subscribers.size) return;
+    observer?.disconnect();
+    observer = null;
+    media?.removeEventListener("change", onMedia);
+    media = null;
+  };
+}
+
+function canvas2d() {
+  if (context2d !== undefined) return context2d;
+  const canvas = typeof OffscreenCanvas === "function" ? new OffscreenCanvas(1, 1) : typeof document !== "undefined" ? Object.assign(document.createElement("canvas"), { width: 1, height: 1 }) : null;
+  context2d = (canvas?.getContext("2d", { willReadFrequently: true }) as OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null | undefined) ?? null;
+  return context2d;
+}
+
+const hex = (value: number) => value.toString(16).padStart(2, "0");
+function fromChannels(r: number, g: number, b: number, a: number): PaletteColor {
+  const alpha = Math.round(a * 10000) / 10000;
+  return { css: alpha >= 1 ? `#${hex(r)}${hex(g)}${hex(b)}` : `rgba(${r}, ${g}, ${b}, ${alpha})`, rgba: [r, g, b, alpha] };
+}
+
+function normalize(value: string): PaletteColor | null {
+  const ctx = canvas2d();
+  if (!ctx) return null;
+  // An invalid color leaves fillStyle unchanged; two sentinels tell it apart from a valid one.
+  ctx.fillStyle = "#000000";
+  ctx.fillStyle = value;
+  const first = String(ctx.fillStyle);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = value;
+  if (first !== String(ctx.fillStyle)) return null;
+  const legacy = first.match(/^#([\da-f]{6})$/i) ?? first.match(/^rgba\((\d+), (\d+), (\d+), ([\d.]+)\)$/);
+  if (legacy) return legacy.length === 2 ? fromChannels(parseInt(legacy[1].slice(0, 2), 16), parseInt(legacy[1].slice(2, 4), 16), parseInt(legacy[1].slice(4), 16), 1) : fromChannels(Number(legacy[1]), Number(legacy[2]), Number(legacy[3]), Number(legacy[4]));
+  // Wider color syntax: draw one pixel; the canvas clips to sRGB.
+  ctx.clearRect(0, 0, 1, 1);
+  ctx.fillRect(0, 0, 1, 1);
+  const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+  return fromChannels(r, g, b, a / 255);
+}
+
+/** A color for a value outside the palette: a palette token (--name or var(--name)) from the
+ * element's context, currentColor or another token from the element's computed style, or any
+ * absolute CSS color. Absolute strings are normalized once by an offscreen canvas and kept in a
+ * bounded cache; the cache clears when an observed context changes. Null when not a color. */
+export function resolveColor(element: Element, value: string): PaletteColor | null {
+  let text = value.trim();
+  const token = text.match(/^var\(\s*(--[\w-]+)\s*\)$/)?.[1] ?? (text.startsWith("--") ? text : null);
+  if (token) {
+    const own = (paletteFor(element) as Record<string, PaletteColor | undefined>)[token];
+    if (own) return own;
+    text = getComputedStyle(element).getPropertyValue(token).trim();
+  } else if (/^currentcolor$/i.test(text) || text.includes("var(")) {
+    const style = getComputedStyle(element);
+    text = /^currentcolor$/i.test(text) ? style.color : text.replace(/var\(\s*(--[\w-]+)\s*\)/g, (_match, name: string) => style.getPropertyValue(name).trim());
+  }
+  if (!text) return null;
+  if (colors.has(text)) {
+    const cached = colors.get(text) ?? null;
+    colors.delete(text);
+    colors.set(text, cached);
+    return cached;
+  }
+  const color = normalize(text);
+  colors.set(text, color);
+  if (colors.size > cacheSize) colors.delete(colors.keys().next().value as string);
+  return color;
+}
+
 export type ElementIconShape = "square" | "diamond" | "hub";
 export type ElementRole =
   | "capability"
@@ -26,7 +191,6 @@ export type ElementRole =
   | "other";
 export type ElementType = Exclude<ElementRole, "other">;
 export type PaletteChannel = "fill" | "ink" | "tint";
-type CssTokenName = `--${string}`;
 
 export const ELEMENT_ROLE_TOKENS = {
   capability: { fill: "--color-role-capability", ink: "--color-role-capability-ink", tint: "--color-role-capability-tint" },
@@ -57,7 +221,7 @@ export const ELEMENT_ROLE_TOKENS = {
   "concept-reference": { fill: "--color-role-concept-reference", ink: "--color-role-concept-reference-ink", tint: "--color-role-concept-reference-tint" },
   resource: { fill: "--color-role-resource", ink: "--color-role-resource-ink", tint: "--color-role-resource-tint" },
   other: { fill: "--color-role-other", ink: "--color-role-other-ink", tint: "--color-role-other-tint" },
-} as const;
+} as const satisfies Record<ElementRole, Record<PaletteChannel, ColorToken>>;
 
 export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementIconShape; role: ElementRole; glyph?: string }> = {
   capability: { color: "var(--color-role-capability)", shape: "square", role: "capability" },
@@ -162,7 +326,7 @@ export const DESIGN_SYSTEM_COLOR_TOKENS = [
   "--danger-bg",
   "--info",
   "--info-bg",
-] as const satisfies readonly CssTokenName[];
+] as const satisfies readonly ColorToken[];
 
 type ElementRoleToken = {
   [Role in keyof typeof ELEMENT_ROLE_TOKENS]: (typeof ELEMENT_ROLE_TOKENS)[Role][keyof (typeof ELEMENT_ROLE_TOKENS)[Role]];
@@ -170,78 +334,6 @@ type ElementRoleToken = {
 
 export type DesignSystemColorToken = ElementRoleToken | (typeof DESIGN_SYSTEM_COLOR_TOKENS)[number];
 export type ExplorerColorToken = DesignSystemColorToken;
-
-const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
-  "--color-role-capability": "#bbdefb",
-  "--color-role-capability-ink": "#1565c0",
-  "--color-role-capability-tint": "#e3f2fd",
-  "--color-role-requirement": "#673ab7",
-  "--color-role-requirement-ink": "#512da8",
-  "--color-role-requirement-tint": "#ede7f6",
-  "--color-role-contract": "#ff9800",
-  "--color-role-contract-ink": "#e65100",
-  "--color-role-contract-tint": "#fff3e0",
-  "--color-role-semantic-contract": "#d32f2f",
-  "--color-role-semantic-contract-ink": "#b71c1c",
-  "--color-role-semantic-contract-tint": "#ffebee",
-  "--color-role-verification": "#4caf50",
-  "--color-role-verification-ink": "#2e7d32",
-  "--color-role-verification-tint": "#e8f5e9",
-  "--color-role-verification-objective": "#1b5e20",
-  "--color-role-verification-objective-ink": "#0b3d12",
-  "--color-role-verification-objective-tint": "#d7ead8",
-  "--color-role-ontology": "#b08a00",
-  "--color-role-ontology-ink": "#6f5600",
-  "--color-role-ontology-tint": "#f4e3a1",
-  "--color-role-concept": "#e7c94a",
-  "--color-role-concept-ink": "#6f5600",
-  "--color-role-concept-tint": "#fbf1cf",
-  "--color-role-concept-scheme": "#cda83a",
-  "--color-role-concept-scheme-ink": "#6f5600",
-  "--color-role-concept-scheme-tint": "#f7e7b4",
-  "--color-role-resource": "#ffca28",
-  "--color-role-resource-ink": "#8d6e00",
-  "--color-role-resource-tint": "#fff3cf",
-  "--color-role-other": "#9e9e9e",
-  "--color-role-other-ink": "#616161",
-  "--color-role-other-tint": "#ececec",
-  "--color-role-node-generic-fill": "#eceff1",
-  "--color-role-edge-default": "#c0c8d4",
-  "--color-role-edge-derive": "#673ab7",
-  "--color-role-edge-satisfy": "#4caf50",
-  "--color-role-edge-trace": "#97a2b4",
-  "--color-role-edge-bind": "#2196f3",
-  "--bg-canvas": "#fbfaf7",
-  "--bg-sunken": "#f3f1eb",
-  "--bg-surface": "#ffffff",
-  "--border-default": "#d8d2c6",
-  "--accent": "#e11d48",
-  "--accent-ring": "rgba(225,29,72,0.32)",
-  "--color-role-rdf-class": "#94a3b8",
-  "--color-role-rdf-concept": "#e7c94a",
-  "--color-role-rdf-concept-scheme": "#cda83a",
-  "--color-role-concept-reference": "#a77718",
-  "--color-role-concept-reference-ink": "#4a3608",
-  "--color-role-concept-reference-tint": "#fbf1cf",
-  "--color-role-rdf-objprop": "#64748b",
-  "--color-role-rdf-dtprop": "#0f766e",
-  "--color-role-rdf-rdfprop": "#115e59",
-  "--color-role-rdf-individual": "#7c3aed",
-  "--color-role-rdf-datatype": "#d6a43f",
-  "--color-role-rdf-restriction": "#cbd5e1",
-  "--color-role-rdf-classexpr": "#e2e8f0",
-  "--color-role-rdf-nodeshape": "#dc2626",
-  "--color-role-rdf-propshape": "#be123c",
-  "--color-role-rdf-resource": "#14b8a6",
-  "--color-role-rdf-shacl": "#ef4444",
-  "--success": "#1f9d57",
-  "--color-paper": "#ffffff",
-  "--color-ink": "#0d1119",
-  "--text-body": "#232b37",
-  "--text-faint": "#97a2b4",
-  "--text-muted": "#6b7688",
-  "--text-strong": "#161d27",
-};
 
 const CONTRACT_TYPES = new Set([
   "source",
@@ -288,35 +380,31 @@ export function roleColorValue(role: string, channel: PaletteChannel = "fill") {
   return cssVar(roleColorToken(role, channel));
 }
 
-export function cssVar(token: DesignSystemColorToken): string {
-  if (typeof window === "undefined") return `var(${token})`;
-  const resolved = resolveCssToken(token);
-  return normalizeCssColor(resolved) ?? resolved;
+/** A design-system color token resolved for the element's context (the document root by
+ * default) as #rrggbb, or #rrggbbaa with alpha; var(<token>) without a document. Reads the
+ * generated palette: no DOM insertion or computed-style read per call, so read colors once per
+ * render pass with paletteFor(element) where many are needed. */
+export function cssVar(token: DesignSystemColorToken, element?: Element): string {
+  if (typeof document === "undefined") return `var(${token})`;
+  // Untyped callers may name a token outside the palette: it stays a var() reference.
+  const color = (paletteFor(element ?? document.documentElement) as Record<string, PaletteColor | undefined>)[token];
+  return color ? hexColor(color) : `var(${token})`;
 }
 
-function resolveCssToken(token: CssTokenName, seen = new Set<string>()): string {
-  if (seen.has(token)) return `var(${token})`;
-  seen.add(token);
-
-  const value = window.getComputedStyle(document.documentElement).getPropertyValue(token).trim();
-  if (!value) return CSS_TOKEN_FALLBACKS[token as DesignSystemColorToken] ?? `var(${token})`;
-
-  return resolveCssValue(value, seen);
+/** A palette color as #rrggbb, or #rrggbbaa with alpha, for renderers that take hex strings. */
+export function paletteHex(colors: Palette, token: ColorToken): string {
+  return hexColor(colors[token]);
 }
 
-function resolveCssValue(value: string, seen = new Set<string>()): string {
-  const normalized = value.trim();
-  const nested = normalized.match(/^var\((--[a-z0-9-]+)(?:,\s*([^)]+))?\)$/i);
-  if (!nested) return normalized;
-
-  return resolveCssToken(nested[1] as CssTokenName, seen);
-}
-
-export function replaceCssVarsForMermaid(source: string) {
+/** Mermaid source with var(--token) references replaced by the element's palette colors (the
+ * document root by default). Re-render from observePalette when the element's theme changes. */
+export function replaceCssVarsForMermaid(source: string, element?: Element) {
+  if (typeof document === "undefined") return source;
+  const root = element ?? document.documentElement;
+  const colors = paletteFor(root) as Record<string, PaletteColor | undefined>;
   return source.replace(/var\((--[a-z0-9-]+)\)/gi, (match, token: string) => {
-    const colorToken = token as DesignSystemColorToken;
-    const value = normalizeCssColor(resolveCssToken(token as CssTokenName)) ?? CSS_TOKEN_FALLBACKS[colorToken];
-    return value ?? match;
+    const color = colors[token] ?? resolveColor(root, match);
+    return color ? hexColor(color) : match;
   });
 }
 
@@ -349,84 +437,10 @@ export function getMermaidClassDefs() {
 }
 
 function mermaidTokenColor(token: DesignSystemColorToken): string {
-  const value = normalizeCssColor(cssVar(token));
-  if (value) return value;
-  const fallback = CSS_TOKEN_FALLBACKS[token];
-  if (fallback) return fallback;
-  throw new Error(`Missing Mermaid-safe CSS token value for ${token}`);
+  return cssVar(token);
 }
 
-const absoluteColorCache = new Map<string, string>();
-
-function normalizeCssColor(value: string | undefined): string | null {
-  if (!value || typeof document === "undefined") return null;
-  const normalized = value.trim();
-  // Absolute sRGB colors need no DOM probe during graph redraws.
-  const direct = colorToHex(normalized);
-  if (direct) return direct;
-  // Numeric absolute colors (including the OKLCH ramps) have no inherited
-  // context. Resolve tokens on every call, but convert each value only once.
-  const cacheable = /^(?:oklch|oklab|lab|lch|hsl|hsla|hwb|rgb|rgba)\([-+0-9.eE%\s/,]+\)$/i.test(normalized);
-  const cached = cacheable ? absoluteColorCache.get(normalized) : undefined;
-  if (cached) return cached;
-  const remember = (color: string) => {
-    if (cacheable) {
-      if (absoluteColorCache.size >= 512) absoluteColorCache.clear();
-      absoluteColorCache.set(normalized, color);
-    }
-    return color;
-  };
-  const probe = document.createElement("span");
-  probe.style.color = "";
-  probe.style.color = normalized;
-  if (!probe.style.color) return null;
-
-  const parent = document.body ?? document.documentElement;
-  parent.appendChild(probe);
-  const computed = window.getComputedStyle(probe).color;
-  probe.remove();
-
-  const hex = colorToHex(computed);
-  if (hex) return remember(hex);
-
-  if (/\bjsdom\b/i.test(window.navigator?.userAgent ?? "")) return null;
-
-  // Wide-gamut path: browser returned color(display-p3 …) or similar.
-  // Render one pixel through a canvas to clamp into sRGB hex.
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 1;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-    ctx.fillStyle = computed;
-    ctx.fillRect(0, 0, 1, 1);
-    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-    return remember(`#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`);
-  } catch {
-    return null;
-  }
-}
-
-function colorToHex(color: string): string | null {
-  if (/^#(?:[a-f0-9]{3,4}|[a-f0-9]{6}|[a-f0-9]{8})$/i.test(color)) {
-    const raw = color.slice(1).toLowerCase();
-    const hex = raw.length < 5 ? [...raw].map(part => part + part).join("") : raw;
-    return `#${hex.length === 8 && hex.endsWith("ff") ? hex.slice(0, 6) : hex}`;
-  }
-  const match = color.match(/^rgba?\(\s*((?:\d*\.)?\d+)\s*,\s*((?:\d*\.)?\d+)\s*,\s*((?:\d*\.)?\d+)(?:\s*,\s*((?:\d*\.)?\d+))?\s*\)$/i);
-  if (!match) return null;
-
-  const [r, g, b] = match.slice(1, 4).map((part) => {
-    const value = Number.parseFloat(part);
-    if (!Number.isFinite(value)) return null;
-    return Math.max(0, Math.min(255, Math.round(value)));
-  });
-  if (r === null || g === null || b === null) return null;
-
-  const alpha = match[4] === undefined ? 1 : Number.parseFloat(match[4]);
-  const hex = [r, g, b].map((component) => component.toString(16).padStart(2, "0")).join("");
-  if (!Number.isFinite(alpha) || alpha >= 1) return `#${hex}`;
-
-  const alphaHex = Math.max(0, Math.min(255, Math.round(alpha * 255))).toString(16).padStart(2, "0");
-  return `#${hex}${alphaHex}`;
+function hexColor({ rgba: [r, g, b, a] }: PaletteColor): string {
+  const channels = `#${hex(r)}${hex(g)}${hex(b)}`;
+  return a >= 1 ? channels : `${channels}${hex(Math.max(0, Math.min(255, Math.round(a * 255))))}`;
 }

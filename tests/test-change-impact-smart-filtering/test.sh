@@ -72,7 +72,7 @@ EOF
 
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -106,7 +106,7 @@ fi
 # Test 2: Verify JSON output also applies smart filtering
 echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT_JSON=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)
+OUTPUT_JSON=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD --json 2>&1)
 EXIT_CODE=$?
 set -e
 

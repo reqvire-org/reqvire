@@ -21,8 +21,11 @@ This workflow bridges the gap between Reqvire's semantic engineering graph and i
 Understand how changes to requirements propagate through the model:
 
 ```bash
-# Run change impact analysis comparing to base branch
-BASE_COMMIT=$(git merge-base main HEAD)
+# Use the available CI or confirmed MCP PR context.
+reqvire change-impact --json --output /tmp/impact.json
+
+# For an explicit choice, set PR_BASE_REF to the actual PR target first.
+BASE_COMMIT=$(git merge-base HEAD "$PR_BASE_REF")
 reqvire change-impact --git-commit="$BASE_COMMIT"
 
 # Save to JSON for programmatic analysis
@@ -33,17 +36,20 @@ reqvire change-impact --git-commit=<commit-hash>
 
 # Compare against previous commit
 reqvire change-impact --git-commit=HEAD~1
+
+# Review only pending changes against the accepted committed composition.
+reqvire change-impact --git-commit=HEAD
 ```
 
-In ordinary Git mode, `--git-commit` selects the single eligible worktree's baseline, defaulting to HEAD. An aggregate containing independent worktrees without a Repo composition remains ambiguous.
+The optional override selects the single eligible worktree's baseline in ordinary Git mode. Without an override, use the actual PR merge-base from available CI/confirmed MCP review context. If unavailable, ask for the baseline; do not assume main or HEAD. An aggregate containing independent worktrees without a Repo composition remains ambiguous.
 
-In Repo mode, `--git-commit` selects the workspace-root repository's base commit. Read its model, manifest and includes from that commit; the historical manifest supplies each component's full commit ID. One selected commit identifies the complete baseline. Use global `--manifest` to select the manifest tracked in that repository:
+In Repo mode, one selected workspace-root commit identifies the root model and versioned composition association. That association identifies native manifest-owner revisions, whose XML pins each component by full commit ID. Reqvire uses `.repo/manifest.xml` automatically:
 
 ```bash
-reqvire --manifest default.xml change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
+reqvire change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
 ```
 
-All historical manifest inputs must be identifiable in the selected workspace-root repository history. Independent native manifest ownership reports `repo_impact_manifest_history_unavailable` with the affected path and guidance to select a tracked workspace-root manifest. Do not infer another repository's revision or reuse live XML. Component pins must be full commit IDs and objects must be local, including those for removed projects. Reqvire fails incomplete baselines rather than fetching, syncing or modifying active checkouts.
+Native XML remains versioned in its actual Git owners; `.reqvire-composition.json` records owner revisions without copying XML into the root. Independent history is supported. Missing associations, unversioned required inputs and unavailable objects produce affected-path diagnostics, including `repo_impact_manifest_history_unavailable`. Do not guess another revision or reuse live XML. Component pins must be full commit IDs, with all required objects local, including removed projects. Analysis never fetches, syncs or modifies active checkouts.
 
 Inspect Repo report `comparison.base` and `comparison.current`: each records `central_commit` (the workspace-root repository commit), `manifest_inputs` (`path`, owning `commit`) and `projects` (`name`, `path`, `repository`, `commit`). Use these selections to inspect each repository's diff and route tasks. Paths and identifiers remain workspace-root-relative. In mutation-enabled MCP, use the same selected `branch`; `git_commit` follows the CLI rules, and the current side uses the accepted model/composition and pending edits. Impact reads do not import external file changes. Commit provenance does not mean pending bytes are committed.
 
@@ -183,18 +189,18 @@ Create a TodoWrite-formatted task plan with full traceability.
 
 ### Step 5: Generate Git Blob Links
 
-Create stable links to exact requirement versions:
+Prefer source links already rendered by the impact report: they select the owning repository and the correct base/current side. For a workspace-root-owned file, a GitHub blob link can also be constructed from the root repository:
 
 ```bash
 # Get repository URL
 REPO_URL=$(git remote get-url origin | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
 
 # Generate blob link
-BASE_COMMIT=$(git merge-base main HEAD)
+BASE_COMMIT=$(git merge-base HEAD "$PR_BASE_REF")
 BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/${file_path}#${element-anchor}"
 ```
 
-These links ensure developers review the exact requirement version from the base commit.
+For a component-owned file, use that side's `comparison.base.projects` or `comparison.current.projects` entry: its `repository`, `commit`, and checkout `path` determine the link. Strip the checkout prefix from the workspace-relative file path. Never combine a component path with the root repository URL or root commit. Removed files use base provenance; changed/current files use current provenance. Unsupported web remotes retain the report's workspace-relative link.
 
 ## Task Plan Structure
 
@@ -303,13 +309,12 @@ When analyzing capability-scoped changes for task generation:
 ## Complete Example
 
 ```bash
-# 1. Detect base branch and get base commit
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-BASE_BRANCH="main"
-BASE_COMMIT=$(git merge-base $BASE_BRANCH HEAD)
+# 1. This example uses an explicit actual PR target.
+# Set PR_BASE_REF first; missing context never implies main or HEAD.
+BASE_COMMIT=$(git merge-base HEAD "${PR_BASE_REF:?Select the actual PR target}")
 
-# 2. Run change impact analysis
-reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
+# 2. Review the complete change against that merge-base.
+reqvire change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
 
 # 3. For each changed capability or requirement, gather context
 reqvire collect "Authentication Capability" --json --output /tmp/context_auth_capability.json
@@ -322,7 +327,7 @@ reqvire search --filter-id="system-model/Auth.md#authentication-capability" --js
 reqvire traces --filter-id="system-model/Auth.md#authentication-capability"
 reqvire search --filter-id="system-model/Verifications/AuthTests.md#auth-test" --json
 
-# 6. Generate git blob URL
+# 6. Generate a blob URL for this workspace-root-owned Auth.md.
 REPO_URL=$(git remote get-url origin | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
 BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/system-model/Auth.md#authentication-capability"
 

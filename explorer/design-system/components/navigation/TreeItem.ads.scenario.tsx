@@ -23,7 +23,7 @@ const [selected, setSelected] = useState<string>("REQ-001");
 const toggle = (id: string) => setOpen((s) => ({ ...s, [id]: !s[id] }));
 return <ShowcaseRegion regions={["page"]}>
 <Section title={fixture.title} desc={fixture.description}>
-        <ShowcaseRegion regions={["tree-demo"]}>
+        <ShowcaseRegion regions={["tree-demo"]} role="tree" aria-label="Model files">
           <TreeItem label="system-model/" icon={<Icon name="folder-open" size={14}/>} count={3} depth={0} expandable open={open.requirements} kind="folder" onToggle={() => toggle("requirements")}/>
           {open.requirements && (<>
               <TreeItem label="Capabilities.md" icon={<Icon name="file-text" size={14}/>} count={4} depth={1} expandable kind="file" selected={selected === "capabilities"} onSelect={() => setSelected("capabilities")}/>

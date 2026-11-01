@@ -143,11 +143,11 @@ impl ReqvireMcpServer {
         if let Some(hook) = &self.before_dispatch {
             hook(method, &params);
         }
-        if method == "tools/call" && params["name"] == "reqvire.worktree.list" {
+        if method == "tools/call" && params["name"] == "reqvire.branch.list" {
             let args = &params["arguments"];
             if !args.as_object().is_some_and(serde_json::Map::is_empty) {
                 return Err(McpError::invalid_params(
-                    "worktree.list takes no arguments",
+                    "branch.list takes no arguments",
                     None,
                 ));
             }
@@ -156,7 +156,7 @@ impl ReqvireMcpServer {
                 .and_then(|root| crate::mcp_worktrees::repository_worktrees(&root));
             return Ok(match value {
                 Ok(rows) => tool_success(json!({"worktrees":rows})),
-                Err(e) => tool_error("reqvire.worktree.list", e),
+                Err(e) => tool_error("reqvire.branch.list", e),
             });
         }
         if method == "resources/read" && params["uri"] == "reqvire://tools/contract" {

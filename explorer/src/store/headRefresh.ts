@@ -24,7 +24,7 @@ export async function refreshWorktreeHead(branch: string, signal: AbortSignal) {
     .catch(error => { initialized = undefined; session = null; throw error; });
   await initialized;
   signal.throwIfAborted();
-  const result = await rpc("tools/call", { name: "reqvire.worktree.refresh_head",
+  const result = await rpc("tools/call", { name: "reqvire.branch.refresh",
     arguments: { branch, dry_run: false } }, signal);
   const data = result?.structuredContent;
   if (data?.outcome === "blocked") {

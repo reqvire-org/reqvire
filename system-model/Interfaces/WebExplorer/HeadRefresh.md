@@ -16,14 +16,14 @@ IF refresh is blocked, the system SHALL retain the displayed accepted model and 
   * type: requirement
 
 #### Contract Bindings
-  * [MCP Worktree HEAD Refresh Specification](../MCP/HeadRefresh.md#mcp-worktree-head-refresh-specification)
+  * [MCP Branch Refresh Specification](../MCP/HeadRefresh.md#mcp-branch-refresh-specification)
 
 #### Relations
   * definedBy: [Explorer Worktree HEAD Refresh Specification](#explorer-worktree-head-refresh-specification)
-  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
-  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
-  * satisfiedBy: [headRefresh.ts](../../../explorer/src/store/headRefresh.ts)
   * satisfiedBy: [ExplorerWorkspace.tsx](../../../explorer/design-system/patterns/shell/ExplorerWorkspace.tsx)
+  * satisfiedBy: [headRefresh.ts](../../../explorer/src/store/headRefresh.ts)
+  * satisfiedBy: [useLiveStore.ts](../../../explorer/src/store/useLiveStore.ts)
+  * specify: [Explorer Worktree Browsing](../InterfacesFeature.md#explorer-worktree-browsing)
 ---
 
 ### Explorer Worktree HEAD Refresh Specification
@@ -33,7 +33,7 @@ Defines HEAD-default branch selection, explicit refresh and accepted/observed co
 #### Details
 - Keep branch/worktree selection as the default HEAD mode, using exact local branch names in the picker, browser URLs, HTTP/MCP requests and tab-local selection. Opaque IDs remain private runtime/cache identity. A commit ID is provenance, not a new worktree identity. Do not add historical commit selection, a global active branch or a separate MCP switching tool.
 - First admission resolves the current local branch HEAD and fully validates its model under existing mode-specific rules. Plain/read-only demand loads retain current dirty-tree and source-cache semantics; HEAD mode does not newly impose writable admission on them. Static exports remain fixed exported snapshots.
-- In mutation-enabled serving, selecting an already admitted context compares its accepted and observed HEAD. If they differ, execute `reqvire.worktree.refresh_head` with that exact branch before adopting a new publication; on an unchanged healthy context, reuse the accepted model without a graph rebuild. Accepted pending MCP edits with unchanged HEAD remain usable on reselection and do not trigger a new clean-start requirement.
+- In mutation-enabled serving, selecting an already admitted context compares its accepted and observed HEAD. If they differ, execute `reqvire.branch.refresh` with that exact branch before adopting a new publication; on an unchanged healthy context, reuse the accepted model without a graph rebuild. Accepted pending MCP edits with unchanged HEAD remain usable on reselection and do not trigger a new clean-start requirement.
 - Expose an accessible `Refresh HEAD` button in mutation-enabled served Explorer. It calls the same MCP tool with the displayed context's exact `branch` and persisted execution (`dry_run: false`). Resolve that branch from the displayed accepted Project Store, not another tab or an observed checkout change. Explorer HTTP routes and selection URLs also use branch names; private cache/runtime identity remains isolated. Selection and button actions consume the shared backend policy; the browser does not implement a separate classifier or Git-diff endpoint.
 - Poll/inventory observations can indicate external HEAD staleness without adopting a tip or rebuilding models. The observed commit is not displayed as accepted model provenance. No continuous background adoption is required.
 - A successful refresh uses normal validated loading and the existing complete-publication adoption path while preserving worker/context identity, route, current view and valid navigation, with matching Git metadata, resource/source bytes, manifest/chunks and publication revision. Artifact-only changes retain the semantic model revision; a permitted current-exclusion change can change membership and revision through normal validation. Clear the relevant stale diagnostic only after complete success.
@@ -46,3 +46,4 @@ Defines HEAD-default branch selection, explicit refresh and accepted/observed co
 
 #### Relations
   * define: [Explorer Worktree HEAD Refresh](#explorer-worktree-head-refresh)
+---

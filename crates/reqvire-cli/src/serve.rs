@@ -1337,7 +1337,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             "origin",
         )
         .expect("test fixture operation should succeed");
-        let created=manager.handle("tools/call",json!({"name":"reqvire.worktree.create","arguments":{"branch":"second","base_ref":"main"}})).expect("test fixture operation should succeed");
+        let created=manager.handle("tools/call",json!({"name":"reqvire.branch.create","arguments":{"branch":"second","base_ref":"main"}})).expect("test fixture operation should succeed");
         assert_ne!(created["isError"], true, "{created}");
         let id = created["structuredContent"]["branch"]
             .as_str()

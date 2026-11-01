@@ -31,7 +31,7 @@ sed -i 's/Power saving./Power saving.../g' "${TEST_DIR}/Requirements.md"
 # Test 1: Run change impact detection with default commit (HEAD)
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -93,7 +93,7 @@ fi
 # Test 3: Verify JSON output format for change impact detection
 echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD --json 2>&1)
 EXIT_CODE=$?
 set -e
 

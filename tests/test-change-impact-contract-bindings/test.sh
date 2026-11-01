@@ -34,7 +34,7 @@ sed -i 's/maximum length of 255 characters/maximum length of 512 characters/' "$
 
 # Run change-impact
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -71,7 +71,7 @@ sed -i 's/export_YYYYMMDD.json/export_YYYY-MM-DD.json/' "$TEST_DIR/specification
 
 # Run change-impact
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -129,7 +129,7 @@ fi
 
 # Run change-impact
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 

@@ -293,7 +293,7 @@ Verifies complete historical composition reconstruction and read isolation using
 
 ##### Acceptance Criteria
 - The sole selected workspace-root repository commit supplies its model, manifest and includes. Historical component commits come from that manifest. Current files do not substitute for deleted historical includes.
-- Independent native manifest history is rejected with the affected path and guidance to select a manifest tracked in the workspace-root repository. CLI, standalone MCP and embedded MCP preserve source state and accepted context on that error. A tracked workspace-root manifest remains usable when unrelated native manifest history exists.
+- A native selected manifest in its actual owner is reconstructed through the selected root composition record, with no root XML copy or --manifest override. CLI, standalone MCP and embedded MCP report the same complete impact and preserve source state. Missing associations, unavailable owner commits and unversioned required inputs fail with path-specific diagnostics; independent ownership alone does not fail. Legacy root-owned manifest comparisons remain supported.
 - Missing historical component objects and mutable baseline revisions produce project-specific errors without a partial report.
 - Base-only projects remain discoverable from retained local objects after their live checkout is removed.
 - Ordinary ambiguous multi-worktree comparisons retain their existing rejection.
@@ -301,7 +301,7 @@ Verifies complete historical composition reconstruction and read isolation using
 - Standalone and embedded MCP preserve the accepted model revision, pending changes and write availability. Accepted pending additions remain in current comparison inputs even after external working-file edits.
 
 ##### Test Criteria
-Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; independent-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
+Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; unavailable-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
 
 #### Metadata
   * type: test-verification

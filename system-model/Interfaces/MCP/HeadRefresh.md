@@ -1,6 +1,6 @@
 # Elements
 
-### MCP Worktree HEAD Refresh
+### MCP Branch Refresh
 
 WHEN a client requests HEAD refresh for an owned worktree context, the system SHALL check the observed local branch tip against the accepted model's protected inputs and, if eligible, reload that committed tip through the normal validated model-loading path.
 
@@ -22,30 +22,31 @@ The operation retains context identity and ownership, supports external implemen
   * [Local External Ontology Source Specification](../../Semantics/SemanticModelSpecifications.md#local-external-ontology-source-specification)
 
 #### Relations
-  * derivedFrom: [MCP Worktree Model Sessions](Tools.md#mcp-worktree-model-sessions)
-  * definedBy: [MCP Worktree HEAD Refresh Specification](#mcp-worktree-head-refresh-specification)
+  * definedBy: [MCP Branch Refresh Specification](#mcp-branch-refresh-specification)
   * definedBy: [MCP HEAD Refresh Input Protection Specification](#mcp-head-refresh-input-protection-specification)
+  * derivedFrom: [MCP Branch Model Sessions](Tools.md#mcp-branch-model-sessions)
   * satisfiedBy: [mcp_head_refresh.rs](../../../crates/reqvire-cli/src/mcp_head_refresh.rs)
   * satisfiedBy: [mcp_worktrees.rs](../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [git_commands.rs](../../../crates/reqvire-core/src/git_commands.rs)
   * satisfiedBy: [model_inputs.rs](../../../crates/reqvire-core/src/model_inputs.rs)
 ---
 
-### MCP Worktree HEAD Refresh Specification
+### MCP Branch Refresh Specification
 
 Defines the typed control operation, eligibility boundary and guarded model reload for adopting an external branch HEAD.
 
 #### Details
 Interface:
-- Expose `reqvire.worktree.refresh_head` on standalone HTTP, stdio and embedded MCP with mutations enabled. It is a context-state mutation, not a read-only tool, and does not require `--enable-commits`.
+- Expose `reqvire.branch.refresh` on standalone HTTP, stdio and embedded MCP with mutations enabled. It is a context-state mutation, not a read-only tool, and does not require `--enable-commits`.
 - Accept `branch` under the shared exact-local-branch context-selection rules and optional `dry_run: boolean`, default `false`. Reject the removed `worktree_id` selector. The branch identifies an already admitted context; it does not switch a checkout or open a worker implicitly. There is no arbitrary path, branch-changing, force or validation-bypass argument. No new shell CLI subcommand is required.
 - Every apply performs the complete eligibility check. `dry_run: true` returns a check result without changing accepted HEAD, captured files, pending paths, semantic state or Explorer publication. A successful preview does not authorize a later changed candidate.
 - Return bounded structured fields `outcome`, `can_refresh`, `dry_run`, `branch`, `previous_head`, `observed_head`, `accepted_head`, `model_revision`, changed-file count and `blockers`; include `publication_revision` when serving. Outcomes are `refreshed`, `unchanged`, `checked` and `blocked`. HEAD fields are commit object IDs, not model revisions.
-- A policy rejection is a tool-execution result with `outcome: blocked`, `can_refresh: false`, the unchanged accepted HEAD and blocker entries containing `reason`, affected `path` when applicable, and a next action. It MUST NOT be mistaken for an unavailable-tool or invalid-schema protocol error. Blocker reason tokens are `protected_model_source`, `semantic_source_changed`, `semantic_resolution_changed`, `missing_relation_target`, `pending_changes`, `dirty_worktree`, `branch_changed`, `git_operation_in_progress`, `recovery_required`. Bound large lists with explicit truncation/continuation information; do not return model bodies or a complete diff to report eligibility.
+- A policy rejection is a tool-execution result with `outcome: blocked`, `can_refresh: false`, the unchanged accepted HEAD and blocker entries containing `reason`, affected `path` when applicable, and a next action. It MUST NOT be mistaken for an unavailable-tool or invalid-schema protocol error. Blocker reason tokens are `protected_model_source`, `semantic_source_changed`, `semantic_resolution_changed`, `missing_relation_target`, `pending_changes`, `dirty_worktree`, `branch_changed`, `git_operation_in_progress`, `recovery_required`, and `manifest_or_project_changed`. Bound large lists with explicit truncation/continuation information; do not return model bodies or a complete diff to report eligibility.
 
 Eligibility and execution:
 - Retain the same live owned worker, branch, worktree root and private opaque context ID. Route this control operation despite an external HEAD mismatch, without bypassing ownership or transaction/commit recovery. Other unavailable-context errors retain the shared routing contract.
 - Require no accepted pending model changes, then require a clean index/worktree including nonignored untracked files. Reject another branch, detached HEAD, an in-progress merge/rebase/cherry-pick/revert and unresolved recovery. Pending accepted changes take the `pending_changes` diagnostic even if their persisted files also make the tree dirty.
+- In a Repo composition, keep component heads, participating manifest-owner revisions and selected manifest bytes at their accepted values. A changed component commit is a composition change even when it only changes ordinary artifacts. Return manifest_or_project_changed and require exact pins, committed owner revisions, a root association and explicit full validated branch.open admission; guarded refresh does not prepare that composition.
 - Compare the accepted HEAD tree directly with the observed HEAD tree, using literal paths and NUL-delimited change records. Check additions, modifications, deletions and mode/type changes; treat a rename as deletion plus addition. Do not compare against a merge base or audit intermediate reverted changes. Same-branch amendments and other non-fast-forward endpoint changes are eligible when all checks pass.
 - Run the guard once per trigger against the captured accepted/observed commit IDs using the existing context control gate. Commits are immutable. A later invocation resolves HEAD again; no HEAD-refresh-specific prepare/adopt protocol or repeated Git race checks are required.
 - After the guard passes, use the same validated snapshot-loading function as normal startup. Reload captured files, parsed graph, pages, semantic store, input observations and committed baseline; retain the owned context and its ID. Recompute the semantic model revision. It remains equal for artifact-only changes with unchanged effective model membership; a permitted exclusion-policy change may change model membership and its revision. Keep pending paths empty.
@@ -57,7 +58,7 @@ Eligibility and execution:
   * type: specification
 
 #### Relations
-  * define: [MCP Worktree HEAD Refresh](#mcp-worktree-head-refresh)
+  * define: [MCP Branch Refresh](#mcp-branch-refresh)
 ---
 
 ### MCP HEAD Refresh Input Protection Specification
@@ -86,4 +87,5 @@ Mutable artifacts and references:
   * type: specification
 
 #### Relations
-  * define: [MCP Worktree HEAD Refresh](#mcp-worktree-head-refresh)
+  * define: [MCP Branch Refresh](#mcp-branch-refresh)
+---

@@ -27,7 +27,7 @@ sed -i 's/The system shall provide standalone functionality./The system shall pr
 
 # Test 1: Run change impact detection (text output)
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -67,7 +67,7 @@ fi
 
 # Test 2: Run change impact detection (JSON output)
 set +e
-JSON_RAW=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)
+JSON_RAW=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD --json 2>&1)
 EXIT_CODE=$?
 set -e
 

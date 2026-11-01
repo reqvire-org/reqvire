@@ -442,7 +442,7 @@ Verify the manifest-defined source boundary through real initialized Repo client
 #### Relations
   * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
   * satisfiedBy: [repo_workspace.rs](../../../crates/reqvire-core/src/repo_workspace.rs)
-  * satisfiedBy: [check_repo_workspaces.py](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.py)
+  * satisfiedBy: [check_repo_workspaces.sh](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
   * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
   * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)
   * verify: [CLI Repo Manifest Selection](../../Interfaces/CLI/RepoWorkspaces.md#cli-repo-manifest-selection)

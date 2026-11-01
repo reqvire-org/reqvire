@@ -18,7 +18,7 @@ function Section({ title, desc, children }: {
     </ShowcaseRegion>);
 }
 function ShellSidePaneMock() {
-    return (<ShowcaseRegion regions={["shell-pane-mock"]} aria-label="Placeholder side pane content">
+    return (<ShowcaseRegion regions={["shell-pane-mock"]} role="group" aria-label="Placeholder side pane content">
       <ShowcaseRegion regions={["shell-placeholder", "shell-placeholder--search"]}/>
       <ShowcaseRegion regions={["shell-placeholder-group"]}>
         <ShowcaseRegion regions={["shell-placeholder", "shell-placeholder--heading"]}/>
@@ -34,7 +34,7 @@ function ShellSidePaneMock() {
     </ShowcaseRegion>);
 }
 function ShellMainMock() {
-    return (<ShowcaseRegion regions={["shell-main-mock"]} aria-label="Placeholder workspace content">
+    return (<ShowcaseRegion regions={["shell-main-mock"]} role="group" aria-label="Placeholder workspace content">
       <ShowcaseRegion regions={["shell-workspace-header"]}>
         <ShowcaseRegion regions={["shell-placeholder", "shell-placeholder--icon"]}/>
         <ShowcaseRegion regions={["shell-placeholder-stack"]}>

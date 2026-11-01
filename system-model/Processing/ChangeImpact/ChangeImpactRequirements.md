@@ -82,6 +82,7 @@ When comparing a manifest-defined workspace, the system SHALL use one selected w
   * type: requirement
 
 #### Contract Bindings
+  * [Workspace Composition Checkpoint Specification](../../ModelStructure/RepoWorkspaces.md#workspace-composition-checkpoint-specification)
   * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
 
 #### Relations

@@ -484,9 +484,9 @@ def mcp(checks, base, binary):
                                 mutations=True, commits=commits) as server:
                 contexts = {}
                 def context_control():
-                    inventory = server.tool("reqvire.worktree.list")["worktrees"]
+                    inventory = server.tool("reqvire.branch.list")["worktrees"]
                     contexts["origin"] = next(row["branch"] for row in inventory if row["original"])
-                    contexts["child"] = server.tool("reqvire.worktree.create", branch="selection-child", base_ref="HEAD")["branch"]
+                    contexts["child"] = server.tool("reqvire.branch.create", branch="selection-child", base_ref="HEAD")["branch"]
                     parent = (TESTS / "fixtures/element-selection/Model.md").read_text().split("### Child Requirement\n", 1)[1].split("---", 1)[0]
                     content = "### Child Requirement\n" + parent.replace("preserve the selected subject", "provide distinct child context evidence")
                     server.tool("reqvire.add_element", branch=contexts["child"], file="Model.md", content=content, override_existing=True)

@@ -2,7 +2,7 @@
 //!
 //! Repo owns manifest composition. The default entry or an alternate file
 //! location selects the inputs. This boundary never syncs or fetches.
-use crate::{error::ReqvireError, model_inputs};
+use crate::{error::ReqvireError, git_commands::local_text as git_text, model_inputs};
 use quick_xml::{
     events::{BytesStart, Event},
     Reader, Writer,
@@ -27,27 +27,6 @@ fn failure(message: impl Into<String>) -> ReqvireError {
     ReqvireError::ProcessError(message.into())
 }
 
-pub fn git_text(root: &Path, args: &[&str]) -> Result<String, ReqvireError> {
-    let out = Command::new("git")
-        .current_dir(root)
-        .args(["-c", "protocol.allow=never"])
-        .env("GIT_TERMINAL_PROMPT", "0")
-        .env("GIT_NO_LAZY_FETCH", "1")
-        .stdin(Stdio::null())
-        .args(args)
-        .output()?;
-    if !out.status.success() {
-        return Err(failure(format!(
-            "Git in {}: {}",
-            root.display(),
-            String::from_utf8_lossy(&out.stderr).trim()
-        )));
-    }
-    String::from_utf8(out.stdout)
-        .map(|v| v.trim_end_matches(['\r', '\n']).to_owned())
-        .map_err(|e| failure(e.to_string()))
-}
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RepoProject {
     pub name: String,
@@ -65,6 +44,7 @@ pub struct ManifestSource {
     pub root: PathBuf,
     pub commit: String,
     pub tracked: bool,
+    pub repository: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -377,6 +357,8 @@ impl RepoWorkspace {
                         .to_owned(),
                     commit: git_text(&owner, &["rev-parse", "--verify", "HEAD"])?,
                     tracked,
+                    repository: git_text(&owner, &["remote", "get-url", "origin"])
+                        .unwrap_or_default(),
                 },
             );
         }

@@ -25,7 +25,7 @@ run_change_impact_json() {
   local work_dir="$1"
   local json_raw
   set +e
-  json_raw=$(cd "$work_dir" && "$REQVIRE_BIN" change-impact --json 2>&1)
+  json_raw=$(cd "$work_dir" && "$REQVIRE_BIN" change-impact --git-commit HEAD --json 2>&1)
   local status=$?
   set -e
 

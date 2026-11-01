@@ -15,7 +15,6 @@ stylesheet.textContent = foundation.toString();
 document.head.append(stylesheet);
 
 beforeEach(() => {
-  document.documentElement.classList.remove("dark");
   document.documentElement.removeAttribute("data-theme");
 });
 

@@ -116,7 +116,7 @@ cd "$TEST_DIR"
 echo "" >> specifications/Requirements.md
 git add -A > /dev/null 2>&1 && git commit -m "test change" > /dev/null 2>&1
 
-test_json_output "change-impact" "change-impact.json" true change-impact
+test_json_output "change-impact" "change-impact.json" true change-impact --git-commit HEAD
 
 # ========================================
 # Error case: --output without --json

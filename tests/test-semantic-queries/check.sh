@@ -242,9 +242,9 @@ printf 'PASS-multiple-used-ontology-namespaces\n'
 git add specifications/Queries.md
 git -c user.name='Query Test' -c user.email=query@example.invalid -c commit.gpgSign=false commit --allow-empty -m 'Query baseline' > output/git-commit.txt
 sed 's/item:Item a owl:Class \./item:Item a owl:Class ; rdfs:comment "Changed vocabulary documentation" ./' output/initial-query-model.txt > "$fixture"
-run change-impact --json | jq -e 'any(.changed[];.name=="Item Ontology" and any(.change_impact_tree[];.usedBy.name=="Item Lookup"))' >/dev/null
+run change-impact --git-commit HEAD --json | jq -e 'any(.changed[];.name=="Item Ontology" and any(.change_impact_tree[];.usedBy.name=="Item Lookup"))' >/dev/null
 sed 's/Lists items for downstream consumers\./Updated query purpose./' output/initial-query-model.txt > "$fixture"
-run change-impact --json | jq -e 'any(.changed[];.name=="Item Lookup" and .change_impact_tree==[])' >/dev/null
+run change-impact --git-commit HEAD --json | jq -e 'any(.changed[];.name=="Item Lookup" and .change_impact_tree==[])' >/dev/null
 restore
 printf 'PASS-ontology-query-change-impact-direction\n'
 export_query 'Item Lookup' > output/original-record.json

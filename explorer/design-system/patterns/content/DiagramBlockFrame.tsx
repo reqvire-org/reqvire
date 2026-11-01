@@ -30,9 +30,13 @@ export function DiagramBlockFrame({
   ...props
 }: DiagramBlockFrameProps) {
   return (
+    // A wide diagram scrolls inside the frame, so the frame is a focusable, labelled region.
     <div
       className={cx("ux-diagram-block-frame", diagramBlockUX, diagramBlockSkinX, className)}
       data-product-pattern="diagram-block-frame"
+      role="region"
+      aria-label="Diagram"
+      tabIndex={0}
       {...props}
     >
       {children}

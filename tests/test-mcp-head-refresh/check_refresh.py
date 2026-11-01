@@ -19,7 +19,7 @@ BINARY, DESTINATION = sys.argv[1:]
 DESTINATION = Path(DESTINATION)
 OUTPUT = DESTINATION / "output"
 OUTPUT.mkdir(exist_ok=True)
-TOOL = "reqvire.worktree.refresh_head"
+TOOL = "reqvire.branch.refresh"
 report = []
 metrics = {"server_starts": 0}
 started = time.monotonic()
@@ -144,7 +144,7 @@ def server(root, name, mode="mcp", commits=False):
 
 
 def original(client):
-    return next(row["branch"] for row in client.tool("reqvire.worktree.list")["worktrees"]
+    return next(row["branch"] for row in client.tool("reqvire.branch.list")["worktrees"]
                 if row.get("original"))
 
 
@@ -432,7 +432,7 @@ def stdio(check):
     root, _ = project("stdio")
     metrics["server_starts"] += 1
     with transports.Stdio(BINARY, root, OUTPUT / "stdio", "--enable-mutations") as client:
-        initial = client.rpc("tools/call", {"name": "reqvire.worktree.list", "arguments": {}})
+        initial = client.rpc("tools/call", {"name": "reqvire.branch.list", "arguments": {}})
         ident = next(r["branch"] for r in initial["structuredContent"]["worktrees"] if r.get("original"))
 
         def adopt():
@@ -475,7 +475,7 @@ def explorer(check):
     root, _ = project("explorer")
     with server(root, "explorer", mode="serve") as client:
         ident = original(client)
-        child = client.tool("reqvire.worktree.create", branch="secondary", base_ref="main")
+        child = client.tool("reqvire.branch.create", branch="secondary", base_ref="main")
         child_root = Path(child["workspace_root"])
         # Reuse the two contexts required by browser selection for backend
         # isolation as well; do not start a separate isolation server/worktree.

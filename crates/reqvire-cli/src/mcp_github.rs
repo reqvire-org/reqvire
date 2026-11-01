@@ -183,6 +183,12 @@ impl GithubAccess {
     pub const fn available(&self) -> bool {
         self.repository.is_some()
     }
+    pub(crate) fn matches_identity(&self, expected: &str) -> bool {
+        Repository::parse(expected).ok().as_ref() == self.repository.as_ref()
+    }
+    pub(crate) fn repository_key(&self) -> Option<String> {
+        self.repository.as_ref().map(Repository::argument)
+    }
     pub(crate) fn disable(&mut self, reason: String) {
         self.repository = None;
         self.reason = Some(reason);
@@ -197,6 +203,19 @@ impl GithubAccess {
         }
         if git(root, &["rev-parse", "--verify", &format!("{commit}^0")])? != commit {
             return Err(error("Saved dependency commit is unavailable"));
+        }
+        let refs = git(
+            root,
+            &["ls-remote", "--heads", "--tags", "--", &self.push_url],
+        )?;
+        if refs
+            .lines()
+            .filter_map(|line| line.split_once('\t').map(|(sha, _)| sha))
+            .any(|sha| {
+                sha == commit || git(root, &["merge-base", "--is-ancestor", commit, sha]).is_ok()
+            })
+        {
+            return Ok(json!({"outcome":"no_op","commit":commit,"reachable":true}));
         }
         let reference = format!("refs/heads/reqvire/commits/{commit}");
         let remote = || -> Result<bool, ReqvireError> {
@@ -266,7 +285,11 @@ impl GithubAccess {
         )?;
         serde_json::from_str(&value).map_err(|_| error("GitHub returned malformed structured data"))
     }
-    fn remote_head(&self, root: &Path, branch: &str) -> Result<Option<String>, ReqvireError> {
+    pub(crate) fn remote_head(
+        &self,
+        root: &Path,
+        branch: &str,
+    ) -> Result<Option<String>, ReqvireError> {
         let reference = format!("refs/heads/{branch}");
         let result = git(
             root,
@@ -277,6 +300,46 @@ impl GithubAccess {
                 .filter(|(_, r)| *r == reference)
                 .map(|(sha, _)| sha.to_string())
         }))
+    }
+
+    /// Validate all PR targets before a coordinated call creates its first PR.
+    pub(crate) fn preflight_pr(
+        &self,
+        root: &Path,
+        base: &str,
+        branch: &str,
+        head: &str,
+    ) -> Result<(String, Option<Value>), ReqvireError> {
+        let repo = self.verify(root)?;
+        git(root, &["check-ref-format", &format!("refs/heads/{base}")])?;
+        if base == branch {
+            return Err(error("PR base must differ from the owned branch"));
+        }
+        if self.remote_head(root, branch)?.as_deref() != Some(head) {
+            return Err(error(
+                "Push the accepted HEAD before creating a pull request",
+            ));
+        }
+        let base_commit = self
+            .remote_head(root, base)?
+            .ok_or_else(|| error("PR base does not exist in the pinned repository"))?;
+        let existing = self.open_prs(root, &repo.argument(), branch)?;
+        if let Some(pr) = matching_pr(&existing, base)? {
+            return Ok((base_commit, Some(pr.clone())));
+        }
+        let encoded_base =
+            percent_encoding::utf8_percent_encode(base, percent_encoding::NON_ALPHANUMERIC);
+        let encoded_head =
+            percent_encoding::utf8_percent_encode(branch, percent_encoding::NON_ALPHANUMERIC);
+        let endpoint = format!(
+            "repos/{}/compare/{encoded_base}...{encoded_head}",
+            repo.name
+        );
+        let comparison = self.gh_json(root, &["api", "--hostname", &repo.host, &endpoint])?;
+        if comparison["ahead_by"].as_u64().unwrap_or(0) == 0 {
+            return Err(error("No proposed commits ahead of the selected PR base"));
+        }
+        Ok((base_commit, None))
     }
     pub fn execute(
         &self,
@@ -346,40 +409,10 @@ impl GithubAccess {
                 let body = args["body"]
                     .as_str()
                     .ok_or_else(|| error("body must be a string"))?;
-                git(root, &["check-ref-format", &format!("refs/heads/{base}")])?;
-                if base == branch {
-                    return Err(error("PR base must differ from the owned branch"));
-                }
-                if self.remote_head(root, branch)?.as_deref() != Some(head) {
-                    return Err(error(
-                        "Push the accepted HEAD before creating a pull request",
-                    ));
-                }
-                if self.remote_head(root, base)?.is_none() {
-                    return Err(error("PR base does not exist in the pinned repository"));
-                }
-                let existing = self.open_prs(root, &repository, branch)?;
-                if let Some(pr) = matching_pr(&existing, base)? {
-                    pr_result(pr, "no_op", head)
+                let (_, existing) = self.preflight_pr(root, base, branch, head)?;
+                if let Some(pr) = existing {
+                    pr_result(&pr, "no_op", head)
                 } else {
-                    // Fixed endpoint, not a caller-supplied API proxy. Encode branch names as path data.
-                    let encoded_base = percent_encoding::utf8_percent_encode(
-                        base,
-                        percent_encoding::NON_ALPHANUMERIC,
-                    );
-                    let encoded_head = percent_encoding::utf8_percent_encode(
-                        branch,
-                        percent_encoding::NON_ALPHANUMERIC,
-                    );
-                    let endpoint = format!(
-                        "repos/{}/compare/{encoded_base}...{encoded_head}",
-                        repo.name
-                    );
-                    let comparison =
-                        self.gh_json(root, &["api", "--hostname", &repo.host, &endpoint])?;
-                    if comparison["ahead_by"].as_u64().unwrap_or(0) == 0 {
-                        return Err(error("No proposed commits ahead of the selected PR base"));
-                    }
                     let mut command = vec![
                         "pr",
                         "create",

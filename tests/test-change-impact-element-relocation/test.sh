@@ -70,7 +70,7 @@ sed -i 's@(#test-capability-test-change-impact-element-relocation-specifications
 # Run change impact detection
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact 2>&1)
+OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -102,7 +102,7 @@ fi
 # Test 7: Test with JSON output
 echo "Running: reqvire change-impact --json" >> "${TEST_DIR}/test_results.log"
 set +e
-JSON_OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)
+JSON_OUTPUT=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --git-commit HEAD --json 2>&1)
 EXIT_CODE_JSON=$?
 set -e
 

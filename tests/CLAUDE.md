@@ -6,6 +6,9 @@ This guide covers how to write and execute end-to-end tests for Reqvire. Tests v
 ## Test Execution
 
 ### Run All Tests
+Build the selected binary first as described under Build Before Testing. The
+runner copies an existing executable; it does not rebuild it.
+
 From the root directory:
 ```bash
 ./tests/run_tests.sh
@@ -38,11 +41,21 @@ launch/cleanup implementation.
 The same Reqvire timing summary is printed for a single test.
 
 ### Build Before Testing
-Tests use the debug binary:
+The runner defaults to `target/release/reqvire`. Build that binary before the
+default invocation:
 ```bash
-cargo build
+cargo build --release
 ./tests/run_tests.sh
 ```
+
+To test a debug build explicitly:
+```bash
+cargo build
+REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh
+```
+
+The runner prints the selected source executable and copies it at startup, so
+an in-progress run keeps its original binary even if another build finishes.
 
 ## Test Structure
 
@@ -61,11 +74,12 @@ Use `ls tests/` to see all available test directories. Each `test-*` directory c
 
 ## Writing Test Scripts
 
-Prefer Bash for fixture setup and command execution, `jq` for JSON assertions,
-and `diff -u` for expected output comparisons, following the existing shell tests.
-Do not add Python wrappers for work those tools express clearly. Use Python when
-it provides substantive protocol, concurrency, process-lifecycle, or graph
-handling, and reuse existing helpers for those cases.
+Use Bash for fixture setup, command execution and HTTP MCP checks, `curl` for
+HTTP, `jq` for JSON assertions, and `diff -u` for expected output comparisons.
+Python is allowed only when Bash, jq and existing shell helpers cannot reasonably
+perform the required check. An existing Python harness, convenience, or protocol
+calls alone do not justify it. Do not add Python fixtures or wrappers for work
+the shell tools can express; reuse existing shell helpers first.
 
 ### Test Script Template (test.sh)
 ```bash

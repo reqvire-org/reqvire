@@ -35,7 +35,8 @@ const baseUX = css`
 
   .ds-typebadge__dot--glyph {
     --ds-typebadge-dot-size: var(--type-icon-sm);
-    color: var(--text-strong);
+    /* Role fills are the same in every theme: glyphs use the fixed ink for light fills. */
+    color: var(--color-ink);
   }
 
   .ds-typebadge__dot--wide-glyph {

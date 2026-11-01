@@ -37,6 +37,7 @@ export const fixture = {
     {"token":"--ring-focus","property":"box-shadow","probe":"1px 3px 5px rgb(31, 97, 163)"},
     {"token":"--ring-selected","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--row-height-compact","property":"width","probe":"13.375px"},
+    {"token":"--side-pane-legend-row-height","property":"width","probe":"13.375px"},
     {"token":"--scroll-thumb","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--scroll-track","property":"background-color","probe":"rgb(31, 97, 163)"},
     {"token":"--side-pane-content-inset-inline","property":"width","probe":"13.375px"},

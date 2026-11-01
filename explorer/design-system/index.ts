@@ -59,18 +59,28 @@ export {
   cssVar,
   elementRole,
   getMermaidClassDefs,
+  observePalette,
+  paletteContext,
+  paletteFor,
+  paletteHex,
   replaceCssVarsForMermaid,
+  resolveColor,
   roleColorToken,
   roleColorValue,
 } from "./palette";
 export type {
+  ColorToken,
   DesignSystemColorToken,
   ElementIconShape,
   ElementRole,
   ElementType,
   ExplorerColorToken,
+  Palette,
   PaletteChannel,
+  PaletteColor,
+  PaletteContext,
 } from "./palette";
+export { themed, themedByScheme } from "./tokens/themes.generated";
 export { RelationPill } from "./components/data/RelationPill";
 export type { RelationPillProps } from "./components/data/RelationPill";
 export { Stat, StatRow } from "./components/data/Stat";

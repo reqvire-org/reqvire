@@ -2,7 +2,9 @@
 use crate::{
     error::ReqvireError,
     exclusions::ExclusionSet,
+    git_commands::{local_bytes as git, local_text as text, run_local},
     mutation_io::{SnapshotFiles, SnapshotGuard},
+    repo_composition::CompositionRecord,
     repo_workspace::{self, RepoProject, RepoWorkspace},
     workspace::WorkspaceScope,
     ModelManager,
@@ -10,9 +12,7 @@ use crate::{
 use serde::Serialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
-    io::Write,
     path::{Component, Path, PathBuf},
-    process::{Command, Stdio},
     sync::Arc,
 };
 
@@ -20,10 +20,18 @@ fn failure(message: impl Into<String>) -> ReqvireError {
     ReqvireError::ProcessError(message.into())
 }
 
+fn is_root_owner(path: &Path) -> bool {
+    path.as_os_str().is_empty()
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct ManifestRevision {
     pub path: PathBuf,
     pub commit: String,
+    #[serde(skip_serializing_if = "is_root_owner")]
+    pub owner: PathBuf,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub repository: String,
 }
 #[derive(Debug, Clone, Serialize)]
 pub struct ProjectRevision {
@@ -70,6 +78,12 @@ impl WorkspaceRevision {
                 .map(|(path, source)| ManifestRevision {
                     path: path.clone(),
                     commit: source.commit.clone(),
+                    owner: source.root.clone(),
+                    repository: if source.root.as_os_str().is_empty() {
+                        String::new()
+                    } else {
+                        source.repository.clone()
+                    },
                 })
                 .collect(),
             projects,
@@ -130,60 +144,6 @@ impl WorkspaceRevision {
     }
 }
 
-fn git(directory: &Path, args: &[&str]) -> Result<Vec<u8>, ReqvireError> {
-    git_with_input(directory, args, None)
-}
-
-fn git_with_input(
-    directory: &Path,
-    args: &[&str],
-    input: Option<&[u8]>,
-) -> Result<Vec<u8>, ReqvireError> {
-    let mut command = Command::new("git");
-    command
-        .current_dir(directory)
-        .args(["-c", "protocol.allow=never"])
-        .args(args)
-        .env("GIT_TERMINAL_PROMPT", "0")
-        .env("GIT_NO_LAZY_FETCH", "1")
-        .stdin(if input.is_some() {
-            Stdio::piped()
-        } else {
-            Stdio::null()
-        });
-    let output = if let Some(input) = input {
-        let mut process = command
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
-        let mut stdin = process
-            .stdin
-            .take()
-            .ok_or_else(|| failure("Missing Git object input"))?;
-        let bytes = input.to_vec();
-        let writer = std::thread::spawn(move || stdin.write_all(&bytes));
-        let output = process.wait_with_output()?;
-        writer
-            .join()
-            .map_err(|_| failure("Historical Git object writer failed"))??;
-        output
-    } else {
-        command.output()?
-    };
-    if !output.status.success() {
-        return Err(failure(format!(
-            "Git in {}: {}",
-            directory.display(),
-            String::from_utf8_lossy(&output.stderr).trim()
-        )));
-    }
-    Ok(output.stdout)
-}
-fn text(directory: &Path, args: &[&str]) -> Result<String, ReqvireError> {
-    String::from_utf8(git(directory, args)?)
-        .map(|v| v.trim_end_matches(['\r', '\n']).to_owned())
-        .map_err(|e| failure(e.to_string()))
-}
 fn resolve(directory: &Path, reference: &str) -> Result<String, ReqvireError> {
     if reference.trim().is_empty() {
         return Err(failure(format!(
@@ -218,7 +178,7 @@ fn relative(path: &Path) -> Result<(), ReqvireError> {
 /// Read Git objects directly: no checkout, filters, index, ref updates or fetch.
 fn tree(directory: &Path, commit: &str) -> Result<BTreeMap<PathBuf, Arc<Vec<u8>>>, ReqvireError> {
     let mut reader = crate::git_commands::GitReader::new(directory, |args, input| {
-        git_with_input(directory, args, input)
+        run_local(directory, args, input)
     });
     let entries = reader.files_at_commit(commit)?;
     let mut files = BTreeMap::new();
@@ -358,7 +318,7 @@ fn project_objects(
     stored.push(".git");
     let stored = PathBuf::from(stored);
     candidates.push(stored);
-    let common = repo_workspace::git_text(
+    let common = crate::git_commands::local_text(
         root,
         &["rev-parse", "--path-format=absolute", "--git-common-dir"],
     )?;
@@ -389,7 +349,7 @@ fn project_objects(
 
 fn manifest_history_unavailable(path: &Path) -> ReqvireError {
     failure(format!(
-        "repo_impact_manifest_history_unavailable: {} has no version in the selected workspace-root repository history; use --manifest to select a manifest tracked in the workspace-root repository",
+        "repo_impact_manifest_history_unavailable: {} has no identified version in the selected composition; commit its manifest-owner revision association in .reqvire-composition.json or restore the recorded local objects",
         path.display()
     ))
 }
@@ -409,30 +369,49 @@ pub fn historical_model(
             git_commit
         },
     )?;
-    let source = current
-        .manifest_sources
-        .get(&current.manifest)
-        .ok_or_else(|| {
-            failure(format!(
-                "Historical manifest ownership unavailable: {}",
-                current.manifest.display()
-            ))
-        })?;
-    if !source.root.as_os_str().is_empty() || !source.tracked {
-        return Err(manifest_history_unavailable(&current.manifest));
+    let central_files = tree(root, &central)?;
+    let mut record = CompositionRecord::at_commit(root, &central, &current.selection)?;
+    if record.is_none() && current.uses_repo_managed_inputs() {
+        let mut captured = CompositionRecord::capture(current)
+            .map_err(|_| manifest_history_unavailable(&current.manifest))?;
+        if git_commit != "HEAD" {
+            // Legacy same-history native selections can be inferred only when
+            // the selected root tree actually versions each source path.
+            for source in &mut captured.sources {
+                if !source.owner.as_os_str().is_empty() {
+                    if source.repository.is_empty()
+                        || repo_workspace::normalize_url(&source.repository)
+                            != repo_workspace::normalize_url(&current.central_repository)
+                        || !central_files.contains_key(&source.source)
+                    {
+                        return Err(manifest_history_unavailable(&source.path));
+                    }
+                    source.commit = Some(central.clone());
+                }
+            }
+        }
+        record = Some(captured);
     }
-    for (path, owner) in &current.manifest_sources {
-        if !owner.tracked || !owner.root.as_os_str().is_empty() {
-            return Err(manifest_history_unavailable(path));
+    if record.is_none() {
+        for (path, owner) in &current.manifest_sources {
+            if !owner.tracked || !owner.root.as_os_str().is_empty() {
+                return Err(manifest_history_unavailable(path));
+            }
         }
     }
-    let central_files = tree(root, &central)?;
     let temporary = tempfile::tempdir()?;
     let staged = temporary.path();
     let mut base;
     {
         let _suspended = SnapshotGuard::suspend();
         materialize(staged, &central_files)?;
+        if let Some(record) = &record {
+            for (path, bytes) in record.historical_inputs(root, &central, current)? {
+                let destination = staged.join(path);
+                std::fs::create_dir_all(destination.parent().expect("validated source path"))?;
+                std::fs::write(destination, bytes)?;
+            }
+        }
         std::fs::create_dir_all(staged.join(".repo/manifests"))?;
         git(
             staged,
@@ -452,9 +431,39 @@ pub fn historical_model(
             staged.join(".repo/manifests/.git"),
             "gitdir: ../manifests.git\n",
         )?;
-        // Repo's generated wrapper is administration, not historical input.
-        // The selected manifest and includes come from the one base tree.
-        std::fs::write(staged.join(".repo/manifest.xml"), "<manifest/>\n")?;
+        // Repo's wrapper is reconstructed administration; XML sources remain
+        // the immutable files read from their recorded owning Git trees.
+        let entry = record.as_ref().map_or_else(
+            || "<manifest/>\n".to_owned(),
+            |record| {
+                let selected = record
+                    .manifest
+                    .strip_prefix(".repo/manifests")
+                    .map(Path::to_path_buf)
+                    .unwrap_or_else(|_| staged.join(&record.manifest));
+                format!(
+                    "<manifest><include name=\"{}\"/></manifest>\n",
+                    quick_xml::escape::escape(selected.to_string_lossy())
+                )
+            },
+        );
+        std::fs::write(staged.join(".repo/manifest.xml"), entry)?;
+        if let Some(source) = record
+            .as_ref()
+            .and_then(|record| record.sources.iter().find(|s| s.path == record.manifest))
+            .filter(|source| !source.repository.is_empty())
+        {
+            git(
+                staged,
+                &[
+                    "--git-dir",
+                    ".repo/manifests.git",
+                    "config",
+                    "remote.origin.url",
+                    &source.repository,
+                ],
+            )?;
+        }
         base = RepoWorkspace::resolve_with_repo(
             staged,
             current.selection.clone(),
@@ -464,17 +473,33 @@ pub fn historical_model(
     base.central_commit = central.clone();
     base.central_repository = current.central_repository.clone();
     for path in base.manifest_input_paths() {
-        if !central_files.contains_key(&path) {
+        let source = record
+            .as_ref()
+            .and_then(|record| record.sources.iter().find(|s| s.path == path));
+        if source.is_none() && (record.is_some() || !central_files.contains_key(&path)) {
             return Err(manifest_history_unavailable(&path));
         }
         base.manifest_sources.insert(
             path,
             repo_workspace::ManifestSource {
-                root: PathBuf::new(),
-                commit: central.clone(),
+                root: source.map(|s| s.owner.clone()).unwrap_or_default(),
+                commit: source
+                    .and_then(|s| s.commit.clone())
+                    .unwrap_or_else(|| central.clone()),
                 tracked: true,
+                repository: source
+                    .map(|s| s.repository.clone())
+                    .unwrap_or_else(|| current.central_repository.clone()),
             },
         );
+    }
+    if record
+        .as_ref()
+        .is_some_and(|record| record.sources.len() != base.manifest_sources.len())
+    {
+        return Err(failure(
+            "Historical composition record contains unconsumed manifest sources",
+        ));
     }
     let mut files = BTreeMap::new();
     for (path, bytes) in central_files {

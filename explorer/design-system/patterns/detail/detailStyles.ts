@@ -173,7 +173,7 @@ export const governanceProvenanceSkinX = css`
   border-radius: var(--radius-full);
   background: transparent;
   padding: 0;
-  color: var(--text-faint);
+  color: var(--text-muted);
   font-size: var(--text-sm);
 `;
 
@@ -334,6 +334,8 @@ export const relationEndpointBaseUX = css`
   justify-self: start;
   min-width: 0;
   max-width: min(100%, var(--ux-detail-chip-link-max-w, 100%));
+  /* A pointer target: at least 24px tall (WCAG 2.5.8). */
+  min-height: var(--space-12);
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-1) var(--control-padding-sm);

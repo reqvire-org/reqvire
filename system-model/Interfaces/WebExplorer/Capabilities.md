@@ -48,9 +48,9 @@ Selection SHALL resolve the branch to an existing or newly created isolated work
   * type: requirement
 
 #### Contract References
+  * [MCP Branch Opening and Inventory Specification](../MCP/Specifications.md#mcp-branch-opening-and-inventory-specification)
   * [MCP Mutation Concurrency Control Specification](../MCP/Specifications.md#mcp-mutation-concurrency-control-specification)
   * [MCP Server State and Cache Specification](../MCP/Specifications.md#mcp-server-state-and-cache-specification)
-  * [MCP Worktree Opening and Inventory Specification](../MCP/Specifications.md#mcp-worktree-opening-and-inventory-specification)
   * [Explorer Worktree HEAD Refresh Specification](HeadRefresh.md#explorer-worktree-head-refresh-specification)
   * [Explorer Automatic Store Refresh Specification](Specifications.md#explorer-automatic-store-refresh-specification)
   * [Explorer Live Store Refresh Input Output](Specifications.md#explorer-live-store-refresh-input-output)

@@ -10,10 +10,12 @@ Contract for mcp accepted change commit.
 - Under the context mutation gate, verify ownership and expected HEAD, validate the complete accepted candidate with Reqvire core, and construct the commit from the accepted baseline plus accumulated accepted changes. Never use unrelated staged files, current external file edits, or hook-modified trees as the accepted candidate.
 - Preserve unrelated index entries and working files. Reconcile index entries for accepted paths only against the accepted commit; external edits in those working files remain distinguishable as dirty state, not accepted model input. Commit scope includes accepted asset moves/removals and executable modes under existing mutation guarantees.
 - Publish the ref using the expected old HEAD. Only success advances expected HEAD and clears the committed pending-change set. Return old/new HEAD, changed files, context, and model revision. A commit alone does not change parsed model content or trigger a model/Explorer rebuild.
-- With no net accepted changes, return an explicit no-op and no commit. After an automatic mutation commit, manual commit therefore normally returns no-op. Model mutations without `--enable-commits` still leave HEAD unchanged until explicit commit.
+- With no net accepted changes and no missing or outdated native composition checkpoint, return an explicit no-op and no commit. An explicit initial checkpoint may commit only the root association and necessary exact native pins without any model edit. After an automatic mutation commit, manual commit therefore normally returns no-op. Model mutations without `--enable-commits` still leave HEAD unchanged until explicit commit.
 - A failed validation, commit creation, or ref update MUST preserve pending accepted changes, the previous accepted model, and unrelated index/worktree state. Unexpected HEAD disables writes under the ownership contract; recovery MUST NOT reset an externally changed ref. Commit messages are data, never shell source.
 - After interrupted explicit-commit ref publication, automatically inspect local Git under the MCP Commit Outcome Reconciliation Specification. If the exact recorded commit was published and verification succeeds, reconcile its affected index entries, advance accepted HEAD, clear pending changes, and return success with `reconciled: true` without a model/Explorer rebuild or repeated ref side effect. If the owned branch remains at the previous accepted HEAD, return a commit error and retain accepted pending edits, model/revision, and index as uncommitted state. Local commits do not require `gh` or a remote query. Only an unresolved observation or failed reconciliation retains the previous accepted HEAD/model/pending changes and index, disables writes, and keeps audited accepted-snapshot reads available; never blindly retry or reset a ref.
-- Recovery of a recorded unknown-outcome local commit may use `reqvire.git.reconcile` under its dedicated verification contract. Other recovery remains an operator procedure. Unknown-outcome ref-publication diagnostics identify the branch, accepted HEAD, and attempted commit. Record those alongside the actual HEAD; inspect the attempted commit's parent, tree, affected paths, index, and physical files. Preserve evidence and unrelated changes before stopping the server/worker when manual recovery is needed. If live verified reconciliation is unavailable and the actual tip is the verified intended commit, repair the stall cause and reconcile only its affected index entries from that exact commit, then validate the model and satisfy clean-worktree admission before restart. The restarted context accepts the reconciled state. If intent or ref ownership is uncertain, keep writes disabled until the operator resolves it; any chosen rollback must compare the expected ref and preserve unrelated work. Reopening a live recovery-required context does not clear recovery.
+- Recovery of a recorded unknown-outcome local commit may use `reqvire.git.reconcile` under its dedicated verification contract. The live reconciliation tool operates on a recorded workspace-root ref attempt. Unknown component or manifest-owner ref outcomes have per-owner evidence and block retries/admission; preserve their files/index and attempted commit, verify/repair the prepared composition, and use normal clean admission after operator recovery. Other recovery remains an operator procedure. Unknown-outcome ref-publication diagnostics identify the branch, accepted HEAD, and attempted commit. Record those alongside the actual HEAD; inspect the attempted commit's parent, tree, affected paths, index, and physical files. Preserve evidence and unrelated changes before stopping the server/worker when manual recovery is needed. If live verified reconciliation is unavailable and the actual tip is the verified intended commit, repair the stall cause and reconcile only its affected index entries from that exact commit, then validate the model and satisfy clean-worktree admission before restart. The restarted context accepts the reconciled state. If intent or ref ownership is uncertain, keep writes disabled until the operator resolves it; any chosen rollback must compare the expected ref and preserve unrelated work. Reopening a live recovery-required context does not clear recovery.
+
+Native and alternate selections use the same owner-aware checkpoint rules. Require named component/manifest-owner authoring branches before updating their refs. Pins advance only to commits actually created or intentionally admitted by the selected transaction. Unversioned required manifest sources block checkpointing with their path. A no-op clears nothing from an incomplete checkpoint, and a retry must reuse confirmed earlier component commits rather than committing them again.
 
 #### Metadata
   * type: specification
@@ -34,7 +36,7 @@ Access rules:
 - File evidence is limited to files referenced by the Reqvire model.
 - Mutation tools are not exposed unless the server is started with `reqvire mcp --enable-mutations`.
 - Model mutation results include changed files and diff. Repository and publication operations return their typed side effects and recovery context even when no model files change.
-- External URLs are returned as references and are not fetched by default. Explicitly enabled GitHub operations access only the pinned repository through their publication contracts.
+- External URLs are returned as references and are not fetched by default. Explicitly enabled GitHub operations access only pinned root and declared repository owners through their publication contracts; they do not accept arbitrary repository URLs.
 
 #### Metadata
   * type: specification
@@ -56,6 +58,70 @@ The owning requirement's contract references provide the core workflow, selectio
   * type: specification
 ---
 
+### MCP Branch Closing Specification
+
+Contract for closing a managed model branch context.
+
+#### Details
+- In Repo mode pending/clean checks include every owned component checkout. Remove only disposable Repo metadata and checkouts belonging to this Central worktree. Preserve component commits referenced by retained Central manifests in available local Repo object storage or configured remotes; refuse removal before destroying a sole required copy. Reopening the retained Central branch reconstructs its recorded component content.
+- `reqvire.branch.close` MUST require `branch` and is available only with mutations enabled. The original startup worktree, external/pre-existing worktrees, unknown or unopened branches, and worktrees owned by another server MUST be rejected.
+- Serialize removal with context operations, stop accepting new calls, drain in-flight work, and recheck expected HEAD and clean index/files/non-ignored untracked state. Pending accepted changes or external dirtiness MUST block removal. No force option is exposed.
+- Remove the managed worktree through Git and release ownership after worker shutdown and cleanup; preserve its branch and every commit. Subsequent branch-selected calls MUST fail until explicit reopening admits the branch again; a retained branch is not permission to reopen implicitly. Never delete another context's paths or alter its model.
+- On failed cleanup, report whether the context is stopped and which path remains; do not claim successful removal or silently resume writes. Explicit reopening must revalidate and reclaim ownership.
+- Ordinary server shutdown only stops workers and releases ownership; it MUST NOT remove worktrees or their uncommitted changes.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Closing](Tools.md#mcp-branch-closing)
+---
+
+### MCP Branch Creation Specification
+
+Contract for preparing and opening a model branch.
+
+#### Details
+- `reqvire.branch.create` MUST require destination `branch` and `base_ref`; an optional `from_branch` selects an already admitted source branch for resolution of a context-relative base such as `HEAD`. With multiple contexts, context-relative resolution without `from_branch` MUST fail. Destination `branch` does not select the source. Named branches such as `main` and remote-tracking refs such as `origin/main` are explicit bases in the same repository; `base_ref` retains its commit/ref semantics. Reject the removed `from_worktree_id` input.
+- Resolve the base to one commit before creation and return `base_commit`, branch, root and accepted revision. A remote-tracking ref means the locally recorded commit; creation MUST NOT fetch, push, merge, or promise remote freshness.
+- In Repo mode base_ref resolves one workspace-root commit and its recorded historical manifest composition. Never inherit the startup/source context's live native selection when the requested base identifies another composition. Prepare the same destination branch name in every declared component at that component's own exact pin, and prepare any distinct manifest-owner branch. Keep native .repo/manifest.xml selection, independent Repo metadata and locally available objects. Creation leaves all pins unchanged and does not fetch. Do not apply base_ref independently as a component ref. Reject collisions and preserve all pre-existing branches/checkouts; clean up only newly created unchanged assets on failure.
+- The new branch name MUST be a valid unused Git branch name. Unknown/non-commit bases, a dirty or unavailable selected source context, duplicate branches, detached targets, foreign repositories, and conflicting ownership MUST fail before publishing a context. Pending accepted changes and external changes are not copied to the new branch; the client commits or otherwise resolves them first.
+- Allocate the destination under server-managed storage, outside every context's eligible model inventory; callers MUST NOT supply arbitrary filesystem destinations. Canonical paths and symlinks MUST NOT permit overlap or scanning another context's model files.
+- Create the branch and worktree without checking out another branch in any existing worktree. Start its worker, acquire ownership, and validate its model under the ordinary startup rules before making the context routable.
+- On failure, release newly acquired ownership and compensate only branch/worktree assets created by this request when still unchanged and safe to remove. Never delete pre-existing work or externally modified partial assets; report residual paths/refs for recovery. An invalid or incomplete context MUST NOT be returned as usable.
+
+Preparing a branch set is explicit management work. Ordinary model mutation never creates branches. Root base_ref and later PR target are distinct. A named prepared component branch is required before authoring commits; pinned detached sources may be used for read-only baseline preparation. Untouched repositories receive no commit or PR solely because a branch was prepared.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Creation](Tools.md#mcp-branch-creation)
+---
+
+### MCP Branch Opening and Inventory Specification
+
+Contract for opening and inspecting model branches.
+
+#### Details
+- In Repo mode opening selects the Central branch and prepares its manifest-defined component view through the same isolated admission used by creation. Inventory remains observational and exposes the Central context plus additive project metadata; it does not synchronize checkouts or build models.
+- `reqvire.branch.list` MUST report worktrees in the startup common Git repository, branch/HEAD, ownership, managed/original status, lifecycle state, and whether each branch has a registered context. Public inventory identifies the startup branch with `original_branch` and does not expose opaque IDs. Inventory does not acquire ownership, import external edits into accepted models, or open workers. Unregistered worktrees report unknown ownership (`owned: null`); admission establishes ownership under the existing exclusive-lock checks.
+- `reqvire.branch.open` MUST require an existing local branch. Return an unchanged healthy owned context idempotently. When an already registered branch has a changed committed composition, an explicit open MUST perform full validated admission under its existing context gate, without an extra reload flag, adopt tool, or repository mode. Require clean participating owners, no accepted pending changes, no unresolved recovery, matching pins and valid complete model; atomically publish the new accepted snapshot only after validation. Rejection preserves the prior accepted snapshot and diagnostics. Otherwise reuse an eligible existing checkout or privately prepare that existing branch; never create an unrequested branch or force it into two checkouts.
+- Reusing an unchanged healthy registered context MUST NOT acquire the repository-administration lock or repeat admission. Explicit changed-composition admission retains the existing owner and serialization gate; it is not commit-outcome reconciliation. New private checkout preparation still requires administration locking; contention must not bypass ownership or alter registration.
+- Admission requires a named committed branch, clean index/worktree including non-ignored untracked files, configured Git identity, valid model, no conflicting owner, and no overlapping context roots. These rules apply equally to pre-existing and newly created worktrees, whether requested through MCP opening or mutation-enabled Explorer selection. Read-only serving does not acquire mutation ownership or enable mutation tools. Fail without stash/reset/checkout when those conditions do not hold. An existing unregistered dirty worktree cannot be silently adopted or loaded through a read-only fallback in mutation-enabled serving.
+- Preserve pre-existing worktrees on failed admission. Worktrees created by this request follow the creation rollback rules. External/pre-existing worktrees may be opened but MUST remain distinguishable from disposable server-created worktrees.
+- A server restart does not implicitly reclaim all worktrees or invent new branches. It registers its clean startup context; explicit open can reclaim an existing clean branch after ownership is released. Preserve pending changes on shutdown; dirty contexts require user resolution before reopening.
+- Existing accessible ownership/administration lock files MUST permit reacquisition after orderly shutdown or termination of all holders. A still-live holder MUST prevent acquisition even if its parent server exited. Lock failures preserve existing registrations, source model files, index and HEAD; diagnostics follow the shared concurrency contract.
+
+Inventory reports accepted/observed revision provenance and component branch names without importing external inputs. Reopen after restart must recover the selected branch's committed composition instead of borrowing the startup branch manifest. Explicit open does not update pins, fetch, sync, or commit. The manager prepares external component commits and pins before admission.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * define: [MCP Branch Opening and Inventory](Tools.md#mcp-branch-opening-and-inventory)
+---
+
 ### MCP Branch Push Specification
 
 Contract for mcp branch push.
@@ -66,6 +132,8 @@ Contract for mcp branch push.
 - Verify the selected context is clean with no pending accepted changes and HEAD equals its last accepted commit. Push that exact commit to `refs/heads/<owned-branch>` with no force, mirror, tag, deletion, or alternate destination options.
 - Return attempted commit, remote branch, and confirmed remote state. Set upstream tracking only for that owned branch after successful publication. An already matching remote branch is a successful no-op; divergence is a structured rejection requiring client resolution.
 - Serialize same-context mutation/commit with the push so a moving local HEAD cannot change the submitted commit. Other worktree contexts remain independent. Push MUST NOT create a PR or comment.
+
+In a composed branch, publish stable named component branches and required manifest-owner commits before the root association. Ensure every selected pin is remotely reachable, including unchanged pins. Return per-owner branch/commit/outcome evidence. A failed dependency prevents all later root push attempts, preserves successful earlier pushes and local checkpoints, and never triggers force-push, reset, implicit PR creation, or history rewrite.
 
 #### Metadata
   * type: specification
@@ -89,11 +157,24 @@ Contract for verified recovery of a recorded local commit publication.
 - Neither preview nor apply creates another commit, invokes a reference-transaction hook, updates/resets a ref, retries the original operation, imports unrelated edits, or changes commit policy. Recheck checkout/files before index publication and checkout again before accepted-state transition. Subsequent reads use the reconciled snapshot; reads captured earlier retain their original content/identity.
 - The recorded evidence exists in the live worker only. Worker loss, restart, unrelated recovery failures, or mismatched evidence require preservation and repair before verified reconciliation or normal admission. The fallback tool requires a published recorded commit; confirmed non-publication is handled directly by the original operation. Reconciliation does not repair the hook itself or make later hook executions safe; repair the stall cause before another commit.
 
+The live recorded attempt belongs to the selected workspace-root branch. This operation does not reconcile an arbitrary component or manifest-owner ref from the per-owner checkpoint results; uncertain non-root outcomes require operator preservation, verification and repair before normal admission.
+
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [MCP Commit Outcome Reconciliation](Tools.md#mcp-commit-outcome-reconciliation)
+---
+
+### MCP Composition Checkpoint Behavior
+
+WHEN accepted composed changes are committed, commit changed components first, update exact pins in their actual manifest owners, commit those sources, and commit the root revision association last. Publish committed acceptance only after the complete checkpoint succeeds. Without automatic commits, accepted edits stay pending until explicit commit. Any later-stage failure retains completed earlier commits and pending checkpoint state; unknown ref outcomes require verified reconciliation rather than blind repetition. Ordinary mutation never creates branches, pushes, or opens PRs.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * define: [MCP Accepted Change Commit](Tools.md#mcp-accepted-change-commit)
 ---
 
 ### MCP Contract Binding Tools Behavior
@@ -152,11 +233,35 @@ Compatibility rules:
 - Clients verify contract compatibility during startup/status checks.
 - Context routing MUST be advertised by an explicit `worktree_contexts` capability and schema revision. Tool contract version `3` replaces public MCP `worktree_id`/`from_worktree_id` inputs with `branch`/`from_branch`; reject the removed inputs rather than accepting compatibility aliases. Single-context calls may omit an optional `branch`; clients must select an exact local branch before using multiple contexts. GitHub requested/available and automatic-commit settings MUST be separately discoverable. MCP transport protocol negotiation is unchanged.
 
+Tool contract version 5 advertises coordinated branch compositions, native owner-aware checkpoints, explicit full admission through branch.open, PR-baseline selection, and repository_bases/pull_requests for coordinated review. Existing branch tool names and MCP transport protocol remain unchanged. Removed worktree names remain unavailable. Advertise composition management as a distinct capability; clients must not assume version 4 implemented these semantics.
+
 #### Metadata
   * type: specification
 
 #### Relations
   * define: [MCP Compatibility Versioning](Tools.md#mcp-compatibility-versioning)
+---
+
+### MCP Coordinated Branch Preparation Behavior
+
+WHEN branch creation is requested, resolve the selected root base and its recorded manifest composition before allocating authoring branches. Prepare the requested branch name at each participating repository's selected commit, validate the whole model, and then publish the owned context. Creation does not advance pins. A collision, invalid model, or missing local revision leaves the source composition unchanged and returns no partially admitted context; retain and report any new assets that cannot safely be cleaned.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * define: [MCP Branch Creation](Tools.md#mcp-branch-creation)
+---
+
+### MCP Coordinated Review Behavior
+
+WHEN a coordinated PR set is requested, validate all participating changed owners, explicit targets, and pushed accepted heads before creating PRs. Create or reuse dependency PRs before the root PR and return all confirmed links. Existing exact PRs remain intact. A later failure preserves earlier published PRs and identifies their outcomes. Review impact uses the actual root PR merge-base unless an explicit commit overrides it; final component SHAs changed by squash or rebase require a new pinned checkpoint before root merge.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * define: [MCP Pull Request Creation](Tools.md#mcp-pull-request-creation)
 ---
 
 ### MCP Coverage Scope Selection Specification
@@ -246,25 +351,6 @@ Tools MUST be `reqvire.semantic.queries` with optional `iri`, `name`, `namespace
 
 #### Relations
   * define: [MCP Managed Query Artifacts](ManagedQueries.md#mcp-managed-query-artifacts)
----
-
-### MCP Managed Worktree Removal Specification
-
-Contract for mcp managed worktree removal.
-
-#### Details
-- In Repo mode pending/clean checks include every owned component checkout. Remove only disposable Repo metadata and checkouts belonging to this Central worktree. Preserve component commits referenced by retained Central manifests in available local Repo object storage or configured remotes; refuse removal before destroying a sole required copy. Reopening the retained Central branch reconstructs its recorded component content.
-- `reqvire.worktree.remove` MUST require `branch` and is available only with mutations enabled. The original startup worktree, external/pre-existing worktrees, unknown or unopened branches, and worktrees owned by another server MUST be rejected.
-- Serialize removal with context operations, stop accepting new calls, drain in-flight work, and recheck expected HEAD and clean index/files/non-ignored untracked state. Pending accepted changes or external dirtiness MUST block removal. No force option is exposed.
-- Remove the managed worktree through Git and release ownership after worker shutdown and cleanup; preserve its branch and every commit. Subsequent branch-selected calls MUST fail until explicit reopening admits the branch again; a retained branch is not permission to reopen implicitly. Never delete another context's paths or alter its model.
-- On failed cleanup, report whether the context is stopped and which path remains; do not claim successful removal or silently resume writes. Explicit reopening must revalidate and reclaim ownership.
-- Ordinary server shutdown only stops workers and releases ownership; it MUST NOT remove worktrees or their uncommitted changes.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Managed Worktree Removal](Tools.md#mcp-managed-worktree-removal)
 ---
 
 ### MCP Merge Elements Tool Specification
@@ -412,11 +498,11 @@ Concurrency rules:
 - Each mutation-enabled worktree context MUST claim exclusive ownership of its branch and worktree before accepting context-bound requests. Ownership is coordinated between Reqvire MCP processes sharing the repository and released when the owning process exits.
 - Ownership and repository-administration locks MUST use nonblocking OS-backed exclusion. Reuse accessible existing lock files without truncating, unlinking, replacing or changing their permissions. Orderly completion MUST explicitly release the owning lock before closing its handle so incidental descriptor copies during subprocess startup cannot prolong ownership. File existence and recorded process IDs alone do not establish active ownership; after abrupt termination, OS cleanup releases ownership when all remaining holders close their handles. A worker surviving its parent MUST continue excluding another owner through its independently acquired ownership locks.
 - Lock failures MUST identify the attempted operation (`open` or `acquire`), exact lock path and underlying OS error. Report active ownership/contention only for the platform's lock-contention result; distinguish denied access, unsupported locking and other failures. Permission diagnostics must direct users to inspect permissions for the server/container identity; unsupported locking must require a compatible filesystem. Do not automatically repair permissions, remove locks or proceed without exclusion. Apply these rules to branch, worktree and repository-administration locks, including failed cleanup diagnostics.
-- Context admission, including startup, MUST require one owning Git worktree at that context's workspace root, plus its declared project checkouts in Repo mode, a named owning branch with an existing commit, clean owned indexes and working trees including non-ignored untracked files, configured Git author identity, and a valid complete model. Repo admission checks each owned component checkout; a component pinned to a commit may be detached. Server startup MUST NOT create or switch branches, stash changes, or create worktrees; explicit worktree tools and browser branch selection may resolve and admit requested contexts after startup. Mutation-enabled Explorer selection MUST reject dirty targets before loading their models under these same admission rules; it cannot use a read-only fallback to bypass them.
+- Context admission, including startup, MUST require one owning Git worktree at that context's workspace root, plus its declared project checkouts in Repo mode, a named owning branch with an existing commit, clean owned indexes and working trees including non-ignored untracked files, configured Git author identity, and a valid complete model. Repo admission checks each owned component checkout; a pinned detached component may supply a clean preparation baseline, but authoring commits require a prepared named branch. Manifest-owner checkouts participating in checkpoints must also have prepared named branches. Server startup MUST NOT create or switch branches, stash changes, or create worktrees; explicit branch tools and browser branch selection may resolve and admit requested contexts after startup. Mutation-enabled Explorer selection MUST reject dirty targets before loading their models under these same admission rules; it cannot use a read-only fallback to bypass them.
 - Ownership covers standalone MCP and the embedded mutation-enabled MCP endpoint equally. Read-only servers retain their existing dirty-worktree and source-refresh behaviour.
 - Automatic Git commits default to false. Only the startup flag `--enable-commits`, together with `--enable-mutations`, enables them; enabling mutations alone MUST NOT enable commits. The commit setting remains fixed for the server session and MUST NOT change ownership, validation, serialization, or authoritative snapshot behavior.
 - The accepted validated model and its captured source inputs are authoritative for that context. External model-file edits are not imported; affected managed files may be overwritten by subsequent mutations. Unrelated files and staged changes MUST NOT be included in a mutation commit.
-- An unexpected branch or HEAD change MUST stop ordinary mutation execution. The dedicated HEAD-refresh control operation may adopt an eligible external HEAD on the same owned branch under its input-protection contract, without bypassing ownership, pending-state or transaction-recovery checks. Status and retained accepted-snapshot reads remain available with distinct accepted/observed provenance. Ownership coordinates cooperating MCP writers; it does not prevent arbitrary external Git commands or file edits.
+- An unexpected branch or HEAD change MUST stop ordinary mutation execution. Guarded branch.refresh may adopt eligible artifact-only HEAD changes; explicit branch.open may admit a prepared committed model or composition through full validation. Both retain ownership, pending-state and transaction-recovery checks. Status and retained accepted-snapshot reads remain available with distinct accepted/observed provenance. Ownership coordinates cooperating MCP writers; it does not prevent arbitrary external Git commands or file edits.
 - Requests sharing a context MUST serialize candidate preparation, validation, persistence, local Git commit publication, and model publication. Reads MUST observe one accepted snapshot and MUST NOT publish partially persisted changes.
 - Audited snapshot reads may execute concurrently. Admission captures immutable accepted model/files and accepted revision, HEAD and pending paths under a shared session gate after the existing ownership check; writes use that gate exclusively. Release the shared gate before evaluating the read so an already admitted slow read does not prevent mutation progress. Admissions and final live Git observations wait for an active write; a queued writer takes precedence over later admissions.
 - A read admitted before a successful mutation may finish afterward using its original accepted snapshot and matching metadata. Reads admitted after publication use the new accepted snapshot. Final Git/recovery diagnostics describe current physical/session availability separately from the captured model identity; an internal successful commit must not appear as an external HEAD violation to an older read.
@@ -425,9 +511,9 @@ Concurrency rules:
 
 Repo-mode commit transaction:
 - Reuse the accepted candidate, serialization, expected-state checks, persistence and rollback boundary. Commit only accepted changed paths in each owning component repository; preserve unrelated files and staged changes. Retain the resulting component commits under ordinary Git refs/object storage.
-- For inputs under Repo administration, save exact resolved component SHAs into the selected manifest declarations while preserving includes and local overlays. Keep Repo administration out of Central's Git tree; its manifest checkout retains its own Git commit and publication lifecycle. Commit accepted Central model changes only when present. A component-only save must not create an unrelated Central commit.
+- For native inputs, save exact resulting component SHAs into selected declarations while preserving includes and supported overlays, commit changed manifest sources in their actual owners, and commit the durable root composition association with accepted root changes. Keep Repo administration outside the root Git tree. A component-only change updates its root composition association; saving native pin bytes alone is not checkpoint completion. Preserve per-owner confirmed commits, pending work and recovery outcomes when a later stage fails.
 - For manifest inputs belonging to the Central Git worktree, record the exact SHAs in those files and commit Central last. Its confirmed Central commit remains the combined-model checkpoint. Unchanged components receive no commit. Exporting a locked manifest does not commit dirty component files.
-- Retain confirmed component commits and pending work after partial failure, and report per-repository outcomes. Native saves identify the Repo manifest path and local saved outcome; explicit saves require their Central checkpoint to succeed. Do not blindly repeat uncertain ref updates or reset confirmed refs.
+- Retain confirmed component commits and pending work after partial failure, and report per-repository outcomes. Native results identify the selected manifest and confirmed owner/root checkpoint outcomes. Saving XML bytes alone is not committed acceptance; explicit and automatic checkpoints require completion of their owning Git commits. Do not blindly repeat uncertain ref updates or reset confirmed refs.
 - Automatic commits remain default-disabled. Without them, accepted mutations leave owned Git HEADs and indexes unchanged until explicit git.commit invokes the same transaction. A no-op creates no commit. Publish committed acceptance only after the selected mode's checkpoint succeeds; single-repository publication remains unchanged.
 
 Mutation critical section:
@@ -439,9 +525,9 @@ Mutation critical section:
 - Preserve executable file modes when moving assets. Reject a newly occupied destination that was absent from the accepted snapshot rather than overwriting an unrelated external file.
 - Preserve existing native permissions during ordinary content edits; do not normalize every written file to a fixed mode. Apply permission changes only when the required state differs, retaining unrelated permission bits. New files retain normal creation permissions except for required executable-state changes. Use the accepted Git index executable mode for tracked assets; when Git declares `core.filemode=false`, preserve that logical mode through moves and commits without requiring the filesystem to emulate executable bits.
 - Permission changes required on mode-aware filesystems MUST be verified and MUST fail with the affected path, operation and underlying error when unsuccessful. Do not ignore a required permission failure or publish its candidate as accepted.
-- Publish the new graph/page/semantic snapshot after persistence succeeds and, when commits are enabled, after the commit succeeds. Include `commit` in the mutation result only when that request creates a commit; omit it with commits disabled and for previews, rejections, and no-ops.
+- For single-repository automatic commits, publish the new graph/page/semantic snapshot only after persistence and commit succeed. A Repo mutation accepts its validated persisted edits before its optional multi-owner checkpoint; if that later checkpoint fails, retain and expose the accepted pending model and confirmed earlier commits with pending/recovery diagnostics, rather than claiming a completed committed composition. Include `commit` in the mutation result only when that request creates a commit; omit it with commits disabled and for previews, rejections, and no-ops.
 - Dry runs, rejected candidates, and no-op executions MUST NOT create commits or advance the accepted snapshot.
-- On persistence or confirmed Git publication failure, restore the operation's affected paths and retain the previous accepted model. If ref publication is interrupted, first resolve its local Git outcome under the MCP Commit Outcome Reconciliation Specification: a verified published candidate is success; confirmed non-publication is a mutation error with rollback. If recovery cannot complete, disable further writes and report recovery failure explicitly.
+- On failed candidate persistence, or confirmed single-repository automatic-commit failure, restore the operation's affected paths and retain the previous accepted model. A later Repo checkpoint failure preserves the already accepted pending model and confirmed component/manifest commits under the owner-aware checkpoint contract. If ref publication is interrupted, first resolve its local Git outcome under the MCP Commit Outcome Reconciliation Specification: a verified published candidate is success; confirmed non-publication is a mutation error with rollback. If recovery cannot complete, disable further writes and report recovery failure explicitly.
 - Rollback MUST restore and verify the bytes, existence and native permissions of paths whose persistence was attempted. Avoid rewriting untouched paths or reapplying permissions that already match; a denied unnecessary permission operation MUST NOT turn a fully restored operation into failed recovery. A real restoration failure must retain the write-disabled behavior.
 - Recovery MUST NOT restore files into an externally changed branch or HEAD; report recovery failure and disable further writes in that case.
 - A recovery failure MUST retain its diagnostic and the last accepted snapshot. Snapshot read availability and write eligibility are separate under the MCP Worktree Worker Sessions Specification; poisoning the write path MUST NOT discard accepted read state. Explicit commits and all remote publication operations, including PR comments, require write eligibility.
@@ -476,7 +562,7 @@ Durable mutation flow:
 - Server executes preview through Reqvire core without filesystem changes.
 - Preview result returns diffs or equivalent change description, changed files when known, validation risks, and affected scope.
 - Client sends explicit execution request using the operation-specific mutating control, such as `dry_run: false` or `fix: true`, when mutation mode is enabled.
-- Server prepares the core candidate, canonically serializes affected model documents through the shared formatting engine, validates the complete candidate, persists its affected files, commits it only when `--enable-commits` was supplied at startup, and publishes the accepted snapshot under the MCP Mutation Concurrency Control Specification.
+- Server prepares the core candidate, canonically serializes affected model documents through the shared formatting engine, validates the complete candidate, persists its affected files, commits it only when `--enable-commits` was supplied at startup, and publishes the accepted snapshot under the MCP Mutation Concurrency Control Specification. For Repo compositions, distinguish accepted persisted edits from completion of the subsequent multi-owner checkpoint: a checkpoint error retains accepted pending edits and confirmed owner commits with diagnostics.
 - Server runs formatting/validation diagnostics according to the tool contract.
 - Server retains the complete accepted persisted model for subsequent requests without filesystem freshness scans in mutation mode, regardless of the commit setting.
 - Server computes affected elements/submodels for client cache invalidation.
@@ -521,6 +607,17 @@ Mutation exposure and safety rules:
 
 #### Relations
   * define: [MCP Mutation Tool Safety](Tools.md#mcp-mutation-tool-safety)
+---
+
+### MCP Prepared Composition Admission Behavior
+
+WHEN an already registered branch is explicitly opened after externally committed composition changes, retain its ownership and accepted snapshot while loading the prepared clean composition through full validation. On success, atomically replace accepted inputs, revisions, exclusions, and repository provenance in the live owner. Reads admitted earlier finish against their captured accepted content and identity; subsequent reads observe the new composition. On rejection, keep the previous accepted view and report blockers. No pending accepted work or unresolved recovery may be bypassed, and the open request does not fetch, update pins, or create commits. Unchanged contexts return idempotently; background observation and guarded HEAD refresh do not perform this full admission.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * define: [MCP Branch Opening and Inventory](Tools.md#mcp-branch-opening-and-inventory)
 ---
 
 ### MCP Prompt Guidance Specification
@@ -624,7 +721,7 @@ Protocol conformance rules:
 Contract for mcp publication scope and recovery.
 
 #### Details
-- Single-repository GitHub publication is limited to the startup common Git repository. Repo-mode dependency publication additionally permits the selected manifest's registered component repositories and pinned remotes; callers still cannot provide arbitrary repository URLs. PR creation and comments continue targeting Central. The configured fetch/push URLs must resolve to the pinned GitHub host and repository; SSH/HTTPS representations of the same identity are allowed. Reject forks, different repositories, multiple push destinations, changed remote identity/configuration, and caller-supplied repository URLs. Local worktree/commit tools do not require a GitHub remote.
+- Single-repository GitHub publication is limited to the startup common Git repository. Repo-mode dependency publication additionally permits the selected manifest's registered component repositories and pinned remotes; callers still cannot provide arbitrary repository URLs. Coordinated PR creation additionally targets changed registered component and distinct manifest-owner branches. Comments retain an explicitly selected repository target and never fan out implicitly. The configured fetch/push URLs must resolve to the pinned GitHub host and repository; SSH/HTTPS representations of the same identity are allowed. Reject forks, different repositories, multiple push destinations, changed remote identity/configuration, and caller-supplied repository URLs. Local worktree/commit tools do not require a GitHub remote.
 - Git/gh commands MUST use typed operation arguments and fixed executables without a shell, passthrough arguments, login/token-management tools, arbitrary API requests, or generic command execution. Multiline messages and bodies are passed as data. Bound execution time and disable interactive prompts. Diagnostics MUST omit credentials and tokens.
 - Before each operation, verify selected ownership, branch, and expected HEAD under its context gate. Publication MUST NOT import external disk edits or rewrite local history. Push/PR creation require no pending accepted changes and a clean selected worktree/index; PR comments do not require committing unrelated pending model work.
 - Return a structured operation result including context, branch, repository/remote where relevant, attempted commit where relevant, outcome (`completed`, `no_op`, `failed`, or `unknown`), diagnostics, and PR/comment identifiers and URLs when known. A tool failure MUST use the existing MCP error contract, retaining this recovery context.
@@ -644,7 +741,7 @@ Contract for mcp publication scope and recovery.
 Contract for mcp pull request commenting.
 
 #### Details
-- `reqvire.github.pr.comment` MUST require a positive `pr_number` and non-empty `body`, with ordinary context routing. Resolve the PR by number within the pinned repository; do not accept arbitrary PR URLs or repository selectors.
+- `reqvire.github.pr.comment` MUST require a positive `pr_number` and non-empty `body`, with ordinary context routing. Resolve the PR by number within the pinned root repository by default. Optional repository_path selects an exact declared non-root owner path; reject unknown paths and arbitrary repository URLs. One request writes one comment to the selected owner, never fans out.
 - Commenting may target a review PR in that repository even when its head differs from the selected context branch. Return the actual target PR and originating context so the caller can distinguish them. It does not push, create a PR, commit pending work, or edit/delete an existing comment.
 - Preserve multiline body content exactly. Return PR number/URL and comment ID/URL only after confirmation. Permission and missing-PR failures must be explicit.
 - A caller-issued repeat is a new comment request, not a guaranteed idempotent operation. On an ambiguous result, report/reconcile under the publication recovery contract; never automatically resend merely because the first response was lost.
@@ -667,6 +764,12 @@ Contract for mcp pull request creation.
 - Before creation, look up an existing open PR for the exact repository/head/base. Return its number and URL as `no_op` rather than duplicating it; do not silently edit its title/body/draft state. Multiple ambiguous matches or an existing open head PR against a different base produce a conflict identifying the known PR.
 - Return repository, head/base, submitted commit, number, URL, and draft state for a confirmed result. Follow publication recovery rules if creation succeeds remotely but the response is lost.
 
+For a composed branch, one call creates or reuses the coordinated PR set. The existing base selects the root target. An optional repository_bases object maps workspace-relative non-root owner paths to their explicit target branches; every changed component or manifest owner requiring a PR needs an entry. Reject unknown owners or missing targets before any creation. Do not assume all repositories use main or the root target.
+
+Require dependency-first pushes completed at the accepted checkpoint. Create/reuse changed dependency PRs first, then the root PR with links to their returned URLs and composition provenance. Untouched repositories need no PR. Return root fields compatibly plus a deterministic pull_requests array containing owner path, repository, head, base, commit, outcome, number, and URL, including partial outcomes on failure. Existing exact PRs are reused without overwriting authored title/body/draft; an existing root needing additional links is reported for explicit update. Response loss uses read-only reconciliation, never blind duplicate creation. Coordinated PR creation does not authorize merging or comment fan-out.
+
+Record the requested root review target locally only after a confirmed created/reused PR, so subsequent default impact can compute its local merge-base without contacting GitHub. Component squash/rebase results require explicit pin/checkpoint updates and review before the root composition is merged.
+
 #### Metadata
   * type: specification
 
@@ -679,11 +782,13 @@ Contract for mcp pull request creation.
 The MCP interface is expected to expose read-only quality and traceability tools grounded in Reqvire core reports.
 
 #### Details
-Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. Lint inspection is the default `fix: false` form of a conditional tool; repair is separately gated by the MCP lint-fix contract. Quality inspection and the other traceability tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Tools that compare against source-control commits require an eligible Git worktree and include the compared commit and current eligible worktree `HEAD` in result metadata.
+Quality and traceability tool behavior is inherited from reused Reqvire lint, coverage, traces, resources, and change-impact contracts. Lint inspection is the default `fix: false` form of a conditional tool; repair is separately gated by the MCP lint-fix contract. Quality inspection and the other traceability tools return structured diagnostics and evidence after server startup validation has passed. Validation is not exposed as an MCP tool because validation is the prerequisite for starting the MCP server, matching normal Reqvire command execution behavior. Source-control comparisons use one eligible worktree or a declared Repo composition. Include the selected baseline and accepted/current root and owner revisions in report provenance; mutation-enabled reads retain captured accepted HEAD and files, with live observed Git/recovery diagnostics reported separately.
 
 
 
-`reqvire.change_impact` accepts optional `git_commit` as its sole baseline revision selector under the shared Repo contract. Discovery MUST advertise that field with a default of HEAD and MUST NOT advertise a separate manifest revision selector. In Repo mode the selected workspace-root repository commit supplies the root model, manifest and includes, while that historical manifest supplies component pins. Route through the selected context and shared comparison operation, using the accepted current model and captured repository provenance; return the additive comparison provenance under the shared report contract. Standalone and embedded endpoints apply the same semantics.
+`reqvire.change_impact` accepts optional `git_commit` as its sole baseline revision selector under the shared Repo contract. Discovery MUST advertise explicit HEAD as the pending-change comparison and explain PR-baseline selection when omitted and MUST NOT advertise a separate manifest revision selector. In Repo mode the selected workspace-root repository commit supplies the root model, manifest and includes, while that historical manifest supplies component pins. Route through the selected context and shared comparison operation, using the accepted current model and captured repository provenance; return the additive comparison provenance under the shared report contract. Standalone and embedded endpoints apply the same semantics.
+
+A selected root commit recovers native manifest-owner history through the committed composition association. Standalone and embedded MCP use the same PR-baseline resolver as CLI and preserve accepted-current inputs. No implicit network operation or manifest override is required.
 
 #### Metadata
   * type: specification
@@ -986,7 +1091,7 @@ Read-only cache rules (mutation mode instead follows the ownership and accepted-
 - Local external ontology bytes and other construction/validation dependencies participate in freshness under the core contract. Semantic prefixes, vocabulary, exports, and SPARQL use derived state from the same completed model as the graph. Missing or invalid current inputs follow the owning strict/lenient operation's error behavior instead of silently returning older semantic data.
 - Public model revisions follow the bound Model Revision Hash Specification. They do not replace the parsed-model cache key: source bytes, build options, excluded patterns, and source-control metadata retain their existing invalidation responsibilities. Migrating model revisions does not migrate the existing file-content hash algorithm.
 - Cached state is invalidated when relevant source/dependency observations, eligible Git worktree metadata state, effective exclusions, Reqvire version, or Reqvire tool contract version changes. Source changes can require refresh while the public parsed-element revision remains unchanged.
-- Mutation-enabled sessions reuse their accepted model and captured inputs. Successful model persistence, including a successful commit when enabled, replaces that snapshot and its derived semantic state together; failed operations retain the previous snapshot. A dedicated eligible HEAD refresh first checks its captured committed endpoint diff under current exclusions, then uses the normal validated snapshot loader and existing runtime publication path. Its recomputed model revision stays equal for artifact-only changes with unchanged effective model membership; permitted exclusion-policy changes may change membership and revision. A missing `commit` field does not prevent adoption in the default commit-disabled mode.
+- Mutation-enabled sessions reuse their accepted model and captured inputs. Successful single-repository persistence and its enabled commit replace that snapshot and derived state together. Repo mutations accept validated persisted pending edits before the optional multi-owner checkpoint; a later checkpoint error retains those accepted edits and confirmed owner commits with diagnostics. Rejected candidates or failed persistence retain the previous accepted snapshot. A dedicated eligible HEAD refresh first checks its captured committed endpoint diff under current exclusions, then uses the normal validated snapshot loader and existing runtime publication path. Its recomputed model revision stays equal for artifact-only changes with unchanged effective model membership; permitted exclusion-policy changes may change membership and revision. A missing `commit` field does not prevent adoption in the default commit-disabled mode.
 - Each response is constructed from one completed model; any exposed model fingerprint describes that response's parsed elements. The source-cache generation is internal and is not inferred from the public model fingerprint.
 - Core cache identity and public SHA-256 revision encoding retain their existing contracts. Context routing adds explicit context identity; clients MUST NOT use a model fingerprint alone as a cross-context cache key.
 - Read-only mode reports dirty state without blocking compatible read operations. Mutation-enabled startup requires a clean worktree.
@@ -1273,11 +1378,12 @@ Mutation and maintenance tools:
 - `reqvire.move_asset`
 - `reqvire.remove_asset`
 
-Worktree management tools:
-- `reqvire.worktree.list` (read-only inventory)
-- `reqvire.worktree.create`
-- `reqvire.worktree.open`
-- `reqvire.worktree.remove`
+Branch management tools:
+- `reqvire.branch.list` (read-only inventory)
+- `reqvire.branch.refresh`
+- `reqvire.branch.create`
+- `reqvire.branch.open`
+- `reqvire.branch.close`
 
 Commit and optional publication tools:
 - `reqvire.git.commit` (local, mutation mode)
@@ -1287,6 +1393,10 @@ Commit and optional publication tools:
 - `reqvire.github.pr.comment` (GitHub enabled and available)
 
 Explorer worktree selection is a browser action, not an MCP tool.
+
+The branch lifecycle names introduced in tool contract version 4 remain the current version-5 operations as `reqvire.branch.list`, `reqvire.branch.create`, `reqvire.branch.open`, `reqvire.branch.close`, and `reqvire.branch.refresh` in standalone and embedded MCP. Worktrees remain the internal storage and isolation mechanism. Previous `reqvire.worktree.*` tool names are unavailable and MUST NOT be advertised or accepted as compatibility aliases. Preserve existing `branch`, `base_ref`, and `from_branch` selectors, permission gates and operation behavior. Closing a managed context preserves its Git branch and commits and retains the existing clean-state and original/external-worktree protections.
+
+Tool contract version 5 retains branch routing and lifecycle names, adds repository_bases to coordinated PR creation, and describes optional git_commit as an explicit override of the available PR baseline. No repository mode, reload flag, adopt tool, or second manifest revision input is introduced.
 
 #### Metadata
   * type: specification
@@ -1309,7 +1419,7 @@ Exposure rules:
 - Do not expose a migration tool or a pre-validation maintenance endpoint. Known source migrations run through CLI before normal validated MCP startup.
 - Expose Reqvire workflow prompts through standard MCP prompt methods rather than as MCP tools.
 - CLI flags, modes, and sub-options become typed request fields on one stable MCP operation instead of nested MCP tool names.
-- Worktree, commit, push, PR creation, and PR commenting are distinct typed operations, not CLI aliases. Their availability follows local mutation and GitHub startup gating.
+- Branch management, commit, push, PR creation, and PR commenting are distinct typed operations, not CLI aliases. Their availability follows local mutation and GitHub startup gating.
 - CLI-only transport flags such as `--json` and `--output` are never MCP tool arguments.
 
 #### Metadata
@@ -1335,7 +1445,7 @@ Classification rules:
 - Local `mutation` tools require mutation mode and use MCP annotations `readOnlyHint: false`, `openWorldHint: false`, and conservative `destructiveHint`. Publication tools additionally require successful GitHub enablement and use `openWorldHint: true`; annotation hints do not replace runtime gates.
 
 Read-only tools:
-- `reqvire.worktree.list`
+- `reqvire.branch.list`
 - `reqvire.workspace_status`
 - `reqvire.tool_contract`
 - `reqvire.model_revision`
@@ -1372,9 +1482,10 @@ Conditional mutation tools:
 Both tools default to `fix: false`. Read-only startup schemas permit only false and advertise read-only annotations; mutation-enabled schemas permit true and advertise mutation-capable annotations. Runtime gates reject repair/application without enablement.
 
 Local mutation tools:
-- `reqvire.worktree.create`
-- `reqvire.worktree.open`
-- `reqvire.worktree.remove`
+- `reqvire.branch.refresh`
+- `reqvire.branch.create`
+- `reqvire.branch.open`
+- `reqvire.branch.close`
 - `reqvire.git.commit`
 - `reqvire.git.reconcile`
 - `reqvire.add_element`
@@ -1454,7 +1565,7 @@ The shared context boundary separates model identity, accepted state, and operat
 - Consumers MUST resolve explicit context selectors before accessing model state. Unknown, removed, stopped, or unavailable contexts MUST fail without substituting another context. Omitted-selector behavior belongs to the consuming interface contract; there is no server-global active branch.
 - Model-bound responses MUST identify their selected context and captured revision. A response MUST represent one completed snapshot; equal relative element identifiers or parsed-model fingerprints do not establish equal context identity.
 - Model caches, derived semantic state, navigation/runtime data, pending changes, and publication cursors MUST retain their context boundary. Operation effects and publication MUST update only their intended context. Request cancellation, late responses, and failures MUST NOT redirect results to another context.
-- Repo client metadata and component working directories are private to their Central worktree. Capture the selected manifest, concrete component commits and their model inputs in the same accepted snapshot; no operation rescans live project state after admission or substitutes another context's checkout. File ownership follows the bound manifest inventory. Model tool names, branch selectors and required arguments remain unchanged; component branches need not match the Central branch.
+- Repo client metadata and component working directories are private to their Central worktree. Capture the selected manifest, concrete component commits and their model inputs in the same accepted snapshot; no operation rescans live project state after admission or substitutes another context's checkout. File ownership follows the bound manifest inventory. Model tool names, branch selectors and required arguments remain unchanged; manually prepared component branches may differ from the root branch. Explicit branch.create prepares the requested name in every component at its own pin; a separate manifest lane is used when its owner shares root repository identity.
 - Each model operation retains the ordinary workspace eligibility boundary, Reqvire core semantics, and branch ownership guarantees. Context management does not grant cross-worktree filesystem access to model or asset operations.
 - Context mutations MUST serialize against that context's accepted state, while independent contexts may progress separately. Context failure MUST be reported explicitly and MUST NOT corrupt or replace another context's accepted model.
 - MCP protocol routing and worker lifecycle are implemented by the child worker-session requirement. Explorer consumers bound to this contract implement the corresponding runtime boundary; the shared owner is fulfilled only when both its worker child and required binding consumers are implemented.
@@ -1464,47 +1575,6 @@ The shared context boundary separates model identity, accepted state, and operat
 
 #### Relations
   * define: [MCP Worktree Context Isolation](Tools.md#mcp-worktree-context-isolation)
----
-
-### MCP Worktree Creation Specification
-
-Contract for mcp worktree creation.
-
-#### Details
-- `reqvire.worktree.create` MUST require destination `branch` and `base_ref`; an optional `from_branch` selects an already admitted source branch for resolution of a context-relative base such as `HEAD`. With multiple contexts, context-relative resolution without `from_branch` MUST fail. Destination `branch` does not select the source. Named branches such as `main` and remote-tracking refs such as `origin/main` are explicit bases in the same repository; `base_ref` retains its commit/ref semantics. Reject the removed `from_worktree_id` input.
-- Resolve the base to one commit before creation and return `base_commit`, branch, root and accepted revision. A remote-tracking ref means the locally recorded commit; creation MUST NOT fetch, push, merge, or promise remote freshness.
-- In Repo mode base_ref still resolves one Central commit. Inputs belonging to the Central Git worktree read that commit's component bases. Repo-managed inputs inherit an isolated copy of the source context's selected manifest files and restores a retained native selection when reopening that same context. Prepare separate Repo metadata and project directories using available local objects before full-model admission. Preserve no-fetch creation and fail when a selected revision is unavailable locally. Do not apply base_ref independently to each component or create matching component branches by default.
-- The new branch name MUST be a valid unused Git branch name. Unknown/non-commit bases, a dirty or unavailable selected source context, duplicate branches, detached targets, foreign repositories, and conflicting ownership MUST fail before publishing a context. Pending accepted changes and external changes are not copied to the new branch; the client commits or otherwise resolves them first.
-- Allocate the destination under server-managed storage, outside every context's eligible model inventory; callers MUST NOT supply arbitrary filesystem destinations. Canonical paths and symlinks MUST NOT permit overlap or scanning another context's model files.
-- Create the branch and worktree without checking out another branch in any existing worktree. Start its worker, acquire ownership, and validate its model under the ordinary startup rules before making the context routable.
-- On failure, release newly acquired ownership and compensate only branch/worktree assets created by this request when still unchanged and safe to remove. Never delete pre-existing work or externally modified partial assets; report residual paths/refs for recovery. An invalid or incomplete context MUST NOT be returned as usable.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Worktree Creation](Tools.md#mcp-worktree-creation)
----
-
-### MCP Worktree Opening and Inventory Specification
-
-Contract for mcp worktree opening and inventory.
-
-#### Details
-- In Repo mode opening selects the Central branch and prepares its manifest-defined component view through the same isolated admission used by creation. Inventory remains observational and exposes the Central context plus additive project metadata; it does not synchronize checkouts or build models.
-- `reqvire.worktree.list` MUST report worktrees in the startup common Git repository, branch/HEAD, ownership, managed/original status, lifecycle state, and whether each branch has a registered context. Public inventory identifies the startup branch with `original_branch` and does not expose opaque IDs. Inventory does not acquire ownership, import external edits into accepted models, or open workers. Unregistered worktrees report unknown ownership (`owned: null`); admission establishes ownership under the existing exclusive-lock checks.
-- `reqvire.worktree.open` MUST require an existing local `branch`. Return an already healthy owned context idempotently; otherwise reuse its existing eligible worktree, or create a managed worktree for that existing branch if none exists. This includes worktrees previously prepared for Explorer branch browsing. This operation MUST NOT create a new branch or force a branch into two checkouts.
-- Reusing a healthy registered context MUST NOT acquire the repository-administration lock or repeat admission. New preparation and recovery still require that lock; contention must not bypass ownership or alter the existing registration.
-- Admission requires a named committed branch, clean index/worktree including non-ignored untracked files, configured Git identity, valid model, no conflicting owner, and no overlapping context roots. These rules apply equally to pre-existing and newly created worktrees, whether requested through MCP opening or mutation-enabled Explorer selection. Read-only serving does not acquire mutation ownership or enable mutation tools. Fail without stash/reset/checkout when those conditions do not hold. An existing unregistered dirty worktree cannot be silently adopted or loaded through a read-only fallback in mutation-enabled serving.
-- Preserve pre-existing worktrees on failed admission. Worktrees created by this request follow the creation rollback rules. External/pre-existing worktrees may be opened but MUST remain distinguishable from disposable server-created worktrees.
-- A server restart does not implicitly reclaim all worktrees or invent new branches. It registers its clean startup context; explicit open can reclaim an existing clean branch after ownership is released. Preserve pending changes on shutdown; dirty contexts require user resolution before reopening.
-- Existing accessible ownership/administration lock files MUST permit reacquisition after orderly shutdown or termination of all holders. A still-live holder MUST prevent acquisition even if its parent server exited. Lock failures preserve existing registrations, source model files, index and HEAD; diagnostics follow the shared concurrency contract.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * define: [MCP Worktree Opening and Inventory](Tools.md#mcp-worktree-opening-and-inventory)
 ---
 
 ### MCP Worktree Worker Sessions Specification
@@ -1517,7 +1587,7 @@ The MCP worker adapter implements the shared worktree context boundary for proto
 - Unless a tool explicitly requires `branch`, omission is allowed only when exactly one context is registered. With multiple contexts, omission MUST fail with the available branch names; unknown, unopened, removed, stopped or unavailable branches MUST fail without fallback or automatic admission. A branch selector is an exact name in the startup common Git repository, not a path, ref expression, remote-tracking ref or `HEAD` alias. Branch names with slashes, Unicode, plus signs or percent signs retain their exact Git identity. Only the explicit create/open workflows admit contexts.
 - Resolve each request to one context before dispatch and retain that context for its operation and response; later removal or readmission cannot redirect an in-flight request. Multiple clients selecting the same branch share its context and existing serialization/revision checks; a branch selector does not grant per-client exclusivity. Renamed/deleted branches do not redirect an accepted context; the existing branch/HEAD guards still control writes. Reading accepted state does not implicitly adopt the current Git tip. Client selection MUST NOT mutate server-global active-branch state or follow another client's Explorer selection.
 - For schema-valid `tools/call` requests, context-resolution failures MUST retain the tool-execution error envelope (`isError: true` with structured Reqvire error data) for both concurrent reads and serialized operations. Schema-invalid selectors remain JSON-RPC invalid-parameter errors. Resource and prompt resolution failures remain protocol errors. When resolution fails, do not attach another context's identity or model evidence.
-- `reqvire.tool_contract` and `reqvire.worktree.list` are server-scoped. Worktree creation/opening use explicit repository branch/base selectors. Every context-bound response and error MUST identify the selected context when resolution succeeded; successful model evidence also identifies its captured model revision.
+- `reqvire.tool_contract` and `reqvire.branch.list` are server-scoped. Worktree creation/opening use explicit repository branch/base selectors. Every context-bound response and error MUST identify the selected context when resolution succeeded; successful model evidence also identifies its captured model revision.
 - Resources and model-bearing prompts MUST route by the same `branch` selector. Context-qualified MCP resource URIs MUST carry the percent-encoded branch in a query parameter; unqualified URIs work only with a single context. Prompt arguments and resource templates MUST advertise `branch`, and returned prompt guidance MUST retain the selected branch on subsequent tool calls. Reject removed ID selectors and malformed, duplicate or unknown query fields. Resource caches and subscriptions still distinguish internal context identity even when branch names are reopened or relative identifiers/model fingerprints coincide.
 - Resource-read response `_meta` context identity and recovery diagnostics MUST survive the MCP transport serialization boundary as well as internal dispatch.
 - Each context MUST use an isolated worker process with a fixed workspace root and reuse Reqvire core parsing, validation, reports, mutations, and semantic stores. The manager MUST NOT switch process-global working directories or construct a parallel model engine. Existing Workspace Scope semantics apply inside each worker, not to a union of managed worktrees.
@@ -1530,7 +1600,7 @@ The MCP worker adapter implements the shared worktree context boundary for proto
 - Every mutation-enabled worker MUST satisfy the existing clean-start and branch/worktree ownership contract. The startup worktree is registered as the original context. Commit policy is inherited from startup flags and fixed for all workers in that server session.
 - Accepted model/captured inputs, expected HEAD, pending accepted changes, mutation gate, exclusions, diagnostics, and lazy semantic stores MUST be isolated per context. Interleaved requests may run across contexts; mutations, explicit commits, and publication of one context MUST serialize against its own accepted state. Brief repository-administration locking MUST protect shared branch/worktree metadata without replacing per-context ownership.
 - An unrecoverable mutation failure MUST disable further model writes, commits, worktree removal and remote publication in that context while retaining its live worker's last accepted model and captured inputs. Report `state: recovery_required`, `available: true`, `writes_available: false`, `recovery_required: true`, the recovery diagnostic, accepted HEAD, branch and accepted revision. This availability describes accepted-snapshot reads, not successful restoration of disk state.
-- In recovery-required state, allow explicitly audited snapshot reads: workspace status/model revision, element/search/model/containment/collection/submodel reports, coverage/traces/resources/lint, concept and semantic tools, workspace status/revision resources, and static prompt/discovery content. Keep captured external semantic inputs and lazy query stores within that snapshot. Reject mutation tools including previews, formatting, change-impact analysis against live Git/files, and any unaudited operation before execution. Only the dedicated `reqvire.git.reconcile` operation may complete a verified recorded local commit attempt under recovery. Workspace status/revision Git fields are live diagnostic observations, distinct from the accepted HEAD/model in context metadata; unavailable Git observations MUST NOT claim a clean worktree.
+- In recovery-required state, allow explicitly audited snapshot reads: workspace status/model revision, element/search/model/containment/collection/submodel reports, coverage/traces/resources/lint, captured change-impact comparisons using immutable historical objects, concept and semantic tools, workspace status/revision resources, and static prompt/discovery content. Keep captured external semantic inputs and lazy query stores within that snapshot. Reject mutation tools including previews, formatting, comparisons importing live current model files or mutable manifest inputs, and any unaudited operation before execution. Historical reads pin the accepted current HEAD/branch and source bytes; missing local baseline objects remain explicit errors and never trigger fetch or checkout changes. Only the dedicated `reqvire.git.reconcile` operation may complete a verified recorded local commit attempt under recovery. Workspace status/revision Git fields are live diagnostic observations, distinct from the accepted HEAD/model in context metadata; unavailable Git observations MUST NOT claim a clean worktree.
 - Successful snapshot reads MUST carry the recovery diagnostic in context metadata without accepting any failed candidate or importing external edits. An operation requiring uncertain filesystem/repository state MUST fail with the requested operation, context and recovery reason. A fully successful rollback leaves the context writable.
 - Worker exit, stopped/removed contexts, or loss of a trustworthy snapshot remain unavailable. Reads MUST NOT silently substitute another context or an older worker snapshot. Reopening an unavailable context applies clean-start validation and ownership checks; reopening a still-live recovery-required context MUST preserve that state rather than clearing it. Other contexts remain independent.
 - In embedded mode, each available context has a separate Explorer runtime. Explorer selects a context per browser tab; mutations refresh only their own context's runtime. Browser selection MUST NOT alter any MCP request selector or global active branch. No MCP Explorer-switching tool is exposed.

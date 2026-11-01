@@ -9,6 +9,17 @@
   "publicEntry": "index.ts",
   "stylesEntry": "styles.css",
   "tokenDir": "tokens",
+  "themes": [
+    {
+      "name": "light",
+      "scheme": "light"
+    },
+    {
+      "name": "dark",
+      "scheme": "dark"
+    }
+  ],
+  "followSystemTheme": true,
   "inlineStyleFiles": [],
   "boundaries": {
     "styleWrites": [
@@ -61,12 +72,6 @@
         "file": "design-system/patterns/graphs/KnowledgeGraphCanvasImpl.tsx",
         "properties": [
           "cursor"
-        ]
-      },
-      {
-        "file": "design-system/palette.ts",
-        "properties": [
-          "color"
         ]
       },
       {
@@ -241,6 +246,7 @@
       "test",
       "build:app"
     ],
-    "behaviorChecks": true
+    "behaviorChecks": true,
+    "browserAudit": true
   }
 }

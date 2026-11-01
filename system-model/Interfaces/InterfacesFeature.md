@@ -49,16 +49,34 @@ MCP tool access covers validated evidence, semantic queries, authoring, maintena
   * type: capability
 
 #### Relations
+  * derive: [MCP Branch Composition Management](#mcp-branch-composition-management)
   * derive: [MCP Change Publication](#mcp-change-publication)
   * derive: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
-  * derive: [MCP Worktree Model Management](#mcp-worktree-model-management)
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [MCP Interface](InterfacesRequirements.md#mcp-interface)
 ---
 
+### MCP Branch Composition Management
+
+As a **System Engineer**, I want to prepare, open, inspect, and close isolated model branches across one repository or a declared repository composition, so that coordinated model work preserves its selected base, ownership, and reproducible revision pins.
+
+#### Details
+Mixed model and implementation workflows can adopt eligible external commits on an owned branch through checked HEAD refresh and normal validated model loading while retaining context identity.
+
+#### Concept References
+  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
+  * specifiedBy: [MCP Branch Model Sessions](MCP/Tools.md#mcp-branch-model-sessions)
+---
+
 ### MCP Change Publication
 
-As a **System Engineer**, I want an MCP client to commit accepted model changes and publish their owning Git histories and the saved Central manifest through the existing branch workflow, so that model work can be reviewed through the existing GitHub workflow.
+As a **System Engineer**, I want to checkpoint and explicitly publish accepted model changes across their owning Git histories with a reproducible composition and linked repository PRs, so that a coordinated change can be reviewed using the same workflow for one or several repositories.
 
 #### Concept References
   * [Model Change Publication](../Thesaurus/Thesaurus.md#model-change-publication)
@@ -128,24 +146,6 @@ MCP semantic prefix registry interface is the capability for exposing ontology e
 #### Relations
   * derivedFrom: [MCP Semantic Query Interface](#mcp-semantic-query-interface)
   * specifiedBy: [MCP Semantic Prefix Registry Tools](MCP/Tools.md#mcp-semantic-prefix-registry-tools)
----
-
-### MCP Worktree Model Management
-
-As an **AI Tool Integrator**, I want to manage independent model branches through Git worktrees behind one MCP endpoint, so that concurrent model work stays isolated without switching the original checkout.
-
-#### Details
-Mixed model and implementation workflows can adopt eligible external commits on an owned branch through checked HEAD refresh and normal validated model loading while retaining context identity.
-
-#### Concept References
-  * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
-
-#### Metadata
-  * type: capability
-
-#### Relations
-  * derivedFrom: [MCP Tool Interface](#mcp-tool-interface)
-  * specifiedBy: [MCP Worktree Model Sessions](MCP/Tools.md#mcp-worktree-model-sessions)
 ---
 
 ### Public Documentation Website Interface

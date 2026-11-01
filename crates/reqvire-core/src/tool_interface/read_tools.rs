@@ -407,11 +407,18 @@ pub fn change_impact_tool(
     args: &Value,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
-    let git_commit = string_arg(args, "git_commit").unwrap_or_else(|| "HEAD".to_string());
     let model = crate::operations::load_model(excluded_filename_patterns)?;
-    let (report, base_url, current_commit) =
-        crate::operations::change_impact_report(&model, &git_commit, excluded_filename_patterns)?;
-    parse_json_string(report.to_json_string(&base_url, &current_commit, &git_commit))
+    let explicit = string_arg(args, "git_commit");
+    let baseline = crate::operations::review_baseline(&model, explicit.as_deref())?;
+    let (report, base_url, current_commit) = crate::operations::change_impact_report(
+        &model,
+        &baseline.reference,
+        excluded_filename_patterns,
+    )?;
+    let mut value =
+        parse_json_string(report.to_json_string(&base_url, &current_commit, &baseline.commit))?;
+    value["baseline_selection"] = serde_json::to_value(baseline)?;
+    Ok(value)
 }
 
 pub fn format_tool(

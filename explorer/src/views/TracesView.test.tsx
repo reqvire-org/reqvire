@@ -21,7 +21,9 @@ vi.mock("../workers/flowLayoutEngine", () => ({ flowLayoutEngine: layoutEngine }
 vi.mock("@xyflow/react", async importOriginal => {
   const original = await importOriginal<typeof import("@xyflow/react")>();
   const instance = { setViewport: vi.fn(), zoomIn: vi.fn(), zoomOut: vi.fn(), zoomTo: vi.fn() };
-  return { ...original, Handle: () => null, ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
+  // Cards render outside a ReactFlowProvider here; they read the viewport zoom at 100%.
+  const store = { transform: [0, 0, 1] };
+  return { ...original, Handle: () => null, useStore: (selector: (state: typeof store) => unknown) => selector(store), ReactFlow: ({ nodes, edges, nodeTypes, onInit }: {
     nodes: { id: string; type: string; data: unknown }[];
     edges: { id: string; source: string; target: string; label: string }[];
     nodeTypes: Record<string, ComponentType<{ data: unknown }>>;
@@ -101,9 +103,9 @@ describe("native trace snapshot ownership", () => {
     render(view(withSecondTrace(fixture("Old Requirement")))); await ready();
     expect(layoutEngine).toHaveBeenCalledTimes(1); expect(prepared).toHaveBeenCalledTimes(1);
     expect(cards()).toHaveLength(2);
-    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Old Requirement"]')!);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a.ux-trace-flow-node-identity[title="Old Requirement"]')!);
     expect(onOpenElement).toHaveBeenLastCalledWith(`${file}#requirement`);
-    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label="Open source for Old Requirement"]')!);
+    fireEvent.click(region().querySelector<HTMLAnchorElement>('a[aria-label$=", source for Old Requirement"]')!);
     expect(window.location.hash).toBe("#/content/system-model/Specifications.md");
     fireEvent.click(screen.getAllByText("Specifications.md")[0]);
     expect(screen.getByTestId("trace-rows")).toBeTruthy();

@@ -96,10 +96,14 @@ and running the showcase.
 For element coloring, use `elementRole(type, family)`, `roleColorToken(role,
 channel)` or `roleColorValue(role, channel)` from `@ds`, rather than copying the
 type-to-color mapping. `ElementIcon` and `TypeBadge` use this same palette.
-`cssVar()` and `getMermaidClassDefs()` need a mounted browser document with the
-foundation CSS loaded to resolve actual colors; `cssVar()` returns a `var(...)`
-fallback outside the browser. `replaceCssVarsForMermaid()` resolves references
-to hex values because Mermaid's parser does not accept CSS variables.
+Renderers (Sigma graphs, d3, Mermaid) read colors from the generated palette in
+[tokens/themes.generated.ts](tokens/themes.generated.ts): `paletteFor(element)`
+once per render pass, `observePalette(element, callback)` to redraw when the
+element's theme changes, and `resolveColor(element, value)` for a color outside
+the palette. None of them insert elements or read computed styles per item.
+`cssVar(token, element?)` is one palette lookup as hex and returns a `var(...)`
+outside the browser. `replaceCssVarsForMermaid()` resolves references to hex
+values because Mermaid's parser does not accept CSS variables.
 
 The application and showcase HTML entries contain document mount mechanics
 only: full-height `html`, `body` and `#root`, plus body overflow. Foundation
@@ -167,7 +171,7 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 
 **Borders, transparency, blur.** Hairline 1px borders in `--border-subtle`/`--border-default`; `--border-strong` on hover. Transparency is used sparingly: the modal scrim is `rgba(13,17,25,.42)` with a 1.5px backdrop blur; node labels get a text-shadow "halo" of the canvas color so they stay legible over nodes.
 
-**Dark theme.** A faithful **navy-slate** dark mode (layered `#0e141d → #1e2836`), activated with `data-theme="dark"` on any container. Tints switch to their `-d` (alpha) variants; shadows deepen; the accent lightens to a brighter rose. The product's theme toggle (sun/moon) lives bottom-right in the original and top-right in this kit's tab shell.
+**Dark theme.** A faithful **navy-slate** dark mode (layered `#0e141d → #1e2836`), activated with `data-theme="dark"` on the page or any section (the nearest `data-theme` wins). Themed tokens are written as `-light`/`-dark` halves in `tokens/`, and ADS generates `tokens/themes.generated.css` from them; tints follow `--bg-surface`; shadows deepen; the accent lightens to a brighter rose. The product's theme toggle (sun/moon) lives bottom-right in the original and top-right in this kit's tab shell.
 
 ---
 

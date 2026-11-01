@@ -59,6 +59,10 @@ impl ReadSnapshot {
         call: impl FnOnce() -> Result<Value, rmcp::ErrorData>,
     ) -> Result<Value, rmcp::ErrorData> {
         let scope = self.files.enter(Some(Arc::clone(&self.model)));
+        scope.set_git_identity(
+            self.metadata["head"].as_str().expect("accepted head"),
+            self.metadata["branch"].as_str().expect("accepted branch"),
+        );
         let result = call();
         if scope.prepared().is_some() {
             return Err(rmcp::ErrorData::internal_error(
@@ -624,7 +628,7 @@ impl MutationSession {
         if observed.branch.as_deref() != Some(self.branch.as_str())
             || observed.head.as_deref() != Some(self.head.as_str())
         {
-            return Err(error("MCP owned branch or HEAD changed externally; check reqvire.worktree.refresh_head for eligible same-branch artifact commits, or use explicit full validated worktree admission before further mutations"));
+            return Err(error("MCP owned branch or HEAD changed externally; check reqvire.branch.refresh for eligible same-branch artifact commits, or use explicit full validated worktree admission before further mutations"));
         }
         Ok(())
     }
@@ -650,12 +654,14 @@ impl MutationSession {
         if let Some(repo) = &self.repo {
             value["workspace_mode"] = serde_json::json!("repo");
             value["manifest"] = serde_json::json!(repo.workspace.manifest);
+            value["manifest_owners"] = serde_json::json!(repo.manifest_metadata());
             value["projects"] = serde_json::json!(repo
                 .workspace
                 .projects
                 .iter()
                 .map(|project| {
                     let mut metadata = serde_json::to_value(project).expect("project provenance");
+                    metadata["branch"] = serde_json::json!(repo.branch(&project.path));
                     let owner = self.root.join(&project.path);
                     metadata["pending_changes"] = serde_json::json!(self
                         .pending_paths
@@ -702,10 +708,11 @@ impl MutationSession {
                     self.recovery_error.as_deref().unwrap_or_default()
                 )));
             }
-        } else {
+        } else if persists || !snapshot_read(tool) {
             self.check_head()?;
         }
         let scope = self.files.enter(Some(Arc::clone(&self.model)));
+        scope.set_git_identity(&self.head, self.branch_name());
         let result = call();
         // Keep protocol errors and tool rejection envelopes intact.
         let mut result = match result {
@@ -935,7 +942,14 @@ impl MutationSession {
         }
         self.check_head()?;
         let changed = self.pending_paths().clone();
-        if changed.is_empty() {
+        if changed.is_empty()
+            && !self
+                .repo
+                .as_ref()
+                .map(|repo| repo.needs_checkpoint(&self.files))
+                .transpose()?
+                .unwrap_or(false)
+        {
             return Ok(serde_json::json!({"outcome":"no_op", "head": self.head}));
         }
         let files = self.files.clone();
@@ -1166,6 +1180,7 @@ impl MutationSession {
         self.committed_files = self.files.clone();
         self.pending_paths.clear();
         self.head = commit.to_owned();
+        self.refresh_repo_provenance();
         // Explicit commits accept the same files/model that were already
         // published by mutations; preserve their model identity.
         if model_changed {
@@ -1561,6 +1576,7 @@ pub fn snapshot_read(tool: &str) -> bool {
             | "reqvire.coverage"
             | "reqvire.traces"
             | "reqvire.resources"
+            | "reqvire.change_impact"
             | "reqvire.lint"
             | "reqvire.concepts.list"
             | "reqvire.concepts.get"

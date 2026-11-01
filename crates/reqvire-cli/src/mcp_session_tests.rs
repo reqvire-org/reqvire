@@ -111,6 +111,47 @@ fn add(content: &str, dry_run: bool) -> Value {
     }})
 }
 
+case!(historical_read_pins_accepted_head_after_external_commit, {
+    git_test(&[
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/test/snapshots.git",
+    ]);
+    let server = fixture(false);
+    let accepted = server.session.lock().expect("session").status()["head"]
+        .as_str()
+        .expect("accepted head")
+        .to_owned();
+    let captured = server
+        .session
+        .lock()
+        .expect("session")
+        .capture_read("reqvire.change_impact")
+        .expect("capture historical read");
+    std::fs::write("artifact.txt", "external implementation commit").expect("artifact");
+    git_test(&["add", "artifact.txt"]);
+    git_test(&["commit", "-qm", "external artifact"]);
+    assert_ne!(git_test(&["rev-parse", "HEAD"]), accepted);
+    captured
+        .execute(|| {
+            let model = reqvire::mutation_io::model().expect("captured model");
+            let baseline = reqvire::operations::review_baseline(&model, Some("HEAD"))
+                .expect("accepted baseline");
+            assert_eq!(baseline.commit, accepted);
+            assert_eq!(baseline.reference, accepted);
+            let (_, _, current) = reqvire::operations::change_impact_report(
+                &model,
+                &baseline.reference,
+                &server.exclusions,
+            )
+            .expect("captured comparison");
+            assert_eq!(current, accepted);
+            Ok(json!({}))
+        })
+        .expect("captured read after external HEAD advance");
+});
+
 case!(head_refresh_uses_normal_loading_after_guard, {
     fs::write("impl.txt", "baseline").expect("write artifact baseline");
     git_test(&["add", "."]);
@@ -1639,6 +1680,12 @@ fn recovery_snapshot_reads(commits: bool) {
     .expect("external fixture");
     git_test(&["add", "."]);
     git_test(&["commit", "-qm", "semantic inputs"]);
+    git_test(&[
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/test/recovery.git",
+    ]);
     let server = fixture(commits);
     let before = server
         .dispatch(
@@ -1714,11 +1761,20 @@ fn recovery_snapshot_reads(commits: bool) {
         resource["_meta"]["reqvire/context"]["recovery_required"],
         true
     );
+    let impact = server
+        .dispatch(
+            "tools/call",
+            json!({
+                "name":"reqvire.change_impact", "arguments":{"git_commit":"HEAD"}
+            }),
+        )
+        .expect("accepted historical snapshot read");
+    assert_ne!(impact["isError"], true, "{impact}");
+    assert_eq!(impact["_meta"]["reqvire/context"]["head"], head);
     for params in [
         add(OTHER, false),
         add(OTHER, true),
         json!({"name":"reqvire.format","arguments":{"fix":false}}),
-        json!({"name":"reqvire.change_impact","arguments":{}}),
     ] {
         let rejected = server
             .dispatch("tools/call", params)

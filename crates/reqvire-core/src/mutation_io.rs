@@ -25,6 +25,7 @@ struct Context {
     removed_directories: BTreeSet<PathBuf>,
     model: Option<Arc<ModelManager>>,
     capture: bool,
+    git_identity: Option<(String, String)>,
 }
 thread_local! {
     static CONTEXT: RefCell<Option<Context>> = const { RefCell::new(None) };
@@ -44,6 +45,7 @@ impl SnapshotFiles {
                 removed_directories: BTreeSet::new(),
                 model,
                 capture: false,
+                git_identity: None,
             });
         });
         SnapshotGuard { previous: None }
@@ -60,12 +62,22 @@ impl SnapshotFiles {
                 removed_directories: BTreeSet::new(),
                 model: None,
                 capture: false,
+                git_identity: None,
             }))
         });
         SnapshotGuard { previous }
     }
 }
 impl SnapshotGuard {
+    /// Pin source-control provenance to the accepted request snapshot.
+    pub fn set_git_identity(&self, head: &str, branch: &str) {
+        CONTEXT.with(|slot| {
+            slot.borrow_mut()
+                .as_mut()
+                .expect("active snapshot")
+                .git_identity = Some((head.to_owned(), branch.to_owned()));
+        });
+    }
     /// Suspend the accepted file view while resolving an isolated temporary
     /// composition. The caller must only read its staged historical inputs.
     pub(crate) fn suspend() -> Self {
@@ -122,6 +134,9 @@ impl Drop for SnapshotGuard {
 }
 pub fn active() -> bool {
     CONTEXT.with(|slot| slot.borrow().is_some())
+}
+pub fn git_identity() -> Option<(String, String)> {
+    CONTEXT.with(|slot| slot.borrow().as_ref().and_then(|c| c.git_identity.clone()))
 }
 pub fn workspace_scope() -> Option<crate::workspace::WorkspaceScope> {
     CONTEXT.with(|slot| {

@@ -360,13 +360,7 @@ pub fn scan_markdown_files_from_commit(
     let mut files = Vec::new();
     let workspace_scope = workspace::WorkspaceScope::discover()?;
 
-    if workspace_scope.git_worktrees.len() != 1 {
-        return Err(ReqvireError::GitCommandError(format!(
-            "Git commit comparison requires exactly one eligible Git worktree; found {}",
-            workspace_scope.git_worktrees.len()
-        )));
-    }
-    let git_root = &workspace_scope.git_worktrees[0];
+    let git_root = workspace_scope.comparison_git_root()?;
 
     // Run git ls-tree command to get all files in the commit
     let result = git_commands::ls_tree_commit_in_folder(commit, git_root);
