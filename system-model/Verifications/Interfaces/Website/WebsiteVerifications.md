@@ -124,6 +124,8 @@ This review verifies the documented worktree and publication workflow against im
 
 - Inspect external checkpoint examples against schema version 1: source inventory remains complete, changed owner commits are recorded, root commit has no circular self-pin, and branch.open follows clean committed preparation. Confirm detached preparation is distinguished from named authoring, preview is followed by an actual apply, and root live reconciliation is not promised for unknown component/manifest refs.
 
+Verify both model-bearing and manifest-only central repository examples use the same root-owned source manifest branch and PR. Source XML remains tracked outside ignored Repo administration; examples do not create a separate manifest lane, cached-manifest commit/PR or manual root self-association. External-work instructions update tracked source pins before explicit admission.
+
 #### Metadata
   * type: demonstration-verification
 

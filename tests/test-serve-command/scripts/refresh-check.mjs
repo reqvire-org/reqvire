@@ -115,6 +115,9 @@ try {
   await Promise.all([main, plain].map(session => session.evaluate(token => {
     window.reqvireRefreshE2E = token;
   }, token)));
+  // Both tabs must have captured the initial store before the filesystem edit.
+  // Navigation can finish while the background tab is still fetching chunks.
+  await Promise.all([main, plain].map(session => rendered(session, "Test Requirement One")));
   const initialManifest = await main.evaluate(() => window.reqvireLiveRefresh.manifest);
   const trafficStart = await main.evaluate(() => window.reqvireManifestTraffic.length);
 

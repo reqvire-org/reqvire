@@ -27,7 +27,8 @@ impl WorkspaceScope {
             let owner = crate::git_commands::local_text(&root, &["rev-parse", "--show-toplevel"])?;
             if Path::new(&owner).canonicalize()? != root {
                 return Err(ReqvireError::PathError(
-                    "Repo mode requires Central's Git worktree at the workspace root".into(),
+                    "Repo mode requires the manifest-owning Git worktree at the workspace root"
+                        .into(),
                 ));
             }
             let repo = crate::repo_workspace::RepoWorkspace::load(&root, manifest)?;

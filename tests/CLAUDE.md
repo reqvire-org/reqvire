@@ -40,6 +40,20 @@ launch/cleanup implementation.
 
 The same Reqvire timing summary is printed for a single test.
 
+For the canonical Repo branch/commit/publication cases only:
+
+```bash
+REQVIRE_REPO_CHECKS=composition ./tests/run_tests.sh test-mcp-repo-workspaces
+```
+
+These real Git/Repo fixtures keep source XML/includes in the manifest-owning root
+branch and cover both model-bearing and manifest-only roots. Repo administration
+is not another authoring owner. Golden outcomes stay PASS while a model-first
+milestone deliberately exposes failures against an unchanged runtime; retain the
+failed response/state artifacts and fix behavior rather than accepting FAIL as
+an expected feature outcome. The complete workspace suite also runs retained
+source-scope and change-impact regression checks.
+
 ### Build Before Testing
 The runner defaults to `target/release/reqvire`. Build that binary before the
 default invocation:

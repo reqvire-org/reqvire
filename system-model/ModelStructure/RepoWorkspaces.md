@@ -2,7 +2,7 @@
 
 ### Manifest-Defined Workspace Scope
 
-When a workspace is selected through a Repo manifest, the system SHALL resolve Central and its declared component repositories as one workspace-relative model scope, with each source retaining its owning repository and selected revision. It SHALL reject invalid or unavailable selections before accepting the model and preserve ordinary single-repository scope behavior.
+When a workspace is selected through a Repo manifest, the system SHALL resolve the manifest-owning workspace-root repository and its pinned component repositories as one workspace-relative model scope, preserving authoritative source ownership and selected revisions whether the root contains model elements or only the versioned manifest and configuration.
 
 #### Concept References
   * [Repo Workspace](../Thesaurus/Thesaurus.md#repo-workspace)
@@ -20,7 +20,7 @@ When a workspace is selected through a Repo manifest, the system SHALL resolve C
 
 ### Reproducible Workspace Composition
 
-WHEN a manifest-defined composition is checkpointed or reconstructed, the system SHALL associate the workspace-root revision with the exact versioned manifest-owner inputs and component commits, preserving native Repo selection and actual Git ownership without requiring a duplicate root manifest or a second baseline selector.
+WHEN a manifest-defined composition is checkpointed or reconstructed, the system SHALL identify the authoritative source manifest and any root model content from the same workspace-root branch revision, with component content selected by that manifest's exact pins and Repo administration remaining internal derived state.
 
 #### Metadata
   * type: requirement
@@ -33,36 +33,25 @@ WHEN a manifest-defined composition is checkpointed or reconstructed, the system
   * derivedFrom: [Manifest-Defined Workspace Scope](#manifest-defined-workspace-scope)
   * satisfiedBy: [mcp_repo.rs](../../crates/reqvire-cli/src/mcp_repo.rs)
   * satisfiedBy: [git_commands.rs](../../crates/reqvire-core/src/git_commands.rs)
-  * satisfiedBy: [repo_composition.rs](../../crates/reqvire-core/src/repo_composition.rs)
   * satisfiedBy: [repo_impact.rs](../../crates/reqvire-core/src/repo_impact.rs)
+  * satisfiedBy: [repo_workspace.rs](../../crates/reqvire-core/src/repo_workspace.rs)
 ---
 
 ### Manifest-Defined Workspace Scope Specification
 
-The owning Central Git worktree remains the effective workspace and identifier root. Repo's .repo/manifest.xml is the default manifest location. --manifest overrides that file location; both selections use the same Repo manifest format and preserve the inputs' Git ownership and history. No duplicate manifest is required in Central. Repo resolves the selected composition; scope includes Central itself and the declared projects. An alternate selected file must not be silently replaced by Repo's separate cached copy.
+The manifest-owning Git repository and selected branch are the workspace authority. That owning checkout is the effective workspace and identifier root. It may contain model elements, or only the tracked source manifest and workspace configuration while the complete system model lives in pinned component repositories. Do not require a root model document, synthetic model element, or duplicated component model.
 
-Require Git, Python 3 and initialized local Google Repo metadata at the workspace root. The caller explicitly initializes and synchronizes the client before admission. Keep Repo administration and component checkouts out of Central's tracked files. Capture the selected manifest inputs, whether under Repo administration or at an alternate workspace location. Support includes, extend-project composition, local overlays for Repo-managed selections, relative fetch URLs, remote aliases and remote-level revision precedence; reject submanifests. A checkout may name its remote differently when one repository identity matches unambiguously, including equivalent SSH URL spellings. Reject conflicting remote identities.
+Repo's .repo/manifest.xml remains the default discovery entry. Resolve its selected source filename and repository identity to the tracked source manifest on the selected root branch, for example manifests/default.xml. The cached files under .repo/manifests are Repo administration, not another authored participant. Native discovery does not require a Reqvire --manifest override. An optional alternate file selection preserves the same authoritative ownership and must not be silently replaced by a cache.
 
-Resolve project revision names to concrete available local commits and retain the selected manifest inputs and per-project revision provenance with the loaded model. Project files remain Central-relative identifiers. Repository identity is ownership/provenance metadata, not an element namespace. Capture tracked inputs separately from Central and each declared repository so that Central ignoring the component checkout directory does not hide declared project sources. Workspace .reqvireignore exclusions remain global; a repository's Git ignores apply within its own ownership boundary. Exclude Repo metadata, copied dependency/build models and undeclared component repositories from this mode.
+Require Git, Python 3, and initialized local Google Repo metadata. The caller explicitly initializes and synchronizes the client before admission. Keep .repo administration and component checkout directories ignored by the root repository; track the authoritative source manifest and its includes as ordinary files in the root Git history. Establish source ownership using repository identity, selected source path and tracked membership; a matching basename or cached bytes alone is not proof. Reject missing, foreign, ambiguous or unversioned authoritative inputs with their source path. Do not invent a separately versioned manifest owner, branch or PR from Repo's internal checkout.
 
-Require unique, non-overlapping project checkout paths, matching local Git project identity, available revisions and containment within the effective workspace. Reject unavailable projects/commits, duplicate project paths, path traversal, symlink escapes and foreign checkouts with the affected manifest/project/path. Do not silently fall back to ordinary Git scope after a selected manifest fails. Manifest-defined source discovery is common to CLI, MCP and Explorer; their existing admission and freshness policies remain interface-owned.
+Read root-owned selecting XML and includes from the selected branch's sources, even when Repo's cached checkout has an older revision or another branch's pin bytes. Use Repo's existing include, extend-project, remote, alias and revision-precedence semantics without importing cached models. Required local overlays must have an unambiguous versioned source in the authoritative root history; an unresolved or unversioned overlay cannot supply a reproducible authoring checkpoint or comparison baseline. Reject submanifests.
 
-The source boundary supplies the declared project inventory, selected revisions and file-to-repository ownership to consumers. Worktree creation, private-checkout lifecycle, accepted-session mutation, Git commit sequencing and Explorer publication are owned by their respective interface requirements, rather than by source discovery.
+Resolve project revision names to concrete locally available commits. Require unique, non-overlapping contained project paths, matching repository identity, and checkouts at their selected revisions. Reject unavailable objects, foreign checkouts, reserved paths, traversal and symlink escapes with the affected input/project/path. A selected-manifest failure must not fall back to generic multi-worktree discovery.
 
-```mermaid
-flowchart TD
-  B[Central branch] --> W[Central worktree]
-  W --> M[Versioned Repo manifest]
-  M --> R[Repo resolves project paths and revisions]
-  W --> S[Central sources]
-  R --> P[Declared component sources and owners]
-  S --> A[One workspace-relative model]
-  P --> A
-```
+The root and declared projects contribute to one graph with workspace-relative identifiers and globally consistent cross-repository relations. Workspace .reqvireignore rules are global; each repository's Git ignores apply inside its ownership boundary. Root ignore rules must not hide declared component sources. Undeclared repositories, Repo metadata, cached manifest-repository model files and copied dependency/build models are excluded. CLI, MCP and Explorer share this scope, including a root with zero model elements.
 
-Within each relation-validation pass, resolve the effective workspace scope at most once when file targets require it, and reuse that inventory and selected revision provenance for every file-reference check, including a failed scope resolution. Increasing the number of file references must not repeat Repo manifest resolution or project Git verification. Each new pass observes the current workspace selection through the existing admission boundary; accepted MCP snapshots retain their own request-local scope. Preserve per-reference existence, ownership and eligibility diagnostics.
-
-Repo-managed manifest files own the dependency pins at their selected location. Updating pins preserves their include and local-overlay composition and must not create a duplicate Central manifest or add Repo administration to Central's Git tree. Manifest inputs retain their actual Git ownership. Explicit MCP composition commits checkpoint accepted pin updates in those owners and record their revision association in the workspace-root history; ordinary discovery does not create commits. Manifest files belonging to the workspace-root Git worktree retain its ordinary Git checkpoint behavior; the flag does not introduce another manifest type.
+Within each relation-validation pass resolve this source inventory at most once and reuse its successes or failures for all file-reference checks. New passes observe the current selection under the interface's normal admission policy; accepted MCP reads retain their captured canonical source and component provenance. Source discovery never creates branches or commits and never fetches or syncs.
 
 #### Metadata
   * type: specification
@@ -74,17 +63,17 @@ Repo-managed manifest files own the dependency pins at their selected location. 
 ### Workspace Composition Checkpoint Specification
 
 #### Details
-- Native selection remains .repo/manifest.xml. Resolve the actual selected source, includes, overlays, and their Git owners. --manifest remains an optional alternate selection, not a workaround for historical impact.
-- Version .reqvire-composition.json in the workspace-root repository when native manifest history needs an explicit association. Its containing root commit identifies the root revision; do not encode that commit in its own tree or copy XML into the record.
-- Schema version 1 contains schema_version: 1, selection (workspace-relative entry), manifest (actual selected source), and sources sorted by path. Each source contains path (workspace-relative source), owner (workspace-relative owning checkout; empty for root), source (owner-relative tracked path), repository (configured owning remote identity), and commit (exact full owner commit for non-root owners; omitted for root-owned sources).
-- Validate unique normalized contained paths, complete source inventory, known schema, owner identity, tracked source membership, and locally available exact commits. Root-owned sources come from the containing root tree. Generated Repo entry wrappers/configuration are reconstructed administration, not independent versioned XML sources.
-- Capture native include/overlay sources in their actual owners. A required unversioned overlay blocks reproducible checkpointing/history with its exact path. Ordinary current inspection retains existing source-loading behavior.
-- Prefer a committed record when present; never substitute live source bytes for its revisions. A legacy root-owned manifest can be read directly from the selected root tree. A native input may be resolved from the same root Git history only when identity and owner-relative historical paths establish that association unambiguously; otherwise report unavailable historical association.
-- At an explicit current HEAD baseline, captured committed owner revisions may identify the current committed composition. This does not permit guessing another root commit's manifest selection.
-- An explicit commit can initialize a missing root association or pin an admitted mutable selection even with no pending model edits. This is a meaningful composition checkpoint; a fully recorded unchanged composition returns no-op.
-- Commit changed component branches first, then selected manifest-owner changes, then the root association and accepted root changes. A component-only checkpoint has a meaningful root association change. Do not add .repo administration or component checkout files to the root tree.
-- Treat multiple checkouts of the same Git history as related ownership, not automatically as the same branch. Do not create circular self-pins. A distinct native manifest checkout sharing root repository identity uses a separate manifest lane, reqvire/manifests/<root-branch>, during branch preparation. Reject competing owner checkouts targeting one logical repository branch before checkpoint or publication side effects; repeated source files of one owner are one participant. Publish required independent owner branches before the root.
-- Missing objects, invalid records, dirty manifest inputs, identity conflicts, or partial checkpoints fail explicitly without fetching, syncing, resetting external work, or reporting on-disk pin bytes alone as committed acceptance.
+- The source manifest and its versioned includes belong to the manifest-owning root repository and selected branch. .repo/manifest.xml discovers that source; the cached checkout, wrappers and config under .repo are implementation state rather than another authoring repository.
+- The root may contain no model elements. Its committed source manifest and exact component pins are sufficient to define the complete product model held in declared repositories.
+- One root commit supplies its optional root model content and authoritative source XML, including all versioned selecting inputs. Each declared component is selected by its own full commit ID. Do not record the root commit in its own tree or treat a cached copy's HEAD as another manifest revision.
+- Do not require, create or manually advance .reqvire-composition.json as an association between the root and its own manifest. Existing association metadata must not override the selected branch's authoritative source files or turn a cached checkout into a separate owner. Missing canonical sources fail with source-specific preparation guidance.
+- Commit changed component authoring branches first. Advance their pins in the tracked source manifest, preserving include composition and unchanged component pins, then commit those pin changes together with accepted root changes in one root commit. Unchanged components receive no commit.
+- An explicit initial commit may lock an admitted mutable component selection even without model edits. A fully pinned unchanged source composition is a no-op; a root-only self-association is not a reason to create a commit.
+- Accepted root source paths, indexes and expected HEAD follow the existing root commit transaction and reconciliation contract. A later root failure retains confirmed component commits and pending root changes. Retry reuses confirmed components; unknown component outcomes require operator repair, while recorded root attempts use existing root reconciliation.
+- Branch creation uses the requested root base's tracked source manifest and prepares the requested named branch in each declared component at that base's own pin. Keep Repo administration derived from that composition without creating reqvire/manifests/<branch>, another manifest ref, or a manifest PR.
+- External work commits component changes first, then updated source pins and related root changes on the same root feature branch. Clean validated branch.open admits that composition without a reload flag, manual self-association or commit inside Repo administration.
+- Publish required component branches before the root branch. One root PR contains the root model/configuration and pin changes, linked to PRs for changed components. Repo administration has no repository_bases entry, publication outcome or PR of its own.
+- Versioned root source selection remains authoritative through restart, reopen and comparison. Missing inputs/objects, conflicting identity, dirty authoring inputs and partial checkpoints fail without fetching, syncing, resetting external work or accepting cache bytes as committed source.
 
 #### Metadata
   * type: specification

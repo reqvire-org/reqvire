@@ -1050,7 +1050,7 @@ export const skinX = css`
   }
 
   .${globalSearchControlClass} {
-    --ds-search-input-border: var(--border-w) solid var(--border-subtle);
+    --ds-search-input-border: var(--border-w) solid var(--border-strong);
     --ds-search-input-bg: var(--bg-canvas);
     --ds-search-input-color: var(--text-body);
     --ds-search-input-placeholder-color: var(--text-muted);
@@ -1099,7 +1099,7 @@ export const skinX = css`
   .${globalSearchResultsClass} .ontology-graph-badge,
   .ontology-graph-results .ontology-graph-badge {
     background: var(--bg-sunken);
-    color: var(--danger);
+    color: var(--danger-text);
   }
 
   .${globalSearchResultsClass} .ontology-graph-result-glyph,
@@ -1110,7 +1110,7 @@ export const skinX = css`
   .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="semantic-query"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="semantic-query"] {
     background: var(--color-role-ontology);
-    color: var(--text-strong);
+    color: var(--color-ink);
     font-family: var(--font-mono);
     font-size: var(--text-micro);
     font-weight: var(--weight-bold);

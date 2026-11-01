@@ -6,7 +6,6 @@ export interface DiagramBlockFrameProps extends Omit<(HTMLAttributes<HTMLDivElem
 }
 
 const diagramBlockUX = css`
-  --ux-markdown-diagram-min-w: var(--space-markdown-diagram-min-w);
   margin: var(--space-5) 0;
   overflow: auto;
   padding: var(--space-5);
@@ -14,7 +13,7 @@ const diagramBlockUX = css`
   svg {
     display: block;
     width: 100%;
-    min-width: var(--ux-markdown-diagram-min-w);
+    min-width: var(--space-markdown-diagram-measure);
   }
 `;
 

@@ -1,61 +1,35 @@
 #!/bin/bash
-# Coordinated branch lifecycle over Repo's native manifest and real local Git.
-# Every listed case must pass; missing implementation is an ordinary failure.
+# Canonical composition: one root history owns source XML and optional models.
+# Real Repo/Git fixtures; Bash/curl/jq assertions. Every golden outcome is PASS.
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$TEST_SCRIPT_DIR/check_change_impact.sh"
 
-composition_record() {
-    local commit repository owner source
-    : > "$native_case/record-sources.jsonl"
-    for owner in .repo/manifests .repo/local_manifests; do
-        [[ -e "$central/$owner/.git" ]] || continue
-        commit=$(git -C "$central/$owner" rev-parse HEAD)
-        repository=$(git -C "$central/$owner" remote get-url origin)
-        while IFS= read -r -d '' source; do
-            jq -cn --arg commit "$commit" --arg repository "$repository" --arg owner "$owner" --arg source "$source" \
-              '{path:($owner+"/"+$source),owner:$owner,source:$source,repository:$repository,commit:$commit}' \
-              >> "$native_case/record-sources.jsonl"
-        done < <(git -C "$central/$owner" ls-files -z -- '*.xml')
-    done
-    jq -s '{schema_version:1,selection:".repo/manifest.xml",manifest:".repo/manifests/default.xml",sources:sort_by(.path)}' \
-        "$native_case/record-sources.jsonl" > "$central/.reqvire-composition.json"
-}
-
 composition_prepare() {
-    native_fixture "composition-$1"
-    git clone -q --bare "$central/.repo/manifests" "$native_case/remotes/manifests"
-    git -C "$central/.repo/manifests" remote set-url origin "file://$native_case/remotes/manifests"
-    git -C "$central/.repo/manifests" checkout -q -B main
-    git -C "$central/.repo/manifests" config branch.main.remote origin
-    git -C "$central/.repo/manifests" config branch.main.merge refs/heads/main
+    local key=$1 mode=empty
+    [[ "$key" != *_model ]] || mode=model
+    native_fixture "canonical-$key" "$mode" nested
+    root_model=$mode
     mkdir -p "$native_case/docs"
     cp "$TEST_SCRIPT_DIR/fixtures/impact-docs.md.txt" "$native_case/docs/Model.md"
-    printf 'Guide for the selected public contract.\n' > "$native_case/docs/Guide.txt"
+    printf 'Guide for the public component behavior.\n' > "$native_case/docs/Guide.txt"
     git -C "$native_case/docs" init -qb main
-    docs_commit=$(impact_commit "$native_case/docs" 'Documentation requirements and page')
+    docs_commit=$(impact_commit "$native_case/docs" 'Documentation model and page')
     git clone -q --bare "$native_case/docs" "$native_case/remotes/docs"
-    sed -i "/<\/manifest>/i\  <project name=\"docs\" path=\"repositories/docs\" remote=\"local\" revision=\"$docs_commit\"/>" "$native"
-    impact_commit "$central/.repo/manifests" 'Declare pinned documentation component' > /dev/null
-    git -C "$central/.repo/manifests" push -q "file://$native_case/remotes/manifests" HEAD:refs/heads/main
+    source_projects="$central/manifests/projects.xml"
+    git -C "$central" mv manifests/default.xml manifests/projects.xml
+    printf '<manifest><include name="manifests/projects.xml"/></manifest>\n' > "$source_manifest"
+    sed -i "/<\/manifest>/i\  <project name=\"docs\" path=\"repositories/docs\" remote=\"local\" revision=\"$docs_commit\"/>" "$source_projects"
+    impact_base=$(impact_commit "$central" 'Record authoritative root source and component pins')
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
     (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
     git -C "$central/repositories/component" checkout -q -B main "$alpha"
     git -C "$central/repositories/docs" checkout -q -B main "$docs_commit"
-    composition_record
-    impact_base=$(impact_commit "$central" 'Record native alpha composition')
-    manifest_base=$(git -C "$central/.repo/manifests" rev-parse HEAD)
     git -C "$central" branch release/1.0 "$impact_base"
-    test ! -e "$central/default.xml"
-    test -z "$(git -C "$central" ls-files .repo default.xml)"
+    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$impact_base"
+    test -z "$(git -C "$central" status --porcelain)"
+    test -z "$(git -C "$central" ls-files -- .repo repositories)"
+    test ! -e "$central/.reqvire-composition.json"
     (cd "$central" && "$REQVIRE_BIN" validate)
-}
-
-composition_omega() {
-    git -C "$central/repositories/component" checkout -q main
-    git -C "$central/repositories/component" merge -q --ff-only "$omega"
-    sed -i "s/$alpha/$omega/" "$native"
-    impact_commit "$central/.repo/manifests" 'Select omega component pin' > /dev/null
-    composition_record
-    impact_current=$(impact_commit "$central" 'Record native omega composition')
 }
 
 composition_stop() {
@@ -64,394 +38,294 @@ composition_stop() {
     trap - EXIT
 }
 
-composition_source_state() {
-    local owner
-    for owner in "$central" "$central/.repo/manifests" "$central"/repositories/*; do
-        printf 'OWNER %s\n' "$owner"
-        git -C "$owner" rev-parse HEAD
-        git -C "$owner" symbolic-ref --short HEAD
-        git -C "$owner" ls-files --stage
-        git -C "$owner" status --porcelain
-    done
+composition_add() {
+    local args
+    if [[ "$root_model" == model ]]; then
+        # One mutation changes the contract and its root/docs consumers. This
+        # remains one transaction even when automatic commits are enabled.
+        impact_rpc reqvire.rename_element \
+          '{"branch":"main","element_name":"Component Specification","new_name":"Reviewed Component Specification","dry_run":false}' \
+          "$native_case/add.json"
+        for owner in "$central" "$central/repositories/docs"; do
+            grep -Fq 'Reviewed Component Specification' "$owner/Model.md"
+        done
+    else
+        args=$(jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
+            '{branch:"main",file:"repositories/component/Added.md",content:$content}')
+        impact_rpc reqvire.add_element "$args" "$native_case/add.json"
+        diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
+    fi
 }
 
-composition_native_history() {
+composition_commit() {
+    impact_rpc reqvire.git.commit '{"branch":"main","message":"Checkpoint root source composition"}' "$native_case/commit.json"
+}
+
+composition_assert_checkpoint() {
+    local component root_head cached
+    component=$(git -C "$central/repositories/component" rev-parse HEAD)
+    root_head=$(git -C "$central" rev-parse HEAD)
+    cached=$(git -C "$central/.repo/manifests" rev-parse HEAD)
+    test "$component" != "$alpha"
+    test "$(git -C "$central/repositories/component" rev-parse HEAD^)" = "$alpha"
+    test "$root_head" != "$impact_base"
+    test "$(git -C "$central" rev-parse HEAD^)" = "$impact_base"
+    grep -Fq "revision=\"$component\"" "$source_projects"
+    git -C "$central" show HEAD:manifests/projects.xml | grep -Fq "revision=\"$component\""
+    if [[ "$root_model" == model ]]; then
+        local docs_head
+        docs_head=$(git -C "$central/repositories/docs" rev-parse HEAD)
+        test "$docs_head" != "$docs_commit"
+        test "$(git -C "$central/repositories/docs" rev-parse HEAD^)" = "$docs_commit"
+        grep -Fq "revision=\"$docs_head\"" "$source_projects"
+    else
+        test "$(git -C "$central/repositories/docs" rev-parse HEAD)" = "$docs_commit"
+    fi
+    # A cache may retain the baseline or reflect the actual root commit. It
+    # cannot have an independently authored manifest commit.
+    [[ "$cached" == "$impact_base" || "$cached" == "$root_head" ]]
+    test ! -e "$central/.reqvire-composition.json"
+    test -z "$(git -C "$central" ls-files -- .repo repositories)"
+    test -z "$(git -C "$central" for-each-ref --format='%(refname)' refs/heads/reqvire/manifests/)"
+    git -C "$central" diff-tree --no-commit-id --name-only -r HEAD | sort > "$native_case/root-paths.txt"
+    if [[ "$root_model" == model ]]; then
+        printf '%s\n' Model.md manifests/projects.xml > "$native_case/expected-paths.txt"
+    else
+        printf '%s\n' manifests/projects.xml > "$native_case/expected-paths.txt"
+    fi
+    diff -u "$native_case/expected-paths.txt" "$native_case/root-paths.txt"
+    (cd "$central" && "$REQVIRE_BIN" validate)
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status.json"
+    jq -e '.result.structuredContent.context |
+      .pending_changes == [] and ((.manifest_owners // []) | length == 0)' "$native_case/status.json"
+}
+
+composition_load() {
+    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/cli-model.json"
+    jq -S '[.files[].elements[].name] | sort' "$native_case/cli-model.json" > "$native_case/cli-names.json"
+    jq -n --arg mode "$root_model" '
+      ["Component Capability","Component Requirement","Component Specification",
+       "Documentation Capability","API Guide Requirement","Documentation Review Objective","Documentation Inspection"]
+      + (if $mode == "model" then ["Central Capability","Central Consumer"] else [] end) | sort' \
+      > "$native_case/expected-names.json"
+    diff -u "$native_case/expected-names.json" "$native_case/cli-names.json"
+    impact_start_server mcp native
+    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/mcp-model.json"
+    jq -S '[.result.structuredContent.files[].elements[].name] | sort' "$native_case/mcp-model.json" > "$native_case/mcp-names.json"
+    diff -u "$native_case/expected-names.json" "$native_case/mcp-names.json"
+}
+
+composition_source_owner() {
+    impact_start_server mcp native
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status.json"
+    jq -e '.result.structuredContent.context | ((.manifest_owners // []) | length == 0)' "$native_case/status.json"
+    composition_commit
+    test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
+    test ! -e "$central/.reqvire-composition.json"
+}
+
+composition_omega() {
+    git -C "$central/repositories/component" merge -q --ff-only "$omega"
+    sed -i "s/$alpha/$omega/" "$source_projects"
+    impact_current=$(impact_commit "$central" 'Advance pins in authoritative root source')
+}
+
+composition_publish_source() {
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
+    (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
+}
+
+composition_stale_cache() {
     composition_omega
-    impact_cli native --json
-    impact_graph "$native_case/impact.out"
-    jq -e --arg base "$impact_base" --arg owner "$manifest_base" '
-      .comparison.base.central_commit == $base and
-      any(.comparison.base.manifest_inputs[];
-        .path == ".repo/manifests/default.xml" and .commit == $owner)
-    ' "$native_case/impact.out"
-    test ! -e "$central/default.xml"
-    test -z "$(git -C "$central" ls-files .repo default.xml)"
-}
-
-composition_native_input_history() {
-    mv "$native" "$central/.repo/manifests/projects.xml"
-    printf '<manifest><include name="projects.xml"/></manifest>\n' > "$native"
-    mkdir -p "$central/.repo/local_manifests"
-    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" \
-        > "$central/.repo/local_manifests/pins.xml"
-    git -C "$central/.repo/local_manifests" init -qb main
-    git -C "$central/.repo/local_manifests" remote add origin "file://$native_case/remotes/overlays"
-    impact_commit "$central/.repo/manifests" 'Select native included projects' > /dev/null
-    impact_commit "$central/.repo/local_manifests" 'Version native local overlay' > /dev/null
-    composition_record
-    impact_base=$(impact_commit "$central" 'Associate native included composition')
-    sed -i "s@$alpha@$omega@" "$central/.repo/local_manifests/pins.xml"
-    git -C "$central/repositories/component" checkout -q -B main "$omega"
-    impact_commit "$central/.repo/local_manifests" 'Advance native overlay pin' > /dev/null
-    composition_record
-    impact_commit "$central" 'Associate changed overlay composition' > /dev/null
+    # The root source and component checkout agree. Repo's cache is still alpha.
+    grep -Fq "$alpha" "$central/.repo/manifests/manifests/projects.xml"
     impact_state > "$native_case/before.txt"
-    impact_cli native --json
-    impact_graph "$native_case/impact.out"
+    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/search.json"
+    grep -Fq 'behavior is omega' "$native_case/search.json"
     impact_state > "$native_case/after.txt"
     diff -u "$native_case/before.txt" "$native_case/after.txt"
 }
 
-composition_branch_set() {
+composition_branches() {
     composition_omega
-    composition_source_state > "$native_case/source-before.txt"
+    composition_publish_source
     impact_start_server mcp native
+    impact_state | sed '/^refs\/heads\/feature\/topic /d' > "$native_case/before.txt"
     impact_rpc reqvire.branch.create \
-        '{"branch":"feature/topic","from_branch":"main","base_ref":"release/1.0"}' \
-        "$native_case/create.json"
-    local child owner
+      '{"branch":"feature/topic","base_ref":"release/1.0","from_branch":"main"}' "$native_case/create.json"
+    local child
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/create.json")
     test "$(git -C "$child" rev-parse HEAD)" = "$impact_base"
-    for owner in "$child" "$child/repositories/component" "$child/repositories/docs" "$child/.repo/manifests"; do
-        test "$(git -C "$owner" symbolic-ref --short HEAD)" = feature/topic
-    done
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$alpha"
     test "$(git -C "$child/repositories/docs" rev-parse HEAD)" = "$docs_commit"
-    grep -Fq "revision=\"$alpha\"" "$child/.repo/manifests/default.xml"
-    test ! -e "$child/default.xml"
-    composition_source_state > "$native_case/source-after.txt"
-    diff -u "$native_case/source-before.txt" "$native_case/source-after.txt"
+    for owner in "$child" "$child/repositories/component" "$child/repositories/docs"; do
+        test "$(git -C "$owner" branch --show-current)" = feature/topic
+    done
+    grep -Fq "$alpha" "$child/manifests/projects.xml"
+    test ! -e "$child/.reqvire-composition.json"
+    jq -e '(.result.structuredContent.context // .result.structuredContent) |
+      ((.manifest_owners // []) | length == 0)' "$native_case/create.json"
+    impact_state | sed '/^refs\/heads\/feature\/topic /d' > "$native_case/after.txt"
+    diff -u "$native_case/before.txt" "$native_case/after.txt"
     impact_rpc reqvire.branch.close '{"branch":"feature/topic"}' "$native_case/close.json"
     impact_rpc reqvire.branch.open '{"branch":"feature/topic"}' "$native_case/reopen.json"
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/reopen.json")
-    test "$(git -C "$child/repositories/component" symbolic-ref --short HEAD)" = feature/topic
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$alpha"
-}
-
-composition_add() {
-    local arguments
-    arguments=$(jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
-        '{branch:"main",file:"repositories/component/Added.md",content:$content}')
-    impact_rpc reqvire.add_element "$arguments" "$native_case/add-result.json"
-    diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
-}
-
-composition_commit() {
-    impact_rpc reqvire.git.commit '{"branch":"main","message":"Checkpoint native component change"}' \
-        "$native_case/commit-result.json"
-}
-
-composition_bootstrap() {
-    git -C "$central" rm -q .reqvire-composition.json
-    before=$(impact_commit "$central" 'Unrecorded native starting composition')
-    impact_start_server mcp native
-    composition_commit
-    test "$(git -C "$central" rev-parse HEAD)" != "$before"
-    git -C "$central" show HEAD:.reqvire-composition.json > "$native_case/bootstrap.json"
-    jq -e --arg commit "$manifest_base" '.sources[0].commit == $commit' "$native_case/bootstrap.json"
-    test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$alpha"
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$manifest_base"
-    after=$(git -C "$central" rev-parse HEAD)
-    composition_commit
-    test "$(git -C "$central" rev-parse HEAD)" = "$after"
-    impact_rpc reqvire.branch.create '{"branch":"feature/bootstrap","from_branch":"main","base_ref":"HEAD"}' "$native_case/bootstrap-branch.json"
-    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/bootstrap-branch.json")
-    test "$(git -C "$child/repositories/component" symbolic-ref --short HEAD)" = feature/bootstrap
-}
-
-composition_shared_history() {
-    git -C "$central/.repo/manifests" remote set-url origin "file://$native_case/remotes/central"
-    composition_record
-    impact_base=$(impact_commit "$central" 'Record native manifest in shared repository history')
-    git -C "$central" branch -f release/1.0 "$impact_base"
-    impact_start_server mcp native
-    impact_rpc reqvire.branch.create '{"branch":"feature/shared","from_branch":"main","base_ref":"release/1.0"}' "$native_case/shared-branch.json"
-    local child saved arguments
-    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/shared-branch.json")
-    test "$(git -C "$child/.repo/manifests" symbolic-ref --short HEAD)" = reqvire/manifests/feature/shared
-    arguments=$(jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
-        '{branch:"feature/shared",file:"repositories/component/Added.md",content:$content}')
-    impact_rpc reqvire.add_element "$arguments" "$native_case/shared-add.json"
-    impact_rpc reqvire.git.commit '{"branch":"feature/shared","message":"Checkpoint shared-history manifest"}' "$native_case/shared-commit.json"
-    saved=$(git -C "$child/.repo/manifests" rev-parse HEAD)
-    impact_rpc reqvire.branch.close '{"branch":"feature/shared"}' "$native_case/shared-close.json"
-    impact_rpc reqvire.branch.open '{"branch":"feature/shared"}' "$native_case/shared-open.json"
-    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/shared-open.json")
-    test "$(git -C "$child/.repo/manifests" rev-parse HEAD)" = "$saved"
-    test "$(git -C "$child/.repo/manifests" symbolic-ref --short HEAD)" = reqvire/manifests/feature/shared
-    diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$child/repositories/component/Added.md"
-    test ! -e "$child/default.xml"
-    test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
-    test ! -e "$central/repositories/component/Added.md"
+    grep -Fq "$alpha" "$child/manifests/projects.xml"
 }
 
 composition_checkpoint() {
-    local mode=$1 saved manifest_saved root_saved
-    [[ "$mode" != automatic ]] || composition_server_options=(--enable-commits)
+    [[ "$1" != automatic_* ]] || composition_server_options=(--enable-commits)
     impact_start_server mcp native
     composition_add
-    [[ "$mode" == automatic ]] || composition_commit
-    saved=$(git -C "$central/repositories/component" rev-parse HEAD)
-    manifest_saved=$(git -C "$central/.repo/manifests" rev-parse HEAD)
-    root_saved=$(git -C "$central" rev-parse HEAD)
-    test "$saved" != "$alpha"
-    test "$manifest_saved" != "$manifest_base"
-    test "$root_saved" != "$impact_base"
-    test "$(git -C "$central/repositories/component" symbolic-ref --short HEAD)" = main
-    git -C "$central/.repo/manifests" show HEAD:default.xml > "$native_case/saved-manifest.xml"
-    grep -Fq "revision=\"$saved\"" "$native_case/saved-manifest.xml"
-    git -C "$central" show HEAD:.reqvire-composition.json > "$native_case/saved-record.json"
-    jq -e --arg saved "$manifest_saved" '.sources[] |
-      select(.owner == ".repo/manifests") | .commit == $saved' "$native_case/saved-record.json"
-    test "$(git -C "$central/repositories/docs" rev-parse HEAD)" = "$docs_commit"
-    test -z "$(git -C "$central" ls-files .repo default.xml repositories)"
-    local owner
-    for owner in "$central" "$central/.repo/manifests" "$central"/repositories/*; do
-        test -z "$(git -C "$owner" status --porcelain)"
-    done
+    [[ "$1" == automatic_* ]] || composition_commit
+    composition_assert_checkpoint
+    local saved
+    saved=$(git -C "$central" rev-parse HEAD)
     composition_commit
-    test "$(git -C "$central" rev-parse HEAD)" = "$root_saved"
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$manifest_saved"
-    test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$saved"
+    test "$(git -C "$central" rev-parse HEAD)" = "$saved"
     composition_stop
     impact_start_server mcp native
     impact_rpc reqvire.search '{"branch":"main"}' "$native_case/restarted.json"
-    jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' "$native_case/restarted.json"
-    impact_rpc reqvire.change_impact "$(jq -n --arg base "$impact_base" '{branch:"main",git_commit:$base}')" \
-        "$native_case/restarted-impact.json"
-    jq -e 'any(.result.structuredContent.added[]; .element_id | endswith("#added-capability"))' \
-        "$native_case/restarted-impact.json"
+    local expected='Added Capability'
+    [[ "$root_model" != model ]] || expected='Reviewed Component Specification'
+    jq -e --arg name "$expected" 'any(.result.structuredContent.files[].elements[]; .name == $name)' "$native_case/restarted.json"
 }
 
-composition_external_open() {
+composition_external() {
     impact_start_server mcp native
     composition_omega
     impact_rpc reqvire.read_element '{"branch":"main","name":"Component Specification"}' "$native_case/before-open.json"
     grep -Fq 'behavior is alpha' "$native_case/before-open.json"
-    impact_rpc reqvire.branch.refresh '{"branch":"main"}' "$native_case/guarded-refresh.json" || true
-    grep -Fq manifest_or_project_changed "$native_case/guarded-refresh.json"
+    impact_rpc reqvire.branch.refresh '{"branch":"main"}' "$native_case/refresh.json" || true
+    grep -Fq manifest_or_project_changed "$native_case/refresh.json"
     impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/open.json"
     impact_rpc reqvire.read_element '{"branch":"main","name":"Component Specification"}' "$native_case/after-open.json"
     grep -Fq 'behavior is omega' "$native_case/after-open.json"
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/opened-status.json"
-    jq -e --arg head "$impact_current" '.result.structuredContent.context |
-      .accepted_head == $head and .writes_available == true' "$native_case/opened-status.json"
-    impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/open-again.json"
-    impact_rpc reqvire.read_element '{"branch":"main","name":"Component Specification"}' "$native_case/after-again.json"
-    diff -u "$native_case/after-open.json" "$native_case/after-again.json"
+    test ! -e "$central/.reqvire-composition.json"
 }
 
-composition_review_baseline() {
+composition_rejected_open() {
+    local kind=$1
+    impact_start_server mcp native
+    if [[ "$kind" == pending ]]; then composition_add; fi
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
+    if [[ "$kind" == invalid ]]; then
+        cp "$central/repositories/component/Model.md" "$central/Broken.md"
+        impact_commit "$central" 'External invalid duplicate model' > /dev/null
+    else
+        git -C "$central" -c commit.gpgSign=false commit --allow-empty -qm 'External root commit'
+    fi
+    if impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/rejected.json"; then
+        echo "Explicit open admitted $kind work" >&2; return 1
+    fi
+    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/retained.json"
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-after.json"
+    for phase in before after; do
+        jq -S '.result.structuredContent.context | {accepted_head,model_revision,pending_changes}' \
+          "$native_case/status-$phase.json" > "$native_case/$phase.json"
+    done
+    diff -u "$native_case/before.json" "$native_case/after.json"
+    if [[ "$kind" == pending ]]; then
+        jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' "$native_case/retained.json"
+    fi
+}
+
+composition_impact() {
+    local mode=$1
     composition_omega
-    impact_state > "$native_case/before-state.txt"
+    composition_publish_source
+    impact_cli native --json
+    impact_graph "$native_case/impact.out"
+    jq -e --arg base "$impact_base" --arg current "$impact_current" '
+      .comparison | .base.central_commit == $base and .current.central_commit == $current and
+      all([.base,.current][]; .central_commit as $root |
+        ([.manifest_inputs[].path] == ["manifests/default.xml","manifests/projects.xml"]) and
+        all(.manifest_inputs[]; .commit == $root and ((.owner // "") == "")))' "$native_case/impact.out"
+    if [[ "$mode" != cli ]]; then
+        impact_start_server "$mode" native
+        local args
+        args=$(jq -n --arg base "$impact_base" '{branch:"main",git_commit:$base}')
+        impact_rpc reqvire.change_impact "$args" "$native_case/mcp-impact.json"
+        jq -S '.result.structuredContent | del(.context)' "$native_case/mcp-impact.json" > "$native_case/mcp-normalized.json"
+        jq -S . "$native_case/impact.out" > "$native_case/cli-normalized.json"
+        diff -u "$native_case/cli-normalized.json" "$native_case/mcp-normalized.json"
+    fi
+    test ! -e "$central/.reqvire-composition.json"
+}
+
+composition_review() {
+    composition_omega
+    composition_publish_source
     (cd "$central" && GITHUB_BASE_REF=release/1.0 "$REQVIRE_BIN" change-impact --json) > "$native_case/review.json"
     impact_graph "$native_case/review.json"
     (cd "$central" && "$REQVIRE_BIN" change-impact --git-commit HEAD --json) > "$native_case/head.json"
     jq -e '.added == [] and .removed == [] and .changed == [] and .relocated == []' "$native_case/head.json"
-    if (cd "$central" && env -u GITHUB_BASE_REF "$REQVIRE_BIN" change-impact --json) > "$native_case/no-base.json" 2>&1; then
-        echo 'Missing review baseline silently defaulted instead of requesting an explicit selection' >&2
-        return 1
+    if (cd "$central" && env -u GITHUB_BASE_REF "$REQVIRE_BIN" change-impact --json) > "$native_case/no-base.txt" 2>&1; then
+        echo 'Comparison guessed a review baseline' >&2; return 1
     fi
-    grep -Fq review_baseline_required "$native_case/no-base.json"
-    impact_state > "$native_case/after-state.txt"
-    diff -u "$native_case/before-state.txt" "$native_case/after-state.txt"
+    grep -Fq review_baseline_required "$native_case/no-base.txt"
 }
 
-composition_invalid_open() {
-    impact_start_server mcp native
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/accepted-before.json"
-    printf '# Elements\n\n### Central Capability\n\nDuplicate invalid model.\n\n#### Metadata\n  * type: capability\n' \
-        > "$central/Broken.md"
-    impact_commit "$central" 'External invalid candidate' > /dev/null
-    if impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/invalid-open.json"; then
-        echo 'Invalid external composition was admitted' >&2
-        return 1
-    fi
-    impact_rpc reqvire.read_element '{"branch":"main","name":"Component Specification"}' "$native_case/retained-read.json"
-    grep -Fq 'behavior is alpha' "$native_case/retained-read.json"
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/accepted-after.json"
-    jq -S '.result.structuredContent.context | {accepted_head,model_revision,pending_changes}' \
-        "$native_case/accepted-before.json" > "$native_case/before.json"
-    jq -S '.result.structuredContent.context | {accepted_head,model_revision,pending_changes}' \
-        "$native_case/accepted-after.json" > "$native_case/after.json"
-    diff -u "$native_case/before.json" "$native_case/after.json"
-}
-
-composition_pending_open() {
-    impact_start_server mcp native
-    composition_add
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/accepted-before.json"
-    git -C "$central" -c commit.gpgSign=false commit --allow-empty -qm 'External committed tip'
-    if impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/pending-open.json"; then
-        echo 'Explicit re-admission bypassed accepted pending edits' >&2
-        return 1
-    fi
-    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/pending-read.json"
-    jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' "$native_case/pending-read.json"
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/accepted-after.json"
-    jq -S '.result.structuredContent.context | {accepted_head,model_revision,pending_changes}' \
-        "$native_case/accepted-before.json" > "$native_case/before.json"
-    jq -S '.result.structuredContent.context | {accepted_head,model_revision,pending_changes}' \
-        "$native_case/accepted-after.json" > "$native_case/after.json"
-    diff -u "$native_case/before.json" "$native_case/after.json"
-}
-
-composition_contract() {
-    impact_start_server mcp native
-    impact_rpc reqvire.tool_contract '{}' "$native_case/contract.json"
-    jq -e '.result.structuredContent |
-      .tool_contract_version == "5" and .capabilities.composition_management == true and
-      any(.tools[]; .name == "reqvire.branch.create")' "$native_case/contract.json"
-}
-
-composition_collision() {
-    git -C "$central/repositories/component" branch feature/topic "$omega"
-    composition_source_state > "$native_case/before.txt"
-    impact_start_server mcp native
-    if impact_rpc reqvire.branch.create '{"branch":"feature/topic","base_ref":"release/1.0","from_branch":"main"}' \
-        "$native_case/collision.json"; then
-        echo 'Existing component feature branch was not protected' >&2
-        return 1
-    fi
-    grep -Fq repositories/component "$native_case/collision.json"
-    test "$(git -C "$central/repositories/component" rev-parse feature/topic)" = "$omega"
-    composition_source_state > "$native_case/after.txt"
-    diff -u "$native_case/before.txt" "$native_case/after.txt"
-    if git -C "$central" show-ref --verify --quiet refs/heads/feature/topic; then
-        echo 'Rejected preparation left a root branch behind' >&2
-        return 1
-    fi
-}
-
-composition_unversioned_overlay() {
-    mkdir -p "$central/.repo/local_manifests"
-    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" \
-        > "$central/.repo/local_manifests/pins.xml"
-    impact_start_server mcp native
-    composition_add
-    if composition_commit; then
-        echo 'An unversioned selecting overlay was reported as a committed composition' >&2
-        return 1
-    fi
-    grep -Fq .repo/local_manifests/pins.xml "$native_case/commit-result.json"
-    test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
-}
-
-composition_conflicting_owner() {
-    git -C "$central/.repo/manifests" remote set-url origin "file://$native_case/remotes/central"
-    git -C "$central/.repo/manifests" checkout -q -B main
-    composition_record
-    impact_base=$(impact_commit "$central" 'Record conflicting authoring destinations')
-    impact_start_server mcp native
-    composition_add
-    composition_source_state > "$native_case/before.txt"
-    if composition_commit; then
-        echo 'Competing authoring branches were checkpointed' >&2
-        return 1
-    fi
-    grep -Fq 'share authoring branch' "$native_case/commit-result.json"
-    composition_source_state > "$native_case/after.txt"
-    diff -u "$native_case/before.txt" "$native_case/after.txt"
-    diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
-}
-
-composition_checkpoint_failure() {
-    local stage=$1 owner hook saved
-    owner=$central
-    [[ "$stage" != manifest ]] || owner="$central/.repo/manifests"
-    hook=$(git -C "$owner" rev-parse --path-format=absolute --git-path hooks/reference-transaction)
-    mkdir -p "$(dirname "$hook")"
+composition_root_failure() {
+    local hook saved
+    hook=$(git -C "$central" rev-parse --path-format=absolute --git-path hooks/reference-transaction)
     printf '#!/bin/bash\n[[ "$1" != prepared ]]\n' > "$hook"
     chmod +x "$hook"
     impact_start_server mcp native
     composition_add
-    if composition_commit; then
-        echo "Injected $stage checkpoint failure was ignored" >&2
-        return 1
-    fi
+    if composition_commit; then echo 'Root commit denial was ignored' >&2; return 1; fi
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
     test "$saved" != "$alpha"
     test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
-    if [[ "$stage" == manifest ]]; then
-        test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$manifest_base"
-    else
-        test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" != "$manifest_base"
-    fi
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/partial-status.json"
-    jq -e '.result.structuredContent.context.pending_changes | length > 0' "$native_case/partial-status.json"
-    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/partial-search.json"
-    jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' "$native_case/partial-search.json"
+    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$impact_base"
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/failed-status.json"
+    jq -e '.result.structuredContent.context.pending_changes | index("manifests/projects.xml") != null' "$native_case/failed-status.json"
     rm "$hook"
     composition_commit
     test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$saved"
-    test "$(git -C "$central" rev-parse HEAD)" != "$impact_base"
+    composition_assert_checkpoint
 }
 
-composition_unknown_ref() {
-    local kind=$1
-    export REQVIRE_REF_TEST_GIT REQVIRE_REF_TEST_OWNER
-    REQVIRE_REF_TEST_GIT=$(command -v git)
-    REQVIRE_REF_TEST_OWNER="$central/repositories/component"
-    [[ "$kind" != manifest_unknown ]] || REQVIRE_REF_TEST_OWNER="$central/.repo/manifests"
-    export REQVIRE_REF_TEST_LOST="$native_case/lost-observation"
-    export REQVIRE_REF_TEST_ATTEMPTS="$native_case/ref-attempts.txt"
-    mkdir "$native_case/bin"
-    cp "$TEST_SCRIPT_DIR/fixtures/git-observation-double.sh" "$native_case/bin/git"
-    chmod +x "$native_case/bin/git"
-    export PATH="$native_case/bin:$PATH"
+composition_collision() {
+    git -C "$central/repositories/component" branch feature/topic "$omega"
     impact_start_server mcp native
-    composition_add
-    if composition_commit; then echo 'Unobserved ref publication was accepted' >&2; return 1; fi
-    local attempted
-    attempted=$("$REQVIRE_REF_TEST_GIT" -C "$REQVIRE_REF_TEST_OWNER" rev-parse HEAD)
-    jq -e --arg attempted "$attempted" '.result.structuredContent.context |
-      .recovery_required == true and .writes_available == false and
-      any(.project_outcomes[]; .commit == $attempted and .outcome == "unknown")' "$native_case/commit-result.json"
-    rm "$REQVIRE_REF_TEST_LOST"
-    if composition_commit; then echo 'Unknown ref outcome was blindly retried' >&2; return 1; fi
-    test "$(wc -l < "$REQVIRE_REF_TEST_ATTEMPTS")" = 1
-    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/unknown-retained-read.json"
-    jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' \
-        "$native_case/unknown-retained-read.json"
-    if impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/unknown-reopen.json"; then
-        echo 'Explicit open bypassed unknown ref recovery' >&2; return 1
+    impact_state > "$native_case/before.txt"
+    if impact_rpc reqvire.branch.create '{"branch":"feature/topic","base_ref":"release/1.0","from_branch":"main"}' "$native_case/collision.json"; then
+        echo 'Component branch collision was ignored' >&2; return 1
     fi
-    test "$("$REQVIRE_REF_TEST_GIT" -C "$REQVIRE_REF_TEST_OWNER" rev-parse HEAD)" = "$attempted"
-    test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
+    grep -Fq repositories/component "$native_case/collision.json"
+    test "$(git -C "$central/repositories/component" rev-parse feature/topic)" = "$omega"
+    impact_state > "$native_case/after.txt"
+    diff -u "$native_case/before.txt" "$native_case/after.txt"
+    ! git -C "$central" show-ref --verify --quiet refs/heads/feature/topic
 }
 
 composition_publication_prepare() {
-    local owner
+    # Both the review base and feature use the same logical repository
+    # identities. The fixture's Git wrapper maps those identities to real
+    # local remotes without changing which repository an old pin belongs to.
+    sed -i "s@file://$native_case/remotes/@https://github.com/test/@" "$source_projects"
+    impact_base=$(impact_commit "$central" 'Register stable offline publication identities')
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
+    git -C "$central" switch -qc feature/topic
+    git -C "$central/repositories/component" switch -qc feature/topic
+    cp "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
+    published_component=$(impact_commit "$central/repositories/component" 'Feature component change')
+    git -C "$central/repositories/component" push -q "file://$native_case/remotes/component" HEAD:refs/heads/feature/topic
+    sed -i "s@$alpha@$published_component@" "$source_projects"
+    published_root=$(impact_commit "$central" 'Feature model and pins on one root branch')
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/feature/topic
+    # Refresh the cache from that actual root commit with Repo, not an authored
+    # cache commit or an unrelated history relabelled with the same URL.
+    (cd "$central" && repo init -q -u "file://$native_case/remotes/central" -b feature/topic -m manifests/default.xml \
+      --repo-url "file://$native_source" --repo-rev "$(git -C "$native_source" rev-parse HEAD)" --no-repo-verify --no-clone-bundle)
+    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$published_root"
     git -C "$central" remote set-url origin https://github.com/test/project.git
+    git -C "$central/.repo/manifests" remote set-url origin https://github.com/test/project.git
     git -C "$central/repositories/component" remote set-url local https://github.com/test/component
     git -C "$central/repositories/docs" remote set-url local https://github.com/test/docs
-    git -C "$central/.repo/manifests" remote set-url origin https://github.com/test/manifests
-    sed -i "s@file://$native_case/remotes/@https://github.com/test/@" "$native"
-    impact_commit "$central/.repo/manifests" 'Register baseline publication identities' > /dev/null
-    composition_record
-    impact_base=$(impact_commit "$central" 'Publishable baseline composition')
-    git -C "$central" push -q "$native_case/remotes/central" HEAD:refs/heads/main
-    git -C "$central/.repo/manifests" push -q "$native_case/remotes/manifests" HEAD:refs/heads/main
-    for owner in "$central" "$central/.repo/manifests" "$central"/repositories/*; do
-        git -C "$owner" switch -qc feature/topic
-    done
     git -C "$central" config branch.feature/topic.reqvireCompositionBase "$impact_base"
-    cp "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
-    published_component=$(impact_commit "$central/repositories/component" 'Saved feature component')
-    sed -i "s@$alpha@$published_component@" "$native"
-    impact_commit "$central/.repo/manifests" 'Saved feature pins' > /dev/null
-    composition_record
-    published_root=$(impact_commit "$central" 'Saved coordinated feature checkpoint')
     mkdir -p "$native_case/bin" "$native_case/github-state"
     cp "$TEST_SCRIPT_DIR/fixtures/git-double.sh" "$native_case/bin/git"
     cp "$TEST_SCRIPT_DIR/fixtures/gh-composition-double.sh" "$native_case/bin/gh"
@@ -463,123 +337,154 @@ composition_publication_prepare() {
     REQVIRE_REPO_TEST_REMOTES=$(jq -cn --arg root "$native_case/remotes" '{
       "https://github.com/test/project.git":($root+"/central"),
       "https://github.com/test/component":($root+"/component"),
-      "https://github.com/test/docs":($root+"/docs"),
-      "https://github.com/test/manifests":($root+"/manifests")}')
+      "https://github.com/test/docs":($root+"/docs")}')
     export REQVIRE_REPO_TEST_PUSHES="$native_case/pushes.jsonl"
+    : > "$REQVIRE_REPO_TEST_PUSHES"
     export REQVIRE_REPO_TEST_FAIL_COMPONENT="$native_case/deny-component"
     export PATH="$native_case/bin:$PATH"
     composition_server_options=(--enable-github)
     impact_start_server mcp native
 }
 
-composition_coordinated_prs() {
+composition_prs() {
+    local kind=$1 args
     composition_publication_prepare
-    # PR acceptance is independent of the separate push implementation: start
-    # with all intended branches already published using real local Git.
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central/repositories/component" push -q \
-        "$native_case/remotes/component" HEAD:refs/heads/feature/topic
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central/.repo/manifests" push -q \
-        "$native_case/remotes/manifests" HEAD:refs/heads/feature/topic
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central" push -q \
-        "$native_case/remotes/central" HEAD:refs/heads/feature/topic
-    local arguments
-    arguments='{"branch":"feature/topic","base":"main","title":"Coordinated change","body":"Review the product change.","repository_bases":{"repositories/component":"main",".repo/manifests":"main"}}'
-    impact_rpc reqvire.github.pr.create "$arguments" "$native_case/pr-result.json"
-    jq -e '.result.structuredContent.pull_requests | map(.path) | sort ==
-      ["", ".repo/manifests", "repositories/component"]' "$native_case/pr-result.json"
-    jq -e -s '[.[] | select(.operation == "pr create") | .repository] ==
-      ["test/component","test/manifests","test/project"]' "$REQVIRE_GH_TEST_STATE/calls.jsonl"
-    jq -e -s 'any(.[]; .operation == "pr create" and .repository == "test/project" and
-      (.body | contains("https://github.com/test/component/pull/7")) and
-      (.body | contains("https://github.com/test/manifests/pull/7")))' "$REQVIRE_GH_TEST_STATE/calls.jsonl"
-    impact_rpc reqvire.github.pr.create "$arguments" "$native_case/pr-repeat.json"
-    jq -e -s '[.[] | select(.operation == "pr create")] | length == 3' "$REQVIRE_GH_TEST_STATE/calls.jsonl"
+    args='{"branch":"feature/topic","base":"main","title":"Coordinated change","body":"Review the product change.","repository_bases":{"repositories/component":"main"}}'
+    if [[ "$kind" == partial_prs ]]; then
+        touch "$REQVIRE_GH_TEST_STATE/deny-root"
+        if impact_rpc reqvire.github.pr.create "$args" "$native_case/partial.json"; then return 1; fi
+        test -f "$REQVIRE_GH_TEST_STATE/test_component.json"
+        test ! -e "$REQVIRE_GH_TEST_STATE/test_project.json"
+        rm "$REQVIRE_GH_TEST_STATE/deny-root"
+    fi
+    impact_rpc reqvire.github.pr.create "$args" "$native_case/prs.json"
+    jq -e '.result.structuredContent.pull_requests | map(.path) | sort == ["","repositories/component"]' "$native_case/prs.json"
+    impact_rpc reqvire.github.pr.create "$args" "$native_case/repeat.json"
+    local root_attempts=1
+    [[ "$kind" != partial_prs ]] || root_attempts=2
+    jq -e -s --argjson roots "$root_attempts" '
+      ([.[] | select(.operation == "pr create" and .repository == "test/component")] | length == 1) and
+      ([.[] | select(.operation == "pr create" and .repository == "test/project")] | length == $roots) and
+      all(.[] | select(.operation == "pr create"); .repository == "test/component" or .repository == "test/project")' \
+      "$REQVIRE_GH_TEST_STATE/calls.jsonl"
     test ! -e "$REQVIRE_GH_TEST_STATE/test_docs.json"
-    local comment='{"branch":"feature/topic","repository_path":"repositories/component","pr_number":7,"body":"Review the component.\nKeep this exact text."}'
-    impact_rpc reqvire.github.pr.comment "$comment" "$native_case/component-comment.json"
-    jq -e '.result.structuredContent | .path == "repositories/component" and .comment_id == 11' \
-        "$native_case/component-comment.json"
-    jq -e -s '[.[] | select(.operation == "pr comment") | .repository] == ["test/component"]' \
-        "$REQVIRE_GH_TEST_STATE/calls.jsonl"
 }
 
-composition_partial_prs() {
+composition_push_retry() {
     composition_publication_prepare
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central/repositories/component" push -q "$native_case/remotes/component" HEAD:refs/heads/feature/topic
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central/.repo/manifests" push -q "$native_case/remotes/manifests" HEAD:refs/heads/feature/topic
-    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$central" push -q "$native_case/remotes/central" HEAD:refs/heads/feature/topic
-    local arguments='{"branch":"feature/topic","base":"main","title":"Coordinated change","body":"Review the product change.","repository_bases":{"repositories/component":"main",".repo/manifests":"main"}}'
-    touch "$REQVIRE_GH_TEST_STATE/deny-root"
-    if impact_rpc reqvire.github.pr.create "$arguments" "$native_case/partial-prs.json"; then
-        echo 'Root PR denial was ignored' >&2
-        return 1
-    fi
-    jq -e '.result.structuredContent | .outcome == "failed" and
-      ([.pull_requests[].path] == ["repositories/component",".repo/manifests"])' "$native_case/partial-prs.json"
-    test -f "$REQVIRE_GH_TEST_STATE/test_component.json"
-    test -f "$REQVIRE_GH_TEST_STATE/test_manifests.json"
-    test ! -e "$REQVIRE_GH_TEST_STATE/test_project.json"
-    rm "$REQVIRE_GH_TEST_STATE/deny-root"
-    impact_rpc reqvire.github.pr.create "$arguments" "$native_case/retry-prs.json"
-    jq -e '.result.structuredContent.pull_requests | length == 3' "$native_case/retry-prs.json"
-    jq -e -s '[.[] | select(.operation == "pr create" and .repository != "test/project")] | length == 2' \
-        "$REQVIRE_GH_TEST_STATE/calls.jsonl"
-}
-
-composition_failed_push() {
-    composition_publication_prepare
+    # Remove only the fixture's already-published feature refs, so the push
+    # operation must perform the dependency publications itself.
+    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$native_case/remotes/component" update-ref -d refs/heads/feature/topic
+    "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$native_case/remotes/central" update-ref -d refs/heads/feature/topic
     touch "$native_case/deny-component"
-    if impact_rpc reqvire.git.push '{"branch":"feature/topic"}' "$native_case/denied-push.json"; then
-        echo 'Dependency push denial was ignored' >&2
-        return 1
-    fi
-    jq -e -s 'all(.[]; all(.targets[]; contains("project.git") | not))' "$native_case/pushes.jsonl"
-    test "$(git -C "$central" rev-parse HEAD)" = "$published_root"
+    if impact_rpc reqvire.git.push '{"branch":"feature/topic"}' "$native_case/denied.json"; then return 1; fi
+    jq -e -s 'length > 0 and all(.[]; all(.targets[]; contains("project.git") | not))' "$REQVIRE_REPO_TEST_PUSHES"
     rm "$native_case/deny-component"
-    impact_rpc reqvire.git.push '{"branch":"feature/topic"}' "$native_case/retry-push.json"
-    test "$(git -C "$native_case/remotes/component" rev-parse refs/heads/feature/topic)" = "$published_component"
-    if git -C "$native_case/remotes/docs" show-ref --verify --quiet refs/heads/feature/topic; then
-        echo 'Untouched documentation branch was unnecessarily published' >&2
-        return 1
-    fi
+    impact_rpc reqvire.git.push '{"branch":"feature/topic"}' "$native_case/pushed.json"
+    jq -e -s 'all(.[]; .cwd | contains("/.repo/") | not)' "$REQVIRE_REPO_TEST_PUSHES"
+    test "$("$REQVIRE_REPO_TEST_GIT_BINARY" -C "$native_case/remotes/central" rev-parse refs/heads/feature/topic)" = "$published_root"
+    test "$("$REQVIRE_REPO_TEST_GIT_BINARY" -C "$native_case/remotes/component" rev-parse refs/heads/feature/topic)" = "$published_component"
+    ! "$REQVIRE_REPO_TEST_GIT_BINARY" -C "$native_case/remotes/docs" show-ref --verify --quiet refs/heads/feature/topic
 }
 
 composition_fresh_consumer() {
-    composition_publication_prepare
-    impact_rpc reqvire.git.push '{"branch":"feature/topic"}' "$native_case/published.json"
-    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/published-model.json"
-    jq '[.files[].elements[].name] | sort' "$native_case/published-model.json" > "$native_case/published-names.json"
+    impact_start_server mcp native
+    composition_add
+    composition_commit
+    composition_assert_checkpoint
     composition_stop
-    local consumer="$native_case/fresh-consumer"
-    "$REQVIRE_REPO_TEST_GIT_BINARY" clone -q --branch feature/topic "$native_case/remotes/central" "$consumer"
-    (
-        cd "$consumer"
-        # Preparation alone rewrites fixture GitHub transport URLs to local
-        # bare remotes. Stored manifest/config URLs retain their real identities.
-        export GIT_CONFIG_COUNT=1
-        export GIT_CONFIG_KEY_0="url.file://$native_case/remotes/.insteadOf"
-        export GIT_CONFIG_VALUE_0=https://github.com/test/
-        repo init -q -u https://github.com/test/manifests -b feature/topic -m default.xml \
-            --repo-url "file://$native_source" --repo-rev "$(git -C "$native_source" rev-parse HEAD)" \
-            --no-repo-verify --no-clone-bundle
-        repo sync -q --no-clone-bundle --no-tags
-    )
-    test ! -e "$consumer/default.xml"
-    test "$(git -C "$consumer/repositories/component" rev-parse HEAD)" = "$published_component"
-    (cd "$consumer" && "$REQVIRE_BIN" validate)
-    (cd "$consumer" && "$REQVIRE_BIN" search --json) > "$native_case/consumer-model.json"
-    jq '[.files[].elements[].name] | sort' "$native_case/consumer-model.json" > "$native_case/consumer-names.json"
-    diff -u "$native_case/published-names.json" "$native_case/consumer-names.json"
-    (
-        central=$consumer
-        native="$consumer/.repo/manifests/default.xml"
-        impact_state > "$native_case/consumer-before.txt"
-        cd "$consumer"
-        "$REQVIRE_BIN" change-impact --git-commit "$impact_base" --json > "$native_case/consumer-impact.json"
-        impact_state > "$native_case/consumer-after.txt"
-        diff -u "$native_case/consumer-before.txt" "$native_case/consumer-after.txt"
-    )
+    git -C "$central/repositories/component" push -q "file://$native_case/remotes/component" HEAD:refs/heads/main
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
+    local consumer="$native_case/consumer"
+    git clone -q --branch main "file://$native_case/remotes/central" "$consumer"
+    (cd "$consumer" && repo init -q -u "file://$native_case/remotes/central" -b main -m manifests/default.xml \
+      --repo-url "file://$native_source" --repo-rev "$(git -C "$native_source" rev-parse HEAD)" --no-repo-verify --no-clone-bundle &&
+      repo sync -q --no-clone-bundle --no-tags && "$REQVIRE_BIN" validate &&
+      "$REQVIRE_BIN" change-impact --git-commit "$impact_base" --json > "$native_case/consumer-impact.json")
     jq -e 'any(.added[]; .element_id | endswith("#added-capability"))' "$native_case/consumer-impact.json"
+    test ! -e "$consumer/.reqvire-composition.json"
+}
+
+composition_missing_source() {
+    git -C "$central" rm -q manifests/projects.xml
+    impact_commit "$central" 'Remove authoritative include while cache retains it' > /dev/null
+    if (cd "$central" && "$REQVIRE_BIN" validate) > "$native_case/missing.txt" 2>&1; then
+        echo 'Cached XML substituted for missing authoritative source' >&2; return 1
+    fi
+    grep -Fq projects.xml "$native_case/missing.txt"
+}
+
+composition_unknown_component() {
+    export REQVIRE_REF_TEST_GIT REQVIRE_REF_TEST_OWNER
+    REQVIRE_REF_TEST_GIT=$(command -v git)
+    REQVIRE_REF_TEST_OWNER="$central/repositories/component"
+    export REQVIRE_REF_TEST_LOST="$native_case/lost-observation"
+    export REQVIRE_REF_TEST_ATTEMPTS="$native_case/ref-attempts.txt"
+    mkdir -p "$native_case/bin"
+    cp "$TEST_SCRIPT_DIR/fixtures/git-observation-double.sh" "$native_case/bin/git"
+    chmod +x "$native_case/bin/git"
+    export PATH="$native_case/bin:$PATH"
+    impact_start_server mcp native
+    composition_add
+    if composition_commit; then echo 'Unknown component publication reported success' >&2; return 1; fi
+    test "$(wc -l < "$REQVIRE_REF_TEST_ATTEMPTS")" = 1
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/recovery.json"
+    jq -e '.result.structuredContent.context | .recovery_required == true and .writes_available == false' "$native_case/recovery.json"
+    rm "$REQVIRE_REF_TEST_LOST"
+    if impact_rpc reqvire.branch.open '{"branch":"main"}' "$native_case/blocked-open.json"; then
+        echo 'Open cleared an unresolved component outcome' >&2; return 1
+    fi
+    impact_rpc reqvire.search '{"branch":"main"}' "$native_case/recovery-read.json"
+    jq -e 'any(.result.structuredContent.files[].elements[]; .name == "Added Capability")' "$native_case/recovery-read.json"
+}
+
+composition_overlay() {
+    local kind=$1 overlay="$central/manifests/revisions.xml" saved
+    mkdir -p "$central/.repo/local_manifests"
+    if [[ "$kind" == unversioned_overlay ]]; then
+        printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" > "$central/.repo/local_manifests/review.xml"
+        impact_state > "$native_case/before.txt"
+        if (cd "$central" && "$REQVIRE_BIN" validate) > "$native_case/rejected.txt" 2>&1; then
+            echo 'Unversioned overlay was accepted' >&2; return 1
+        fi
+        grep -Fq '.repo/local_manifests/review.xml' "$native_case/rejected.txt"
+        impact_state > "$native_case/after.txt"
+        diff -u "$native_case/before.txt" "$native_case/after.txt"
+        return
+    fi
+    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" > "$overlay"
+    printf '<manifest><include name="manifests/revisions.xml"/></manifest>\n' > "$central/.repo/local_manifests/review.xml"
+    impact_base=$(impact_commit "$central" 'Version selected overlay in root history')
+    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/native.json"
+    (cd "$central" && "$REQVIRE_BIN" --manifest manifests/default.xml search --json) > "$native_case/explicit.json"
+    diff -u "$native_case/native.json" "$native_case/explicit.json"
+    impact_start_server mcp native
+    composition_add
+    composition_commit
+    saved=$(git -C "$central/repositories/component" rev-parse HEAD)
+    grep -Fq "revision=\"$saved\"" "$overlay"
+    grep -Fq "revision=\"$saved\"" "$source_projects"
+    test "$(git -C "$central" rev-parse HEAD^)" = "$impact_base"
+    (cd "$central" && "$REQVIRE_BIN" validate)
+    (cd "$central" && "$REQVIRE_BIN" change-impact --git-commit "$impact_base" --json) > "$native_case/impact.json"
+    jq -e 'any(.added[]; .element_id == "repositories/component/Added.md#added-capability") and
+      all([.comparison.base,.comparison.current][];
+        .central_commit as $root | [.manifest_inputs[].path] == ["manifests/default.xml","manifests/projects.xml","manifests/revisions.xml"] and
+        all(.manifest_inputs[]; .commit == $root))' "$native_case/impact.json"
+    composition_stop
+    ln -sfn ../../manifests/revisions.xml "$central/.repo/local_manifests/review.xml"
+    impact_start_server mcp native
+    impact_rpc reqvire.rename_element '{"branch":"main","element_name":"Added Capability","new_name":"Renamed Added Capability","dry_run":false}' "$native_case/symlink-rename.json"
+    composition_commit
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/symlink-status.json"
+    jq -e '.result.structuredContent.context | .writes_available == true and .pending_changes == []' "$native_case/symlink-status.json"
+    saved=$(git -C "$central/repositories/component" rev-parse HEAD)
+    grep -Fq "revision=\"$saved\"" "$overlay"
+    impact_rpc reqvire.branch.create '{"branch":"feature/overlay","base_ref":"HEAD","from_branch":"main"}' "$native_case/child.json"
+    local child
+    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/child.json")
+    grep -Fq "revision=\"$saved\"" "$child/manifests/revisions.xml"
+    test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$saved"
 }
 
 run_composition_cases() {
@@ -594,57 +499,59 @@ run_composition_cases() {
             status=1
         fi
     done <<'CASES'
-history cli/native-composition-history
-input_history cli/native-includes-and-versioned-overlay-history
-bootstrap mcp/initial-native-composition-checkpoint
-branches mcp/native-coordinated-branch-base
-shared_history mcp/shared-root-manifest-history-and-reopen
-explicit mcp/native-committed-checkpoint-and-restart
-automatic mcp/native-automatic-checkpoint-and-restart
-external mcp/prepared-composition-explicit-open
-invalid_open mcp/rejected-admission-retains-accepted-reads
-pending_open mcp/pending-admission-retains-accepted-edits
-review cli/pr-baseline-and-explicit-head
-contract mcp/composition-contract-discovery
+load_model cli-mcp/root-source-with-root-model
+load_empty cli-mcp/manifest-only-root-with-complete-pinned-model
+owner mcp/cache-is-not-an-authoring-owner-or-initial-checkpoint
+stale cli/root-source-over-stale-cache
+branches_model mcp/root-source-release-base-and-reopen-with-root-model
+branches_empty mcp/root-source-release-base-and-reopen-without-root-model
+explicit_model mcp/component-first-one-root-commit-with-model
+explicit_empty mcp/component-first-one-root-commit-without-model
+automatic_model mcp/automatic-one-root-source-checkpoint-with-model
+automatic_empty mcp/automatic-one-root-source-checkpoint-without-model
+external mcp/external-root-pins-explicit-admission
+invalid mcp/rejected-invalid-admission-retains-accepted-model
+pending mcp/rejected-pending-admission-retains-accepted-edits
+impact_cli cli/root-source-impact-and-provenance
+impact_mcp mcp/root-source-impact-parity
+impact_serve serve/root-source-impact-parity
+review cli/pr-merge-base-and-explicit-head
 collision mcp/component-branch-collision-preserves-source
-conflicting_owner mcp/conflicting-owner-branches-preserve-refs
-overlay mcp/unversioned-overlay-cannot-checkpoint
-manifest_failure mcp/manifest-checkpoint-failure-retains-components
-root_failure mcp/root-checkpoint-failure-retains-manifest
+root_failure mcp/root-failure-retains-components-without-manifest-stage
 component_unknown mcp/unknown-component-ref-retains-recovery
-manifest_unknown mcp/unknown-manifest-ref-retains-recovery
-prs mcp/coordinated-linked-pr-set
-partial_prs mcp/partial-pr-set-retained-and-reused
-push_failure mcp/dependency-push-failure-and-retry
-fresh_consumer cli/published-native-composition-fresh-consumer
+prs mcp/linked-component-root-prs-without-manifest-pr
+partial_prs mcp/partial-component-root-pr-set-reused
+push_retry mcp/component-before-root-push-without-manifest-ref
+fresh_consumer cli/published-root-source-composition-fresh-consumer
+missing_source cli/missing-authoritative-source-not-replaced-by-cache
+versioned_overlay mcp/versioned-root-overlay-checkpoint-and-impact
+unversioned_overlay cli/unversioned-overlay-rejected
 CASES
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     set -Eeuo pipefail
-    trap 'printf "FAIL composition case %s at line %s: %s\n" "${1:-unknown}" "$LINENO" "$BASH_COMMAND" >&2' ERR
+    case_name=${1:-unknown}
+    trap 'printf "FAIL canonical composition case %s at line %s: %s\n" "$case_name" "$LINENO" "$BASH_COMMAND" >&2' ERR
     composition_prepare "$1"
     case "$1" in
-        history) composition_native_history ;;
-        input_history) composition_native_input_history ;;
-        bootstrap) composition_bootstrap ;;
-        branches) composition_branch_set ;;
-        shared_history) composition_shared_history ;;
-        explicit|automatic) composition_checkpoint "$1" ;;
-        external) composition_external_open ;;
-        invalid_open) composition_invalid_open ;;
-        pending_open) composition_pending_open ;;
-        review) composition_review_baseline ;;
-        contract) composition_contract ;;
+        load_*) composition_load ;;
+        owner) composition_source_owner ;;
+        stale) composition_stale_cache ;;
+        branches_*) composition_branches ;;
+        explicit_*|automatic_*) composition_checkpoint "$1" ;;
+        external) composition_external ;;
+        invalid|pending) composition_rejected_open "$1" ;;
+        impact_*) composition_impact "${1#impact_}" ;;
+        review) composition_review ;;
         collision) composition_collision ;;
-        conflicting_owner) composition_conflicting_owner ;;
-        overlay) composition_unversioned_overlay ;;
-        manifest_failure) composition_checkpoint_failure manifest ;;
-        root_failure) composition_checkpoint_failure root ;;
-        component_unknown|manifest_unknown) composition_unknown_ref "$1" ;;
-        prs) composition_coordinated_prs ;;
-        partial_prs) composition_partial_prs ;;
-        push_failure) composition_failed_push ;;
+        root_failure) composition_root_failure ;;
+        component_unknown) composition_unknown_component ;;
+        prs|partial_prs) composition_prs "$1" ;;
+        push_retry) composition_push_retry ;;
         fresh_consumer) composition_fresh_consumer ;;
+        missing_source) composition_missing_source ;;
+        versioned_overlay|unversioned_overlay) composition_overlay "$1" ;;
+        *) printf 'Unknown canonical composition case: %s\n' "$1" >&2; exit 2 ;;
     esac
 fi

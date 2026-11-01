@@ -77,7 +77,7 @@ const markSkinX = css`
   background: var(--danger-bg);
   border: var(--border-w) solid var(--danger-border);
   border-radius: var(--radius-md);
-  color: var(--danger);
+  color: var(--danger-text);
 `;
 
 const titleBaseUX = css`

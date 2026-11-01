@@ -185,6 +185,11 @@
       "site.webmanifest"
     ]
   },
+  "layout": {
+    "widthTokens": [
+      "--content-max"
+    ]
+  },
   "framework": "preact",
   "mcp": {
     "previewManifest": ".ds/preview/manifest.json",

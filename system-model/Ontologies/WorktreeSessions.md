@@ -11,9 +11,9 @@ Competency questions:
 - Which input observations protect model content or source resolution?
 - Which referenced artifacts have existence dependencies without frozen content?
 - Which context is the subject of a HEAD refresh?
-- Which Central worktree and manifest define a Repo workspace?
+- Which root worktree and manifest define a Repo workspace?
 - Which project paths and resolved commits supply that workspace's component sources?
-- Which Git repository owns each changed file independently of the Central branch selector?
+- Which Git repository owns each changed file independently of the root branch selector?
 
 Command names, eligibility algorithms, blocker codes and publication transitions belong to requirement-owned contracts. The vocabulary describes those domain distinctions without imposing an operational state machine or claiming runtime session instances are already exported.
 
@@ -42,7 +42,7 @@ reqvire:snapshotManifestInput a owl:ObjectProperty ;
 
 reqvire:WorktreeContext a owl:Class ;
   reqvire:mapsToConcept concept:MCPWorktreeContext ;
-  rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a Central worktree's manifest can select component sources within that same context." .
+  rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a root worktree's manifest can select component sources within that same context." .
 reqvire:GitCommit a owl:Class ;
   rdfs:comment "A Git commit that can be accepted or observed by a worktree context." .
 reqvire:AcceptedModelSnapshot a owl:Class ;
@@ -93,10 +93,20 @@ reqvire:GitRepository a owl:Class ;
   rdfs:comment "Git history and object ownership for a source repository." .
 reqvire:RepoWorkspace a owl:Class ;
   reqvire:mapsToConcept concept:RepoWorkspace ;
-  rdfs:comment "Workspace whose Central worktree and versioned Repo manifest select the component model view." .
+  rdfs:comment "Workspace whose root worktree and versioned Repo manifest select the component model view." .
 reqvire:RepoManifest a owl:Class ;
   reqvire:mapsToConcept concept:RepoManifest ;
-  rdfs:comment "Versioned project inventory and revision selection belonging to a Central worktree." .
+  rdfs:comment "Versioned project inventory and revision selection belonging to a root worktree." .
+reqvire:RepoManifestSource a owl:Class ;
+  rdfs:subClassOf reqvire:File ;
+  rdfs:comment "A tracked authoritative manifest source in the manifest-owning root repository." .
+reqvire:RepoManifestCachedCopy a owl:Class ;
+  rdfs:subClassOf reqvire:File ;
+  rdfs:comment "An internal derived copy of a manifest source; its location does not introduce another authoring repository or revision authority." .
+reqvire:manifestSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepoManifest ; rdfs:range reqvire:RepoManifestSource .
+reqvire:cachedManifestSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:RepoManifestCachedCopy ; rdfs:range reqvire:RepoManifestSource .
 reqvire:RevisionLockedManifest a owl:Class ;
   rdfs:subClassOf reqvire:RepoManifest ;
   reqvire:mapsToConcept concept:RevisionLockedManifest ;
@@ -133,10 +143,10 @@ reqvire:RepositoryBranchSelection a owl:Class ;
   rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
   rdfs:comment "A repository revision selection associated with a named authoring branch." .
 reqvire:CompositionCheckpoint a owl:Class ;
-  rdfs:comment "Committed provenance associating a root model revision with the manifest-owner revisions selecting its component commits." .
+  rdfs:comment "A root Git revision containing the authoritative source manifest, optional root model content and exact pins selecting component commits." .
 reqvire:ManifestRevisionSelection a owl:Class ;
   rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
-  rdfs:comment "A versioned manifest source selected from its actual owning Git history." .
+  rdfs:comment "An authoritative manifest source selected from the owning root repository branch revision, independently of a cached working copy." .
 reqvire:CoordinatedPullRequestSet a owl:Class ;
   rdfs:comment "Repository-specific pull requests reviewing one composed model change." .
 reqvire:RepositoryPullRequest a owl:Class .
@@ -169,12 +179,14 @@ reqvire:compositionReviewBaseline a owl:ObjectProperty ;
 ```
 
 #### Composition Competency Questions
-- Which named repository branches participate in one model branch?
-- Which manifest-owner commits make a root checkpoint reproducible?
-- Which component commits were selected by a historical manifest rather than by the live checkout?
-- Which repository PRs review a coordinated change, and which root commit is its review baseline?
+- Which root repository and branch own the authoritative manifest source?
+- Which files are authoritative selecting inputs, and which are internal cached copies?
+- Which root revision supplies both the source manifest and any root model elements?
+- Which pinned repositories supply the entire model when the central repository has no model elements?
+- Which component branches and exact commits participate in one model branch?
+- Which root and changed-component PRs review the composition, without a PR for internal administration?
 
-Equal branch names do not imply identical repository identity. Checkpoint ownership and review baselines are structural provenance, while JSON fields, operation order, and admission rules remain requirement-owned contracts.
+Repository ownership is independent of directory nesting. A root with no model elements can still own the complete manifest composition. Repo's cached checkout is not another product participant. JSON field names, transaction order, admission rules and diagnostics remain requirement-owned contracts.
 
 #### Metadata
   * type: ontology

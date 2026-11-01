@@ -197,8 +197,8 @@ Verifies that repository boundaries preserve the complete model comparison and i
 
 ##### Acceptance Criteria
 - A changed component contract reaches the referencing requirement in a separate documentation repository, its inspection verification and page source. Reference-edge provenance remains distinct and the verification is reported once.
-- Text and JSON reports identify the relevant Central, manifest and component commits. Project and manifest-input provenance is sorted and workspace-relative.
-- Source links use the owning repository and correct side's commit; component paths are never rendered as Central blob links. Unsupported web remotes retain workspace-relative links.
+- Text and JSON reports identify the relevant root, manifest and component commits. Project and manifest-input provenance is sorted and workspace-relative.
+- Source links use the owning repository and correct side's commit; component paths are never rendered as root blob links. Unsupported web remotes retain workspace-relative links.
 - Added and removed projects produce the corresponding element additions and removals.
 - A project path move without content changes yields stable-name relocations without false additions, removals or content changes.
 - CLI, standalone MCP and embedded MCP yield equivalent shared report data.
@@ -293,7 +293,7 @@ Verifies complete historical composition reconstruction and read isolation using
 
 ##### Acceptance Criteria
 - The sole selected workspace-root repository commit supplies its model, manifest and includes. Historical component commits come from that manifest. Current files do not substitute for deleted historical includes.
-- A native selected manifest in its actual owner is reconstructed through the selected root composition record, with no root XML copy or --manifest override. CLI, standalone MCP and embedded MCP report the same complete impact and preserve source state. Missing associations, unavailable owner commits and unversioned required inputs fail with path-specific diagnostics; independent ownership alone does not fail. Legacy root-owned manifest comparisons remain supported.
+- Native discovery resolves the source manifest and includes from the selected root tree, without --manifest or a self-association. Test a model-bearing root and a manifest-only root whose complete model comes from pinned components. Stale cached pins must not override the selected root source. CLI, standalone MCP and embedded MCP preserve source state and canonical source/commit provenance. Missing canonical inputs and unavailable component history fail with path-specific diagnostics.
 - Missing historical component objects and mutable baseline revisions produce project-specific errors without a partial report.
 - Base-only projects remain discoverable from retained local objects after their live checkout is removed.
 - Ordinary ambiguous multi-worktree comparisons retain their existing rejection.
@@ -302,6 +302,8 @@ Verifies complete historical composition reconstruction and read isolation using
 
 ##### Test Criteria
 Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; unavailable-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
+
+Read-state preservation covers authored source bytes, source-selection wrappers, actual Git configuration, refs, HEADs and indexes. Operational trace logs and Repo's derived .repo_config.json caches are not authoritative selection inputs and may be regenerated; excluding those derived caches does not permit changing source selection, source files, checkout revisions or accepted model state.
 
 #### Metadata
   * type: test-verification

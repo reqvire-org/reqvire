@@ -56,7 +56,7 @@ const skinX = css`
   .ds-search__input {
     color: var(--ds-search-input-color, var(--text-body));
     background: var(--ds-search-input-bg, var(--bg-field));
-    border: var(--ds-search-input-border, var(--border-w) solid var(--border-default));
+    border: var(--ds-search-input-border, var(--border-w) solid var(--border-strong));
     border-radius: var(--ds-search-input-radius, var(--radius-md));
   }
 
@@ -65,7 +65,7 @@ const skinX = css`
   }
 
   .ds-search__input:hover {
-    border-color: var(--ds-search-input-hover-border-color, var(--border-strong));
+    border-color: var(--ds-search-input-hover-border-color, var(--text-muted));
   }
 
   .ds-search__input:focus {

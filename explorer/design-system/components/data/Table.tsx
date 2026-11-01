@@ -15,7 +15,7 @@ const skinXViewport = css`
 const baseUXTable = css`
   display: table;
   width: 100%;
-  min-width: var(--ds-table-min-w, var(--content-max));
+  min-width: var(--ds-table-min-w, 100%);
   border-collapse: collapse;
   font-size: var(--text-sm);
 `;

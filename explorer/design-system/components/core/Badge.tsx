@@ -27,7 +27,7 @@ const skinX = css`
 
 const accentSkinX = css`
   background: var(--accent-subtle);
-  color: var(--accent);
+  color: var(--accent-text);
 `;
 
 const solidSkinX = css`

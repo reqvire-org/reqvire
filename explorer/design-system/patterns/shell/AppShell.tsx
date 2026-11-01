@@ -167,7 +167,7 @@ const headerBaseUX = css`
   @media (max-width: 1100px) {
     display: grid;
     flex-basis: auto;
-    grid-template-columns: var(--ux-header-leading-width) minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-rows: var(--app-header-height) var(--control-height-lg);
     height: auto;
   }
@@ -242,9 +242,7 @@ const headerContextClass = css`
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  width: calc(var(--space-32) * 4 + var(--space-10));
-  min-width: calc(var(--space-32) * 2 + var(--space-6));
-  max-width: calc(var(--space-32) * 4 + var(--space-10));
+  width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 46vw, calc(var(--space-32) * 4 + var(--space-10)));
   height: var(--app-header-height);
   box-sizing: border-box;
   padding-right: var(--space-10);
@@ -255,7 +253,6 @@ const headerContextClass = css`
 
   @media (max-width: 600px) {
     width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 32vw, calc(var(--space-32) * 3 + var(--space-6)));
-    max-width: calc(var(--space-32) * 3 + var(--space-6));
   }
 `;
 

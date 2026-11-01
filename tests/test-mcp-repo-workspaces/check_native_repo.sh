@@ -1,9 +1,11 @@
 #!/bin/bash
 # Native Repo selection uses real local Git remotes and actual Repo metadata.
-# Keep the root manifest absent, so filename substitution cannot pass these cases.
+# The root Git history owns the source manifest; Repo administration is derived.
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 native_fixture() {
+    local root_model=${2:-model} layout=${3:-flat} source_name=default.xml
+    [[ "$layout" != nested ]] || source_name=manifests/default.xml
     native_case="$TEST_DIR/native-$1"
     mkdir -p "$native_case/remotes" "$native_case/component" "$native_case/central"
     export GIT_ALLOW_PROTOCOL=file GIT_TERMINAL_PROMPT=0
@@ -19,11 +21,16 @@ native_fixture() {
     git -C "$native_case/component" -c commit.gpgSign=false commit -qam omega
     omega=$(git -C "$native_case/component" rev-parse HEAD)
     git clone -q --bare "$native_case/component" "$native_case/remotes/component"
+    git -C "$native_case/remotes/component" branch next "$omega"
+    git -C "$native_case/remotes/component" update-ref refs/heads/main "$alpha"
     central="$native_case/central"
     git -C "$central" init -qb main
-    cp "$TEST_SCRIPT_DIR/fixtures/central.md.txt" "$central/Model.md"
+    if [[ "$root_model" == model ]]; then
+        cp "$TEST_SCRIPT_DIR/fixtures/central.md.txt" "$central/Model.md"
+    fi
     printf '.repo/\nrepositories/\n' > "$central/.gitignore"
-    cat > "$central/default.xml" <<EOF
+    mkdir -p "$(dirname "$central/$source_name")"
+    cat > "$central/$source_name" <<EOF
 <manifest>
   <remote name="local" fetch="file://$native_case/remotes/"/>
   <project name="component" path="repositories/component" remote="local" revision="$alpha"/>
@@ -32,295 +39,15 @@ EOF
     git -C "$central" add .
     git -C "$central" -c commit.gpgSign=false commit -qm Central
     git clone -q --bare "$central" "$native_case/remotes/central"
-    git -C "$central" remote add origin "$native_case/remotes/central"
+    git -C "$central" remote add origin "file://$native_case/remotes/central"
     (
         cd "$central"
-        repo init -q -u "file://$native_case/remotes/central" -b main \
+        repo init -q -u "file://$native_case/remotes/central" -b main -m "$source_name" \
             --repo-url "file://$native_source" \
             --repo-rev "$(git -C "$native_source" rev-parse HEAD)" \
             --no-repo-verify --no-clone-bundle
         repo sync -q --no-clone-bundle --no-tags
     )
-    git -C "$central" rm -q default.xml
-    git -C "$central" -c commit.gpgSign=false commit -qm 'Use native Repo manifest only'
-    test ! -e "$central/default.xml"
-    native="$central/.repo/manifests/default.xml"
+    source_manifest="$central/$source_name"
+    native="$central/.repo/manifests/$source_name"
 }
-
-native_cli_names() {
-    (cd "$central" && "$REQVIRE_BIN" "$@" search --json) > "$native_case/search.json"
-    jq '[.files[].elements[].name] | sort' "$native_case/search.json" > "$native_case/names.json"
-    diff -u "$TEST_SCRIPT_DIR/expected/native-names.json" "$native_case/names.json"
-}
-
-native_server_names() {
-    local mode=$1 callback=${2:-} server_url server_pid ready=false
-    local options=()
-    if [[ "$mode" == serve ]]; then options+=(--enable-mcp); fi
-    (
-        cd "$central"
-        exec "$REQVIRE_BIN" "$mode" --host 127.0.0.1 --port 0 \
-            --enable-mutations "${options[@]}"
-    ) > "$native_case/$mode-server.log" 2>&1 &
-    server_pid=$!
-    trap "kill $server_pid 2>/dev/null || true; wait $server_pid 2>/dev/null || true" EXIT
-    for ((attempt=0; attempt<200; attempt++)); do
-        server_url=$(sed -n 's@.*\(http://127\.0\.0\.1:[0-9][0-9]*/mcp\).*@\1@p' "$native_case/$mode-server.log" | head -n 1)
-        if [[ -n "$server_url" ]] && curl -fsS --max-time 1 -D "$native_case/$mode-headers" \
-            -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
-            -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"native-repo-e2e","version":"1"}}}' \
-            "$server_url" > "$native_case/$mode-initialize.json" 2>/dev/null; then
-            ready=true
-            break
-        fi
-        kill -0 "$server_pid" 2>/dev/null || { cat "$native_case/$mode-server.log"; return 1; }
-        sleep 0.1
-    done
-    [[ "$ready" == true ]] || { cat "$native_case/$mode-server.log"; return 1; }
-    local session
-    session=$(awk 'tolower($1)=="mcp-session-id:" {gsub("\r", "", $2); print $2}' "$native_case/$mode-headers")
-    curl -fsS --max-time 15 \
-        -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
-        -H "Mcp-Session-Id: $session" \
-        -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"reqvire.search","arguments":{"branch":"main"}}}' \
-        "$server_url" > "$native_case/$mode-search.json"
-    jq -e '.result.isError != true' "$native_case/$mode-search.json" >/dev/null
-    jq '[.result.structuredContent.files[].elements[].name] | sort' \
-        "$native_case/$mode-search.json" > "$native_case/$mode-names.json"
-    diff -u "$TEST_SCRIPT_DIR/expected/native-names.json" "$native_case/$mode-names.json"
-    if [[ -n "$callback" ]]; then "$callback"; fi
-    kill "$server_pid"
-    wait "$server_pid" 2>/dev/null || true
-    trap - EXIT
-}
-
-native_rpc() {
-    curl -fsS --max-time 30 \
-        -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
-        -H "Mcp-Session-Id: $session" --data-binary "@$1" \
-        "$server_url" > "$2"
-    jq -e '.result.isError != true and .error == null' "$2" >/dev/null || { cat "$2"; return 1; }
-}
-
-native_pin_mutation() {
-    jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
-        '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.add_element",arguments:{branch:"main",file:"repositories/component/Added.md",content:$content}}}' \
-        > "$native_case/add.json"
-    native_rpc "$native_case/add.json" "$native_case/add-result.json"
-    diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$central/repositories/component/Added.md"
-    printf '%s\n' '{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"reqvire.git.commit","arguments":{"branch":"main","message":"Save native Repo component addition"}}}' \
-        > "$native_case/commit.json"
-    native_rpc "$native_case/commit.json" "$native_case/commit-result.json"
-}
-
-native_prepare_authoring() {
-    local owner source relative owner_relative commit repository branch owner_identity root_identity
-    local records="$native_case/manifest-sources.jsonl"
-    : > "$records"
-    for owner in "$central/.repo/manifests" "$central/.repo/local_manifests"; do
-        [[ -d "$owner" ]] || continue
-        if [[ "$(git -C "$owner" rev-parse --show-toplevel 2>/dev/null)" != "$owner" ]]; then
-            git -C "$owner" init -qb main
-            git -C "$owner" remote add origin "file://$native_case/remotes/$(basename "$owner")"
-        fi
-        branch=main
-        owner_identity=$(git -C "$owner" remote get-url origin)
-        root_identity=$(git -C "$central" remote get-url origin)
-        if [[ "${owner_identity#file://}" == "${root_identity#file://}" ]]; then
-            branch=reqvire/manifests/main
-        fi
-        git -C "$owner" checkout -q -B "$branch"
-        git -C "$owner" add .
-        if ! git -C "$owner" diff --cached --quiet; then
-            git -C "$owner" -c commit.gpgSign=false commit -qm 'Prepare versioned native authoring inputs'
-        fi
-    done
-    git -C "$central/repositories/component" checkout -q -B main "$alpha"
-    for source in "$native" "$central/.repo/manifests/parts/projects.xml" "$central/.repo/local_manifests/pins.xml"; do
-        [[ -f "$source" ]] || continue
-        owner=$(git -C "$(dirname "$source")" rev-parse --show-toplevel)
-        relative=${source#"$owner"/}
-        owner_relative=${owner#"$central"/}
-        commit=$(git -C "$owner" rev-parse HEAD)
-        repository=$(git -C "$owner" remote get-url origin)
-        jq -cn --arg path "${source#"$central"/}" --arg owner "$owner_relative" \
-            --arg source "$relative" --arg commit "$commit" --arg repository "$repository" \
-            '{path:$path,owner:$owner,source:$source,commit:$commit,repository:$repository}' >> "$records"
-    done
-    jq -s '{schema_version:1,selection:".repo/manifest.xml",manifest:".repo/manifests/default.xml",
-        sources:sort_by(.path)}' "$records" > "$central/.reqvire-composition.json"
-    git -C "$central" add .reqvire-composition.json
-    if ! git -C "$central" diff --cached --quiet; then
-        git -C "$central" -c commit.gpgSign=false commit -qm 'Record native authoring composition'
-    fi
-}
-
-native_repo_pin_checkpoint() {
-    cp "$central/.repo/manifest.xml" "$native_case/expected-wrapper.xml"
-    cp "$native" "$native_case/expected-includes.xml"
-    central_head=$(git -C "$central" rev-parse HEAD)
-    manifest_head=$(git -C "$central/.repo/manifests" rev-parse HEAD)
-    native_pin_mutation
-    saved=$(git -C "$central/repositories/component" rev-parse HEAD)
-    jq -e --arg saved "$saved" '.result.structuredContent.context.projects[] | select(.name == "component") | .revision == $saved' \
-        "$native_case/commit-result.json" >/dev/null
-    test "$saved" != "$alpha"
-    test "$(git -C "$central/repositories/component" rev-parse HEAD^)" = "$alpha"
-    test "$(git -C "$central" rev-parse HEAD)" != "$central_head"
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" != "$manifest_head"
-    test -z "$(git -C "$central/.repo/manifests" status --porcelain)"
-    test -z "$(git -C "$central/.repo/local_manifests" status --porcelain)"
-    diff -u "$native_case/expected-wrapper.xml" "$central/.repo/manifest.xml"
-    diff -u "$native_case/expected-includes.xml" "$native"
-    grep -q "revision=\"$saved\"" "$central/.repo/manifests/parts/projects.xml"
-    grep -q "revision=\"$saved\"" "$central/.repo/local_manifests/pins.xml"
-    (cd "$central" && repo manifest -o "$native_case/saved-repo-manifest.xml")
-    grep -q "revision=\"$saved\"" "$native_case/saved-repo-manifest.xml"
-    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/saved-search.json"
-    jq '[.files[].elements[].name] | sort' "$native_case/saved-search.json" > "$native_case/saved-names.json"
-    jq '. + ["Added Capability"] | sort' "$TEST_SCRIPT_DIR/expected/native-names.json" > "$native_case/expected-saved-names.json"
-    diff -u "$native_case/expected-saved-names.json" "$native_case/saved-names.json"
-    test -z "$(git -C "$central" ls-files .repo default.xml)"
-    test -z "$(git -C "$central" status --porcelain)"
-}
-
-native_worktree_mutation() {
-    jq -n '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.branch.create",arguments:{branch:"native-topic",from_branch:"main",base_ref:"main"}}}' > "$native_case/create.json"
-    native_rpc "$native_case/create.json" "$native_case/create-result.json"
-    local child saved
-    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/create-result.json")
-    test -f "$child/.repo/manifests/default.xml"
-    test ! -e "$child/default.xml"
-    jq -n --rawfile content "$TEST_SCRIPT_DIR/fixtures/addition.md.txt" \
-        '{jsonrpc:"2.0",id:4,method:"tools/call",params:{name:"reqvire.add_element",arguments:{branch:"native-topic",file:"repositories/component/Added.md",content:$content}}}' > "$native_case/add.json"
-    native_rpc "$native_case/add.json" "$native_case/add-result.json"
-    jq -n '{jsonrpc:"2.0",id:5,method:"tools/call",params:{name:"reqvire.git.commit",arguments:{branch:"native-topic",message:"Save native branch component"}}}' > "$native_case/commit.json"
-    native_rpc "$native_case/commit.json" "$native_case/commit-result.json"
-    saved=$(git -C "$child/repositories/component" rev-parse HEAD)
-    test "$saved" != "$alpha"
-    jq -n '{jsonrpc:"2.0",id:6,method:"tools/call",params:{name:"reqvire.branch.close",arguments:{branch:"native-topic"}}}' > "$native_case/remove.json"
-    native_rpc "$native_case/remove.json" "$native_case/remove-result.json"
-    jq -n '{jsonrpc:"2.0",id:7,method:"tools/call",params:{name:"reqvire.branch.open",arguments:{branch:"native-topic"}}}' > "$native_case/open.json"
-    native_rpc "$native_case/open.json" "$native_case/open-result.json"
-    child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/open-result.json")
-    test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$saved"
-    grep -q "revision=\"$saved\"" "$child/.repo/manifests/default.xml"
-    diff -u "$TEST_SCRIPT_DIR/expected/added.md.txt" "$child/repositories/component/Added.md"
-    test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$alpha"
-    test ! -e "$central/repositories/component/Added.md"
-    test ! -e "$central/default.xml"
-}
-
-native_pass() {
-    printf 'PASS %s\n' "$1" >> "$TEST_DIR/output/native-checks.txt"
-}
-
-active_repo_session() {
-    # native_server_names has checked the initial snapshot on this session.
-    native_pass cli/active-repo-manifest-selection
-    native_repo_pin_checkpoint
-    native_pass mcp/native-repo-pin-checkpoint
-}
-
-standalone_repo_session() {
-    native_pass cli/standalone-repo-manifest-selection
-    native_worktree_mutation
-    native_pass mcp/native-repo-worktree
-}
-
-active_repo_manifest() {
-    native_fixture active
-    mkdir -p "$central/.repo/manifests/parts" "$central/.repo/local_manifests"
-    sed "s/$alpha/$omega/" "$native" > "$central/.repo/manifests/parts/projects.xml"
-    printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$native"
-    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' \
-        "$alpha" > "$central/.repo/local_manifests/pins.xml"
-    (cd "$central" && repo manifest -o "$native_case/repo-manifest.xml")
-    # The CLI can succeed only if it reads the include and local pin overlay:
-    # the included manifest selects omega while the checkout is still alpha.
-    cp "$native" "$native_case/expected-manifest.xml"
-    git -C "$central/repositories/component" ls-files --stage > "$native_case/expected-index"
-    native_cli_names
-    diff -u "$native_case/expected-manifest.xml" "$native"
-    git -C "$central/repositories/component" ls-files --stage > "$native_case/actual-index"
-    diff -u "$native_case/expected-index" "$native_case/actual-index"
-    test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$alpha"
-    # Cover the entry symlink emitted by older Repo releases.
-    mv "$central/.repo/manifest.xml" "$native_case/generated-wrapper.xml"
-    ln -s manifests/default.xml "$central/.repo/manifest.xml"
-    native_cli_names
-    native_prepare_authoring
-    native_server_names serve
-    # The CLI and embedded server cover the legacy symlink. Use the generated
-    # entry for the shared MCP loading/pin-save sequence below.
-    mv "$native_case/generated-wrapper.xml" "$central/.repo/manifest.xml"
-    # An override changes the file location, including within Repo's own Git
-    # manifest checkout; it must not require a tracked Central copy.
-    sed "s/$omega/$alpha/" "$central/.repo/manifests/parts/projects.xml" \
-        > "$central/.repo/manifests/alternate.xml"
-    git -C "$central/.repo/manifests" add alternate.xml
-    git -C "$central/.repo/manifests" -c commit.gpgSign=false commit -qm 'Alternate manifest location'
-    manifest_head=$(git -C "$central/.repo/manifests" rev-parse HEAD)
-    printf '<manifest>' > "$native"
-    native_cli_names --manifest .repo/manifests/alternate.xml
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$manifest_head"
-    cp "$native_case/expected-manifest.xml" "$native"
-    git -C "$central/repositories/component" checkout -q --detach "$omega"
-    if (cd "$central" && "$REQVIRE_BIN" validate) > "$native_case/mismatch.log" 2>&1; then
-        echo 'Mismatching checkout was accepted' >&2
-        return 1
-    fi
-    grep -Eq '\.repo/.*repositories/component|repositories/component.*\.repo/' "$native_case/mismatch.log"
-    test ! -e "$central/default.xml"
-    test -z "$(git -C "$central" status --porcelain)"
-    git -C "$central/repositories/component" checkout -q --detach "$alpha"
-    native_prepare_authoring
-    native_server_names mcp active_repo_session
-}
-
-standalone_repo_manifest() {
-    native_fixture standalone
-    cp "$native" "$native_case/download.xml"
-    (cd "$central" && repo init -q -u "file://$native_case/download.xml" \
-        --standalone-manifest --no-clone-bundle)
-    # Move the original download away: Repo's cached manifest must be sufficient.
-    mv "$native_case/download.xml" "$native_case/expected-manifest.xml"
-    (cd "$central" && repo manifest -o "$native_case/repo-manifest.xml")
-    native_cli_names
-    native_prepare_authoring
-    native_server_names serve
-    diff -u "$native_case/expected-manifest.xml" "$native"
-    test ! -e "$central/default.xml"
-    test -z "$(git -C "$central" status --porcelain)"
-    native_prepare_authoring
-    native_server_names mcp standalone_repo_session
-}
-
-run_native_repo_cases() {
-    local name result
-    : > "$TEST_DIR/output/native-checks.txt"
-    for name in active standalone; do
-        result=0
-        bash "$TEST_SCRIPT_DIR/check_native_repo.sh" "$name" > "$TEST_DIR/output/native-$name.log" 2>&1 || result=$?
-        if [[ "$result" != 0 ]]; then
-            cat "$TEST_DIR/output/native-$name.log" >&2
-            status=1
-        fi
-    done
-    # Keep independent outcomes in the golden order even though related checks
-    # now share one fixture and MCP session. An unrun dependent check must fail.
-    for name in cli/active-repo-manifest-selection cli/standalone-repo-manifest-selection \
-        mcp/native-repo-pin-checkpoint mcp/native-repo-worktree; do
-        if grep -Fxq "PASS $name" "$TEST_DIR/output/native-checks.txt"; then
-            printf 'PASS %s\n' "$name" >> "$TEST_DIR/output/checks.txt"
-        else
-            printf 'FAIL %s\n' "$name" >> "$TEST_DIR/output/checks.txt"
-            status=1
-        fi
-    done
-}
-
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
-    set -euo pipefail
-    "${1}_repo_manifest"
-fi

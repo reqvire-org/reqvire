@@ -215,7 +215,7 @@ const tracePanelSkinX = css`
 
   .trace-tree-count-badge {
     background: var(--bg-selected);
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   .trace-verification-card {
@@ -352,7 +352,7 @@ const coverageDashboardBaseUX = css`
     max-width: 100%;
     min-height: var(--control-height-md);
     padding: var(--space-4) var(--control-padding-md);
-    border: var(--border-w) solid var(--border-subtle);
+    border: var(--border-w) solid var(--border-strong);
     border-radius: var(--radius-md);
     font: inherit;
   }
@@ -559,7 +559,8 @@ const coverageDashboardBaseUX = css`
   }
 
   .coverage-breakdown__pie {
-    width: var(--space-32);
+    aspect-ratio: 1;
+    width: auto;
     height: var(--space-32);
   }
 
@@ -1259,7 +1260,7 @@ const coverageScopeControl = css`
   min-width: 0;
   .coverage-controls__field { display: flex; flex-direction: column; gap: var(--space-4); font-size: var(--text-caption); }
   select { width: 100%; min-width: 0; min-height: var(--control-height-md); padding: var(--space-4) var(--control-padding-md);
-    border: var(--border-w) solid var(--border-subtle); border-radius: var(--radius-md);
+    border: var(--border-w) solid var(--border-strong); border-radius: var(--radius-md);
     background: var(--bg-field); color: var(--text-strong); font: inherit; }
   select:disabled { border-color: var(--border-disabled); background: var(--bg-disabled); color: var(--text-disabled); }
 `;

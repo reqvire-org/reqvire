@@ -3,9 +3,9 @@ PASS cli/repo-impact-provenance-and-links
 PASS cli/repo-impact-text
 PASS mcp/repo-impact-parity-and-isolation
 PASS serve/repo-impact-parity-and-isolation
-PASS cli/repo-impact-unrecorded-manifest-history-rejected
-PASS mcp/repo-impact-unrecorded-manifest-history-rejected
-PASS serve/repo-impact-unrecorded-manifest-history-rejected
+PASS cli/repo-impact-root-source-without-association
+PASS mcp/repo-impact-root-source-without-association
+PASS serve/repo-impact-root-source-without-association
 PASS cli/repo-impact-single-baseline-selector
 PASS cli/repo-impact-historical-includes
 PASS cli/repo-impact-missing-base-commit

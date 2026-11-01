@@ -40,14 +40,14 @@ In mutation-enabled MCP, comparisons use the captured accepted current model and
 
    Ordinary Git mode requires one eligible worktree. The explicit override selects its base; omission uses available CI or confirmed MCP PR context. Without that context, ask for a baseline instead of selecting main or HEAD silently. Explicit HEAD reviews pending changes. A plain aggregate with multiple independent worktrees remains ambiguous.
 
-   **Repo composition:** Run at the workspace root with initialized Repo metadata and declared projects prepared locally. `.repo/manifest.xml` is the default. One root baseline supplies its model and composition association, which selects the actual manifest-owner commits and their full component pins. Do not apply the root ref independently in components or require another manifest selector:
+   **Repo composition:** Run at the workspace root with initialized Repo metadata and declared projects prepared locally. `.repo/manifest.xml` is the default. The selected root branch owns the tracked source manifest/includes and any root model content. Its baseline commit selects the component pins, which may supply the entire model when the root has no model documents. Repo administration is not another authoring owner; no separate manifest branch, PR or self-association is required. Do not apply the root ref independently in components or require another manifest selector:
 
    ```bash
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact \
      --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
    ```
 
-   XML/includes/overlays remain versioned in their actual owners. The root `.reqvire-composition.json` contains revision references, without copied XML or a circular root commit. Independent owner history is supported. Unidentified associations or unversioned required inputs report `repo_impact_manifest_history_unavailable`; mutable project pins report `repo_impact_base_unlocked`, and unavailable project objects report `repo_impact_base_unavailable`. Removed owners/projects may use retained local object storage. Never drop unavailable projects, guess another revision or use live XML for a partial comparison. Analysis never fetches, syncs or changes active checkouts.
+   Selecting XML/includes are versioned in the manifest-owning root branch. Repo's cache is internal; do not create another manifest owner or root self-association. Missing or unversioned canonical inputs report `repo_impact_manifest_history_unavailable`; mutable baseline component pins report `repo_impact_base_unlocked`, and unavailable objects report `repo_impact_base_unavailable`. Removed projects may use retained local object storage. Never drop unavailable projects, guess a revision or substitute live cached XML for a partial comparison. Analysis never fetches, syncs or changes active checkouts.
 
    **Mutation-enabled MCP:** Use `reqvire.change_impact` with the same selected `branch` and optional `git_commit`. The current side is the accepted model, captured composition and accepted pending edits, including embedded MCP. External changes are not imported by this read. A baseline error preserves the accepted revision, pending edits and write availability.
 

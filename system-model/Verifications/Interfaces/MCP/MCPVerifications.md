@@ -794,14 +794,12 @@ Acceptance review for the typed MCP `reqvire.rename_element` adapter.
 
 ### MCP Repository Workflow Verification Objective
 
-This objective groups verification of isolated worktree model sessions, accepted-change commits, and authorized repository publication, including Central manifest checkpoints for Repo workspaces.
+This objective groups verification of isolated worktree model sessions, accepted-change commits, and authorized repository publication, including root manifest checkpoints for Repo workspaces.
 
 #### Details
-Repo-mode acceptance covers unchanged Central branch-selected calls, private manifest-defined component checkouts, cross-project preview/apply, per-component commits before the Central checkpoint, dependency-first publication and retained-state failures.
+Repo-mode acceptance covers one manifest-owning root branch and its declared component snapshots, cross-project preview/apply, per-component commits before one root source-manifest checkpoint, dependency-first publication and retained-state failures. The root can contain model elements or only manifest/configuration files. Repo administration is derived internal state rather than another authoring repository.
 
-Repository workflow acceptance uses disposable local Git repositories and controlled gh executables. Concrete verifications define executable pass/fail criteria and link their fixture and outcome evidence. Regular tests publish only to local fixture remotes.
-
-The complete lifecycle includes native manifest-owner checkpoints, root revision associations, coordinated named component branches, explicit external composition admission, actual PR review baselines, and linked PR sets. Existing artifact-only refresh, accepted snapshot isolation, recovery and publication protections remain part of acceptance.
+The complete lifecycle includes coordinated named component branches, root source pins committed with related root changes, explicit external composition admission, actual PR review baselines, and linked component/root PR sets. Existing artifact-only refresh, accepted snapshot isolation, recovery and publication protections remain part of acceptance. No extra manifest lane, cached-manifest commit/PR or root-to-manifest self-association is required.
 
 #### Metadata
   * type: verification-objective
@@ -869,6 +867,8 @@ Verify the successful and rejected paths of mcp worktree creation.
 
 In native Repo mode all declared component branches use the requested destination name at the selected base composition pins; verify explicit release bases differing from startup HEAD and no initial pin advance. Reject a component branch collision without mutating source refs or publishing a partial context.
 
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+
 #### Metadata
   * type: test-verification
 
@@ -890,6 +890,8 @@ Verify the successful and rejected paths of mcp worktree opening and inventory.
 - Stop/restart with committed work and with pending accepted changes; confirm no implicit branch nesting or loss of files, clean reopening, and rejection of dirty reopening. Inventory must distinguish unavailable contexts from healthy sessions.
 
 Explicitly open a registered branch after externally committed model/composition changes. Require full validated admission without new flags, no-op reuse when unchanged, and retained accepted reads after invalid/pending/recovery rejection. Ensure artifact-only refresh remains guarded and background polling does not import the changes.
+
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1017,7 +1019,9 @@ Verify the successful and rejected paths of mcp pull request creation.
 - Reject missing/unknown/same-as-head bases, unpushed or stale remote head, no valid comparison, dirty/pending context, and foreign heads before creation. Assert no implicit push/fork/commit.
 - Return an existing exact open PR without duplicates or metadata edits; surface conflicting base/multiple matches. Simulate a response lost after creation and confirm read-only reconciliation rather than blind retries.
 
-For a composed change, require explicit repository_bases for each changed dependency, stable already-pushed component/manifest branches, dependency-first creation, a root body linking their PR URLs, and deterministic per-owner results. Reject missing/foreign targets before side effects. Retry exact PRs without duplicates or authored metadata edits; preserve and report partial created/reused PRs after a later failure. Untouched components receive no PR.
+For a composed change, require explicit repository_bases for each changed dependency, stable already-pushed component branches, dependency-first creation, a root body linking their PR URLs, and deterministic per-owner results. Reject missing/foreign targets before side effects. Retry exact PRs without duplicates or authored metadata edits; preserve and report partial created/reused PRs after a later failure. Untouched components receive no PR.
+
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1033,14 +1037,16 @@ For a composed change, require explicit repository_bases for each changed depend
 Verify the owning-repository save and publication boundaries for one combined Repo model.
 
 #### Details
-- The existing explicit and automatic commit cases declare three component repositories. One shared-contract rename changes Central and references in two components in the same mutation. Require exact golden source bytes in all three changed Git histories, one commit per changed repository parented by its accepted base, and a final Central manifest pinning every component's exact resulting SHA. Preserve relative contract-reference paths even when the source documents have the same filename. Central cannot track component files.
-- Require the third component's files, index, refs and HEAD to remain identical throughout both save policies. Default acceptance before explicit commit leaves every owned index and HEAD unchanged. Pending paths clear only after the Central checkpoint; a fresh CLI read of that saved manifest returns the complete combined model.
-- Retain the new-component-file save check in the same session after the shared rename. Require its owning component and Central to receive the next commits, pin every component correctly, leave the other component HEADs unchanged and preserve the retained component's full state. Repeated no-op commit creates no further commit.
-- `mcp/failed-central-checkpoint-retains-component` rejects the final Central Git reference transaction. Require a tool error, unchanged Central HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
-- The push cases start from an independently prepared saved Central manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before Central and a reachable component ref. A denied component push must prevent every Central push attempt and preserve local saved commits and the previous Central remote tip; removing the denial then retries the same saved view successfully in that server.
+- The existing explicit and automatic commit cases declare three component repositories. One shared-contract rename changes root and references in two components in the same mutation. Require exact golden source bytes in all three changed Git histories, one commit per changed repository parented by its accepted base, and a final root manifest pinning every component's exact resulting SHA. Preserve relative contract-reference paths even when the source documents have the same filename. root cannot track component files.
+- Require the third component's files, index, refs and HEAD to remain identical throughout both save policies. Default acceptance before explicit commit leaves every owned index and HEAD unchanged. Pending paths clear only after the root checkpoint; a fresh CLI read of that saved manifest returns the complete combined model.
+- Retain the new-component-file save check in the same session after the shared rename. Require its owning component and root to receive the next commits, pin every component correctly, leave the other component HEADs unchanged and preserve the retained component's full state. Repeated no-op commit creates no further commit.
+- `mcp/failed-central-checkpoint-retains-component` rejects the final root Git reference transaction. Require a tool error, unchanged root HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
+- The push cases start from an independently prepared saved root manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before root and a reachable component ref. A denied component push must prevent every root push attempt and preserve local saved commits and the previous root remote tip; removing the denial then retries the same saved view successfully in that server.
 - Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution. Reuse compatible fixed-policy HTTP sessions across related cases and record actual server starts in the suite report. Different startup policies, dirty admission and destructive reference-failure checks remain isolated; shared sessions are closed through the existing lifecycle on completion or failure.
 
-Native publication additionally requires a committed changed manifest-owner revision and root composition record, clean owning checkouts, successful server restart/historical replay, stable named component branches, and linked dependency/root PRs from one explicit call. Saving pin bytes without committing their owner must fail this verification. Test manifest-owner and root ref failures separately, preserving completed components and pending checkpoint evidence.
+Native publication uses the root branch's tracked source manifest. Require changed component commits before one root commit containing exact pins and root changes, including a manifest-only root. No cached-manifest authoring ref or root self-association is permitted. Root failure retains confirmed component commits and pending root work.
+
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1058,15 +1064,17 @@ Native publication additionally requires a committed changed manifest-owner revi
 
 ### MCP Repo Context Isolation Verification
 
-Verify that the existing Central branch context owns a complete isolated Repo view and applies model changes through its accepted snapshot.
+Verify that the existing root branch context owns a complete isolated Repo view and applies model changes through its accepted snapshot.
 
 #### Details
-- `mcp/central-branch-component-revisions` creates a context from a different Central commit whose manifest pins a second locally available component commit. Require separate component directories and Repo metadata, unchanged original files/indexes/HEADs, different selected content under the same component identifier, and the requested named branch in every declared component at its own selected pin. Remove and reopen the managed context; require its recorded component content again.
-- `mcp/cross-project-preview-apply` previews a component contract rename referenced from Central. Require a complete diff, unchanged source/index/HEAD/revision after preview and rejected duplicate naming, then exact committed golden file contents in both repositories after acceptance. Default mutation leaves Git indexes and HEADs unchanged and reports both pending paths.
+- `mcp/central-branch-component-revisions` creates a context from a different root commit whose manifest pins a second locally available component commit. Require separate component directories and Repo metadata, unchanged original files/indexes/HEADs, different selected content under the same component identifier, and the requested named branch in every declared component at its own selected pin. Remove and reopen the managed context; require its recorded component content again.
+- `mcp/cross-project-preview-apply` previews a component contract rename referenced from root. Require a complete diff, unchanged source/index/HEAD/revision after preview and rejected duplicate naming, then exact committed golden file contents in both repositories after acceptance. Default mutation leaves Git indexes and HEADs unchanged and reports both pending paths.
 - `mcp/dirty-component-admission` requires a dirty declared project to fail mutation admission with its path; rejecting admission cannot alter files or Git state.
 - Exercise existing typed branch-selected tools over the real HTTP server. Do not add a project selector or substitute a single-repository test adapter for Repo preparation.
 
-Repeat the differing-base case with native .repo/manifest.xml and committed root composition records. The startup branch and explicit release base must select different pins. Verify native owners and all components are isolated, pins do not advance during creation, source refs remain unchanged, and restart/reopen uses the branch checkpoint.
+Repeat the differing-base case with native discovery and root-owned source manifests, without composition association files. Startup and release source pins differ; test both model-bearing and manifest-only roots. Require component isolation, no initial pin advance and restart/reopen from the selected root source.
+
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1120,13 +1128,16 @@ Verify that MCP worker sessions implement the shared context boundary on success
 Verify native composition preparation, checkpoint ownership, restart, intentional external admission, and coordinated publication against real local Git and Repo fixtures.
 
 #### Details
-- With no root XML copy and no --manifest override, checkpoint root/native-manifest/component revisions, restart, and reconstruct the same model from the selected root commit. Assert manifest-owner HEAD advances, its tracked pins match the component commits, the root association is committed, and .repo remains absent from root tracked files.
-- Create from release/1.0 while startup main selects different native pins. Every declared component must use the destination branch at its own release pin. Source checkouts, indexes, refs and pin bytes remain unchanged; untouched repositories receive no commit or PR.
-- Initialize a native checkpoint without pending model edits; repeat it as no-op. Exercise a manifest checkout sharing root Git history, require its separate manifest lane, close/reopen it, and preserve retained Git objects. Competing owners on one logical branch reject before refs change and retain accepted edits.
-- Exercise explicit and automatic component-first checkpoints, manifest-owner/root failure, unknown ref outcomes, no-op repeat, and reopen after worker/server restart. Retain confirmed commits and exact pending/recovery outcomes.
-- Commit a prepared external composed change, open the already registered branch explicitly, and require complete validated admission without an extra mode. Rejection preserves accepted reads; pending edits and unresolved recovery block admission. Guarded artifact-only refresh still rejects model/composition changes.
-- Publish stable component and manifest-owner branches before the root. Retrieve the published native composition in a fresh checkout and reproduce its combined graph and historical impact. One explicit PR-create call creates/reuses linked component/root PRs with explicit per-owner bases. A denied dependency prevents root push; repeated requests do not duplicate PRs or overwrite authored metadata.
-- Exercise current HEAD versus PR merge-base after automatic commits, native includes and versioned overlays, missing historical objects, removed/relocated components, and fresh-consumer reconstruction. Compare source state before/after read-only success and failure; no remote sync is permitted during analysis.
+- Use real local Git histories and an actual Repo client. The root repository tracks manifests/default.xml and includes on the same branch as any root model; .repo and component directories stay ignored. Do not simulate common ownership by only changing a remote URL.
+- Run both a root with model elements and a root containing only manifest/configuration files whose pinned repositories contain the entire model. Native CLI/MCP/Explorer discovery must accept both without a manifest override or self-association.
+- Create from a release base whose source pins differ from startup main and cached XML. Each component must use the requested destination branch at its own base pin; preserve existing checkouts and initial pins. Close/reopen and restart must recover that source composition. No reqvire/manifests branch or extra manifest authoring owner is created.
+- For explicit and automatic commits, require confirmed changed-component commits followed by one root commit containing updated tracked pins and root changes. Assert unchanged components remain unchanged, no .repo files enter root Git, no cached-manifest authoring commit is made, and no .reqvire-composition.json self-association is created. A pinned unchanged checkpoint is a no-op.
+- Root ref failure retains confirmed component commits and pending root pin changes. Unknown root outcomes use recorded root reconciliation; unknown component outcomes retain operator recovery. Retrying must not duplicate confirmed component commits. There is no separate cached-manifest ref recovery stage.
+- Prepare external component commits, update and commit source pins with related root work, then explicitly open the same root branch. Require valid full admission without a mode or self-association; pending/recovery/invalid rejection retains accepted reads. Artifact refresh cannot admit changed source pins.
+- Push actual changed component branches before the root and create/reuse linked component/root PRs. repository_bases contains component targets only; the root PR includes source pin changes even when there are no root model elements. No administrative checkout target, ref, remote push or PR is permitted.
+- Retrieve the published root source composition in a fresh checkout and reproduce the graph and change impact analysis. Compare root and per-component committed provenance with actual source paths. Read-only comparisons preserve HEADs, indexes, refs, working bytes and Repo administration and never contact remotes.
+
+Read-state preservation covers authored source bytes, source-selection wrappers, actual Git configuration, refs, HEADs and indexes. Operational trace logs and Repo's derived .repo_config.json caches are not authoritative selection inputs and may be regenerated; excluding those derived caches does not permit changing source selection, source files, checkout revisions or accepted model state.
 
 #### Metadata
   * type: test-verification

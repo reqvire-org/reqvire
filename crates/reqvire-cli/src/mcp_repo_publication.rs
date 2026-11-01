@@ -5,7 +5,6 @@ use reqvire::repo_workspace::normalize_url;
 struct Dependency {
     path: PathBuf,
     metadata: Value,
-    manifest: bool,
     access: GithubAccess,
 }
 
@@ -23,15 +22,10 @@ impl Dependency {
                 .or_else(|| self.metadata["fetch_url"].as_str())
                 .unwrap_or(""),
         );
-        let entries = base[if self.manifest {
-            "manifest_inputs"
-        } else {
-            "projects"
-        }]
-        .as_array();
+        let entries = base["projects"].as_array();
         let matched = entries.into_iter().flatten().find(|entry| {
             normalize_url(entry["repository"].as_str().unwrap_or("")) == identity
-                && (self.manifest || entry["path"] == self.metadata["path"])
+                && entry["path"] == self.metadata["path"]
         });
         matched.is_none_or(|entry| entry["commit"] != self.metadata["commit"])
     }
@@ -56,20 +50,15 @@ impl Worktrees {
             .github_dependencies
             .lock()
             .expect("dependency publication cache poisoned");
-        let mut metadata = Vec::new();
-        for (key, manifest) in [("projects", false), ("manifest_owners", true)] {
-            metadata.extend(
-                status[key]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .cloned()
-                    .map(|value| (value, manifest)),
-            );
-        }
+        let metadata: Vec<_> = status["projects"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .cloned()
+            .collect();
         if cache.is_none() {
             let mut accesses = BTreeMap::new();
-            for (item, _) in &metadata {
+            for item in &metadata {
                 let path = PathBuf::from(text(item, "path")?);
                 if path.as_os_str().is_empty()
                     || path
@@ -100,7 +89,7 @@ impl Worktrees {
         let accesses = cache.as_ref().expect("captured publication owners");
         let result = metadata
             .into_iter()
-            .map(|(metadata, manifest)| {
+            .map(|metadata| {
                 let path = PathBuf::from(text(&metadata, "path")?);
                 let access = accesses
                     .get(&path)
@@ -111,7 +100,6 @@ impl Worktrees {
                 Ok(Dependency {
                     path,
                     metadata,
-                    manifest,
                     access,
                 })
             })

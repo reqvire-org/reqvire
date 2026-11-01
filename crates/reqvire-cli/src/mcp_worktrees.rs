@@ -594,20 +594,11 @@ impl Worktrees {
         if github.available() && manifest.is_some() {
             let scope = reqvire::workspace::WorkspaceScope::discover_from(root.clone())?;
             let repo = scope.repo.as_ref().expect("Repo source scope");
-            let mut owners: BTreeMap<_, _> = repo
+            let owners: BTreeMap<_, _> = repo
                 .projects
                 .iter()
                 .map(|p| (p.path.clone(), p.remote.clone()))
                 .collect();
-            for source in repo
-                .manifest_sources
-                .values()
-                .filter(|s| !s.root.as_os_str().is_empty())
-            {
-                owners
-                    .entry(source.root.clone())
-                    .or_insert_with(|| "origin".into());
-            }
             for (path, remote) in owners {
                 let access = GithubAccess::check(&root.join(&path), true, &remote);
                 if !access.available() {
@@ -1845,7 +1836,7 @@ fn publication_definitions() -> Vec<Value> {
         definition(
             "reqvire.github.pr.create",
             "Create or reuse linked PRs for the pushed root and changed composition owners, with explicit targets.",
-            json!({"branch":branch_selector(),"base":{"type":"string","minLength":1},"title":{"type":"string","minLength":1},"body":{"type":"string"},"draft":{"type":"boolean"},"repository_bases":{"type":"object","additionalProperties":{"type":"string","minLength":1},"description":"Explicit PR targets keyed by declared non-root repository path, including native manifest owners."}}),
+            json!({"branch":branch_selector(),"base":{"type":"string","minLength":1},"title":{"type":"string","minLength":1},"body":{"type":"string"},"draft":{"type":"boolean"},"repository_bases":{"type":"object","additionalProperties":{"type":"string","minLength":1},"description":"Explicit PR targets keyed by declared component repository paths. The source manifest uses the root PR base."}}),
             &["base", "title", "body"],
             false,
             true,

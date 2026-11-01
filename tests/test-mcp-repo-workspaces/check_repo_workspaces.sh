@@ -379,6 +379,9 @@ ws_push() {
         cp "$TEST_SCRIPT_DIR/../test-mcp-publication/fixtures/gh-double.sh" "$native_case/bin/gh"
         chmod +x "$native_case/bin/git" "$native_case/bin/gh"
         git -C "$central" remote set-url origin https://github.com/test/project.git
+        # Both checkouts represent this same source history under the fixture's
+        # controlled web identity; Repo administration is not another owner.
+        git -C "$central/.repo/manifests" remote set-url origin https://github.com/test/project.git
         git -C "$central/repositories/component" remote set-url local https://github.com/test/component
         ws_manifest "$alpha" https://github.com/test/
         impact_commit "$central" 'Register publication identities' > /dev/null
@@ -424,7 +427,7 @@ ws_case() {
         explicit) ws_explicit ;;
         invalid)
             ws_fixture invalid
-            printf '<manifest>' > "$central/.repo/manifests/default.xml"
+            printf '<manifest>' > "$central/default.xml"
             ws_state > "$native_case/before.txt"
             if (cd "$central" && "$REQVIRE_BIN" validate --json) > "$native_case/invalid.log" 2>&1; then return 1; fi
             grep -Fq default.xml "$native_case/invalid.log"

@@ -1,10 +1,7 @@
 //! Repository-owned state for the existing accepted-model transaction.
-//! Component ref updates precede the owning Central manifest checkpoint.
+//! Component ref updates precede the root-owned source manifest checkpoint.
 use super::*;
-use reqvire::{
-    repo_composition::{CompositionRecord, RECORD_PATH},
-    repo_workspace::RepoWorkspace,
-};
+use reqvire::repo_workspace::RepoWorkspace;
 use serde_json::json;
 
 pub(super) struct RepoSession {
@@ -40,16 +37,11 @@ impl RepoSession {
         let mut branches = BTreeMap::new();
         #[cfg(unix)]
         let mut modes = BTreeMap::new();
-        let mut participants: BTreeMap<_, _> = workspace
+        let participants: BTreeMap<_, _> = workspace
             .projects
             .iter()
             .map(|p| (p.path.clone(), p.commit.clone()))
             .collect();
-        for source in workspace.manifest_sources.values() {
-            if !source.root.as_os_str().is_empty() {
-                participants.insert(source.root.clone(), source.commit.clone());
-            }
-        }
         for (path, expected) in &participants {
             let checkout = root.join(path);
             let lock = checkout.join(git_text(
@@ -127,42 +119,12 @@ impl RepoSession {
             .map(|b| b.trim_start_matches("refs/heads/"))
     }
 
-    pub fn manifest_metadata(&self) -> Vec<Value> {
-        let owners: BTreeMap<_, _> = self
+    pub fn needs_checkpoint(&self, _files: &SnapshotFiles) -> Result<bool, ReqvireError> {
+        Ok(self
             .workspace
-            .manifest_sources
-            .values()
-            .filter(|source| !source.root.as_os_str().is_empty())
-            .map(|source| (source.root.clone(), source))
-            .collect();
-        owners
-            .into_iter()
-            .map(|(path, source)| {
-                json!({
-                    "path":path,"commit":source.commit,"repository":source.repository,
-                    "remote":"origin","branch":self.branch(&path)
-                })
-            })
-            .collect()
-    }
-
-    pub fn needs_checkpoint(&self, files: &SnapshotFiles) -> Result<bool, ReqvireError> {
-        if !self.workspace.uses_repo_managed_inputs() {
-            return Ok(false);
-        }
-        CompositionRecord::capture(&self.workspace)?;
-        let record = files
-            .files
-            .get(&files.root.join(RECORD_PATH))
-            .and_then(|bytes| CompositionRecord::from_bytes(bytes).ok());
-        Ok(
-            record.is_none_or(|record| record.matches_workspace(&self.workspace).is_err())
-                || self
-                    .workspace
-                    .projects
-                    .iter()
-                    .any(|project| project.revision != project.commit),
-        )
+            .projects
+            .iter()
+            .any(|project| project.revision != project.commit))
     }
     #[cfg(unix)]
     pub fn track_file_mode(&self, root: &Path, path: &Path) -> Option<bool> {
@@ -172,6 +134,7 @@ impl RepoSession {
             .map(|(_, value)| *value)
     }
     pub fn check(&self, root: &Path) -> Result<(), ReqvireError> {
+        self.workspace.check_selection(root)?;
         for project in &self.workspace.projects {
             let observed = GitCheckout::read(&root.join(&project.path))?;
             if observed.head.as_deref() != Some(&project.commit)
@@ -183,27 +146,8 @@ impl RepoSession {
                 )));
             }
         }
-        for source in self.workspace.manifest_sources.values() {
-            if source.root.as_os_str().is_empty() {
-                continue;
-            }
-            let owner = root.join(&source.root);
-            let observed = GitCheckout::read(&owner)?;
-            if observed.head.as_deref() != Some(&source.commit)
-                || self.branches.get(&source.root) != Some(&observed.branch)
-                || git_text(&owner, &["remote", "get-url", "origin"]).unwrap_or_default()
-                    != source.repository
-            {
-                return Err(error(format!(
-                    "Owned manifest repository {} changed externally",
-                    source.root.display()
-                )));
-            }
-        }
         for (path, accepted) in &self.workspace.inputs {
-            if path != Path::new(".repo/manifests.git/config")
-                && fs::read(root.join(path)).ok().as_deref() != Some(accepted.as_slice())
-            {
+            if fs::read(root.join(path)).ok().as_deref() != Some(accepted.as_slice()) {
                 return Err(error(format!(
                     "Accepted manifest input {} changed externally",
                     path.display()
@@ -228,14 +172,6 @@ impl MutationSession {
         committed: &mut SnapshotFiles,
     ) {
         repo.workspace.central_commit = head.to_owned();
-        for source in repo
-            .workspace
-            .manifest_sources
-            .values_mut()
-            .filter(|source| source.root.as_os_str().is_empty())
-        {
-            source.commit = head.to_owned();
-        }
         let mut scope = files
             .workspace
             .as_deref()
@@ -290,24 +226,6 @@ impl MutationSession {
                 &project.fetch_url,
                 repo.branch(&project.path),
             )?;
-        }
-        for source in repo
-            .workspace
-            .manifest_sources
-            .values()
-            .filter(|s| !s.root.as_os_str().is_empty())
-        {
-            select(&source.root, &source.repository, repo.branch(&source.root))?;
-        }
-        // Reject unversioned selectors before publishing any component refs.
-        if repo.workspace.uses_repo_managed_inputs() {
-            CompositionRecord::capture(&repo.workspace)?;
-            let path = self.root.join(RECORD_PATH);
-            if fs::read(&path).ok().as_deref()
-                != self.files.files.get(&path).map(|bytes| bytes.as_slice())
-            {
-                return Err(error("Composition record changed outside the accepted snapshot; preserve and resolve that edit before checkpointing"));
-            }
         }
         repo.outcomes.clear();
         for project in &mut repo.workspace.projects {
@@ -393,7 +311,6 @@ impl MutationSession {
             )?;
         }
         repo.check(&self.root)?;
-        let native = repo.workspace.uses_repo_managed_inputs();
         let pins = repo.workspace.pinned_inputs()?;
         for (relative, bytes) in pins {
             let manifest = self.root.join(&relative);
@@ -413,128 +330,6 @@ impl MutationSession {
         }
         let bytes = repo.workspace.pinned_xml()?;
         repo.workspace.resolved_xml = String::from_utf8(bytes).map_err(|e| error(e.to_string()))?;
-        if !native {
-            // Central checkpoints flatten the resolved manifest. Prior include
-            // files remain source assets, but no longer select this composition.
-            let manifest = &repo.workspace.manifest;
-            repo.workspace.inputs.retain(|path, _| {
-                path == manifest || path == Path::new(".repo/manifests.git/config")
-            });
-            repo.workspace
-                .manifest_sources
-                .retain(|path, _| path == manifest);
-        }
-        if native {
-            let owners: BTreeSet<_> = repo
-                .workspace
-                .manifest_sources
-                .values()
-                .filter(|s| !s.root.as_os_str().is_empty())
-                .map(|s| s.root.clone())
-                .collect();
-            for owner_path in owners {
-                let owner = self.root.join(&owner_path);
-                let changed: BTreeSet<_> = repo
-                    .workspace
-                    .manifest_sources
-                    .keys()
-                    .map(|path| self.root.join(path))
-                    .filter(|path| path.starts_with(&owner) && self.pending_paths.contains(path))
-                    .collect();
-                if changed.is_empty() {
-                    continue;
-                }
-                let expected = repo
-                    .workspace
-                    .manifest_sources
-                    .values()
-                    .find(|s| s.root == owner_path)
-                    .expect("manifest owner")
-                    .commit
-                    .clone();
-                let reference = repo
-                    .branches
-                    .get(&owner_path)
-                    .and_then(Option::as_deref)
-                    .ok_or_else(|| {
-                        error(format!(
-                            "Manifest owner {} needs a prepared named authoring branch",
-                            owner_path.display()
-                        ))
-                    })?;
-                let mut publication =
-                    prepare_commit_for(&owner, &expected, &self.files, &changed, message)?;
-                if git_text(
-                    &owner,
-                    &["rev-parse", &format!("{}^{{tree}}", publication.commit)],
-                )? == git_text(&owner, &["rev-parse", &format!("{expected}^{{tree}}")])?
-                {
-                    repo.outcomes.push(json!({"name":"manifest","path":owner_path,"commit":expected,"outcome":"no_op"}));
-                    continue;
-                }
-                let attempted = publication.commit.clone();
-                let result = git_result(
-                    &owner,
-                    &[
-                        "update-ref",
-                        "-m",
-                        "reqvire: manifest checkpoint",
-                        reference,
-                        &attempted,
-                        &expected,
-                    ],
-                    None,
-                    None,
-                );
-                let observed = match git_text(&owner, &["rev-parse", "HEAD"]) {
-                    Ok(observed) => observed,
-                    Err(failure) => {
-                        repo.outcomes.push(json!({"name":"manifest","path":owner_path,"commit":attempted,"outcome":"unknown"}));
-                        self.recovery_error=Some(format!("Manifest owner {} ref observation failed after attempting {attempted}; preserve its files/index and verify that commit before normal admission: {failure}",owner_path.display()));
-                        return Err(error(self.recovery_error.as_deref().unwrap_or_default()));
-                    }
-                };
-                if observed != attempted {
-                    let unknown = observed != expected;
-                    repo.outcomes.push(json!({"name":"manifest","path":owner_path,"commit":attempted,"outcome":if unknown {"unknown"} else {"failed"}}));
-                    if unknown {
-                        self.recovery_error = Some(format!("Manifest owner {} has an unrecognized ref outcome; preserve accepted checkpoint evidence", owner_path.display()));
-                    }
-                    return Err(error(format!(
-                        "Manifest owner {} checkpoint not confirmed: {}",
-                        owner_path.display(),
-                        result
-                            .err()
-                            .map(|e| e.error.to_string())
-                            .unwrap_or_else(|| "HEAD did not match attempted commit".into())
-                    )));
-                }
-                for source in repo
-                    .workspace
-                    .manifest_sources
-                    .values_mut()
-                    .filter(|s| s.root == owner_path)
-                {
-                    source.commit.clone_from(&attempted);
-                }
-                repo.outcomes.push(json!({"name":"manifest","path":owner_path,"commit":attempted,"outcome":"completed"}));
-                if let Err(failure) =
-                    fs::rename(&publication.index_lock.path, &publication.index_path)
-                {
-                    self.recovery_error = Some(format!("Manifest owner {} commit is retained but its index requires reconciliation: {failure}", owner_path.display()));
-                    return Err(failure.into());
-                }
-                publication.index_lock.published = true;
-            }
-            let record = Arc::new(CompositionRecord::capture(&repo.workspace)?.to_bytes()?);
-            let path = self.root.join(RECORD_PATH);
-            if self.files.files.get(&path) != Some(&record) {
-                ensure_regular_destination(&self.root, &path)?;
-                persist(&path, Some(record.as_slice()))?;
-                Arc::make_mut(&mut self.files.files).insert(path.clone(), record);
-                self.pending_paths.insert(path);
-            }
-        }
         let mut scope = self
             .files
             .workspace
@@ -553,9 +348,6 @@ impl MutationSession {
                     .projects
                     .iter()
                     .any(|p| path.starts_with(self.root.join(&p.path)))
-                    && !repo.workspace.manifest_sources.values().any(|s| {
-                        !s.root.as_os_str().is_empty() && path.starts_with(self.root.join(&s.root))
-                    })
             })
             .cloned()
             .collect();
@@ -565,11 +357,9 @@ impl MutationSession {
                 Self::set_repo_head(repo, &self.head, &mut self.files, &mut self.committed_files);
                 repo.outcomes
                     .push(json!({"name":"central","commit":self.head,
-                    "outcome":if native && central.is_empty() {"no_op"} else {"completed"}}));
+                    "outcome":if central.is_empty() {"no_op"} else {"completed"}}));
                 value["projects"] = json!(repo.outcomes);
-                if native {
-                    value["manifest"] = json!({"path":repo.workspace.manifest, "outcome":"committed", "versioned_in_central":false,"composition_record":RECORD_PATH});
-                }
+                value["manifest"] = json!({"path":repo.workspace.manifest, "outcome":"committed", "versioned_in_central":true});
                 value["changed_files"] = json!(all_changed
                     .iter()
                     .filter_map(|p| p.strip_prefix(&self.root).ok())

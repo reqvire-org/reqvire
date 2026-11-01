@@ -96,14 +96,15 @@
   --row-height-compact: var(--space-15);   /* compact tree/list row height */
   --side-pane-legend-row-height: var(--space-14);   /* read-only legend row (swatch + label) */
   --compact-column-min: var(--space-56); /* minimum readable compact metadata/filter column width */
-  --space-flow-node-width: var(--space-140); /* shared model and verification flow cards */
+  --space-flow-node-width: 32.5ch; /* shared model and verification flow cards */
   --space-flow-node-height: 164px;
+  --space-markdown-diagram-measure: 60ch; /* smallest readable diagram before its frame scrolls */
   --stack-gap-compact: var(--space-0); /* contiguous compact stack gap */
   --side-pane-content-inset-inline: var(--space-12); /* shared Explorer side-pane content inset */
   --side-pane-search-content-gap: var(--space-4); /* compact gap from pane quick filter to next pane block */
   --side-pane-summary-columns: repeat(2, minmax(0, 1fr)); /* compact key/value summary grid */
-  --color-role-thesaurus-map-scheme-node-min-width: calc(var(--space-32) * 4 + var(--space-4)); /* concept-scheme map node width */
-  --color-role-thesaurus-map-concept-node-min-width: calc(var(--space-32) * 3 - var(--space-2)); /* concept map node width */
+  --color-role-thesaurus-map-scheme-node-min-width: 30.5ch; /* concept-scheme map node width */
+  --color-role-thesaurus-map-concept-node-min-width: 22ch; /* concept map node width */
 
   /* Toast geometry */
   --space-zero-length: 0px; /* A length-valued zero for calc()/transforms. */

@@ -47,7 +47,10 @@ case "$1" in
 esac
 CARGO
     chmod +x "$folder/commands/cargo"
-    workflow_steps "$workflow" "$folder/steps"
+    local job=test
+    [[ "$label" != release ]] || job=build
+    workflow_job "$workflow" "$job" > "$folder/job.yml"
+    workflow_steps "$folder/job.yml" "$folder/steps"
     for command in "$folder"/steps/*.run; do
         if ! grep -Fq 'cargo test ' "$command" &&
             ! { grep -Fq 'cargo build ' "$command" && grep -Fq -- '--bin reqvire' "$command"; }; then continue; fi
@@ -95,6 +98,33 @@ policy() {
     done
     [[ -n "$shell" ]] || fail 'shell end-to-end step is missing'
     grep -Fq 'REQVIRE_BIN: ${{ github.workspace }}/target/release/reqvire' "$shell"
+}
+
+macos_units() {
+    local folder="$work/macos-policy" command selected=''
+    mkdir -p "$folder/commands"
+    workflow_job "$pr" macos-repo-unit-tests > "$folder/job.yml"
+    grep -Fq 'runs-on: macos-latest' "$folder/job.yml"
+    grep -Fq 'needs: test' "$folder/job.yml"
+    grep -Fq "needs.test.outputs.explorer_artifact_id != ''" "$folder/job.yml"
+    grep -Fq 'uses: actions/download-artifact@' "$folder/job.yml"
+    grep -Fq 'path: explorer/dist' "$folder/job.yml"
+    [[ $(grep -Fc 'name: reqvire-pr-explorer' "$pr") == 2 ]] || fail 'checked Explorer artifact is not shared with macOS'
+    workflow_steps "$folder/job.yml" "$folder/steps"
+    for command in "$folder"/steps/*.run; do
+        if grep -Fq 'cargo test ' "$command"; then selected=$command; break; fi
+    done
+    [[ -n "$selected" ]] || fail 'macOS unit test step is missing'
+    cat > "$folder/commands/cargo" <<'CARGO'
+#!/bin/bash
+set -eu
+printf '%s\n' "$*" > "$TRACE"
+[[ "$*" == 'test --locked -p reqvire --lib repo_workspace::tests --verbose' ]]
+CARGO
+    chmod +x "$folder/commands/cargo"
+    execute_step "$selected" "$folder" "PATH=$folder/commands:$PATH" "TRACE=$folder/commands.txt"
+    printf '%s\n' 'test --locked -p reqvire --lib repo_workspace::tests --verbose' > "$folder/expected.txt"
+    diff -u "$folder/expected.txt" "$folder/commands.txt"
 }
 
 model_gate() {
@@ -149,6 +179,7 @@ for label in pr release; do
     record "$label-test-failure" workers "$workflow" "$label" false test
 done
 record pr-current-revision-policy policy
+record pr-macos-manifest-unit-tests macos_units
 record valid-model-gate model_gate false
 record invalid-model-fails-gate model_gate true
 exit "$status"

@@ -654,7 +654,6 @@ impl MutationSession {
         if let Some(repo) = &self.repo {
             value["workspace_mode"] = serde_json::json!("repo");
             value["manifest"] = serde_json::json!(repo.workspace.manifest);
-            value["manifest_owners"] = serde_json::json!(repo.manifest_metadata());
             value["projects"] = serde_json::json!(repo
                 .workspace
                 .projects

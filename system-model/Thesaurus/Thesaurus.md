@@ -519,7 +519,7 @@ Human or machine surface that exposes Reqvire model semantics or operations.
 
 ### MCP Worktree Context
 
-An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a Repo workspace the owning worktree is Central; its versioned manifest selects the component checkouts included in that same context.
+An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a Repo workspace, the root branch owns the source manifest selecting the component checkouts in that same context. Model documents may be held in the root, the components, or both.
 
 #### Metadata
   * type: concept
@@ -545,7 +545,7 @@ A component repository declared by the effective Repo manifest, with a workspace
 
 ### Model Change Publication
 
-The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. In a Repo workspace, component commits are recorded by the Central manifest before the Central commit saves the combined view. Pull requests and review comments remain repository-specific.
+The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. A Repo composition records component commits in the source manifest owned by the root branch. One root revision holds those pins and any root model or configuration changes; related component and root pull requests review the coordinated change.
 
 #### Metadata
   * type: concept
@@ -862,7 +862,7 @@ Semantic pattern describing relation behavior such as hierarchy, bridge, ownersh
 
 ### Repo Manifest
 
-A version-controlled description of a Repo workspace's component repositories, their checkout paths and selected revisions. A Central worktree's manifest defines that branch's component view.
+A version-controlled description of a Repo workspace's component repositories, checkout paths and selected revisions. Its source belongs to the selected root branch. Repo's cached copy is internal administration rather than another authored revision authority.
 
 #### Metadata
   * type: concept
@@ -873,7 +873,7 @@ A version-controlled description of a Repo workspace's component repositories, t
 
 ### Repo Workspace
 
-A model workspace rooted in a Central Git worktree whose versioned manifest selects component repository checkouts managed by the Repo tool. The Central branch identifies the context; project revisions identify its component content.
+A model workspace whose root repository and branch own the source manifest selecting component repositories managed by Repo. The root branch identifies the context; project pins identify the component content. The root may contain only the manifest and configuration while the complete model resides in pinned repositories.
 
 #### Metadata
   * type: concept

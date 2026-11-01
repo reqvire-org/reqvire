@@ -455,3 +455,4 @@ export type { RendererNoticeProps, RendererNoticeTone } from "./components/core/
 
 
 export { flowCanvasClasses } from "./patterns/graphs/FlowCanvasSkin/FlowCanvasSkin";
+export { preloadFonts } from "./tokens/fonts.preload.generated";

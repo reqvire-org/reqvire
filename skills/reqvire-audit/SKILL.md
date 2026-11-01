@@ -33,7 +33,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Run from the intended effective workspace root, or pass that root with `--workspace`. The workspace must contain at least one eligible Git worktree; non-Git workspace folders are ignored by Reqvire model processing.
 
-For historical impact, ordinary Git mode requires one eligible worktree. A distributed model uses native `.repo/manifest.xml`, versioned manifest owners, exact pins and locally available history. A root composition record associates the selected root revision with manifest-owner commits; no duplicate root XML or routine override is required. Independent owner history is supported. Omitted baselines use available PR review context; otherwise ask for the intended baseline. Explicit HEAD reviews pending changes. See Change Impact before choosing a ref.
+For change impact analysis, ordinary Git mode requires one eligible worktree. A Repo composition uses native .repo/manifest.xml discovery, the selected manifest-owning root branch's tracked source XML/includes and exact component pins. Root model elements are optional; pinned repositories may supply the entire model. Cached administration creates no extra manifest owner, branch, PR or self-association. Required history must be local. Omitted baselines use actual PR context; otherwise ask for the intended baseline. Explicit HEAD reviews pending changes. See Change Impact before choosing a ref.
 
 ## Reference Documents
 

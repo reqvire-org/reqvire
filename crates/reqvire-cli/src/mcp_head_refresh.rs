@@ -62,15 +62,6 @@ impl MutationSession {
         {
             return Err(error("Composition admission requires one owning root worktree and explicitly declared components"));
         }
-        if let Some(workspace) = scope
-            .repo
-            .as_ref()
-            .filter(|workspace| workspace.uses_repo_managed_inputs())
-        {
-            let record = reqvire::repo_composition::CompositionRecord::at_commit(&self.root, &head, &workspace.selection)?
-                .ok_or_else(|| error("Prepared native composition needs a committed .reqvire-composition.json revision association before explicit admission"))?;
-            record.matches_workspace(workspace)?;
-        }
         let mut next_repo = loaded
             .files
             .workspace
@@ -179,9 +170,7 @@ impl MutationSession {
         if let Some(repo) = &self.repo {
             if repo.check(&self.root).is_err()
                 || repo.workspace.inputs.iter().any(|(path, bytes)| {
-                    path != Path::new(".repo/manifests.git/config")
-                        && std::fs::read(self.root.join(path)).ok().as_deref()
-                            != Some(bytes.as_slice())
+                    std::fs::read(self.root.join(path)).ok().as_deref() != Some(bytes.as_slice())
                 })
             {
                 return Ok(Self::rejected(result, state_block("manifest_or_project_changed", "Restore the accepted Repo selection or use full validated worktree admission.")));

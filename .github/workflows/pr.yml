@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       cli_artifact_id: ${{ steps.share_cli.outputs.artifact-id }}
+      explorer_artifact_id: ${{ steps.share_explorer.outputs.artifact-id }}
 
     steps:
       - name: Checkout Repository
@@ -53,6 +54,15 @@ jobs:
       - name: Build CLI for Rust and end-to-end tests
         run: cargo build --release --locked --bin reqvire
 
+      - name: Share checked Explorer bundle with macOS unit tests
+        id: share_explorer
+        uses: actions/upload-artifact@v6
+        with:
+          name: reqvire-pr-explorer
+          path: explorer/dist
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Share current CLI with model validation
         id: share_cli
         uses: actions/upload-artifact@v6
@@ -84,6 +94,30 @@ jobs:
         with:
           name: end-to-end-test-logs
           path: /tmp/reqvire-test-logs
+
+  macos-repo-unit-tests:
+    name: Run Repo Workspace Unit Tests on macOS
+    needs: test
+    if: ${{ !cancelled() && needs.test.outputs.explorer_artifact_id != '' }}
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Download checked Explorer bundle
+        uses: actions/download-artifact@v6
+        with:
+          name: reqvire-pr-explorer
+          path: explorer/dist
+
+      - name: Run manifest source and macOS path regressions
+        run: cargo test --locked -p reqvire --lib repo_workspace::tests --verbose
 
   validate:
     name: Validate Requirements

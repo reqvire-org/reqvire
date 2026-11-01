@@ -20,7 +20,7 @@ impact_prepare() {
     git -C "$native_case/docs" init -qb main
     docs_commit=$(impact_commit "$native_case/docs" 'Documentation model and page')
     git clone -q --bare "$native_case/docs" "$native_case/remotes/docs"
-    mkdir -p "$central/parts" "$(dirname "$native")/parts"
+    mkdir -p "$central/parts"
     printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$central/default.xml"
     cat > "$central/parts/projects.xml" <<EOF
 <manifest>
@@ -30,19 +30,16 @@ impact_prepare() {
 </manifest>
 EOF
     impact_base=$(impact_commit "$central" 'Historical combined model')
-    cp "$central/default.xml" "$native"
-    cp "$central/parts/projects.xml" "$(dirname "$native")/parts/projects.xml"
-    impact_commit "$(dirname "$native")" 'Historical manifest inputs' > /dev/null
     sed -i "s/$alpha/$omega/" "$central/parts/projects.xml"
     impact_current=$(impact_commit "$central" 'Current combined model')
-    cp "$central/parts/projects.xml" "$(dirname "$native")/parts/projects.xml"
-    impact_commit "$(dirname "$native")" 'Current manifest inputs' > /dev/null
+    git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
     (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
     git -C "$central/repositories/component" checkout -q -B main "$omega"
     git -C "$central/repositories/docs" checkout -q -B main "$docs_commit"
     # Keep Central's web identity distinct from component file remotes. Reports
     # must not invent Central blob URLs for component-owned paths.
     git -C "$central" remote set-url origin https://github.com/reqvire-test/central.git
+    git -C "$central/.repo/manifests" remote set-url origin https://github.com/reqvire-test/central.git
     (cd "$central" && "$REQVIRE_BIN" --manifest default.xml validate)
     (cd "$central" && "$REQVIRE_BIN" validate)
 }
@@ -62,9 +59,12 @@ impact_state() {
         done < <(git -C "$owner" ls-files -z --cached --others --exclude-standard)
     done
     # Include source-selection Repo administration, not only model inputs.
-    # Repo's own command trace is observational logging, not source state.
+    # Repo's trace and derived GitConfig JSON caches are not source-selection
+    # authority. The actual config, wrapper, Git refs/indexes and source bytes
+    # remain in this state comparison.
     (cd "$central/.repo" && find . -type f ! -path './repo/*' ! -name index.lock \
-        ! -path '*/logs/*' ! -name 'TRACE_FILE*' ! -name FETCH_HEAD ! -name COMMIT_EDITMSG -print0 | sort -z | xargs -0 sha256sum)
+        ! -path '*/logs/*' ! -name 'TRACE_FILE*' ! -name .repo_config.json \
+        ! -name FETCH_HEAD ! -name COMMIT_EDITMSG -print0 | sort -z | xargs -0 sha256sum)
 }
 
 impact_cli() {
@@ -189,13 +189,6 @@ impact_mcp() {
     jq -S '.result.structuredContent.context | {model_revision,accepted_head,pending_changes,writes_available}' \
         "$native_case/status-after.json" > "$native_case/accepted-after.json"
     diff -u "$native_case/accepted-before.json" "$native_case/accepted-after.json"
-    if [[ "$selection" == native ]]; then
-        [[ "$result" != 0 ]] || { echo 'Unrecorded manifest history was silently guessed'; return 1; }
-        grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact-result.json"
-        impact_cli native --json && return 1
-        grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
-        return 0
-    fi
     [[ "$result" == 0 ]] || { cat "$native_case/impact-result.json"; return 1; }
     jq '.result.structuredContent | del(.context)' "$native_case/impact-result.json" > "$native_case/mcp-impact.json"
     impact_graph "$native_case/mcp-impact.json"
@@ -206,23 +199,10 @@ impact_mcp() {
 }
 
 impact_native() {
-    if impact_cli native --json; then echo 'Unrecorded manifest history was silently guessed'; return 1; fi
-    grep -Fq repo_impact_manifest_history_unavailable "$native_case/impact.diagnostic"
-    grep -Fq .repo/manifests/ "$native_case/impact.diagnostic"
-    grep -Fq composition "$native_case/impact.diagnostic"
-    impact_state > "$native_case/before-explicit-native.txt"
-    if (cd "$central" && "$REQVIRE_BIN" --manifest .repo/manifests/default.xml change-impact \
-        --git-commit "$impact_base" --json) > "$native_case/explicit-native.out" 2>&1; then
-        echo 'Changing manifest location silently guessed independent history'; return 1
-    fi
-    impact_state > "$native_case/after-explicit-native.txt"
-    diff -u "$native_case/before-explicit-native.txt" "$native_case/after-explicit-native.txt"
-    grep -Fq repo_impact_manifest_history_unavailable "$native_case/explicit-native.out"
-    # The workspace-root commit and its tracked manifest still identify the
-    # complete baseline, regardless of the native checkout's separate history.
-    impact_cli central --json
+    impact_cli native --json
     impact_graph "$native_case/impact.out"
     impact_provenance
+    test ! -e "$central/.reqvire-composition.json"
 }
 
 impact_single_selector() {
@@ -236,7 +216,7 @@ impact_single_selector() {
 
 impact_include() {
     local owner
-    for owner in "$central" "$(dirname "$native")"; do
+    for owner in "$central"; do
         mv "$owner/parts/projects.xml" "$owner/parts/current.xml"
         sed -i 's@parts/projects.xml@parts/current.xml@' "$owner/default.xml"
         impact_commit "$owner" 'Remove the historical include from the live tree' > /dev/null
@@ -379,9 +359,9 @@ provenance cli/repo-impact-provenance-and-links
 text cli/repo-impact-text
 mcp mcp/repo-impact-parity-and-isolation
 serve serve/repo-impact-parity-and-isolation
-foreign_manifest cli/repo-impact-unrecorded-manifest-history-rejected
-foreign_mcp mcp/repo-impact-unrecorded-manifest-history-rejected
-foreign_serve serve/repo-impact-unrecorded-manifest-history-rejected
+foreign_manifest cli/repo-impact-root-source-without-association
+foreign_mcp mcp/repo-impact-root-source-without-association
+foreign_serve serve/repo-impact-root-source-without-association
 selector cli/repo-impact-single-baseline-selector
 include cli/repo-impact-historical-includes
 missing cli/repo-impact-missing-base-commit

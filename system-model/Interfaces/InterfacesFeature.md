@@ -63,6 +63,8 @@ As a **System Engineer**, I want to prepare, open, inspect, and close isolated m
 #### Details
 Mixed model and implementation workflows can adopt eligible external commits on an owned branch through checked HEAD refresh and normal validated model loading while retaining context identity.
 
+The manifest-owning root branch is one authoring context whether the root contains model elements or only the manifest and configuration. Internal Repo copies do not introduce another independently authored manifest branch.
+
 #### Concept References
   * [MCP Worktree Context](../Thesaurus/Thesaurus.md#mcp-worktree-context)
 

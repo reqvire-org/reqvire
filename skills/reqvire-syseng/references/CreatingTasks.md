@@ -43,13 +43,13 @@ reqvire change-impact --git-commit=HEAD
 
 The optional override selects the single eligible worktree's baseline in ordinary Git mode. Without an override, use the actual PR merge-base from available CI/confirmed MCP review context. If unavailable, ask for the baseline; do not assume main or HEAD. An aggregate containing independent worktrees without a Repo composition remains ambiguous.
 
-In Repo mode, one selected workspace-root commit identifies the root model and versioned composition association. That association identifies native manifest-owner revisions, whose XML pins each component by full commit ID. Reqvire uses `.repo/manifest.xml` automatically:
+In Repo mode, the selected manifest-owning root commit supplies its tracked source manifest/includes and any root model documents. The root may contain no model elements; the exact component pins then supply the entire model. Repo administration introduces no separate manifest revision association. Reqvire uses `.repo/manifest.xml` automatically:
 
 ```bash
 reqvire change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
 ```
 
-Native XML remains versioned in its actual Git owners; `.reqvire-composition.json` records owner revisions without copying XML into the root. Independent history is supported. Missing associations, unversioned required inputs and unavailable objects produce affected-path diagnostics, including `repo_impact_manifest_history_unavailable`. Do not guess another revision or reuse live XML. Component pins must be full commit IDs, with all required objects local, including removed projects. Analysis never fetches, syncs or modifies active checkouts.
+Native selecting XML/includes remain versioned in the manifest-owning root branch. Repo's cached copy is not another revision authority; no separate manifest branch, PR or root self-association is needed. Missing canonical sources, unversioned selecting inputs and unavailable objects produce affected-path diagnostics, including `repo_impact_manifest_history_unavailable`. Do not guess a revision or substitute live cached XML. Component pins must be full commit IDs, with all required objects local, including removed projects. Analysis never fetches, syncs or modifies active checkouts.
 
 Inspect Repo report `comparison.base` and `comparison.current`: each records `central_commit` (the workspace-root repository commit), `manifest_inputs` (`path`, owning `commit`) and `projects` (`name`, `path`, `repository`, `commit`). Use these selections to inspect each repository's diff and route tasks. Paths and identifiers remain workspace-root-relative. In mutation-enabled MCP, use the same selected `branch`; `git_commit` follows the CLI rules, and the current side uses the accepted model/composition and pending edits. Impact reads do not import external file changes. Commit provenance does not mean pending bytes are committed.
 

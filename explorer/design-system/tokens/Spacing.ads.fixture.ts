@@ -67,6 +67,7 @@ export const fixture = {
     {"token":"--side-pane-collapsed-width","property":"width","probe":"13.375px"},
     {"token":"--side-pane-width","property":"width","probe":"13.375px"},
     {"token":"--space-left-pane-width-2","property":"width","probe":"13.375px"},
+    {"token":"--space-markdown-diagram-measure","property":"width","probe":"13.375px"},
     {"token":"--space-markdown-diagram-min-w","property":"width","probe":"13.375px"},
     {"token":"--space-markdown-frame-margin","property":"margin","probe":"13.375px"},
     {"token":"--space-markdown-frame-margin-1","property":"margin","probe":"13.375px"},

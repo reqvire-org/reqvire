@@ -77,8 +77,11 @@ npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/project mcp --t
 Configure this command and its arguments in the MCP client so it starts Reqvire
 for that project. HTTP remains the default transport. Both transports retain
 normal startup validation and mutation ownership checks, including the clean
-checkout requirement. A Repo composition also requires clean declared component
-and manifest-owner checkouts. Startup does not create authoring branches; use
+checkout requirement. A Repo composition uses the manifest-owning root branch
+and clean declared component checkouts. Track source XML/includes in that root
+repository; Repo administration is internal and has no separate authoring branch
+or PR. The root can have no model documents when pinned repositories supply the
+complete model. Startup does not create authoring branches; use
 `reqvire.branch.create` to prepare a working composition, or prepare named
 branches before committing model changes. Installing skills does not opt into
 mutations or commits.

@@ -142,6 +142,8 @@ reqvire:RelationSemanticCategory rdfs:isDefinedBy <https://www.reqvire.org/ontol
 reqvire:RelationSemanticPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RelationUsageCategory rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepoManifest rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:RepoManifestCachedCopy rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:RepoManifestSource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepoWorkspace rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepositoryBranchSelection rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:RepositoryPullRequest rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -225,6 +227,7 @@ reqvire:branchName rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:branchRepository rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:bridgeRelationPattern rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:builtinExternalOntology rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:cachedManifestSource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:canonicalConceptRelationSource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:canonicalConceptRelationTarget rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:capabilityCoverageRollupRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -437,6 +440,7 @@ reqvire:lintScope rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:lowPriority rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:lowRisk rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:manifestDeclaresProject rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
+reqvire:manifestSource rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:mappedByOntologyImpactRule rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:mapsToConcept rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
 reqvire:mediumPriority rdfs:isDefinedBy <https://www.reqvire.org/ontology> .
@@ -3624,7 +3628,7 @@ reqvire:snapshotManifestInput a owl:ObjectProperty ;
 	rdfs:range reqvire:ModelInputDependency .
 reqvire:WorktreeContext a owl:Class ;
 	reqvire:mapsToConcept concept:MCPWorktreeContext ;
-	rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a Central worktree's manifest can select component sources within that same context." .
+	rdfs:comment "An independently addressed accepted-model session rooted in one owning Git worktree; a root worktree's manifest can select component sources within that same context." .
 reqvire:GitCommit a owl:Class ;
 	rdfs:comment "A Git commit that can be accepted or observed by a worktree context." .
 reqvire:AcceptedModelSnapshot a owl:Class ;
@@ -3674,10 +3678,22 @@ reqvire:GitRepository a owl:Class ;
 	rdfs:comment "Git history and object ownership for a source repository." .
 reqvire:RepoWorkspace a owl:Class ;
 	reqvire:mapsToConcept concept:RepoWorkspace ;
-	rdfs:comment "Workspace whose Central worktree and versioned Repo manifest select the component model view." .
+	rdfs:comment "Workspace whose root worktree and versioned Repo manifest select the component model view." .
 reqvire:RepoManifest a owl:Class ;
 	reqvire:mapsToConcept concept:RepoManifest ;
-	rdfs:comment "Versioned project inventory and revision selection belonging to a Central worktree." .
+	rdfs:comment "Versioned project inventory and revision selection belonging to a root worktree." .
+reqvire:RepoManifestSource a owl:Class ;
+	rdfs:subClassOf reqvire:File ;
+	rdfs:comment "A tracked authoritative manifest source in the manifest-owning root repository." .
+reqvire:RepoManifestCachedCopy a owl:Class ;
+	rdfs:subClassOf reqvire:File ;
+	rdfs:comment "An internal derived copy of a manifest source; its location does not introduce another authoring repository or revision authority." .
+reqvire:manifestSource a owl:ObjectProperty ;
+	rdfs:domain reqvire:RepoManifest ;
+	rdfs:range reqvire:RepoManifestSource .
+reqvire:cachedManifestSource a owl:ObjectProperty ;
+	rdfs:domain reqvire:RepoManifestCachedCopy ;
+	rdfs:range reqvire:RepoManifestSource .
 reqvire:RevisionLockedManifest a owl:Class ;
 	rdfs:subClassOf reqvire:RepoManifest ;
 	reqvire:mapsToConcept concept:RevisionLockedManifest ;
@@ -3723,10 +3739,10 @@ reqvire:RepositoryBranchSelection a owl:Class ;
 	rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
 	rdfs:comment "A repository revision selection associated with a named authoring branch." .
 reqvire:CompositionCheckpoint a owl:Class ;
-	rdfs:comment "Committed provenance associating a root model revision with the manifest-owner revisions selecting its component commits." .
+	rdfs:comment "A root Git revision containing the authoritative source manifest, optional root model content and exact pins selecting component commits." .
 reqvire:ManifestRevisionSelection a owl:Class ;
 	rdfs:subClassOf reqvire:RepositoryRevisionSelection ;
-	rdfs:comment "A versioned manifest source selected from its actual owning Git history." .
+	rdfs:comment "An authoritative manifest source selected from the owning root repository branch revision, independently of a cached working copy." .
 reqvire:CoordinatedPullRequestSet a owl:Class ;
 	rdfs:comment "Repository-specific pull requests reviewing one composed model change." .
 reqvire:RepositoryPullRequest a owl:Class .

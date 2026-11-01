@@ -45,10 +45,12 @@ Use Reqvire to:
   and multi-repository workspaces. Previous `reqvire.worktree.*` names are no
   longer supported; clients must inspect contract compatibility.
 - **Multi-repository fixes and improvements.** Repo's native `.repo/manifest.xml`
-  selects the combined model. MCP prepares coordinated named branches, commits
-  changed components, advances and commits manifest pins in their actual owners,
-  and records the root composition checkpoint. Explicit push publishes dependencies
-  before the root; explicit PR creation produces linked PRs with per-repository targets.
+  discovers the source manifest owned by the root branch. MCP prepares coordinated
+  component branches, commits changed components, then commits updated source pins
+  with root changes in one root commit. The root can contain only the manifest and
+  configuration, with the entire model in pinned repositories. Explicit push
+  publishes components before the root; PR creation links changed-component PRs
+  with one root PR.
 - **Change impact analysis across repositories.** Comparisons reconstruct the
   selected composition from recorded manifest revisions and component pins.
   Available PR context selects the target's merge-base; otherwise supply an
@@ -108,16 +110,16 @@ the workspace but outside Git worktrees are ignored by model processing.
 
 ### Multi-repository models
 
-Use an initialized Google Repo workspace to combine its own model with declared
-component repositories. Runtime prerequisites are
+Use an initialized Google Repo workspace whose root repository owns the source
+manifest. The root can contain model elements or only manifest/configuration
+files, with the complete model in pinned repositories. Runtime prerequisites are
 Git, Python 3 and an initialized Google Repo client. Install the `repo` launcher
 and explicitly run `repo init` and `repo sync` before using Reqvire. By default,
-Reqvire follows Repo's active `.repo/manifest.xml`, its manifest checkout and
-local overlays, including standalone manifests. No duplicate root manifest is
-needed. Use `--manifest` only to select another manifest file location; its
-format, Git ownership and history stay the same. Keep `.repo/` and component
-checkout directories ignored by the outer Git repository. Manifest sources
-remain tracked in their actual owners. All declared projects must be local,
+Reqvire follows Repo's active `.repo/manifest.xml` entry to the root branch's
+tracked source XML/includes, for example `manifests/default.xml`. Repo's cached
+checkout is internal administration. `--manifest` remains an optional alternate
+source selection. Keep `.repo/` and component checkout directories ignored by the
+root Git repository while tracking the source manifest normally. All declared projects must be local,
 inside the workspace, at the selected revisions, and match their repository identity.
 Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
 
@@ -135,11 +137,11 @@ never fetches missing projects or revisions implicitly.
 The same MCP branch tools manage one repository or a declared composition.
 Explicit branch creation uses the requested root base's composition and creates
 named component branches at their own pins. Commits save changed components,
-advance and commit pins in actual manifest owners, then commit the root revision
-association in `.reqvire-composition.json`. This record contains references,
-without copying XML into the root. Explicit GitHub publication pushes dependencies
-before the root and can create linked PRs for changed owners in one call, with
-explicit per-repository bases. Change impact uses available PR context or one
+then commit updated tracked source pins together with root changes. The root
+branch is the manifest authority; no separately authored manifest branch, cached
+manifest commit/PR or manual root self-association is needed. Explicit GitHub
+publication pushes components before the root and can create linked component
+and root PRs in one call, with explicit review targets. Change impact uses available PR context or one
 explicit baseline override; select `HEAD` for pending changes. See the
 [User Guide](https://www.reqvire.org/user-guide) and
 [MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.

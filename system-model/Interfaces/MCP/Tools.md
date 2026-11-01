@@ -48,7 +48,7 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
 WHILE mutation mode is enabled, the system SHALL manage independently owned model branches through one MCP endpoint, with the same public branch operations for a single repository and a manifest-defined composition of repositories.
 
 #### Details
-Worktree administration is an explicit repository operation. It preserves the original checkout branch and effective workspace boundary. In Repo mode the owning worktree is Central and its manifest supplies the component view within that same branch context.
+Worktree administration is an explicit repository operation preserving original checkouts and the effective workspace boundary. In Repo mode the context belongs to the manifest-owning root branch and its pinned component view. The root can contain only manifest/configuration files; all model elements may belong to components. Repo administration does not add another public authoring context.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
@@ -241,7 +241,7 @@ When mutation mode is disabled, the system SHALL retain lint inspection and reje
 WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to its authorized owning repository remotes.
 
 #### Details
-Automatic commits remain an independent, default-disabled option. The context transaction commits changed components, then actual manifest-owner changes, then the workspace-root composition checkpoint in Repo mode. Publication does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+Automatic commits remain an independent, default-disabled option. Repo compositions commit changed components first, then their exact pins together with accepted root changes in the manifest-owning root branch. The root may contain no model documents. Publication does not introduce a separately authored manifest branch or PR, and does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -592,7 +592,7 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned Central worktrees. Declared component checkouts may supply clean detached preparation baselines, but authoring commits require named component and participating manifest-owner branches.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned root worktrees. Declared component checkouts may supply clean detached preparation baselines, but authoring commits require named component branches and the selected named root branch. The tracked source manifest belongs to that root branch; Repo administration has no separate authoring-branch requirement.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
 - The MCP server SHALL preserve the previous accepted model after rejected candidates or failed persistence and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Guarded branch.refresh may admit eligible artifact changes; explicit branch.open may fully validate a prepared committed model or composition. Neither may bypass ownership, accepted pending work or transaction recovery. A later Repo checkpoint failure retains already accepted pending edits and confirmed owner commits, without claiming a completed checkpoint.

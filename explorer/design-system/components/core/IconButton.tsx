@@ -56,7 +56,7 @@ const skinX = css`
   &[aria-pressed="true"],
   &.is-active {
     background: var(--accent-subtle);
-    color: var(--accent);
+    color: var(--accent-text);
   }
 
   &:disabled {

@@ -69,7 +69,7 @@ const baseUX = css`
 `;
 
 const skinX = css`
-  color: var(--color-paper);
+  color: var(--color-ink);
   background: var(--ds-elemicon-color, var(--color-role-other));
   box-shadow: inset 0 0 0 var(--border-w) var(--color-role-element-icon-ring);
 
@@ -79,6 +79,7 @@ const skinX = css`
   }
 
   &.ds-elemicon--hub {
+    color: var(--color-paper);
     background: var(--color-ink);
     box-shadow: inset 0 0 0 var(--border-w) var(--color-role-element-icon-ring-inverse);
   }
