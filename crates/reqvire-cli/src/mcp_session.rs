@@ -6,6 +6,8 @@ mod repo;
 #[cfg(test)]
 #[path = "mcp_session_tests.rs"]
 mod tests;
+#[path = "mcp_workspace_tools.rs"]
+mod workspace_tools;
 use reqvire::{
     error::ReqvireError, exclusions::ExclusionSet, mutation_io::SnapshotFiles, ModelBuildOptions,
     ModelManager,
@@ -37,6 +39,7 @@ pub struct MutationSession {
     recovery_error: Option<String>,
     recovery_attempt: Option<RecoveryAttempt>,
     enable_commits: bool,
+    workspace_outcomes: Vec<Value>,
     repo: Option<repo::RepoSession>,
     #[cfg(unix)]
     track_file_mode: bool,
@@ -263,144 +266,20 @@ impl GitObservation {
         })
     }
 }
-#[cfg(unix)]
-fn claim(file: &File) -> std::io::Result<()> {
-    rustix::fs::flock(file, rustix::fs::FlockOperation::NonBlockingLockExclusive)
-        .map_err(Into::into)
-}
-#[cfg(windows)]
-fn claim(file: &File) -> std::io::Result<()> {
-    use std::os::windows::io::AsRawHandle;
-    use windows_sys::Win32::{
-        Storage::FileSystem::{LockFileEx, LOCKFILE_EXCLUSIVE_LOCK, LOCKFILE_FAIL_IMMEDIATELY},
-        System::IO::OVERLAPPED,
-    };
-    // The synchronous handle remains open for the session; Windows releases the
-    // byte-range lock on close/process exit. No asynchronous operation is used.
-    let mut overlapped: OVERLAPPED = unsafe { std::mem::zeroed() };
-    let result = unsafe {
-        LockFileEx(
-            file.as_raw_handle(),
-            LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY,
-            0,
-            1,
-            0,
-            &mut overlapped,
-        )
-    };
-    if result == 0 {
-        Err(std::io::Error::last_os_error())
-    } else {
-        Ok(())
-    }
-}
-
-#[cfg(unix)]
-fn release(file: &File) -> std::io::Result<()> {
-    rustix::fs::flock(file, rustix::fs::FlockOperation::Unlock).map_err(Into::into)
-}
-
-#[cfg(windows)]
-fn release(file: &File) -> std::io::Result<()> {
-    use std::os::windows::io::AsRawHandle;
-    use windows_sys::Win32::{Storage::FileSystem::UnlockFileEx, System::IO::OVERLAPPED};
-    let mut overlapped: OVERLAPPED = unsafe { std::mem::zeroed() };
-    let result = unsafe { UnlockFileEx(file.as_raw_handle(), 0, 1, 0, &mut overlapped) };
-    if result == 0 {
-        Err(std::io::Error::last_os_error())
-    } else {
-        Ok(())
-    }
-}
-
-fn lock_contention(failure: &std::io::Error) -> bool {
-    #[cfg(unix)]
-    {
-        failure.kind() == std::io::ErrorKind::WouldBlock
-    }
-    #[cfg(windows)]
-    {
-        failure.raw_os_error() == Some(windows_sys::Win32::Foundation::ERROR_LOCK_VIOLATION as i32)
-    }
-}
-
-fn unsupported_lock(failure: &std::io::Error) -> bool {
-    if failure.kind() == std::io::ErrorKind::Unsupported {
-        return true;
-    }
-    #[cfg(unix)]
-    {
-        failure.raw_os_error() == Some(rustix::io::Errno::NOSYS.raw_os_error())
-    }
-    #[cfg(windows)]
-    {
-        failure.raw_os_error()
-            == Some(windows_sys::Win32::Foundation::ERROR_INVALID_FUNCTION as i32)
-    }
-}
-
-fn lock_error(path: &Path, operation: &str, failure: std::io::Error) -> ReqvireError {
-    let guidance = if operation == "acquire" && lock_contention(&failure) {
-        "already owned or busy; another operation holds this lock"
-    } else if failure.kind() == std::io::ErrorKind::PermissionDenied {
-        "permission denied; check this file and its directory permissions for the server/container user"
-    } else if operation == "acquire" && unsupported_lock(&failure) {
-        "filesystem locking is unsupported; use a filesystem with exclusive lock support"
-    } else {
-        "lock operation failed; ownership was not acquired"
-    };
-    error(format!(
-        "Cannot {operation} MCP lock '{}': {failure}; {guidance}. Leave lock files in place.",
-        path.display()
-    ))
-}
-
-fn open_lock(path: &Path) -> std::io::Result<File> {
-    OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(false)
-        .open(path)
-}
-
-/// Owns one OS lock, releasing it explicitly before closing the handle.
-/// An incidental fork/exec descriptor copy must not extend the owner's lifetime.
-/// The handle is private and cannot be cloned or transferred out of this guard.
-#[derive(Debug)]
-pub struct FileLock {
-    file: File,
-    path: PathBuf,
-}
-
-impl Drop for FileLock {
-    fn drop(&mut self) {
-        if let Err(failure) = release(&self.file) {
-            log::error!(
-                "Cannot release MCP lock '{}': {failure}",
-                self.path.display()
-            );
-        }
-    }
-}
-
-// Shared by context ownership and repository administration. Never remove the
-// filename to release a lock: other contenders must continue using its inode.
+// Lock ownership is shared with standalone workspace commands.
+pub use reqvire_workspace::locks::FileLock;
+#[cfg(test)]
+use reqvire_workspace::locks::{claim, open_lock};
 pub fn lock_file(path: &Path) -> Result<FileLock, ReqvireError> {
-    lock_file_with(path, open_lock, claim)
+    reqvire_workspace::locks::lock_file(path).map_err(Into::into)
 }
-
+#[cfg(test)]
 fn lock_file_with(
     path: &Path,
     open: impl FnOnce(&Path) -> std::io::Result<File>,
     acquire: impl FnOnce(&File) -> std::io::Result<()>,
 ) -> Result<FileLock, ReqvireError> {
-    let file = open(path).map_err(|failure| lock_error(path, "open", failure))?;
-    acquire(&file).map_err(|failure| lock_error(path, "acquire", failure))?;
-    Ok(FileLock {
-        file,
-        path: path.to_path_buf(),
-    })
+    reqvire_workspace::locks::lock_file_with(path, open, acquire).map_err(Into::into)
 }
 
 struct LoadedSnapshot {
@@ -417,6 +296,16 @@ fn load_snapshot(
     head: &str,
     exclusions: &ExclusionSet,
     options: ModelBuildOptions,
+) -> Result<LoadedSnapshot, ReqvireError> {
+    load_workspace_candidate(root, branch, head, exclusions, options, None)
+}
+fn load_workspace_candidate(
+    root: &Path,
+    branch: &str,
+    head: &str,
+    exclusions: &ExclusionSet,
+    options: ModelBuildOptions,
+    allowed_root_changes: Option<&BTreeSet<PathBuf>>,
 ) -> Result<LoadedSnapshot, ReqvireError> {
     let mut files = SnapshotFiles {
         root: root.to_path_buf(),
@@ -484,7 +373,32 @@ fn load_snapshot(
         .expect("workspace snapshot")
         .git_worktrees
     {
-        require_clean(owner)?;
+        if let Some(allowed) = allowed_root_changes.filter(|_| root.starts_with(owner)) {
+            let mut paths = git(
+                owner,
+                &["diff", "--name-only", "-z", "HEAD", "--"],
+                None,
+                None,
+            )?;
+            paths.extend(git(
+                owner,
+                &["ls-files", "--others", "--exclude-standard", "-z"],
+                None,
+                None,
+            )?);
+            for relative in paths.split(|b| *b == 0).filter(|p| !p.is_empty()) {
+                let path =
+                    owner.join(std::str::from_utf8(relative).map_err(|e| error(e.to_string()))?);
+                if !allowed.contains(&path) {
+                    return Err(error(format!(
+                        "Unaccepted root change blocks workspace admission: {}",
+                        path.display()
+                    )));
+                }
+            }
+        } else {
+            require_clean(owner)?;
+        }
     }
     let model_revision = reqvire::model_fingerprint(&model.graph_registry.get_all_elements())?;
     let checkout = GitCheckout::read(root)?;
@@ -507,7 +421,7 @@ impl MutationSession {
     ) -> Result<Self, ReqvireError> {
         let scope = reqvire::workspace::WorkspaceScope::discover()?;
         if (scope.git_worktrees.len() != 1 && scope.repo.is_none())
-            || scope.git_worktrees[0] != scope.root
+            || !scope.root.starts_with(&scope.git_worktrees[0])
         {
             return Err(error(
                 "Mutation-enabled MCP requires one Git worktree at the workspace root",
@@ -580,6 +494,7 @@ impl MutationSession {
             recovery_error: None,
             recovery_attempt: None,
             enable_commits,
+            workspace_outcomes: Vec::new(),
             repo,
             #[cfg(unix)]
             track_file_mode,
@@ -650,10 +565,13 @@ impl MutationSession {
             "head": self.head, "accepted_head": self.head, "enable_commits": self.enable_commits,
             "model_revision": self.model_revision,
             "pending_changes": self.pending_paths().iter().filter_map(|p| p.strip_prefix(&self.root).ok()).collect::<Vec<_>>(),
+            "repositories_dir":null,"projects":[],
+            "project_outcomes":self.workspace_outcomes,
         });
         if let Some(repo) = &self.repo {
             value["workspace_mode"] = serde_json::json!("repo");
             value["manifest"] = serde_json::json!(repo.workspace.manifest);
+            value["repositories_dir"] = serde_json::json!(repo.workspace.repositories_dir);
             value["projects"] = serde_json::json!(repo
                 .workspace
                 .projects
@@ -662,6 +580,8 @@ impl MutationSession {
                     let mut metadata = serde_json::to_value(project).expect("project provenance");
                     metadata["branch"] = serde_json::json!(repo.branch(&project.path));
                     let owner = self.root.join(&project.path);
+                    metadata["head"] =
+                        serde_json::json!(git_text(&owner, &["rev-parse", "HEAD"]).ok());
                     metadata["pending_changes"] = serde_json::json!(self
                         .pending_paths
                         .iter()
@@ -901,7 +821,7 @@ impl MutationSession {
                 self.check_checkout(&observed).and_then(|_| {
                     self.repo
                         .as_ref()
-                        .map_or(Ok(()), |repo| repo.check(&self.root))
+                        .map_or(Ok(()), |repo| repo.check(&self.root).map_err(Into::into))
                 }),
                 observed.head.clone(),
                 observed.branch.as_deref() != Some(&self.branch)
@@ -945,7 +865,7 @@ impl MutationSession {
             && !self
                 .repo
                 .as_ref()
-                .map(|repo| repo.needs_checkpoint(&self.files))
+                .map(|repo| repo.needs_checkpoint())
                 .transpose()?
                 .unwrap_or(false)
         {
@@ -1292,6 +1212,10 @@ fn prepare_commit_for(
     changed: &BTreeSet<PathBuf>,
     message: &str,
 ) -> Result<PreparedCommit, ReqvireError> {
+    // Git index/tree paths are relative to the owning checkout even when the
+    // model and manifest live below it.
+    let owner = PathBuf::from(git_text(root, &["rev-parse", "--show-toplevel"])?);
+    let root = owner.as_path();
     let candidate_index = tempfile::NamedTempFile::new()?.into_temp_path();
     fs::remove_file(&candidate_index)?;
     git(root, &["read-tree", head], None, Some(&candidate_index))?;

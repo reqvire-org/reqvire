@@ -40,14 +40,14 @@ In mutation-enabled MCP, comparisons use the captured accepted current model and
 
    Ordinary Git mode requires one eligible worktree. The explicit override selects its base; omission uses available CI or confirmed MCP PR context. Without that context, ask for a baseline instead of selecting main or HEAD silently. Explicit HEAD reviews pending changes. A plain aggregate with multiple independent worktrees remains ambiguous.
 
-   **Repo composition:** Run at the workspace root with initialized Repo metadata and declared projects prepared locally. `.repo/manifest.xml` is the default. The selected root branch owns the tracked source manifest/includes and any root model content. Its baseline commit selects the component pins, which may supply the entire model when the root has no model documents. Repo administration is not another authoring owner; no separate manifest branch, PR or self-association is required. Do not apply the root ref independently in components or require another manifest selector:
+   **Declared workspace:** Run at the root owning reqvire-workspace.toml, with its configured component checkouts prepared locally. The selected root commit supplies that versioned manifest and optional root model; exact pins supply each component's content. Do not apply the root ref independently in components or add another manifest revision flag.
 
    ```bash
-   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact \
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact \\
      --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
    ```
 
-   Selecting XML/includes are versioned in the manifest-owning root branch. Repo's cache is internal; do not create another manifest owner or root self-association. Missing or unversioned canonical inputs report `repo_impact_manifest_history_unavailable`; mutable baseline component pins report `repo_impact_base_unlocked`, and unavailable objects report `repo_impact_base_unavailable`. Removed projects may use retained local object storage. Never drop unavailable projects, guess a revision or substitute live cached XML for a partial comparison. Analysis never fetches, syncs or changes active checkouts.
+   Analysis stays offline. Use explicit workspace sync to prepare the recorded pins; --latest advances refs and is a separate development choice. A pre-conversion baseline can read its versioned root-owned XML/includes through the shared workspace reader, requiring neither Repo nor Python. Ambiguous legacy selection, missing history and unavailable objects fail with affected paths; never substitute live XML/TOML or drop a project for a partial comparison. Existing error codes include repo_impact_manifest_history_unavailable, repo_impact_base_unlocked and repo_impact_base_unavailable. Removed projects can use matching retained local checkouts or object storage; no retention step is required when removing a declaration.
 
    **Mutation-enabled MCP:** Use `reqvire.change_impact` with the same selected `branch` and optional `git_commit`. The current side is the accepted model, captured composition and accepted pending edits, including embedded MCP. External changes are not imported by this read. A baseline error preserves the accepted revision, pending edits and write availability.
 
@@ -61,7 +61,7 @@ In mutation-enabled MCP, comparisons use the captured accepted current model and
    - `impact_scope[]` - Per-branch scope roots (common parent requirements covering all impacted elements)
    - `invalidated_verifications[]` - Verifications that need re-review
 
-   Repo reports also include `comparison.workspace_mode: "repo"` and `comparison.base` / `comparison.current`. Each side records `central_commit`, sorted `manifest_inputs` with `path` / owning `commit`, and `projects` with `name`, workspace-relative `path`, repository identity `repository` and resolved `commit`. Inspect each owning repository's diff using these selections, including added, removed and moved projects. Commit provenance does not imply pending bytes are committed; inspect context/pending-state evidence separately. Source links use the relevant side's owning repository and commit, with workspace-relative fallbacks for unsupported remotes.
+   Composition reports retain the compatibility field `comparison.workspace_mode: "repo"` and `comparison.base` / `comparison.current`. Each side records `central_commit`, sorted `manifest_inputs` with `path` / owning `commit`, and `projects` with `name`, workspace-relative `path`, repository identity `repository` and resolved `commit`. Inspect each owning repository's diff using these selections, including added, removed and moved projects. Commit provenance does not imply pending bytes are committed; inspect context/pending-state evidence separately. Source links use the relevant side's owning repository and commit, with workspace-relative fallbacks for unsupported remotes.
 
    The top-level `added` and `changed` arrays are smart-filtered report roots, not a complete change inventory: changes already reached through another root remain inside its `change_impact_tree`. Traverse those trees and compare the Git diff and current element inventory before concluding that no elements were added or changed. Native ontology and concept changes can produce a broad review set. An invalidated verification needs evidence review; it is not an assertion that its test has failed.
 
@@ -105,7 +105,7 @@ In mutation-enabled MCP, comparisons use the captured accepted current model and
 ## Change Propagation Rules
 
 - **Contract → Binding or reference consumer**: Both dependency kinds propagate content changes for review; only bindings affect implementation fulfillment. Inspect both structured edge kinds in the impact report.
-- **Cross-repository documentation**: Include website/docs repositories as declared Repo projects. Documentation requirements use Contract References to product contracts, concrete verifications and eligible `satisfiedBy` page sources. Contract changes can reach all three across repository boundaries. A remote URL alone does not make an external model or history available.
+- **Cross-repository documentation**: Include website/docs repositories as declared workspace dependencies. Documentation requirements use Contract References to product contracts, concrete verifications and eligible `satisfiedBy` page sources. Contract changes can reach all three across repository boundaries. A remote URL alone does not make an external model or history available.
 - **Parent → Child**: Parent changes propagate to all derived children
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates

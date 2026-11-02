@@ -1,0 +1,20 @@
+# Elements
+
+### Root Capability
+
+Coordinate the root product.
+
+#### Metadata
+  * type: capability
+---
+
+### Root Requirement
+
+The system SHALL provide the root behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Root Capability](#root-capability)
+---

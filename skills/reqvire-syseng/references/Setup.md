@@ -39,11 +39,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --version
 For reproducible runtime behavior, set `REQVIRE_NPX_PACKAGE` before starting the assistant:
 
 ```bash
-export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@1.5.0
 ```
 
-Use the intended workspace root for validation and MCP startup. Migration remains
-CLI-only and precedes MCP startup when the model is incompatible:
+Use the intended workspace root for validation and MCP startup. Model-syntax migration remains
+CLI-only and precedes MCP startup when the model is incompatible. Native workspace preparation is separate; follow [Workspace Preparation](Workspaces.md) before startup when dependencies are missing:
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate

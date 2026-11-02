@@ -519,7 +519,7 @@ Human or machine surface that exposes Reqvire model semantics or operations.
 
 ### MCP Worktree Context
 
-An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a Repo workspace, the root branch owns the source manifest selecting the component checkouts in that same context. Model documents may be held in the root, the components, or both.
+An independently addressed MCP model session rooted in one owning Git worktree, with its own branch identity, accepted model state and operation lifecycle. In a multi-repository workspace, the root branch owns the source manifest selecting the component checkouts in that same context. Model documents may be held in the root, the components, or both.
 
 #### Metadata
   * type: concept
@@ -533,19 +533,19 @@ An independently addressed MCP model session rooted in one owning Git worktree, 
 
 ### Manifest Project
 
-A component repository declared by the effective Repo manifest, with a workspace-relative checkout path and a selected revision. Its files retain their repository ownership while participating in the combined model.
+A dependent repository declared by a workspace manifest, with a path relative to its configured checkout parent and an exact selected commit. Its files retain their repository ownership while participating in the combined workspace.
 
 #### Metadata
   * type: concept
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [Repo Manifest](#repo-manifest)
+  * related: [Workspace Manifest](Workspaces.md#workspace-manifest)
 ---
 
 ### Model Change Publication
 
-The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. A Repo composition records component commits in the source manifest owned by the root branch. One root revision holds those pins and any root model or configuration changes; related component and root pull requests review the coordinated change.
+The progression of accepted model changes into their owning repositories' Git histories and explicit remote publication. A workspace composition records component commits in the source manifest owned by the root branch. One root revision holds those pins and any root model or configuration changes; related component and root pull requests review the coordinated change.
 
 #### Metadata
   * type: concept
@@ -860,30 +860,6 @@ Semantic pattern describing relation behavior such as hierarchy, bridge, ownersh
   * related: [Relation Model](#relation-model)
 ---
 
-### Repo Manifest
-
-A version-controlled description of a Repo workspace's component repositories, checkout paths and selected revisions. Its source belongs to the selected root branch. Repo's cached copy is internal administration rather than another authored revision authority.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
----
-
-### Repo Workspace
-
-A model workspace whose root repository and branch own the source manifest selecting component repositories managed by Repo. The root branch identifies the context; project pins identify the component content. The root may contain only the manifest and configuration while the complete model resides in pinned repositories.
-
-#### Metadata
-  * type: concept
-
-#### Relations
-  * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * related: [MCP Worktree Context](#mcp-worktree-context)
-  * related: [Repo Manifest](#repo-manifest)
----
-
 ### Report
 
 Generated view or output that presents selected model structure, semantic context, coverage, traceability, resources, or validation evidence.
@@ -927,14 +903,14 @@ Precise terms that define a requirement, including source basis, specifications,
 
 ### Revision-Locked Manifest
 
-A Repo manifest recording exact component commit identifiers so that its saved component view can be reconstructed independently of moving branch tips.
+A workspace manifest recording exact component commit identifiers so that its saved composition can be reconstructed independently of moving branch tips.
 
 #### Metadata
   * type: concept
 
 #### Relations
   * derivedFrom: [Reqvire Concept Scheme](#reqvire-concept-scheme)
-  * broader: [Repo Manifest](#repo-manifest)
+  * broader: [Workspace Manifest](Workspaces.md#workspace-manifest)
 ---
 
 ### Runtime Ontology Artifact

@@ -10,6 +10,7 @@ mod mcp_session;
 mod mcp_worker;
 mod mcp_worktrees;
 mod serve;
+mod workspace_cli;
 
 use crate::cli::apply_workspace;
 use crate::cli::handle_command;
@@ -41,6 +42,15 @@ async fn main() {
     if let Err(err) = reqvire::repo_workspace::set_manifest_selection(args.manifest.clone()) {
         error!("{}", err);
         std::process::exit(1);
+    }
+
+    // Preparation does not construct a model or its exclusion policy.
+    if let Some(cli::Commands::Workspace { json, command }) = &args.command {
+        let code = workspace_cli::handle(command, *json).unwrap_or_else(|err| {
+            error!("{err}");
+            1
+        });
+        std::process::exit(code);
     }
 
     // Run `handle_command` and get exit code

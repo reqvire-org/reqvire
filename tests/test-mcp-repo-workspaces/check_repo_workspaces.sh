@@ -5,16 +5,13 @@ source "$TEST_SCRIPT_DIR/check_change_impact.sh"
 
 ws_manifest() {
     local revision=$1 fetch=${2:-file://$native_case/remotes/} name
-    {
-        printf '<manifest>\n  <remote name="local" fetch="%s"/>\n  <default remote="local" revision="main"/>\n' "$fetch"
-        printf '  <project name="component" path="repositories/component" revision="%s"/>\n' "$revision"
-        for name in secondary retained; do
-            if [[ -f "$native_case/$name-revision" ]]; then
-                printf '  <project name="%s" path="repositories/%s" revision="%s"/>\n' "$name" "$name" "$(cat "$native_case/$name-revision")"
-            fi
-        done
-        printf '</manifest>\n'
-    } > "$central/default.xml"
+    fixture_manifest > "$central/reqvire-workspace.toml"
+    fixture_project component "$revision" component "$fetch" >> "$central/reqvire-workspace.toml"
+    for name in secondary retained; do
+        if [[ -f "$native_case/$name-revision" ]]; then
+            fixture_project "$name" "$(cat "$native_case/$name-revision")" "$name" "$fetch" >> "$central/reqvire-workspace.toml"
+        fi
+    done
 }
 
 ws_fixture() {
@@ -59,13 +56,7 @@ ws_fixture() {
         review=$(impact_commit "$central" 'Root omega selection')
         git -C "$central" branch review
         git -C "$central" reset -q --hard "$initial_central"
-        runtime=$(git -C "$TEST_DIR/repo-tool" rev-parse HEAD)
-        (
-            cd "$central"
-            repo init -q -u "file://$native_case/remotes/central" -b main \
-                --repo-url "file://$TEST_DIR/repo-tool" --repo-rev "$runtime" --no-repo-verify --no-clone-bundle
-            repo sync -q --no-clone-bundle --no-tags
-        ) > "$native_case/repo-setup.log" 2>&1
+        (cd "$central" && "$REQVIRE_BIN" workspace sync) > "$native_case/workspace-setup.log" 2>&1
         for project in "$central"/repositories/*; do git -C "$project" checkout -q -B main; done
         jq -n --arg alpha "$alpha" --arg omega "$omega" --arg root "$initial_central" --arg review "$review" \
             '{alpha:$alpha,omega:$omega,root:$root,review:$review}' > "$native_case/provenance.json"
@@ -93,7 +84,7 @@ ws_start() {
     fi
 }
 ws_rpc() { impact_rpc "$1" "$2" "$3" > /dev/null; }
-ws_cli() { (cd "$central" && "$REQVIRE_BIN" --manifest default.xml "$@"); }
+ws_cli() { (cd "$central" && "$REQVIRE_BIN" --manifest reqvire-workspace.toml "$@"); }
 ws_names() { jq '[.result.structuredContent.files[].elements[].name] | sort' "$1"; }
 ws_git_state() {
     local owner
@@ -107,7 +98,7 @@ ws_git_state() {
 ws_state() {
     ws_git_state
     local file
-    for file in "$central/Model.md" "$central/default.xml" "$central/.repo/manifests/default.xml" "$central"/repositories/*/Model.md "$central"/repositories/*/Added.md; do
+    for file in "$central/Model.md" "$central/reqvire-workspace.toml" "$central/reqvire-workspace.toml" "$central"/repositories/*/Model.md "$central"/repositories/*/Added.md; do
         if [[ -f "$file" ]]; then sha256sum "$file"; else printf 'ABSENT %s\n' "$file"; fi
     done
 }
@@ -130,13 +121,10 @@ ws_saved() {
         printf '%s %s\n' "${owner##*/}" "$(git -C "$owner" rev-parse HEAD)" >> "$native_case/expected-pins.txt"
         test -z "$(git -C "$owner" status --porcelain)"
     done
-    git -C "$central" show HEAD:default.xml > "$native_case/saved.xml"
+    git -C "$central" show HEAD:reqvire-workspace.toml > "$native_case/saved.toml"
     : > "$native_case/actual-pins.txt"
-    while IFS= read -r line; do
-        name=$(sed -n 's/.*name="\([^"]*\)".*/\1/p' <<< "$line")
-        revision=$(sed -n 's/.*revision="\([^"]*\)".*/\1/p' <<< "$line")
-        printf '%s %s\n' "$name" "$revision" >> "$native_case/actual-pins.txt"
-    done < <(awk 'BEGIN {RS=">"} /<project[[:space:]]/ {gsub(/[\r\n]/," ");print $0 ">"}' "$native_case/saved.xml")
+    awk '/^name = / {name=$3;gsub(/"/,"",name)} /^commit = / {commit=$3;gsub(/"/,"",commit);print name,commit}' \
+        "$native_case/saved.toml" > "$native_case/actual-pins.txt"
     sort -o "$native_case/actual-pins.txt" "$native_case/actual-pins.txt"
     diff -u "$native_case/expected-pins.txt" "$native_case/actual-pins.txt"
     test -z "$(git -C "$central" ls-files repositories)"
@@ -168,9 +156,9 @@ ws_explicit() {
     diff -u "$TEST_SCRIPT_DIR/expected/native-names.json" "$native_case/names.json"
     cp "$central/Model.md" "$native_case/original.md"
     mkdir "$central/evidence" "$native_case/resolver-bin"
-    cp "$TEST_SCRIPT_DIR/fixtures/resolver-double.sh" "$native_case/resolver-bin/python3"
-    chmod +x "$native_case/resolver-bin/python3"
-    local count i first=0 current declaration fetch url
+    cp "$TEST_SCRIPT_DIR/fixtures/resolver-double.sh" "$native_case/resolver-bin/git"
+    chmod +x "$native_case/resolver-bin/git"
+    local count i first=0 current url
     for count in 1 64; do
         : > "$native_case/relations.txt"
         for ((i=0;i<count;i++)); do
@@ -180,64 +168,55 @@ ws_explicit() {
         awk -v file="$native_case/relations.txt" '{print} /^#### Relations$/ {while ((getline line < file)>0) print line; close(file)}' \
             "$native_case/original.md" > "$central/Model.md"
         : > "$native_case/resolver-launches.txt"
-        REQVIRE_REPO_TEST_PYTHON=$(command -v python3) REQVIRE_REPO_TEST_RESOLVER_LOG="$native_case/resolver-launches.txt" \
+        REQVIRE_REPO_TEST_GIT=$(command -v git) REQVIRE_REPO_TEST_RESOLVER_LOG="$native_case/resolver-launches.txt" \
             PATH="$native_case/resolver-bin:$PATH" ws_cli validate > /dev/null
         current=$(wc -l < "$native_case/resolver-launches.txt")
         if [[ "$count" == 1 ]]; then first=$current; else test "$current" = "$first"; fi
         test "$current" -gt 0
     done
     cp "$native_case/original.md" "$central/Model.md"
-    # Evidence stays outside the declared model and is ignored after this check.
     rm -r "$central/evidence"
-    cp "$central/default.xml" "$native_case/original.xml"
-    declaration=$(sed -n '/<project /p' "$central/default.xml")
-    printf '<manifest>\n%s\n</manifest>\n' "$declaration" > "$central/projects.xml"
-    sed '/<project /c\  <include name="projects.xml"/>' "$native_case/original.xml" | \
-        sed "/<\/manifest>/i\  <extend-project name=\"component\" revision=\"$alpha\"/>" > "$central/default.xml"
-    impact_commit "$central" 'Select root-owned include' > /dev/null
+    cp "$central/reqvire-workspace.toml" "$native_case/original.toml"
     ws_state > "$native_case/before.txt"
-    ws_cli search --json > "$native_case/included.json"
+    ws_cli search --json > "$native_case/selected.json"
     ws_state > "$native_case/after.txt"
     diff -u "$native_case/before.txt" "$native_case/after.txt"
-    git -C "$central/repositories/component" remote rename local origin
-    cp "$central/default.xml" "$native_case/included.xml"
-    for fetch in . ssh://git@github.com/test; do
-        url="$native_case/remotes/component"
-        [[ "$fetch" == . ]] || url=git@github.com:test/component.git
-        sed "s|file://$native_case/remotes/|$fetch|" "$native_case/included.xml" > "$central/default.xml"
-        git -C "$central/repositories/component" remote set-url origin "$url"
+    git -C "$central/repositories/component" remote rename origin local
+    for url in "$native_case/remotes/component" git@github.com:test/component.git; do
+        sed "s|file://$native_case/remotes/component|$url|" "$native_case/original.toml" > "$central/reqvire-workspace.toml"
+        git -C "$central/repositories/component" remote set-url local "$url"
         ws_cli search --json > "$native_case/alias.json"
         jq '[.files[].elements[].name]|sort' "$native_case/alias.json" > "$native_case/names.json"
         diff -u "$TEST_SCRIPT_DIR/expected/native-names.json" "$native_case/names.json"
     done
-    if (cd "$central" && "$REQVIRE_BIN" --manifest missing.xml validate) > "$native_case/missing.log" 2>&1; then return 1; fi
-    grep -Fq missing.xml "$native_case/missing.log"
+    if (cd "$central" && "$REQVIRE_BIN" --manifest missing.toml validate) > "$native_case/missing.log" 2>&1; then return 1; fi
+    grep -Fq missing.toml "$native_case/missing.log"
     ! grep -Fq 'unexpected argument' "$native_case/missing.log"
 }
 
 ws_boundaries() {
     ws_fixture boundaries
-    cp "$central/default.xml" "$native_case/original.xml"
+    cp "$central/reqvire-workspace.toml" "$native_case/original.toml"
     ln -s "$native_case/component-seed" "$central/repositories/escape"
     local key replacement
     for key in duplicate escape commit missing symlink overlap foreign; do
-        cp "$native_case/original.xml" "$central/default.xml"
+        cp "$native_case/original.toml" "$central/reqvire-workspace.toml"
         case "$key" in
             duplicate|overlap)
-                replacement=repositories/component
+                replacement=component
                 [[ "$key" != overlap ]] || replacement+=/nested
-                sed -i "/<\/manifest>/i\  <project name=\"another\" path=\"$replacement\" revision=\"$alpha\"/>" "$central/default.xml" ;;
+                fixture_project another "$alpha" "$replacement" >> "$central/reqvire-workspace.toml" ;;
             escape|missing|symlink)
                 replacement=../outside
                 [[ "$key" != missing ]] || replacement=repositories/missing
                 [[ "$key" != symlink ]] || replacement=repositories/escape
-                sed -i "s@path=\"repositories/component\"@path=\"$replacement\"@" "$central/default.xml" ;;
-            commit) sed -i "s/$alpha/0000000000000000000000000000000000000000/" "$central/default.xml" ;;
-            foreign) git -C "$central/repositories/component" remote set-url local "$native_case/foreign" ;;
+                sed -i "s@path = \"repositories/component\"@path = \"$replacement\"@" "$central/reqvire-workspace.toml" ;;
+            commit) sed -i "s/$alpha/0000000000000000000000000000000000000000/" "$central/reqvire-workspace.toml" ;;
+            foreign) git -C "$central/repositories/component" remote set-url origin "$native_case/foreign" ;;
         esac
         ws_state > "$native_case/before.txt"
         if ws_cli validate --json > "$native_case/$key.log" 2>&1; then echo "Invalid $key accepted" >&2; return 1; fi
-        grep -Fq default.xml "$native_case/$key.log"
+        grep -Fq reqvire-workspace.toml "$native_case/$key.log"
         ws_state > "$native_case/after.txt"
         diff -u "$native_case/before.txt" "$native_case/after.txt"
     done
@@ -253,7 +232,7 @@ ws_branch() {
     jq -e --arg review "$review" '.result.structuredContent.base_commit == $review' "$native_case/create.json" > /dev/null
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$omega"
     test "$(git -C "$child/repositories/component" symbolic-ref --short HEAD)" = topic
-    test "$(realpath "$child/.repo")" != "$(realpath "$central/.repo")"
+    test "$(git -C "$child/repositories/component" rev-parse --path-format=absolute --git-dir)" != "$(git -C "$central/repositories/component" rev-parse --path-format=absolute --git-dir)"
     ws_rpc reqvire.read_element '{"branch":"topic","name":"Component Specification"}' "$native_case/omega.json"
     grep -Fq omega "$native_case/omega.json"
     ws_rpc reqvire.read_element '{"branch":"main","name":"Component Specification"}' "$native_case/alpha.json"
@@ -381,8 +360,7 @@ ws_push() {
         git -C "$central" remote set-url origin https://github.com/test/project.git
         # Both checkouts represent this same source history under the fixture's
         # controlled web identity; Repo administration is not another owner.
-        git -C "$central/.repo/manifests" remote set-url origin https://github.com/test/project.git
-        git -C "$central/repositories/component" remote set-url local https://github.com/test/component
+        git -C "$central/repositories/component" remote set-url origin https://github.com/test/component
         ws_manifest "$alpha" https://github.com/test/
         impact_commit "$central" 'Register publication identities' > /dev/null
         git -C "$central/repositories/component" switch -qc dependency-review
@@ -427,10 +405,10 @@ ws_case() {
         explicit) ws_explicit ;;
         invalid)
             ws_fixture invalid
-            printf '<manifest>' > "$central/default.xml"
+            printf 'version = [' > "$central/reqvire-workspace.toml"
             ws_state > "$native_case/before.txt"
             if (cd "$central" && "$REQVIRE_BIN" validate --json) > "$native_case/invalid.log" 2>&1; then return 1; fi
-            grep -Fq default.xml "$native_case/invalid.log"
+            grep -Fq reqvire-workspace.toml "$native_case/invalid.log"
             ws_state > "$native_case/after.txt"
             diff -u "$native_case/before.txt" "$native_case/after.txt" ;;
         boundaries) ws_boundaries ;;

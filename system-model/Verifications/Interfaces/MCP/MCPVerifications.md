@@ -122,7 +122,7 @@ Verify that long-lived MCP tools apply the core cache freshness/publication cont
 - Move HEAD externally while an accepted read is held, then explicitly readmit the stale context. Confirm the live owner admits the clean prepared HEAD while held reads finish with their original captured content and identity. Subsequent reads use the admitted model; neither successful nor rejected admission substitutes a new-context response for an old read. Stopped/unavailable worker cases retain their separate failure and ownership-release assertions.
 - After external checkout changes, audited resources and prompts retain the accepted snapshot with live staleness and disabled-write diagnostics. Unavailable or replaced workers retain context diagnostics in protocol errors rather than returning malformed successful resource/prompt payloads.
 - A superseded pre-write build cannot replace the model used for post-write MCP evidence or Explorer runtime generation. Generated store and ontology artifacts agree with the accepted post-write model under the existing runtime projection.
-- Construct mutation adapter regressions through the production worktree manager and actual workers under both commit policies. Successful persisted mutations rebuild and publish the selected runtime once. Preview requests, no-op executions, JSON-RPC errors, and rejected tool results with no newly accepted persisted model perform no runtime build, change no published assets/revision, and do not clear a previous runtime diagnostic. Runtime publication follows accepted state, not the error envelope alone: a later Repo checkpoint failure may retain a newly accepted pending model with its diagnostics.
+- Construct mutation adapter regressions through the production worktree manager and actual workers under both commit policies. Successful persisted mutations rebuild and publish the selected runtime once. Preview requests, no-op executions, JSON-RPC errors, and rejected tool results with no newly accepted persisted model perform no runtime build, change no published assets/revision, and do not clear a previous runtime diagnostic. Runtime publication follows accepted state, not the error envelope alone: a later workspace checkpoint failure may retain a newly accepted pending model with its diagnostics.
 - A runtime-generation or parent payload-publication failure after a successful persisted mutation preserves the last valid Explorer snapshot internally and reports runtime unavailability, while accepted model reads and their revision/HEAD/pending paths remain available. Context diagnostics survive HTTP resource/tool metadata serialization. A subsequent valid worker runtime publication clears the diagnostic without changing identical runtime content's revision.
 - Read-only aggregate workspace adapters retain model reads and workspace-relative child paths, omit mutation tools, reject mutation calls, and preserve child source/index bytes without writable ownership, including when cached index stat data is stale.
 - Ordinary manifest/chunk requests keep reading the published snapshot without triggering source scans or builds. External edits become visible to read-only MCP model reads under the core contract; mutation-enabled reads retain the accepted snapshot; this change does not add external-edit polling to Explorer's publication lifecycle.
@@ -565,7 +565,7 @@ Expected checks:
 - In both commit modes, inject permission-setting denial while content writes remain possible. Existing content edits with matching executable state must retain their native permissions without a permission call, including non-default modes. Exercise new files and executable/non-executable asset moves; a required denied or ineffectual permission change must reject publication with its path and operation, preserve the accepted revision, and leave the session usable when rollback fully succeeds.
 - Force a later Git publication failure and confirm restored bytes and native permissions, unchanged HEAD/index/accepted revision, and no unnecessary permission calls during restoration. Separately force a genuinely required restoration failure and confirm writes remain disabled. Verify unattempted paths are not restored and no failed candidate becomes visible.
 - With `core.filemode=false`, simulate filesystem execute bits differing from tracked Git modes. Content edits and asset moves must preserve the logical index mode and avoid filesystem chmod, with the correct tree mode after explicit or automatic commit. Include real-worker checks for non-default native permissions and moves; retain a Windows host-clone/container-bind-mount reproduction procedure and distinguish local fault injection from platform validation.
-- Verify successive reads reuse the accepted snapshot without filesystem cache rebuilding; semantic exports and Explorer refresh adopt successfully persisted candidates in both commit modes. Single-repository commit-enabled adoption waits for a successful commit. Repo checkpoint-failure cases separately retain accepted pending edits and confirmed owner commits while reporting incomplete committed acceptance.
+- Verify successive reads reuse the accepted snapshot without filesystem cache rebuilding; semantic exports and Explorer refresh adopt successfully persisted candidates in both commit modes. Single-repository commit-enabled adoption waits for a successful commit. workspace checkpoint-failure cases separately retain accepted pending edits and confirmed owner commits while reporting incomplete committed acceptance.
 - Check shared identity of accepted model and file-map entries across read scopes. Verify request-local overlays provide read-after-write, delete/rename/directory visibility and executable-mode preservation without changing the base or importing external edits; dropping failed/preview scopes discards preparation. Capture dependencies only during explicit startup capture.
 - In both commit modes, retain earlier read handles through successful and failed writes and confirm their content remains immutable. For commit-disabled sessions, exercise successive edits, deletion/recreation, moves and byte/mode reversions to the committed baseline; pending paths match only accepted differences. Failed and preview requests retain pending state, while successful explicit/automatic commits clear it and preserve unrelated staged files.
 - Instrument real worker Git subprocesses for repeated accepted reads, unchanged read-only loads, and runtime metadata. Confirm reduced duplicate observations without cross-request reuse. Exercise branch/HEAD changes between requests and during loading/preparation, fresh staged/unstaged/untracked dirty state, detached/unborn metadata, invalid reload recovery, and Git observation failures. Preserve the existing commit/publication race and rollback checks.
@@ -794,10 +794,10 @@ Acceptance review for the typed MCP `reqvire.rename_element` adapter.
 
 ### MCP Repository Workflow Verification Objective
 
-This objective groups verification of isolated worktree model sessions, accepted-change commits, and authorized repository publication, including root manifest checkpoints for Repo workspaces.
+This objective groups verification of isolated worktree model sessions, accepted-change commits, and authorized repository publication, including root manifest checkpoints for multi-repository workspaces.
 
 #### Details
-Repo-mode acceptance covers one manifest-owning root branch and its declared component snapshots, cross-project preview/apply, per-component commits before one root source-manifest checkpoint, dependency-first publication and retained-state failures. The root can contain model elements or only manifest/configuration files. Repo administration is derived internal state rather than another authoring repository.
+composition acceptance covers one manifest-owning root branch and its declared component snapshots, cross-project preview/apply, per-component commits before one root source-manifest checkpoint, dependency-first publication and retained-state failures. The root can contain model elements or only manifest/configuration files. derived workspace administration is derived internal state rather than another authoring repository.
 
 The complete lifecycle includes coordinated named component branches, root source pins committed with related root changes, explicit external composition admission, actual PR review baselines, and linked component/root PR sets. Existing artifact-only refresh, accepted snapshot isolation, recovery and publication protections remain part of acceptance. No extra manifest lane, cached-manifest commit/PR or root-to-manifest self-association is required.
 
@@ -865,9 +865,9 @@ Verify the successful and rejected paths of mcp worktree creation.
 - Reproduce a valid source whose selected base has an invalid model. Inject worker/startup/worktree creation failure and verify no usable context is exposed; cleanup affects only new unchanged assets, with explicit residual-state reporting if cleanup is unsafe.
 - Verify uncommitted accepted and external edits are never silently copied, committed, stashed, or discarded.
 
-In native Repo mode all declared component branches use the requested destination name at the selected base composition pins; verify explicit release bases differing from startup HEAD and no initial pin advance. Reject a component branch collision without mutating source refs or publishing a partial context.
+In native manifest-defined operation all declared component branches use the requested destination name at the selected base composition pins; verify explicit release bases differing from startup HEAD and no initial pin advance. Reject a component branch collision without mutating source refs or publishing a partial context.
 
-Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. derived workspace administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -891,7 +891,7 @@ Verify the successful and rejected paths of mcp worktree opening and inventory.
 
 Explicitly open a registered branch after externally committed model/composition changes. Require full validated admission without new flags, no-op reuse when unchanged, and retained accepted reads after invalid/pending/recovery rejection. Ensure artifact-only refresh remains guarded and background polling does not import the changes.
 
-Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. derived workspace administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1021,7 +1021,7 @@ Verify the successful and rejected paths of mcp pull request creation.
 
 For a composed change, require explicit repository_bases for each changed dependency, stable already-pushed component branches, dependency-first creation, a root body linking their PR URLs, and deterministic per-owner results. Reject missing/foreign targets before side effects. Retry exact PRs without duplicates or authored metadata edits; preserve and report partial created/reused PRs after a later failure. Untouched components receive no PR.
 
-Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. derived workspace administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1032,49 +1032,19 @@ Canonical root-owned manifest checks use the Workspace Composition Lifecycle Ver
   * verify: [MCP Pull Request Creation](../../../Interfaces/MCP/Tools.md#mcp-pull-request-creation)
 ---
 
-### MCP Repo Change Publication Verification
+### MCP Workspace Composition Isolation Verification
 
-Verify the owning-repository save and publication boundaries for one combined Repo model.
-
-#### Details
-- The existing explicit and automatic commit cases declare three component repositories. One shared-contract rename changes root and references in two components in the same mutation. Require exact golden source bytes in all three changed Git histories, one commit per changed repository parented by its accepted base, and a final root manifest pinning every component's exact resulting SHA. Preserve relative contract-reference paths even when the source documents have the same filename. root cannot track component files.
-- Require the third component's files, index, refs and HEAD to remain identical throughout both save policies. Default acceptance before explicit commit leaves every owned index and HEAD unchanged. Pending paths clear only after the root checkpoint; a fresh CLI read of that saved manifest returns the complete combined model.
-- Retain the new-component-file save check in the same session after the shared rename. Require its owning component and root to receive the next commits, pin every component correctly, leave the other component HEADs unchanged and preserve the retained component's full state. Repeated no-op commit creates no further commit.
-- `mcp/failed-central-checkpoint-retains-component` rejects the final root Git reference transaction. Require a tool error, unchanged root HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
-- The push cases start from an independently prepared saved root manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before root and a reachable component ref. A denied component push must prevent every root push attempt and preserve local saved commits and the previous root remote tip; removing the denial then retries the same saved view successfully in that server.
-- Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution. Reuse compatible fixed-policy HTTP sessions across related cases and record actual server starts in the suite report. Different startup policies, dirty admission and destructive reference-failure checks remain isolated; shared sessions are closed through the existing lifecycle on completion or failure.
-
-Native publication uses the root branch's tracked source manifest. Require changed component commits before one root commit containing exact pins and root changes, including a manifest-only root. No cached-manifest authoring ref or root self-association is permitted. Root failure retains confirmed component commits and pending root work.
-
-Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [check_repo_workspaces.sh](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
-  * satisfiedBy: [added.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/added.md.txt)
-  * satisfiedBy: [commit-central-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-central-renamed.md.txt)
-  * satisfiedBy: [commit-component-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-component-renamed.md.txt)
-  * satisfiedBy: [commit-secondary-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-secondary-renamed.md.txt)
-  * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
-  * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
----
-
-### MCP Repo Context Isolation Verification
-
-Verify that the existing root branch context owns a complete isolated Repo view and applies model changes through its accepted snapshot.
+Verify that the existing root branch context owns a complete isolated combined view and applies model changes through its accepted snapshot.
 
 #### Details
-- `mcp/central-branch-component-revisions` creates a context from a different root commit whose manifest pins a second locally available component commit. Require separate component directories and Repo metadata, unchanged original files/indexes/HEADs, different selected content under the same component identifier, and the requested named branch in every declared component at its own selected pin. Remove and reopen the managed context; require its recorded component content again.
+- `mcp/central-branch-component-revisions` creates a context from a different root commit whose manifest pins a second locally available component commit. Require separate component directories and derived workspace metadata, unchanged original files/indexes/HEADs, different selected content under the same component identifier, and the requested named branch in every declared component at its own selected pin. Remove and reopen the managed context; require its recorded component content again.
 - `mcp/cross-project-preview-apply` previews a component contract rename referenced from root. Require a complete diff, unchanged source/index/HEAD/revision after preview and rejected duplicate naming, then exact committed golden file contents in both repositories after acceptance. Default mutation leaves Git indexes and HEADs unchanged and reports both pending paths.
 - `mcp/dirty-component-admission` requires a dirty declared project to fail mutation admission with its path; rejecting admission cannot alter files or Git state.
-- Exercise existing typed branch-selected tools over the real HTTP server. Do not add a project selector or substitute a single-repository test adapter for Repo preparation.
+- Exercise existing typed branch-selected tools over the real HTTP server. Do not add a project selector or substitute a single-repository test adapter for native workspace preparation.
 
 Repeat the differing-base case with native discovery and root-owned source manifests, without composition association files. Startup and release source pins differ; test both model-bearing and manifest-only roots. Require component isolation, no initial pin advance and restart/reopen from the selected root source.
 
-Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. Repo administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. derived workspace administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
 
 #### Metadata
   * type: test-verification
@@ -1089,6 +1059,36 @@ Canonical root-owned manifest checks use the Workspace Composition Lifecycle Ver
   * verify: [MCP Branch Opening and Inventory](../../../Interfaces/MCP/Tools.md#mcp-branch-opening-and-inventory)
   * verify: [MCP Mutation Concurrency Control](../../../Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control)
   * verify: [MCP Worktree Context Isolation](../../../Interfaces/MCP/Tools.md#mcp-worktree-context-isolation)
+---
+
+### MCP Workspace Publication Verification
+
+Verify the owning-repository save and publication boundaries for one combined workspace model.
+
+#### Details
+- The existing explicit and automatic commit cases declare three component repositories. One shared-contract rename changes root and references in two components in the same mutation. Require exact golden source bytes in all three changed Git histories, one commit per changed repository parented by its accepted base, and a final root manifest pinning every component's exact resulting SHA. Preserve relative contract-reference paths even when the source documents have the same filename. root cannot track component files.
+- Require the third component's files, index, refs and HEAD to remain identical throughout both save policies. Default acceptance before explicit commit leaves every owned index and HEAD unchanged. Pending paths clear only after the root checkpoint; a fresh CLI read of that saved manifest returns the complete combined model.
+- Retain the new-component-file save check in the same session after the shared rename. Require its owning component and root to receive the next commits, pin every component correctly, leave the other component HEADs unchanged and preserve the retained component's full state. Repeated no-op commit creates no further commit.
+- `mcp/failed-central-checkpoint-retains-component` rejects the final root Git reference transaction. Require a tool error, unchanged root HEAD, a retained completed component commit with the accepted file bytes, pending work and readable accepted model content.
+- The push cases start from an independently prepared saved root manifest. Redirect only authorized GitHub identities to real local bare Git remotes, using the existing controlled gh executable. Require component publication before root and a reachable component ref. A denied component push must prevent every root push attempt and preserve local saved commits and the previous root remote tip; removing the denial then retries the same saved view successfully in that server.
+- Use outcome/golden-file comparisons and actual Git refs, not a mocked Reqvire commit or publication layer. Network publication is outside regular test execution. Reuse compatible fixed-policy HTTP sessions across related cases and record actual server starts in the suite report. Different startup policies, dirty admission and destructive reference-failure checks remain isolated; shared sessions are closed through the existing lifecycle on completion or failure.
+
+Native publication uses the root branch's tracked source manifest. Require changed component commits before one root commit containing exact pins and root changes, including a manifest-only root. No cached-manifest authoring ref or root self-association is permitted. Root failure retains confirmed component commits and pending root work.
+
+Canonical root-owned manifest checks use the Workspace Composition Lifecycle Verification's real shared history and Bash cases. derived workspace administration is not an extra authoring participant. Assert the manifest-only central repository follows the same branch, commit, review and admission workflow.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
+  * satisfiedBy: [check_repo_workspaces.sh](../../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
+  * satisfiedBy: [added.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/added.md.txt)
+  * satisfiedBy: [commit-central-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-central-renamed.md.txt)
+  * satisfiedBy: [commit-component-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-component-renamed.md.txt)
+  * satisfiedBy: [commit-secondary-renamed.md.txt](../../../../tests/test-mcp-repo-workspaces/expected/commit-secondary-renamed.md.txt)
+  * verify: [MCP Accepted Change Commit](../../../Interfaces/MCP/Tools.md#mcp-accepted-change-commit)
+  * verify: [MCP Branch Push](../../../Interfaces/MCP/Tools.md#mcp-branch-push)
 ---
 
 ### MCP Worktree Context Isolation Verification
@@ -1121,32 +1121,6 @@ Verify that MCP worker sessions implement the shared context boundary on success
   * satisfiedBy: [mcp_worktrees.rs](../../../../crates/reqvire-cli/src/mcp_worktrees.rs)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-ownership/test.sh)
   * verify: [MCP Worktree Worker Sessions](../../../Interfaces/MCP/Tools.md#mcp-worktree-worker-sessions)
----
-
-### Workspace Composition Lifecycle Verification
-
-Verify native composition preparation, checkpoint ownership, restart, intentional external admission, and coordinated publication against real local Git and Repo fixtures.
-
-#### Details
-- Use real local Git histories and an actual Repo client. The root repository tracks manifests/default.xml and includes on the same branch as any root model; .repo and component directories stay ignored. Do not simulate common ownership by only changing a remote URL.
-- Run both a root with model elements and a root containing only manifest/configuration files whose pinned repositories contain the entire model. Native CLI/MCP/Explorer discovery must accept both without a manifest override or self-association.
-- Create from a release base whose source pins differ from startup main and cached XML. Each component must use the requested destination branch at its own base pin; preserve existing checkouts and initial pins. Close/reopen and restart must recover that source composition. No reqvire/manifests branch or extra manifest authoring owner is created.
-- For explicit and automatic commits, require confirmed changed-component commits followed by one root commit containing updated tracked pins and root changes. Assert unchanged components remain unchanged, no .repo files enter root Git, no cached-manifest authoring commit is made, and no .reqvire-composition.json self-association is created. A pinned unchanged checkpoint is a no-op.
-- Root ref failure retains confirmed component commits and pending root pin changes. Unknown root outcomes use recorded root reconciliation; unknown component outcomes retain operator recovery. Retrying must not duplicate confirmed component commits. There is no separate cached-manifest ref recovery stage.
-- Prepare external component commits, update and commit source pins with related root work, then explicitly open the same root branch. Require valid full admission without a mode or self-association; pending/recovery/invalid rejection retains accepted reads. Artifact refresh cannot admit changed source pins.
-- Push actual changed component branches before the root and create/reuse linked component/root PRs. repository_bases contains component targets only; the root PR includes source pin changes even when there are no root model elements. No administrative checkout target, ref, remote push or PR is permitted.
-- Retrieve the published root source composition in a fresh checkout and reproduce the graph and change impact analysis. Compare root and per-component committed provenance with actual source paths. Read-only comparisons preserve HEADs, indexes, refs, working bytes and Repo administration and never contact remotes.
-
-Read-state preservation covers authored source bytes, source-selection wrappers, actual Git configuration, refs, HEADs and indexes. Operational trace logs and Repo's derived .repo_config.json caches are not authoritative selection inputs and may be regenerated; excluding those derived caches does not permit changing source selection, source files, checkout revisions or accepted model state.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [MCP Repository Workflow Verification Objective](#mcp-repository-workflow-verification-objective)
-  * satisfiedBy: [check_composition.sh](../../../../tests/test-mcp-repo-workspaces/check_composition.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
-  * verify: [Reproducible Workspace Composition](../../../ModelStructure/RepoWorkspaces.md#reproducible-workspace-composition)
 ---
 
 ### MCP Resource Interface Verification

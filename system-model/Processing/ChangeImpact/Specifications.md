@@ -51,38 +51,23 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
   * type: specification
 ---
 
-### Repo Change Impact Baseline Specification
+### Workspace Change Impact Baseline Specification
 
 #### Details
-**Selection**
-- In ordinary Git mode retain single-eligible-worktree scope. Resolve an explicit --git-commit / git_commit directly; otherwise use available PR review-base metadata and a local merge-base. If no review context exists, return review_baseline_required with guidance to supply the actual baseline or explicitly select HEAD. An ordinary multi-worktree workspace without a Repo composition remains ambiguous and MUST be rejected.
-- In Repo mode `--git-commit` / `git_commit` is the sole baseline selector. It selects the workspace-root repository's base commit, using the same explicit-override and PR-baseline policy. That commit identifies both the root model and the historical manifest composition. Resolve it once locally; never apply this ref independently to components.
-- Read the authoritative source manifest and all versioned selecting inputs directly from the selected root tree, along with any root model documents. The root may have no model elements; its pins then supply the entire baseline model. Native .repo/manifest.xml selection must not require an explicit override or a root-to-manifest association.
-- Repo's cached manifest checkout is internal derived state, not a separate baseline owner. Resolve the canonical tracked source path and repository identity; reject missing, foreign, unversioned or ambiguous source inputs with their path. Never use live cached bytes or a separate cached-manifest commit to substitute for the selected root tree.
-- Resolve all base includes and overlays from their identified owning historical trees. If an input is unversioned or its historical version cannot be identified, fail with the input path; never mix historical declarations with live inputs.
-- Require historical component revisions to be full commit object IDs. Reject mutable branch/tag selections in a baseline instead of guessing their historical value. Current composition revisions may use the admitted locally resolved commits.
-- Support Repo's existing include, remote, revision precedence and ownership semantics. Do not introduce a second manifest format or reinterpret the selected workspace-root commit as unrelated manifest-project history.
+**Baseline selection**
+Use one explicit --git-commit / git_commit override when supplied. Otherwise use the actual available PR target and its local merge-base. If no review context exists, return review_baseline_required and require the intended baseline or explicit HEAD; never silently choose main. Resolve the selected root ref once, independently of component refs. Ordinary single-repository scope keeps its existing comparison behavior.
 
-**Complete historical scope**
-- Materialize root and every base-declared project's model, semantic dependencies and eligible local artifacts at its own commit, under that composition's workspace-relative paths and ignore rules.
-- Discover base projects independently of the current project inventory. Added, removed, renamed-path and changed-identity projects must not be silently omitted. A removed project's objects may come from retained local Repo object storage even when no live checkout remains.
-- Require repository identity, path containment, non-overlap and locally available objects for each historical selection. Fail before reporting on missing commits, unavailable removed-project objects, invalid manifests, identity conflicts or path escapes, with the affected manifest/project/path/revision.
-- Compare two complete workspace graphs. Preserve existing model validation, including the existing historical compatibility policy; never construct a partial baseline by dropping unresolved projects or relations.
+**Shared composition access**
+Request the complete baseline repository selections and native manifest provenance from the workspace service. Construct model sources, semantic dependencies, eligible artifacts and ignore rules under that returned inventory at each repository's own exact commit. Do not parse another manifest, use live source bytes in place of the selected root tree or reimplement object-store/checkout discovery.
+
+The owner may contain no model elements. Added, removed, relocated and changed-identity components participate from their respective complete snapshots. Missing source history, unsupported input, mutable pins, foreign identities, invalid paths and unavailable commits fail with the affected source/repository/path; do not drop unresolved components or introduce a second baseline selector.
 
 **Read isolation**
-- Reconstruction MUST use captured inputs or isolated temporary materialization; it MUST NOT checkout/reset active repositories, change HEADs, indexes, working bytes, source-selection Repo administration, manifest pins or accepted MCP state. Operational trace logs are outside source-state preservation.
-- Never fetch, sync or contact remotes. Temporary resources must be cleaned after success and failure.
-- CLI current scope retains its normal valid working-tree behavior. MCP uses only the selected context's accepted current model, captured manifest/project provenance and accepted pending changes. External file/manifest changes cannot be imported by an impact request.
-- A base reconstruction failure returns a read error while preserving the accepted model, revision, pending changes and write availability.
+Graph construction and analysis use captured sources or isolated temporary materialization supplied through the shared boundary. Never fetch, sync, switch active checkouts, change refs/indexes/source bytes/pins or adopt external edits. Preserve accepted current model, revision, pending changes and write availability after failed comparisons.
 
+MCP comparisons use only the selected context's accepted model and captured current provenance, including accepted pending edits. Explicit HEAD compares that pending state to the captured committed composition and may be empty after automatic commits. Baseline selection metadata may come from CI or an already confirmed PR context; the analysis operation itself does not contact remote services.
 
-
-**Diagnostics**
-An unidentifiable or unversioned selecting input reports repo_impact_manifest_history_unavailable with its canonical source path and guidance to prepare its versioned root source or unavailable local objects. An unavailable component commit reports repo_impact_base_unavailable; a mutable baseline component revision reports repo_impact_base_unlocked. No diagnostic may demand a separately authored manifest branch or self-association when the root owns its source manifest.
-
-PR review selects the merge-base of the admitted root branch and its actual PR target. Explicit HEAD compares accepted pending changes with the captured committed composition and may be empty after automatic commits. GITHUB_BASE_REF or locally recorded PR-target metadata may supply the target before comparison; the shared analysis operation must not call gh or other remote services. Return baseline provenance including how it was selected.
-
-Read-state preservation covers authored source bytes, source-selection wrappers, actual Git configuration, refs, HEADs and indexes. Operational trace logs and Repo's derived .repo_config.json caches are not authoritative selection inputs and may be regenerated; excluding those derived caches does not permit changing source selection, source files, checkout revisions or accepted model state.
+Preserve existing diagnostic roles, including repo_impact_manifest_history_unavailable, repo_impact_base_unavailable and repo_impact_base_unlocked, with native-source preparation guidance. The representation change does not rename public errors or weaken existing historical model validation.
 
 #### Metadata
   * type: specification
@@ -91,20 +76,22 @@ Read-state preservation covers authored source bytes, source-selection wrappers,
   * define: [Manifest-Based Change Impact Baselines](ChangeImpactRequirements.md#manifest-based-change-impact-baselines)
 ---
 
-### Repo Change Impact Reporting Specification
+### Workspace Change Impact Reporting Specification
 
 #### Details
 - Apply the existing added, changed, removed, relocated, impact-scope, invalidated-verification and smart-filtering rules to the complete base and current graphs. Repository boundaries MUST NOT interrupt hierarchy, contract-binding, contract-reference, ontology, semantic-contract, concept, verification or local-artifact impact paths.
 - A contract changed in a server repository must reach a referencing documentation requirement in another repository, its verification and its eligible page source. Keep contract-reference and binding edge provenance distinct; references do not add implementation obligations.
 - A project path move with unchanged elements uses existing stable-name relocation semantics. It MUST NOT create false content changes or add/remove pairs merely because workspace-relative identifiers changed. Added and removed project elements use their respective complete snapshots.
-- Preserve existing report fields. Repo-mode JSON adds `comparison` with `workspace_mode: "repo"` and `base` / `current` records. Each record contains `central_commit`, sorted `manifest_inputs` records with workspace-relative `path` and owning `commit`, and sorted `projects` records with `name`, workspace-relative `path`, repository identity `repository` and resolved `commit`. Sort manifest inputs by path and projects by path, name and repository identity.
+- Preserve existing report fields. Manifest-defined comparison JSON retains `comparison` with `workspace_mode: "repo"` and `base` / `current` records. Each record contains `central_commit`, sorted `manifest_inputs` records with workspace-relative `path` and owning `commit`, and sorted `projects` records with `name`, workspace-relative `path`, repository identity `repository` and resolved `commit`. Sort manifest inputs by path and projects by path, name and repository identity.
 - Current provenance identifies the accepted/current source commits even when model inputs include permitted pending changes. It MUST NOT imply those pending bytes are committed; existing context/pending-state evidence remains authoritative.
 - Text reports include an equivalent composition provenance summary. All model identifiers, evidence paths and relocation paths remain workspace-relative.
 - Resolve source links using the relevant side's owning repository, repository-relative source path and commit. Removed source links use base provenance; changed/added/impacted source links use current provenance. Do not prefix component paths with root's GitHub identity or commit. When a repository URL cannot be mapped to a supported web URL, retain a workspace-relative link without inventing a remote URL.
 - CLI and MCP use the shared single-selector baseline and comparison semantics. MCP discovery exposes optional `git_commit` only for baseline selection; it does not add another repository revision selector or reinterpret the selected context branch. Embedded MCP uses the same accepted-snapshot semantics.
 - The structural comparison vocabulary describes snapshots and repository revision selections; it does not require runtime session/provenance RDF instances to be exported.
 
-Root-owned source manifest inputs use canonical tracked source paths and the corresponding root commit in base/current provenance. Cached .repo paths and cached checkout HEADs must not masquerade as separate authored sources or produce incorrect blob links. Reports remain complete when every model element belongs to pinned component repositories and the root contributes only source manifest/configuration files.
+Root-owned source manifest inputs use canonical tracked source paths and the corresponding root commit in base/current provenance. Derived cache paths and checkout HEADs must not masquerade as separate authored sources or produce incorrect blob links. Reports remain complete when every model element belongs to pinned component repositories and the root contributes only source manifest/configuration files.
+
+The existing workspace_mode value repo and legacy-named provenance fields remain wire-compatible labels for this comparison. They do not require Google Repo or XML input. The workspace service supplies the native manifest path, owning source path and component selections; this report consumes that provenance without implementing workspace management.
 
 #### Metadata
   * type: specification

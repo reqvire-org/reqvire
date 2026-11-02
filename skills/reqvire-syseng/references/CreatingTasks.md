@@ -41,19 +41,19 @@ reqvire change-impact --git-commit=HEAD~1
 reqvire change-impact --git-commit=HEAD
 ```
 
-The optional override selects the single eligible worktree's baseline in ordinary Git mode. Without an override, use the actual PR merge-base from available CI/confirmed MCP review context. If unavailable, ask for the baseline; do not assume main or HEAD. An aggregate containing independent worktrees without a Repo composition remains ambiguous.
+The optional override selects the single eligible worktree's baseline in ordinary Git mode. Without an override, use the actual PR merge-base from available CI/confirmed MCP review context. If unavailable, ask for the baseline; do not assume main or HEAD. An aggregate containing independent worktrees without a declared workspace composition remains ambiguous.
 
-In Repo mode, the selected manifest-owning root commit supplies its tracked source manifest/includes and any root model documents. The root may contain no model elements; the exact component pins then supply the entire model. Repo administration introduces no separate manifest revision association. Reqvire uses `.repo/manifest.xml` automatically:
+In a declared workspace, the selected root commit supplies reqvire-workspace.toml and optional root model documents. Exact component pins may supply the entire model. Run from that root or select it explicitly:
 
 ```bash
 reqvire change-impact --git-commit="$BASE_COMMIT" --json --output /tmp/impact.json
 ```
 
-Native selecting XML/includes remain versioned in the manifest-owning root branch. Repo's cached copy is not another revision authority; no separate manifest branch, PR or root self-association is needed. Missing canonical sources, unversioned selecting inputs and unavailable objects produce affected-path diagnostics, including `repo_impact_manifest_history_unavailable`. Do not guess a revision or substitute live cached XML. Component pins must be full commit IDs, with all required objects local, including removed projects. Analysis never fetches, syncs or modifies active checkouts.
+The manifest and component paths follow the configured repositories_dir. Prepare checkouts explicitly through workspace sync; analysis never fetches, syncs, changes pins or modifies active checkouts. sync --latest follows configured refs and advances pins only when requested. Comparisons across conversion use the baseline's versioned XML through the shared legacy reader; missing or ambiguous selection/history fails explicitly without importing current XML or cached metadata. No separate manifest branch, PR or self-association exists.
 
-Inspect Repo report `comparison.base` and `comparison.current`: each records `central_commit` (the workspace-root repository commit), `manifest_inputs` (`path`, owning `commit`) and `projects` (`name`, `path`, `repository`, `commit`). Use these selections to inspect each repository's diff and route tasks. Paths and identifiers remain workspace-root-relative. In mutation-enabled MCP, use the same selected `branch`; `git_commit` follows the CLI rules, and the current side uses the accepted model/composition and pending edits. Impact reads do not import external file changes. Commit provenance does not mean pending bytes are committed.
+Inspect composition report `comparison.base` and `comparison.current`: each records `central_commit` (the workspace-root repository commit), `manifest_inputs` (`path`, owning `commit`) and `projects` (`name`, `path`, `repository`, `commit`). Use these selections to inspect each repository's diff and route tasks. Paths and identifiers remain workspace-root-relative. In mutation-enabled MCP, use the same selected `branch`; `git_commit` follows the CLI rules, and the current side uses the accepted model/composition and pending edits. Impact reads do not import external file changes. Commit provenance does not mean pending bytes are committed.
 
-For website or documentation repositories, include them as declared Repo projects. Give their obligations requirements with Contract References to the product contracts they describe, concrete verifications and `satisfiedBy` page sources. This carries review impact across repositories without adding implementation obligations to the contract owner. A remote link alone cannot supply another repository's model or historical graph.
+For website or documentation repositories, include them as declared workspace dependencies. Give their obligations requirements with Contract References to the product contracts they describe, concrete verifications and `satisfiedBy` page sources. This carries review impact across repositories without adding implementation obligations to the contract owner. A remote link alone cannot supply another repository's model or historical graph.
 
 The change-impact command identifies:
 - `added[]` - New capabilities/requirements/contracts/verifications

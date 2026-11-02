@@ -417,9 +417,27 @@ pub fn run() -> Result<(), ReqvireError> {
                 let tool = params["name"].as_str().unwrap_or(method).to_string();
                 let persists = method == "tools/call"
                     && crate::mcp::request_refreshes_runtime_after_write(&params);
-                let (result, changed) = session.execute(persists, &tool, || {
-                    dispatch_rpc(&request, options.with_size_estimates, &exclusions)
-                });
+                let (result, changed) = if method == "tools/call"
+                    && tool.starts_with("reqvire.workspace.")
+                {
+                    match reqvire::tool_interface::validate_tool_arguments(
+                        &tool,
+                        &params["arguments"],
+                        true,
+                    ) {
+                        Err(message) => {
+                            (Err(rmcp::ErrorData::invalid_params(message, None)), false)
+                        }
+                        Ok(()) => match session.workspace_operation(&tool, &params["arguments"]) {
+                            Ok(data) => (Ok(crate::mcp::tool_success(data)), persists),
+                            Err(error) => (Ok(crate::mcp::tool_error(&tool, error)), false),
+                        },
+                    }
+                } else {
+                    session.execute(persists, &tool, || {
+                        dispatch_rpc(&request, options.with_size_estimates, &exclusions)
+                    })
+                };
                 let mut value = rpc_result(result);
                 if changed {
                     runtime_result(&session, &options, &mut value);

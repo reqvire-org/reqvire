@@ -215,8 +215,9 @@ impl MutationSession {
             ));
         }
         let head = observed.checkout.head.expect("checked committed HEAD");
-        let changed = reqvire::git_commands::GitReader::new(&self.root, |args, input| {
-            git(&self.root, args, input, None)
+        let owner = PathBuf::from(git_text(&self.root, &["rev-parse", "--show-toplevel"])?);
+        let changed = reqvire::git_commands::GitReader::new(&owner, |args, input| {
+            git(&owner, args, input, None)
         })
         .changed_paths(&self.head, &head)?;
         result["changed_files"] = json!(changed.len());
@@ -254,8 +255,8 @@ impl MutationSession {
             .filter(|path| self.markdown_candidate(path, &exclusions))
             .cloned()
             .collect();
-        let documents = reqvire::git_commands::GitReader::new(&self.root, |args, input| {
-            git(&self.root, args, input, None)
+        let documents = reqvire::git_commands::GitReader::new(&owner, |args, input| {
+            git(&owner, args, input, None)
         })
         .regular_files_at_commit(&head, &markdown)?;
         for (path, file) in &documents {

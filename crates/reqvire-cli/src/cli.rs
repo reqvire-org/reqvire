@@ -28,7 +28,7 @@ pub struct Args {
     #[clap(long, global = true, value_name = "DIR")]
     pub workspace: Option<PathBuf>,
 
-    /// Override Repo manifest location (default: .repo/manifest.xml)
+    /// Override native workspace manifest location (default: reqvire-workspace.toml)
     #[clap(long, global = true, value_name = "FILE")]
     pub manifest: Option<PathBuf>,
 
@@ -126,7 +126,61 @@ pub struct SearchArgs {
 }
 
 #[derive(Subcommand, Debug)]
+pub enum WorkspaceCommands {
+    /// Inspect repository locations, pins and local state
+    Status,
+    /// Register and prepare a dependent repository
+    Add {
+        /// Git URL of the dependent repository
+        url: String,
+        /// Checkout path relative to repositories_dir
+        #[clap(long)]
+        path: PathBuf,
+        /// Configured tracking ref, preserved when recording pins
+        #[clap(long = "ref")]
+        reference: String,
+    },
+    /// Remove a declaration and preserve its checkout
+    Remove {
+        /// Declared path relative to repositories_dir
+        path: PathBuf,
+    },
+    /// Synchronize recorded pins, or explicitly advance configured refs
+    Sync {
+        /// Follow configured refs and update exact commit pins
+        #[clap(long)]
+        latest: bool,
+    },
+    /// Record committed component HEADs as exact pins
+    Freeze {
+        /// Preview pin changes without writing
+        #[clap(long)]
+        dry_run: bool,
+    },
+    /// Convert Repo XML into a native workspace and synchronize
+    Migrate {
+        /// Source workspace format
+        #[clap(long, value_parser = ["repo"])]
+        from: String,
+        /// XML source override (default: .repo/manifest.xml)
+        #[clap(long)]
+        source: Option<PathBuf>,
+        /// Preview conversion and synchronization without writing
+        #[clap(long)]
+        dry_run: bool,
+    },
+}
+
+#[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Prepare and manage repository workspaces
+    Workspace {
+        /// Output structured JSON
+        #[clap(long, global = true)]
+        json: bool,
+        #[clap(subcommand)]
+        command: WorkspaceCommands,
+    },
     /// Serve the embedded Explorer UI via HTTP server
     #[clap(
         override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>             Bind address (default: localhost)\n      --port <PORT>             Server port (default: 8080)\n      --enable-mcp              Also serve the Reqvire MCP Streamable HTTP endpoint at /mcp\n      --enable-mutations        Advertise and allow mutation tools on the embedded MCP endpoint\n      --enable-commits          Commit successful mutations automatically (default: false; requires --enable-mutations)\n      --enable-github           Enable same-repository GitHub publication (requires --enable-mutations)\n      --github-remote <NAME>    Configured publication remote (default: origin; requires --enable-github)\n      --allow-origin <ORIGIN>   Additional browser origin (repeatable; requires --enable-mcp)\n      --allow-host <HOST[:PORT]>  Additional MCP endpoint hostname (repeatable; requires --enable-mcp)"
@@ -711,6 +765,9 @@ impl Args {
 
 pub fn apply_workspace(workspace: Option<&PathBuf>) -> Result<(), ReqvireError> {
     let Some(workspace) = workspace else {
+        if let Ok(root) = reqvire_workspace::service::effective_root(&std::env::current_dir()?) {
+            std::env::set_current_dir(root)?;
+        }
         return Ok(());
     };
 
@@ -950,6 +1007,7 @@ pub(crate) fn print_validation_results(errors: &[ReqvireError], json_output: boo
 
 pub(crate) const fn wants_json(args: &Args) -> bool {
     match &args.command {
+        Some(Commands::Workspace { json, .. }) => *json,
         Some(Commands::Semantic {
             command: SemanticCommands::Query { command },
         }) => match command {
@@ -1016,6 +1074,9 @@ pub async fn handle_command(
     args: Args,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<i32, ReqvireError> {
+    if let Some(Commands::Workspace { json, command }) = &args.command {
+        return crate::workspace_cli::handle(command, *json);
+    }
     // If no command provided, show help
     if args.command.is_none() {
         Args::print_help();
@@ -1213,6 +1274,9 @@ pub async fn handle_command(
     }
 
     match args.command {
+        Some(Commands::Workspace { .. }) => {
+            unreachable!("workspace commands dispatch before model loading")
+        }
         Some(Commands::Validate { json, output }) => {
             // For validate command, if we get here it means no validation errors
             if json {

@@ -4,7 +4,7 @@
 
 This objective groups verification that Reqvire parses element structure, subsections, fragments, governance metadata, contracts, and specification files consistently, and reuses completed model builds with correct source freshness and publication.
 
-Manifest-defined workspace acceptance includes real Repo/local-Git fixtures proving complete declared-project discovery, workspace-relative ownership and source parity, plus precise rejection of unavailable or escaping selections.
+Manifest-defined workspace acceptance includes native TOML/local-Git fixtures proving complete declared-project discovery, workspace-relative ownership and source parity, plus precise rejection of unavailable or escaping selections.
 
 #### Metadata
   * type: verification-objective
@@ -378,6 +378,30 @@ Regression execution passes for coordinated construction, superseded publication
   * verify: [In-Memory Model Build Cache](../../ModelStructure/ModelManagement.md#in-memory-model-build-cache)
 ---
 
+### Native Workspace Model Scope Verification
+
+Verify that model scope consumes the native workspace inventory and preserves ownership-aware membership.
+
+#### Details
+- Convert existing workspace fixtures/setup from XML/Repo to equivalent tracked TOML compositions while preserving their graph, identity, revision, path and failure assertions. Use configured checkout parents and exact pins with local Git histories.
+- Exercise model-bearing and manifest-only owners. All elements may come from pinned components without a synthetic root model.
+- Assert versioned owning sources, repository identities and captured pins remain authoritative over stale or unrelated copies. Missing/unversioned/foreign inputs fail with their paths. Declared Git ignores do not hide component sources, and undeclared nested repositories remain excluded.
+- Preserve rejection of duplicate, overlapping, reserved or escaping paths, unavailable commits, missing checkouts, symlink escapes and foreign identities without source mutation. Retain portable root-alias coverage.
+- Confirm model validation reuses one supplied workspace inventory throughout a pass as evidence references grow; use native instrumentation rather than a Python-resolver process count. The production path requires no Repo/Python runtime.
+- Keep deterministic acceptance outcomes and source-state comparisons. Preparation/startup failures are failures, not successful negative tests. Identify serialization-only include/overlay cases explicitly before fixture conversion; do not silently remove behavioral assertions.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
+  * satisfiedBy: [repo_workspace.rs](../../../crates/reqvire-core/src/repo_workspace.rs)
+  * satisfiedBy: [check_repo_workspaces.sh](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
+  * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
+  * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)
+  * verify: [Manifest-Defined Workspace Scope](../../ModelStructure/WorkspaceScope.md#manifest-defined-workspace-scope)
+---
+
 ### Non-Reserved Subsections Content Test
 
 This test verifies that ordinary authored prose subsections, distinguished from declaration-only Metadata, Relations, Contract Bindings and Contract References are correctly included in the element's content field.
@@ -414,33 +438,6 @@ The search fixture and expected output establish parsing and content placement. 
 #### Relations
   * satisfiedBy: [test.sh](../../../tests/test-search-all-capabilities/test.sh)
   * verify: [Reserved Subsections Support](../../ModelStructure/StructureAndParsing.md#reserved-subsections-support)
----
-
-### Repo Manifest Workspace Source Verification
-
-Verify the manifest-defined source boundary through real initialized Repo clients and local Git remotes.
-
-#### Details
-- Use real initialized Repo clients, local Git remotes and a tracked root source manifest/includes. Native .repo/manifest.xml discovery and optional explicit source selection must produce the same canonical graph without importing cached manifest-repository model files.
-- Exercise a root with model elements and a root containing only versioned manifest/configuration files. In the latter case every element and cross-repository relation comes from pinned components; no root model document or synthetic capability is required.
-- Establish source ownership through the manifest repository identity and selected tracked source path. Cached copies, matching filenames or rewritten remote URLs alone are insufficient proof. Stale cache pin bytes must not replace the selected root branch's versioned source. Missing, unversioned or foreign source inputs fail with their paths.
-- Preserve include/extend-project composition, relative remotes, equivalent SSH identities and checkout aliases. Reject duplicate/overlapping/reserved/escaping paths, unavailable revisions, missing checkouts, symlink escapes and foreign component identities without modifying source state. Undeclared nested repositories contribute no model elements.
-- Native source commits keep exact component pins in the root's tracked source, preserving selecting inputs. .repo remains ignored and no cached-manifest authoring ref, separate manifest branch or root self-association is created. Fresh CLI loading and managed reopen recover the same pinned graph.
-- The entry-file chooser's generated-wrapper and legacy-symlink unit cases only select the native entry; they do not assert model ownership without a Git source. Current inspection and authoring admission retain their respective cleanliness policies.
-- Require real Repo resolver launches to remain bounded per validation pass as evidence-reference count grows; a shell observer may count the production Python process. Reuse does not outlive one pass. Test fixtures and JSON assertions use Bash/curl/jq, not Python wrappers.
-- Compare deterministic expected outcomes and source state for every acceptance case; every expected feature outcome is PASS. Preparation or server startup failures are failures, not successful negative checks.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Model Parsing and Structure Verification Objective](#model-parsing-and-structure-verification-objective)
-  * satisfiedBy: [repo_workspace.rs](../../../crates/reqvire-core/src/repo_workspace.rs)
-  * satisfiedBy: [check_repo_workspaces.sh](../../../tests/test-mcp-repo-workspaces/check_repo_workspaces.sh)
-  * satisfiedBy: [checks.txt](../../../tests/test-mcp-repo-workspaces/expected/checks.txt)
-  * satisfiedBy: [test.sh](../../../tests/test-mcp-repo-workspaces/test.sh)
-  * verify: [CLI Repo Manifest Selection](../../Interfaces/CLI/RepoWorkspaces.md#cli-repo-manifest-selection)
-  * verify: [Manifest-Defined Workspace Scope](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope)
 ---
 
 ### Requirement Governance Metadata Verification

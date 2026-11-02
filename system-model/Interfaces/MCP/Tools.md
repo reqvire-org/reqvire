@@ -34,6 +34,7 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
 #### Contract References
   * [Model Interface Operation Boundary Specification](../Specifications.md#model-interface-operation-boundary-specification)
   * [Shared Core Operation Layer Specification](../Specifications.md#shared-core-operation-layer-specification)
+  * [Workspace Management API Specification](../../Workspaces/Specifications.md#workspace-management-api-specification)
 
 #### Relations
   * definedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
@@ -48,7 +49,7 @@ Detailed protocol-neutral type ownership, adapter mapping, shared registry, SDK/
 WHILE mutation mode is enabled, the system SHALL manage independently owned model branches through one MCP endpoint, with the same public branch operations for a single repository and a manifest-defined composition of repositories.
 
 #### Details
-Worktree administration is an explicit repository operation preserving original checkouts and the effective workspace boundary. In Repo mode the context belongs to the manifest-owning root branch and its pinned component view. The root can contain only manifest/configuration files; all model elements may belong to components. Repo administration does not add another public authoring context.
+Worktree administration is an explicit repository operation preserving original checkouts and the effective workspace boundary. For a declared composition the context belongs to the manifest-owning root branch and its pinned component view. The root can contain only manifest/configuration files; all model elements may belong to components. derived workspace administration does not add another public authoring context.
 
 #### Concept References
   * [MCP Worktree Context](../../Thesaurus/Thesaurus.md#mcp-worktree-context)
@@ -92,6 +93,7 @@ WHEN a client requests a new model branch from an explicit base, the system SHAL
 
 #### Contract References
   * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Workspace Branch Coordination Specification](../../Workspaces/Specifications.md#workspace-branch-coordination-specification)
 
 #### Relations
   * definedBy: [MCP Branch Creation Specification](Specifications.md#mcp-branch-creation-specification)
@@ -112,6 +114,8 @@ WHEN a client selects an existing branch, the system SHALL open an eligible work
 
 #### Contract References
   * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Workspace Management API Specification](../../Workspaces/Specifications.md#workspace-management-api-specification)
+  * [Workspace Operation Isolation Specification](../../Workspaces/Specifications.md#workspace-operation-isolation-specification)
 
 #### Relations
   * definedBy: [MCP Branch Opening and Inventory Specification](Specifications.md#mcp-branch-opening-and-inventory-specification)
@@ -132,11 +136,13 @@ The child worker-session requirement implements the MCP side of this boundary. E
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Workspace Composition Checkpoint Specification](../../ModelStructure/RepoWorkspaces.md#workspace-composition-checkpoint-specification)
+#### Contract References
   * [MCP Mutation Concurrency Control Specification](Specifications.md#mcp-mutation-concurrency-control-specification)
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
-  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/WorkspaceScope.md#manifest-defined-workspace-scope-specification)
+  * [Workspace Composition Checkpoint Specification](../../Workspaces/Specifications.md#workspace-composition-checkpoint-specification)
+  * [Workspace Management API Specification](../../Workspaces/Specifications.md#workspace-management-api-specification)
+  * [Workspace Operation Isolation Specification](../../Workspaces/Specifications.md#workspace-operation-isolation-specification)
 
 #### Relations
   * definedBy: [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
@@ -241,7 +247,7 @@ When mutation mode is disabled, the system SHALL retain lint inspection and reje
 WHILE mutation mode is enabled, the system SHALL provide explicit publication of accepted model changes to local Git history and, when GitHub integration is enabled and available, to its authorized owning repository remotes.
 
 #### Details
-Automatic commits remain an independent, default-disabled option. Repo compositions commit changed components first, then their exact pins together with accepted root changes in the manifest-owning root branch. The root may contain no model documents. Publication does not introduce a separately authored manifest branch or PR, and does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
+Automatic commits remain an independent, default-disabled option. workspace compositions commit changed components first, then their exact pins together with accepted root changes in the manifest-owning root branch. The root may contain no model documents. Publication does not introduce a separately authored manifest branch or PR, and does not support forks, arbitrary Git or gh commands, merges, or history rewriting.
 
 #### Concept References
   * [Model Change Publication](../../Thesaurus/Thesaurus.md#model-change-publication)
@@ -265,6 +271,7 @@ WHEN a client explicitly requests a commit in an owned context, the system SHALL
 
 #### Contract References
   * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Workspace Composition Checkpoint Specification](../../Workspaces/Specifications.md#workspace-composition-checkpoint-specification)
 
 #### Relations
   * definedBy: [MCP Accepted Change Commit Specification](Specifications.md#mcp-accepted-change-commit-specification)
@@ -287,6 +294,7 @@ WHEN a client requests publication of a committed owned branch, the system SHALL
   * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
   * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
   * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Workspace Publication Coordination Specification](../../Workspaces/Specifications.md#workspace-publication-coordination-specification)
 
 #### Relations
   * definedBy: [MCP Branch Push Specification](Specifications.md#mcp-branch-push-specification)
@@ -391,6 +399,7 @@ WHEN a client requests a pull request for a pushed owned branch with an explicit
   * [MCP GitHub Tool Availability Specification](Specifications.md#mcp-github-tool-availability-specification)
   * [MCP Publication Scope and Recovery Specification](Specifications.md#mcp-publication-scope-and-recovery-specification)
   * [MCP Worktree Context Isolation Specification](Specifications.md#mcp-worktree-context-isolation-specification)
+  * [Workspace Publication Coordination Specification](../../Workspaces/Specifications.md#workspace-publication-coordination-specification)
 
 #### Relations
   * definedBy: [MCP Pull Request Creation Specification](Specifications.md#mcp-pull-request-creation-specification)
@@ -592,12 +601,14 @@ While mutation mode is enabled, the system SHALL exclusively own each admitted c
 
 #### Details
 - The MCP server shall prevent concurrent mutation requests from interleaving writes for the same workspace.
-- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned root worktrees. Declared component checkouts may supply clean detached preparation baselines, but authoring commits require named component branches and the selected named root branch. The tracked source manifest belongs to that root branch; Repo administration has no separate authoring-branch requirement.
+- The MCP server SHALL reject mutation startup for dirty, invalid, detached, uncommitted, or already-owned root worktrees. Declared component checkouts may supply clean detached preparation baselines, but authoring commits require named component branches and the selected named root branch. The tracked source manifest belongs to that root branch; derived workspace administration has no separate authoring-branch requirement.
 - If branch, worktree or repository-administration ownership cannot be acquired, the system SHALL reject the operation with an actionable diagnostic that distinguishes contention from filesystem failures, without modifying model files or bypassing ownership.
 - The MCP server SHALL create automatic commits only when explicitly enabled at startup; without that opt-in, successful mutations SHALL leave HEAD and the Git index unchanged.
-- The MCP server SHALL preserve the previous accepted model after rejected candidates or failed persistence and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Guarded branch.refresh may admit eligible artifact changes; explicit branch.open may fully validate a prepared committed model or composition. Neither may bypass ownership, accepted pending work or transaction recovery. A later Repo checkpoint failure retains already accepted pending edits and confirmed owner commits, without claiming a completed checkpoint.
+- The MCP server SHALL preserve the previous accepted model after rejected candidates or failed persistence and SHALL stop ordinary mutations after unexpected branch or HEAD changes. Guarded branch.refresh may admit eligible artifact changes; explicit branch.open may fully validate a prepared committed model or composition. Neither may bypass ownership, accepted pending work or transaction recovery. A later workspace checkpoint failure retains already accepted pending edits and confirmed owner commits, without claiming a completed checkpoint.
 - The MCP server shall make observed model revision visible to clients for read responses.
 - The MCP server shall keep post-mutation model state synchronized before serving dependent reads.
+
+Repository ownership, source/pin guards and partial repository outcomes are supplied by the workspace service. MCP retains permission, accepted-model and protocol concurrency responsibilities.
 
 #### Metadata
   * type: requirement
@@ -1003,8 +1014,8 @@ The system shall expose MCP read tools for linting, coverage, verification trace
   * [Requirement Implementation Coverage Logic Specification](../../Implementation/Traceability/Specifications.md#requirement-implementation-coverage-logic-specification)
   * [Lint Output Specification](../../Operations/Linting/Specifications.md#lint-output-specification)
   * [Impact Scope Computation Specification](../../Processing/ChangeImpact/Specifications.md#impact-scope-computation-specification)
-  * [Repo Change Impact Baseline Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-baseline-specification)
-  * [Repo Change Impact Reporting Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-reporting-specification)
+  * [Workspace Change Impact Baseline Specification](../../Processing/ChangeImpact/Specifications.md#workspace-change-impact-baseline-specification)
+  * [Workspace Change Impact Reporting Specification](../../Processing/ChangeImpact/Specifications.md#workspace-change-impact-reporting-specification)
   * [Implementation Coverage Output Structure Specification](../../Reports/ModelReports/Specifications.md#implementation-coverage-output-structure-specification)
   * [Resources Report Format Specification](../../Reports/ModelReports/Specifications.md#resources-report-format-specification)
   * [Verification Coverage Specification](../../Reports/ModelReports/Specifications.md#verification-coverage-specification)
@@ -1289,22 +1300,104 @@ The system shall classify every MCP tool by side-effect behavior so clients and 
   * verifiedBy: [MCP Tool Contract and Side Effect Classification Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-tool-contract-and-side-effect-classification-verification)
 ---
 
-### MCP Workspace Session Tools
+### MCP Workspace Preparation and Management
 
-The system shall expose MCP-only workspace/session tools for workspace status, tool interface discovery, and model revision metadata.
-
-#### Details
-- The MCP interface shall provide workspace/session tools that have no direct CLI command equivalent.
-- Workspace/session tools shall report workspace identity and revision state.
-- Workspace/session tools shall report Reqvire and MCP compatibility state.
-- Workspace/session tools shall not mutate the model or filesystem.
+While mutations are enabled in an admitted context, the system SHALL expose typed workspace preparation and management operations backed by the same service used by the CLI.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
+  * [Workspace Management API Specification](../../Workspaces/Specifications.md#workspace-management-api-specification)
+
+#### Relations
+  * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)
+---
+
+### MCP Repo Workspace Migration
+
+When a client requests Repo workspace migration, the system SHALL invoke the shared XML-to-native conversion and synchronization flow within the selected admitted context.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Repo Workspace Migration Specification](../../Workspaces/Specifications.md#repo-workspace-migration-specification)
+
+#### Relations
+  * derivedFrom: [MCP Workspace Preparation and Management](#mcp-workspace-preparation-and-management)
+---
+
+### MCP Workspace Dependency Registration
+
+When a client registers a workspace dependency, the system SHALL translate its typed URL, path and ref arguments into the shared registration operation and return its confirmed result.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Workspace Dependency Registration Specification](../../Workspaces/Specifications.md#workspace-dependency-registration-specification)
+
+#### Relations
+  * derivedFrom: [MCP Workspace Preparation and Management](#mcp-workspace-preparation-and-management)
+---
+
+### MCP Workspace Dependency Removal
+
+When a client unregisters a declared dependency, the system SHALL invoke shared removal for the selected path and preserve its checkout and accepted model on rejection.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Workspace Dependency Removal Specification](../../Workspaces/Specifications.md#workspace-dependency-removal-specification)
+
+#### Relations
+  * derivedFrom: [MCP Workspace Preparation and Management](#mcp-workspace-preparation-and-management)
+---
+
+### MCP Workspace Pin Freeze
+
+When a client explicitly freezes committed component state, the system SHALL preview or apply shared pin capture with validated admission of changed external composition state.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Workspace Pin Freeze Specification](../../Workspaces/Specifications.md#workspace-pin-freeze-specification)
+
+#### Relations
+  * derivedFrom: [MCP Workspace Preparation and Management](#mcp-workspace-preparation-and-management)
+---
+
+### MCP Workspace Synchronization
+
+When a client requests workspace synchronization, the system SHALL invoke shared pinned synchronization by default or latest synchronization only when explicitly requested, preserving accepted state until valid admission.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
+  * [Workspace Synchronization Specification](../../Workspaces/Specifications.md#workspace-synchronization-specification)
+
+#### Relations
+  * derivedFrom: [MCP Workspace Preparation and Management](#mcp-workspace-preparation-and-management)
+---
+
+### MCP Workspace Session Tools
+
+The system SHALL expose typed workspace/session observations, tool discovery and model revision metadata without mutating workspace or model state.
+
+#### Details
+Workspace observations consume the same service as CLI status. Tool discovery and model/session compatibility metadata retain their MCP-specific projections. Preserve the distinction between accepted provenance and live diagnostics.
+
+#### Metadata
+  * type: requirement
+
+#### Contract References
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [Model Revision Hash Specification](../../Processing/ContentHashing/Specifications.md#model-revision-hash-specification)
+  * [Workspace Status Specification](../../Workspaces/Specifications.md#workspace-status-specification)
 
 #### Relations
   * derivedFrom: [MCP Interface](../InterfacesRequirements.md#mcp-interface)

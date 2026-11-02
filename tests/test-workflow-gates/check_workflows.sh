@@ -103,7 +103,7 @@ policy() {
 macos_units() {
     local folder="$work/macos-policy" command selected=''
     mkdir -p "$folder/commands"
-    workflow_job "$pr" macos-repo-unit-tests > "$folder/job.yml"
+    workflow_job "$pr" macos-workspace-unit-tests > "$folder/job.yml"
     grep -Fq 'runs-on: macos-latest' "$folder/job.yml"
     grep -Fq 'needs: test' "$folder/job.yml"
     grep -Fq "needs.test.outputs.explorer_artifact_id != ''" "$folder/job.yml"
@@ -119,11 +119,11 @@ macos_units() {
 #!/bin/bash
 set -eu
 printf '%s\n' "$*" > "$TRACE"
-[[ "$*" == 'test --locked -p reqvire --lib repo_workspace::tests --verbose' ]]
+[[ "$*" == 'test --locked -p reqvire-workspace --verbose' ]]
 CARGO
     chmod +x "$folder/commands/cargo"
     execute_step "$selected" "$folder" "PATH=$folder/commands:$PATH" "TRACE=$folder/commands.txt"
-    printf '%s\n' 'test --locked -p reqvire --lib repo_workspace::tests --verbose' > "$folder/expected.txt"
+    printf '%s\n' 'test --locked -p reqvire-workspace --verbose' > "$folder/expected.txt"
     diff -u "$folder/expected.txt" "$folder/commands.txt"
 }
 

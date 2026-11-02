@@ -16,6 +16,7 @@ dist = false
 workspace = true
 
 [dependencies]
+reqvire-workspace.workspace = true
 # Parsing and content manipulation
 pulldown-cmark = { workspace = true }
 regex = { workspace = true }
@@ -34,7 +35,6 @@ log = { workspace = true }
 # Serialization
 serde = { workspace = true }
 serde_json = { workspace = true }
-quick-xml = { workspace = true }
 tempfile = { workspace = true }
 
 # Performance

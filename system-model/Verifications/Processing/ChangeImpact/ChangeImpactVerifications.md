@@ -205,7 +205,7 @@ Verifies that repository boundaries preserve the complete model comparison and i
 - CLI and MCP expose one baseline revision selector. MCP discovery advertises `git_commit` and omits the removed separate manifest selector; no component selector is introduced.
 
 ##### Test Criteria
-Run the Bash Repo workspace suite and compare its PASS inventory, normalized provenance and relocation JSON with the committed golden files. Use jq for structured report assertions and diff for deterministic comparisons. Repeated comparisons of unchanged snapshots MUST be deterministic. Runtime vocabulary and shape exports MUST retain the workspace-snapshot and repository-selection declarations.
+Run the Bash multi-repository workspace suite and compare its PASS inventory, normalized provenance and relocation JSON with the committed golden files. Use jq for structured report assertions and diff for deterministic comparisons. Repeated comparisons of unchanged snapshots MUST be deterministic. Runtime vocabulary and shape exports MUST retain the workspace-snapshot and repository-selection declarations.
 
 #### Metadata
   * type: test-verification
@@ -285,38 +285,6 @@ This test verifies that the change impact report correctly computes and displays
   * verify: [Change Impact Detection](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#change-impact-detection)
 ---
 
-### Repo Change Impact Baseline Verification
-
-Verifies complete historical composition reconstruction and read isolation using real local Repo clients.
-
-#### Details
-
-##### Acceptance Criteria
-- The sole selected workspace-root repository commit supplies its model, manifest and includes. Historical component commits come from that manifest. Current files do not substitute for deleted historical includes.
-- Native discovery resolves the source manifest and includes from the selected root tree, without --manifest or a self-association. Test a model-bearing root and a manifest-only root whose complete model comes from pinned components. Stale cached pins must not override the selected root source. CLI, standalone MCP and embedded MCP preserve source state and canonical source/commit provenance. Missing canonical inputs and unavailable component history fail with path-specific diagnostics.
-- Missing historical component objects and mutable baseline revisions produce project-specific errors without a partial report.
-- Base-only projects remain discoverable from retained local objects after their live checkout is removed.
-- Ordinary ambiguous multi-worktree comparisons retain their existing rejection.
-- Successful and failed reads preserve repository HEADs, indexes, refs, working bytes, manifest inputs and source-selection Repo administration; operational trace logs are outside the source-state comparison.
-- Standalone and embedded MCP preserve the accepted model revision, pending changes and write availability. Accepted pending additions remain in current comparison inputs even after external working-file edits.
-
-##### Test Criteria
-Run the Repo workspace suite through its Bash entry point. All impact outcomes in the golden file MUST be PASS. Supported single-selector comparisons must succeed; unavailable-history and removed-selector rejection checks must fail explicitly with the expected diagnostics, rather than skip comparisons or construct partial baselines. Validate each fixture independently before comparison. Compare repository state before and after impact requests, including failure paths. Inspect retained logs and response JSON when a check fails.
-
-Read-state preservation covers authored source bytes, source-selection wrappers, actual Git configuration, refs, HEADs and indexes. Operational trace logs and Repo's derived .repo_config.json caches are not authoritative selection inputs and may be regenerated; excluding those derived caches does not permit changing source selection, source files, checkout revisions or accepted model state.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
-  * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
-  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
-  * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
-  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
-  * verify: [Manifest-Based Change Impact Baselines](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#manifest-based-change-impact-baselines)
----
-
 ### Structural Change Reports Verification
 
 This test verifies that the system analyzes and reports on structural changes in the System model.
@@ -342,4 +310,28 @@ TODO: write test procedure
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
   * verify: [Tracing Structural Changes](../../../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
+---
+
+### Workspace Change Impact Baseline Verification
+
+Verify complete baseline composition reconstruction and read isolation using real local Git histories and native TOML fixtures.
+
+#### Details
+- The selected owning-repository commit supplies its optional model sources and tracked native manifest. Each component is read at its own exact recorded commit; current files cannot replace baseline input.
+- Exercise a model-bearing owner and an owner containing only composition/configuration. CLI, standalone MCP and embedded MCP retain source-state and canonical commit/path provenance. Stale unrelated copies never override the selected source.
+- Missing historical objects, unsupported/mutable inputs and identity/path conflicts fail explicitly without partial reports. Base-only components remain accessible from retained local objects after checkout removal.
+- Successful and failed reads preserve source bytes, configuration, HEADs, refs, indexes, pins and accepted model state; operational trace logs are outside source-state comparisons. No remote acquisition is allowed.
+- Accepted pending changes remain current inputs even after external working-file drift. Preserve existing ambiguous-source rejection, baseline policy and standalone/embedded outcomes.
+- Convert format-specific fixture setup while retaining existing PASS/failure expectations. Inspect retained logs and JSON for failures; do not skip comparisons, weaken source-state checks or construct partial baselines.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * derivedFrom: [Change Impact Analysis Verification Objective](#change-impact-analysis-verification-objective)
+  * satisfiedBy: [mutation_io.rs](../../../../crates/reqvire-core/src/mutation_io.rs)
+  * satisfiedBy: [repo_impact.rs](../../../../crates/reqvire-core/src/repo_impact.rs)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-repo-workspaces/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
+  * verify: [Manifest-Based Change Impact Baselines](../../../Processing/ChangeImpact/ChangeImpactRequirements.md#manifest-based-change-impact-baselines)
 ---

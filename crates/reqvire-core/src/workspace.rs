@@ -1,8 +1,5 @@
 use crate::error::ReqvireError;
-use crate::git_commands;
-use rustc_hash::FxHashSet;
 use std::path::{Component, Path, PathBuf};
-use walkdir::WalkDir;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WorkspaceScope {
@@ -23,71 +20,11 @@ impl WorkspaceScope {
                 return Ok(scope);
             }
         }
-        if let Some(manifest) = crate::repo_workspace::selected_manifest(&root)? {
-            let owner = crate::git_commands::local_text(&root, &["rev-parse", "--show-toplevel"])?;
-            if Path::new(&owner).canonicalize()? != root {
-                return Err(ReqvireError::PathError(
-                    "Repo mode requires the manifest-owning Git worktree at the workspace root"
-                        .into(),
-                ));
-            }
-            let repo = crate::repo_workspace::RepoWorkspace::load(&root, manifest)?;
-            let mut git_worktrees = vec![root.clone()];
-            git_worktrees.extend(repo.projects.iter().map(|p| root.join(&p.path)));
-            return Ok(Self {
-                root,
-                git_worktrees,
-                repo: Some(std::sync::Arc::new(repo)),
-            });
-        }
-        let mut roots = Vec::new();
-        let mut seen = FxHashSet::default();
-
-        if let Ok(containing_root) = git_commands::find_git_repo_root(&root) {
-            let containing_root = normalize_existing_path(PathBuf::from(containing_root))?;
-            if seen.insert(containing_root.clone()) {
-                roots.push(containing_root);
-            }
-            roots.sort();
-            return Ok(Self {
-                root,
-                git_worktrees: roots,
-                repo: None,
-            });
-        }
-
-        for entry in WalkDir::new(&root)
-            .into_iter()
-            .filter_entry(|entry| entry.file_name() != ".git")
-            .filter_map(Result::ok)
-            .filter(|entry| entry.file_type().is_dir())
-        {
-            let path = entry.path();
-            if !path.join(".git").exists() {
-                continue;
-            }
-            let Ok(git_root) = git_commands::find_git_repo_root(&path.to_path_buf()) else {
-                continue;
-            };
-            let git_root = normalize_existing_path(PathBuf::from(git_root))?;
-            if git_root.starts_with(&root) && seen.insert(git_root.clone()) {
-                roots.push(git_root);
-            }
-        }
-
-        roots.sort();
-
-        if roots.is_empty() {
-            return Err(ReqvireError::GitCommandError(format!(
-                "Workspace '{}' does not contain an eligible Git worktree",
-                root.display()
-            )));
-        }
-
+        let scope = reqvire_workspace::scope::discover(&root)?;
         Ok(Self {
-            root,
-            git_worktrees: roots,
-            repo: None,
+            root: scope.root,
+            git_worktrees: scope.git_worktrees,
+            repo: scope.composition,
         })
     }
 
@@ -116,6 +53,9 @@ impl WorkspaceScope {
     pub fn is_eligible_path(&self, path: &Path) -> bool {
         let absolute = absolute_logical_path(path);
         if self.repo.is_some() {
+            if !absolute.starts_with(&self.root) {
+                return false;
+            }
             let Some(owner) = self.git_worktree_for_path(&absolute) else {
                 return false;
             };

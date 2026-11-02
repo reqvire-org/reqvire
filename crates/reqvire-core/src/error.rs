@@ -504,3 +504,13 @@ impl ReqvireError {
         }
     }
 }
+impl From<reqvire_workspace::Error> for ReqvireError {
+    fn from(error: reqvire_workspace::Error) -> Self {
+        match error {
+            reqvire_workspace::Error::IoError(e) => Self::IoError(e),
+            reqvire_workspace::Error::GitCommandError(e) => Self::GitCommandError(e),
+            reqvire_workspace::Error::ProcessError(e) => Self::ProcessError(e),
+            error => Self::ProcessError(error.to_string()),
+        }
+    }
+}

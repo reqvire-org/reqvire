@@ -415,6 +415,11 @@ fn build_tool_definitions(enable_mutations: bool) -> Vec<Value> {
 
     if enable_mutations {
         tools.extend(vec![
+            mutation_tool("reqvire.workspace.add", "Register and prepare a declared workspace dependency.", required_object_schema(vec![("url",json!({"type":"string","minLength":1})),("path",json!({"type":"string","minLength":1})),("ref",json!({"type":"string","minLength":1}))],vec!["url","path","ref"])),
+            mutation_tool("reqvire.workspace.remove", "Remove a dependency declaration and preserve its checkout.", required_object_schema(vec![("path",json!({"type":"string","minLength":1}))],vec!["path"])),
+            mutation_tool("reqvire.workspace.sync", "Synchronize exact pins; latest explicitly advances configured refs.", object_schema(vec![("latest",json!({"type":"boolean","default":false}))])),
+            mutation_tool("reqvire.workspace.freeze", "Preview or record committed component HEADs as pins, preserving refs.", object_schema(vec![("dry_run",json!({"type":"boolean","default":false}))])),
+            mutation_tool("reqvire.workspace.migrate", "Convert selected Repo XML to native TOML and synchronize.", required_object_schema(vec![("from",json!({"type":"string","enum":["repo"]})),("source",json!({"type":"string","minLength":1})),("dry_run",json!({"type":"boolean","default":false}))],vec!["from"])),
             mutation_tool(
                 "reqvire.update_element",
                 "Edit an existing element's opening prose (target: 'Element Text') or an exact subsection name. Apply requires expected_model_revision from the current context; dry_run previews without writing. Protected declarations require their supported tools. Ontology/Shapes/Query support replace and replace_text only.",
@@ -634,6 +639,11 @@ pub fn tool_exists(name: &str, enable_mutations: bool) -> bool {
 
 pub const fn mutation_tool_names() -> &'static [&'static str] {
     &[
+        "reqvire.workspace.add",
+        "reqvire.workspace.remove",
+        "reqvire.workspace.sync",
+        "reqvire.workspace.freeze",
+        "reqvire.workspace.migrate",
         "reqvire.update_element",
         "reqvire.add_element",
         "reqvire.remove_element",

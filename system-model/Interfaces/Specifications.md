@@ -50,6 +50,7 @@ Command-line operations:
 - Structure and reports: `model`, `traces`, `containment`, `resources`, `change-impact`.
 - Artifact generation: static Explorer `export`, `semantic export`, `concepts export`, and the existing `ontologies` compatibility alias.
 - Managed-query inspection: `semantic query list`, `validate`, `export`, and `check`.
+- Workspace preparation/inspection: workspace status, add, remove, sync, freeze and migrate invoke the shared workspace crate. They manage repository checkouts and manifest pins, not authored model CRUD, and may run before a complete model exists.
 - Interface startup: `mcp`, `serve`; retain workspace selection, help, version, supported filtering and output controls.
 - Source upgrade: `migrate` previews known deterministic migrations; only `migrate --fix` applies those rewrites. Migration is available before a model passes current validation and is not a generic authoring escape hatch.
 
@@ -78,16 +79,17 @@ This is an intentional breaking operation-surface change. The core remains autho
 
 ### Shared Core Operation Layer Specification
 
-Reqvire core owns operation request/result APIs independently of external transport availability.
+Model operation APIs and workspace-management APIs are transport-neutral, with ownership retained by their respective crates.
 
 #### Details
 - Shared operations own parsing, selection, validation, report construction, mutation preview and application, canonical persistence, diagnostics, and cache invalidation for their operation scope.
-- CLI adapters expose only supported inspections, artifact generation, server launch, and deterministic migrations. Removing authoring and formatting commands does not remove their core operations.
+- CLI adapters expose supported inspections, artifact generation, explicit workspace management, server launch and deterministic migrations. Repository/composition commands call the workspace crate; model operations call the model engine. Removing authoring and formatting commands does not remove their core operations.
 - MCP adapters invoke shared core authoring and maintenance operations through typed tools and enforce startup permissions, ownership, accepted-state publication, and protocol wrapping.
 - Read operations supported by both adapters preserve the same structured semantic results; CLI adds argument/output rendering and MCP adds typed schemas and envelopes.
 - Core authoring and maintenance APIs are not CLI command handlers. MCP must not shell out to removed CLI commands or introduce a second model engine.
 - Existing-element selection remains shared. Semantic read/query helpers continue to use the native semantic index and tool contracts.
 - Cross-interface tests compare retained read operations. Authoring, formatting, and lint-fix tests exercise core and MCP paths; migrations exercise CLI.
+- Manifest discovery, repository coordination, pinning, locks/recovery and publication ordering belong exclusively to the workspace crate. Model and protocol adapters consume its descriptions and operation results rather than implementing those algorithms.
 
 #### Metadata
   * type: specification

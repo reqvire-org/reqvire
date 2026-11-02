@@ -142,7 +142,12 @@ pub fn get_excluded_filename_patterns_glob_set() -> GlobSet {
                     .collect();
                 (
                     root.strip_prefix(&scope.root)
-                        .expect("workspace owner")
+                        .unwrap_or_else(|_| Path::new(""))
+                        .to_owned(),
+                    scope
+                        .root
+                        .strip_prefix(root)
+                        .unwrap_or_else(|_| Path::new(""))
                         .to_owned(),
                     patterns,
                 )

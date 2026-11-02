@@ -27,8 +27,8 @@ export default function UserGuide() {
           option applies to normal CLI commands and the MCP server. A workspace
           must contain at least one eligible Git worktree; files in non-Git
           workspace folders are ignored, and model paths remain relative to the
-          workspace root. For a model spanning repositories, initialize Repo at
-          the owning Git worktree as described below.
+          workspace root. For a model spanning repositories, track a native TOML
+          manifest in the owning repository as described below.
         </p>
         <CodeBlock>{`reqvire --workspace /path/to/workspace validate
 reqvire --workspace /path/to/workspace search --filter-type requirement
@@ -49,106 +49,124 @@ npx -y @reqvire-org/reqvire@latest --workspace /path/to/workspace mcp`}</CodeBlo
 
       <Section title="Multi-repository Models">
         <p className="text-zinc-600 mb-4">
-          The repository and branch owning the source manifest define the
-          composition. The owning Git checkout is the workspace root; its
-          declared pinned repositories contribute to one combined model.
-          The root can contain model elements or only the manifest and workspace
-          configuration, with the entire system model in pinned repositories.
-          Identifiers and relations remain workspace-relative in both layouts.
+          Track <code>reqvire-workspace.toml</code> in the repository and branch
+          owning the composition. The root can hold server/client code and a
+          shared model, or only configuration while pinned repositories supply
+          the entire model. Paths and relations stay relative to the effective
+          workspace root. Native preparation needs Git; Google Repo and Python
+          are unnecessary.
         </p>
-        <BulletList items={[
-          "Install Git, Python 3 and Google Repo. Explicitly initialize and synchronize the client from the manifest-owning root checkout before analysis or authoring.",
-          "Reqvire follows Repo's .repo/manifest.xml entry automatically to the tracked source manifest and includes on the selected root branch. For example, manifests/default.xml is an ordinary root-repository source file; Repo's cached copy is internal administration.",
-          "Ignore /.repo/ and component checkout directories in the root repository. Track the source manifest and its includes outside those ignored directories. Updating source pins and related root model/configuration changes uses one root branch, commit and PR.",
-          "Prepare exact component pins and local objects. Project paths must be unique, non-overlapping and contained in the workspace, and checkouts must match their repository identity and selected commit. Missing or foreign sources fail explicitly. Repo submanifests are unsupported.",
-          "CLI, MCP and Explorer share this source scope. Workspace .reqvireignore rules are global; each repository's Git ignores apply within its boundary. Undeclared repositories and cached Repo model files are excluded. Analysis never fetches or synchronizes repositories.",
-        ]} />
         <p className="text-zinc-600 mb-4">
-          In this example the server/client repository tracks
-          <code> manifests/default.xml</code> alongside its shared model on
-          <code> main</code>. Publish that source and the ignore rules through
-          your normal branch and PR workflow before initializing Repo.
+          Start from the server/client checkout on your normal setup branch.
+          Create this small manifest, choosing an available checkout parent:
         </p>
-        <CodeBlock>{`<manifest>
-  <remote name="github" fetch="https://github.com/YOUR_ORG/" />
-  <default remote="github" revision="main" />
-  <project name="website" path="repositories/website" revision="WEBSITE_COMMIT_SHA" />
-  <project name="user-docs" path="repositories/user-docs" revision="DOCS_COMMIT_SHA" />
-</manifest>`}</CodeBlock>
+        <CodeBlock>{`version = 1
+repositories_dir = "external"`}</CodeBlock>
+        <CodeBlock>{`reqvire workspace add https://github.com/YOUR_ORG/website.git --path website --ref refs/heads/main
+reqvire workspace add https://github.com/YOUR_ORG/user-docs.git --path user-docs --ref refs/heads/main
+reqvire workspace status`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
-          Replace the names and the two revision placeholders with your actual
-          repositories and full published commit IDs. Repo combines the remote&apos;s
-          fetch prefix with each project name to locate its Git repository;
-          path selects its checkout directory. For an existing Repo checkout,
-          <code> repo manifest -r</code> can generate XML with the checked-out pins.
+          Add these specific entries to the root <code>.gitignore</code>,
+          preserving other content in that directory:
         </p>
-        <CodeBlock>{`# Tracked source: manifests/default.xml
-# Root .gitignore entries:
-# /.repo/
-# /repositories/
-git clone https://github.com/YOUR_ORG/server-client.git
-cd server-client
-repo init -u https://github.com/YOUR_ORG/server-client.git -b main -m manifests/default.xml
-repo sync
+        <CodeBlock>{`/external/website/
+/external/user-docs/`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          For a manifest below the Git root, prefix these root ignore entries
+          with that directory&apos;s relative path.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          Add resolves each URL and ref, prepares its checkout and records the
+          exact commit. Each declaration keeps both update policy and selection:
+        </p>
+        <CodeBlock>{`[[repositories]]
+path = "website"
+url = "https://github.com/YOUR_ORG/website.git"
+ref = "refs/heads/main"
+commit = "d3c2a1e0908b7c6d5e4f32100123456789abcdef"`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          The hash illustrates a full commit ID; add writes the actual resolved
+          commit. <code>ref</code> is the configured update source, independent
+          of feature working branches. <code>commit</code> selects reproducible
+          content. <code>repositories_dir</code> is required and configurable;
+          component paths are relative to it. The manifest can also live at an
+          effective subdirectory root inside the owning Git repository.
+          All repository declarations belong in this one manifest; native
+          includes, fragments and overlays are unsupported. A manual commit-only
+          declaration supports pinned sync; latest sync requires a configured ref.
+          Ref-only initial declarations need sync to record exact pins before model startup.
+        </p>
+        <CodeBlock>{`git add reqvire-workspace.toml .gitignore
+git commit -m "Define product workspace"
+# Publish through the normal branch and PR workflow.
 
+# Other developers clone the root, then reproduce its pins:
+reqvire workspace sync
 reqvire validate
-reqvire serve --enable-mcp --enable-mutations`}</CodeBlock>
+reqvire mcp --enable-mutations`}</CodeBlock>
+        <CommandList items={[
+          { cmd: "reqvire workspace status", desc: "Inspect configured locations, refs, pins, observed HEADs and diagnostics without changes." },
+          { cmd: "reqvire workspace sync", desc: "Prepare recorded commits; resolve the first pin for a ref-only setup declaration." },
+          { cmd: "reqvire workspace sync --latest", desc: "Explicitly follow configured refs and advance commit pins." },
+          { cmd: "reqvire workspace freeze --dry-run", desc: "Preview pins for currently committed component HEADs; applying freeze preserves refs." },
+          { cmd: "reqvire workspace remove website", desc: "Remove the declaration while preserving the checkout and its Git history." },
+        ]} />
+        <BulletList items={[
+          "Without a manifest, Reqvire uses its normal single-repository workflow. Invalid manifests fail instead of silently changing mode.",
+          "Discovery stops at a Git repository boundary. Running inside a component does not select its parent composition; pass --workspace when that is intended.",
+          "CLI preparation works before model validation. MCP startup retains its valid-model, clean-composition, named-branch and Git-author requirements.",
+          "Named root branches use matching component working branches. Detached CLI/CI owners prepare detached checkouts. Dirty, foreign or diverged destinations need normal Git resolution.",
+          "Only declared components participate in the combined model. Workspace .reqvireignore rules are global; each repository's Git ignores apply within its own boundary.",
+          "Preparation and local commits do not publish branches or create PRs. Analysis never fetches or synchronizes implicitly.",
+        ]} />
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">External Code and Model Work</h3>
         <p className="text-zinc-600 mb-4">
-          The <code>-m</code> option selects the source file for Google Repo.
-          Reqvire uses the native entry automatically and authors the tracked
-          source on the selected root branch. The ignore rules apply to local
-          administration and component directories; they do not exclude
-          <code> manifests/default.xml</code>. There is no separate manifest
-          authoring branch, commit inside <code>.repo/</code>, or manifest-only PR.
+          Work on a root feature branch and the corresponding component
+          branches. Outside a live MCP session, commit component changes first,
+          then preview and record their pins:
         </p>
-        <p className="text-zinc-600 mt-4">
-          A manifest-only central repository uses the same commands and tools:
-          omit the server/client model documents and declare all model-bearing
-          repositories as pinned projects. No root model document or synthetic
-          capability is required. Mutation startup requires a clean committed
-          composition and Git author identity. Repo sync may leave components at
-          detached pins; use <code>reqvire.branch.create</code> or prepare named
-          component branches before authoring. Startup alone does not create them.
-        </p>
-        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
-          Website and Documentation Repositories
-        </h3>
+        <CodeBlock>{`reqvire workspace freeze --dry-run
+reqvire workspace freeze
+git add reqvire-workspace.toml
+# Stage related root changes through your normal Git workflow.
+git commit -m "Record component changes and product pins"`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
-          Declare the website and documentation repositories as projects so their
-          model and evidence participate in traceability and change impact
-          analysis. A remote URL alone does not make a repository&apos;s model or
-          history available. Give documentation obligations requirements with
-          Contract References to the server/client contracts they describe, link
-          page sources with <code>satisfiedBy</code>, and attach verifications.
-          An API contract change can then identify documentation requirements,
-          checks and page sources needing review across repository boundaries.
+          Standalone commands cannot bypass a live MCP owner's lock. Its typed
+          workspace tools can prepare changes within the admitted context and
+          validate the complete candidate. Rejected candidates retain accepted
+          reads. Pending model edits and unresolved recovery must be resolved
+          first. Clean externally prepared compositions use full
+          <code> reqvire.branch.open</code> admission; artifact-only refresh
+          does not adopt changed component selections.
         </p>
-        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
-          Admitting External Repository Work
-        </h3>
         <p className="text-zinc-600 mb-4">
-          Work in the selected context&apos;s <code>workspace_root</code> and its
-          prepared feature branches. Resolve pending MCP edits first. Commit
-          component changes, update their exact pins in the root branch&apos;s
-          tracked source manifest, and commit those pins with related root work.
-          This example uses a source manifest without includes:
+          MCP checkpoints commit changed components first, update exact pins
+          while preserving refs, then commit those pins with accepted root
+          changes in one root commit. Push and linked PR creation stay explicit.
+          Record final component SHAs after squash/rebase before the root merges.
         </p>
-        <CodeBlock>{`WEBSITE_COMMIT=$(git -C repositories/website rev-parse HEAD)
-# Set the website project's revision in manifests/default.xml
-# to WEBSITE_COMMIT, preserving the other project declarations.
-git diff -- manifests/default.xml
-git add -- manifests/default.xml
-# Stage related root model/code changes through your normal Git workflow.
-git commit -m "Record website changes and updated product pins"`}</CodeBlock>
-        <p className="text-zinc-600 mt-4">
-          For includes, update and commit the relevant tracked source files on
-          that same root branch. With all participating checkouts clean and at
-          the recorded pins, call <code>reqvire.branch.open</code> for the root
-          feature branch. Full admission validates the prepared composition and
-          retains the accepted model on failure. No manual root-to-manifest
-          association or cached-manifest commit is required. Ordinary MCP commit
-          does not import external edits; guarded <code>branch.refresh</code>
-          remains for eligible root artifact changes with unchanged composition.
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">Website and Documentation Traceability</h3>
+        <p className="text-zinc-600 mb-4">
+          Declare website and documentation repositories so their models and
+          evidence join the composition. Give documentation obligations
+          requirements with Contract References to the product contracts they
+          describe, attach verifications and link page sources with
+          <code> satisfiedBy</code>. Contract changes can then identify the
+          requirements, checks and pages needing review across repositories.
+          A remote URL alone does not load another model or its history.
+        </p>
+        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">Migrating a Repo Workspace</h3>
+        <CodeBlock>{`reqvire workspace migrate --from repo --dry-run
+reqvire workspace migrate --from repo`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Migration reads the selected Repo XML, writes native TOML into the
+          effective root, then runs normal sync. Existing checkouts and Git
+          metadata remain in place. Use <code>--source FILE</code> for an explicit
+          XML source. Preview writes nothing; a conflicting native manifest is
+          not overwritten. This differs from CLI <code>migrate</code>, which
+          upgrades model syntax before validated MCP startup.
+          Supported XML includes and defaults are flattened into the one native
+          manifest. Unsupported XML elements and Repo local overlays fail explicitly.
         </p>
       </Section>
 
@@ -305,7 +323,7 @@ reqvire lint --json --output reports/lint.json`}</CodeBlock>
 
       <Section title="Migrating Existing Models">
         <p className="text-zinc-600 mb-4">
-          Migration remains CLI-only. MCP validates the model before starting,
+          Model-syntax migration remains CLI-only. MCP validates the model before starting,
           so migrate incompatible source before launching an MCP server.
           The migrate command previews changes by default; add --fix to apply them.
         </p>
@@ -397,10 +415,10 @@ reqvire coverage --from "Shared Branch" --json`}</CodeBlock>
           override, Reqvire uses the actual target&apos;s local merge-base from CI
           or a confirmed MCP PR workflow. Without review context, it requests a
           baseline. Explicit HEAD reviews pending changes. Ordinary Git mode
-          requires one eligible worktree. In Repo mode it selects the
+          requires one eligible worktree. A declared composition selects the
           manifest-owning root repository&apos;s base commit and tracked source
           manifest; that versioned manifest supplies each component&apos;s
-          own revision. A collection of independent worktrees without a Repo
+          own revision. A collection of independent worktrees without a declared
           composition remains ambiguous.
         </p>
         <CodeBlock>{`reqvire change-impact
@@ -420,15 +438,15 @@ reqvire coverage --json --output reports/coverage.json`}</CodeBlock>
           added, removed or moved between them. Historical component revisions
           must be full commit object IDs, and all required Git objects must be
           available locally. Reqvire reads historical files without changing
-          active checkouts and never fetches or runs Repo sync.
+          active checkouts and never fetches or synchronizes.
         </p>
-        <CodeBlock>{`# Native .repo/manifest.xml is selected automatically.
-# The root baseline supplies source XML/includes and exact component pins.
+        <CodeBlock>{`# reqvire-workspace.toml is selected automatically.
+# The root baseline supplies its manifest and exact component pins.
 reqvire change-impact --git-commit "$PR_BASE_COMMIT" \\
   --json --output reports/impact.json`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
-          One selected root commit supplies the authoritative source XML,
-          includes and any root model documents. Its pins supply component
+          One selected root commit supplies the native manifest and any root model documents.
+          A baseline predating conversion can read its versioned XML through the shared workspace reader. Its pins supply component
           models, including the complete model for a manifest-only root.
           Missing sources or unversioned required inputs report
           <code> repo_impact_manifest_history_unavailable</code> with the affected path. Missing
@@ -436,7 +454,7 @@ reqvire change-impact --git-commit "$PR_BASE_COMMIT" \\
           Reqvire never guesses another revision or reports a partial baseline.
         </p>
         <p className="text-zinc-600 mt-4">
-          Repo JSON reports add <code>comparison</code> with
+          Composition JSON reports add <code>comparison</code> with
           <code> workspace_mode: "repo"</code> and <code>base</code> /
           <code> current</code> records. Each includes the workspace-root repository&apos;s commit,
           versioned manifest inputs and project identities, paths and commits.
@@ -659,11 +677,10 @@ reqvire serve --host 0.0.0.0 --port 3000`}</CodeBlock>
           pull request base branch in the eligible Git worktree.
         </p>
         <p className="text-zinc-600 mb-4">
-          For a Repo composition, also prepare the declared checkouts and all
+          For a declared composition, explicitly synchronize its checkouts and prepare all
           pinned objects for the baseline, including retained history for removed
-          projects, before running reports. Reqvire follows
-          <code> .repo/manifest.xml</code> automatically. Track source XML and selecting includes in the manifest-owning root
-          branch. The root may contain no model documents; its pinned projects
+          projects, before running reports. Reqvire selects
+          <code> reqvire-workspace.toml</code> automatically. Track the native manifest in its owning root branch. The root may contain no model documents; its pinned projects
           then supply the complete model. The single-repository example below does
           not perform that preparation.
         </p>

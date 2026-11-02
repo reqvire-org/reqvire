@@ -47,8 +47,8 @@ Command invocation, base-commit selection, default comparison scope and text/JSO
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
   * [JSON Output Structure](../../Reports/ModelReports/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Reports/ModelReports/Specifications.md#text-output-formatting)
-  * [Repo Change Impact Baseline Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-baseline-specification)
-  * [Repo Change Impact Reporting Specification](../../Processing/ChangeImpact/Specifications.md#repo-change-impact-reporting-specification)
+  * [Workspace Change Impact Baseline Specification](../../Processing/ChangeImpact/Specifications.md#workspace-change-impact-baseline-specification)
+  * [Workspace Change Impact Reporting Specification](../../Processing/ChangeImpact/Specifications.md#workspace-change-impact-reporting-specification)
 
 #### Relations
   * definedBy: [Change Propagation Behavior](Behaviors.md#change-propagation-behavior)
@@ -435,8 +435,9 @@ Detailed global option, startup ordering, normal/MCP command behavior, fallback 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
+#### Contract References
   * [Workspace Scope Specification](../../ModelStructure/Specifications.md#workspace-scope-specification)
+  * [Workspace Discovery Specification](../../Workspaces/Specifications.md#workspace-discovery-specification)
 
 #### Relations
   * definedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)

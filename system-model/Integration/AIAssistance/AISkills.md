@@ -83,16 +83,28 @@ Instruction contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Contract References
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [CLI Workspace Command Dispatch Specification](../../Interfaces/CLI/Workspaces.md#cli-workspace-command-dispatch-specification)
+  * [CLI Workspace Freeze Specification](../../Interfaces/CLI/Workspaces.md#cli-workspace-freeze-specification)
+  * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
+  * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
   * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
   * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
   * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
-  * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
-  * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [MCP Workspace Preparation Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-workspace-preparation-tool-specification)
   * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
   * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Native Workspace Manifest Specification](../../Workspaces/Specifications.md#native-workspace-manifest-specification)
+  * [Repo Workspace Migration Specification](../../Workspaces/Specifications.md#repo-workspace-migration-specification)
+  * [Workspace Composition Checkpoint Specification](../../Workspaces/Specifications.md#workspace-composition-checkpoint-specification)
+  * [Workspace Dependency Registration Specification](../../Workspaces/Specifications.md#workspace-dependency-registration-specification)
+  * [Workspace Dependency Removal Specification](../../Workspaces/Specifications.md#workspace-dependency-removal-specification)
+  * [Workspace Discovery Specification](../../Workspaces/Specifications.md#workspace-discovery-specification)
+  * [Workspace Pin Freeze Specification](../../Workspaces/Specifications.md#workspace-pin-freeze-specification)
+  * [Workspace Status Specification](../../Workspaces/Specifications.md#workspace-status-specification)
+  * [Workspace Synchronization Specification](../../Workspaces/Specifications.md#workspace-synchronization-specification)
 
 #### Relations
   * definedBy: [AI Skills Instruction Contract Specification](#ai-skills-instruction-contract-specification)
@@ -110,19 +122,31 @@ Artifact contract details shall follow the associated contract specification.
   * type: requirement
 
 #### Contract References
-  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
-  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
-  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
-  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
-  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
-  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [CLI Workspace Command Dispatch Specification](../../Interfaces/CLI/Workspaces.md#cli-workspace-command-dispatch-specification)
+  * [CLI Workspace Freeze Specification](../../Interfaces/CLI/Workspaces.md#cli-workspace-freeze-specification)
   * [MCP Formatting Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-formatting-tool-specification)
   * [MCP Lint Fix Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-lint-fix-tool-specification)
   * [MCP Prompt Guidance Specification](../../Interfaces/MCP/Specifications.md#mcp-prompt-guidance-specification)
+  * [MCP Server Command Specification](../../Interfaces/MCP/Specifications.md#mcp-server-command-specification)
+  * [MCP Stdio Process Lifecycle Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-process-lifecycle-specification)
+  * [MCP Stdio Transport Specification](../../Interfaces/MCP/Specifications.md#mcp-stdio-transport-specification)
+  * [MCP Update Element Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-update-element-tool-specification)
+  * [MCP Workspace Preparation Tool Specification](../../Interfaces/MCP/Specifications.md#mcp-workspace-preparation-tool-specification)
   * [Model Interface Operation Boundary Specification](../../Interfaces/Specifications.md#model-interface-operation-boundary-specification)
   * [Contract Reference Mutation Specification](../../ModelStructure/Specifications.md#contract-reference-mutation-specification)
   * [Contract Reference Semantics Specification](../../ModelStructure/Specifications.md#contract-reference-semantics-specification)
+  * [Create Element Override Behavior](../../Operations/ModelOperations/Behaviors.md#create-element-override-behavior)
+  * [Focused Element Editing Behavior](../../Operations/ModelOperations/Behaviors.md#focused-element-editing-behavior)
   * [Canonical Model Mutation Persistence Specification](../../Operations/ModelOperations/Specifications.md#canonical-model-mutation-persistence-specification)
+  * [Native Workspace Manifest Specification](../../Workspaces/Specifications.md#native-workspace-manifest-specification)
+  * [Repo Workspace Migration Specification](../../Workspaces/Specifications.md#repo-workspace-migration-specification)
+  * [Workspace Composition Checkpoint Specification](../../Workspaces/Specifications.md#workspace-composition-checkpoint-specification)
+  * [Workspace Dependency Registration Specification](../../Workspaces/Specifications.md#workspace-dependency-registration-specification)
+  * [Workspace Dependency Removal Specification](../../Workspaces/Specifications.md#workspace-dependency-removal-specification)
+  * [Workspace Discovery Specification](../../Workspaces/Specifications.md#workspace-discovery-specification)
+  * [Workspace Pin Freeze Specification](../../Workspaces/Specifications.md#workspace-pin-freeze-specification)
+  * [Workspace Status Specification](../../Workspaces/Specifications.md#workspace-status-specification)
+  * [Workspace Synchronization Specification](../../Workspaces/Specifications.md#workspace-synchronization-specification)
 
 #### Relations
   * definedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
@@ -167,7 +191,11 @@ Instruction contract rules:
 - Guidance MUST place bindings on the requirements responsible for the obligation, preserve the mutual exclusion of binding and reference sections on one requirement, and preserve acyclic dependencies including mixed reference, binding, and ancestry paths.
 - Model-refactor examples include correct and incorrect examples where that improves assistant behavior.
 
-Interface guidance follows the owning requirement's boundary and maintenance references. Authoring/refactoring workflows use typed MCP tools with mutation enablement, including their previews; inspection, validation and exports may use retained CLI commands. Formatting is MCP-only, lint repair uses `reqvire.lint` with `fix: true`, and ordinary successful writes already normalize affected documents. Known migrations remain CLI preview/application before validated MCP startup. Do not prescribe removed CLI authoring commands, CLI formatting or CLI lint repair.
+Interface guidance follows the owning requirement's boundary and maintenance references. Authoring/refactoring workflows use typed MCP tools with mutation enablement, including their previews; inspection, validation and exports may use retained CLI commands. Formatting is MCP-only, lint repair uses `reqvire.lint` with `fix: true`, and ordinary successful writes already normalize affected documents. Known model-syntax migrations remain CLI preview/application before validated MCP startup. Do not prescribe removed CLI authoring commands, CLI formatting or CLI lint repair.
+
+Workspace instructions consume the referenced native manifest and CLI contracts. Explain configured checkout locations, explicit dependency preparation before validated model startup, the shared single-repository default, component-first checkpoints and external committed work followed by pin freeze and a root commit. Keep model CRUD in typed MCP; workspace CLI configuration/Git operations do not widen the model-authoring surface.
+
+Workspace preparation guidance covers the CLI/MCP status/add/remove/sync/freeze/migration parity through its referenced contracts. Distinguish configured tracking refs from exact pins, normal sync from explicit latest, freeze preserving refs and removal preserving checkouts. Repo XML migration writes native root TOML then calls shared sync. It does not add a second checkout engine or bypass normal validated MCP startup.
 
 #### Metadata
   * type: specification
@@ -195,6 +223,8 @@ Artifact contract rules:
 - Ontology-authoring skills should keep existing-ontology cleanup guidance in a separate refactoring reference document. The main skill should load that reference only when the task is to refactor, audit, clean up, or improve existing ontology content, not for greenfield ontology creation.
 
 All shared skills, installed copies and reference pages MUST use the supported interface boundary. CRUD examples use typed MCP tool names and arguments rather than removed CLI verbs; no shell/CLI wrapper substitutes for an MCP authoring tool. Preserve read/report CLI examples where supported, including their actual output controls. Show MCP formatting preview/application, gated lint repair, automatic canonical writes and the CLI migration exception. Installed copies and canonical package guidance must agree with the released boundary; updating this contract alone does not update those artifacts.
+
+Workspace examples use one tracked native TOML manifest, explicitly configured repositories_dir and component-relative paths. Show CLI workspace preparation/management and corresponding typed MCP operations separately from model CRUD and coordinated commits. Explain status/add/remove/sync/freeze/migration, explicit latest, independent ref/commit semantics, retained checkouts on removal and XML-to-root-TOML conversion followed by shared sync. External freeze requires committed component work and no conflicting active authoring owner. The owning repository may contain no model. Do not hardcode a checkout parent or reintroduce a cached manifest authoring branch/PR. Shipped instructions must match the implemented version; these model contracts alone do not update skill artifacts.
 
 #### Metadata
   * type: specification

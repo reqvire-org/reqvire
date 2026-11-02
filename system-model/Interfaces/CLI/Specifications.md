@@ -333,17 +333,11 @@ Structure for error and warning messages.
 
 ### Explicit Workspace Selection Specification
 
-The CLI is expected to resolve and enter an explicitly selected workspace before executing Reqvire operations.
+The CLI passes an explicit --workspace directory to the shared workspace resolver before ignore loading, model construction or operation dispatch. Without the option, use the service's native manifest discovery and normal single-repository selection.
 
-#### Details
-The `--workspace` behavior is governed by the reused workspace-selection and startup contracts.
+Use the resulting effective directory and repository ownership inventory consistently for paths, diagnostics, ordinary commands and server startup. A workspace below its owning Git root retains its own identifier base. A command invoked inside a component does not implicitly cross its Git boundary into a containing composition.
 
-Option rules:
-- The CLI provides a global workspace selection option.
-- Workspace selection is applied as a startup directory change before Git worktree discovery, model parsing, ignore-pattern loading, Git metadata collection, reporting, and mutation execution.
-- Workspace selection preserves existing current-directory behavior when the option is omitted.
-- Workspace selection applies consistently to normal CLI commands and MCP server startup.
-- Invalid workspace directories are rejected before command execution.
+Invalid directories and invalid selected manifests fail before operation execution. Workspace preparation dispatch remains available before the combined model exists; model-bearing operations retain normal validation.
 
 #### Metadata
   * type: specification

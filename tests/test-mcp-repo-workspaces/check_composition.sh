@@ -15,20 +15,21 @@ composition_prepare() {
     git -C "$native_case/docs" init -qb main
     docs_commit=$(impact_commit "$native_case/docs" 'Documentation model and page')
     git clone -q --bare "$native_case/docs" "$native_case/remotes/docs"
-    source_projects="$central/manifests/projects.xml"
-    git -C "$central" mv manifests/default.xml manifests/projects.xml
-    printf '<manifest><include name="manifests/projects.xml"/></manifest>\n' > "$source_manifest"
-    sed -i "/<\/manifest>/i\  <project name=\"docs\" path=\"repositories/docs\" remote=\"local\" revision=\"$docs_commit\"/>" "$source_projects"
+    source_projects="$source_manifest"
+    { fixture_manifest; fixture_project component "$alpha"; fixture_project docs "$docs_commit"; } > "$source_manifest"
     impact_base=$(impact_commit "$central" 'Record authoritative root source and component pins')
     git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
-    (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
+    (cd "$central" && "$REQVIRE_BIN" workspace sync)
     git -C "$central/repositories/component" checkout -q -B main "$alpha"
     git -C "$central/repositories/docs" checkout -q -B main "$docs_commit"
     git -C "$central" branch release/1.0 "$impact_base"
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$impact_base"
+    test ! -e "$central/.repo/manifests/.git"
     test -z "$(git -C "$central" status --porcelain)"
     test -z "$(git -C "$central" ls-files -- .repo repositories)"
     test ! -e "$central/.reqvire-composition.json"
+    mkdir -p "$central/.repo/manifests/manifests"
+    cp "$source_projects" "$central/.repo/manifests/reqvire-workspace.toml"
+    printf '%s\n' "$impact_base" > "$native_case/cache-head"
     (cd "$central" && "$REQVIRE_BIN" validate)
 }
 
@@ -65,19 +66,19 @@ composition_assert_checkpoint() {
     local component root_head cached
     component=$(git -C "$central/repositories/component" rev-parse HEAD)
     root_head=$(git -C "$central" rev-parse HEAD)
-    cached=$(git -C "$central/.repo/manifests" rev-parse HEAD)
+    cached=$(cat "$native_case/cache-head")
     test "$component" != "$alpha"
     test "$(git -C "$central/repositories/component" rev-parse HEAD^)" = "$alpha"
     test "$root_head" != "$impact_base"
     test "$(git -C "$central" rev-parse HEAD^)" = "$impact_base"
-    grep -Fq "revision=\"$component\"" "$source_projects"
-    git -C "$central" show HEAD:manifests/projects.xml | grep -Fq "revision=\"$component\""
+    grep -Fq "commit = \"$component\"" "$source_projects"
+    git -C "$central" show HEAD:reqvire-workspace.toml | grep -Fq "commit = \"$component\""
     if [[ "$root_model" == model ]]; then
         local docs_head
         docs_head=$(git -C "$central/repositories/docs" rev-parse HEAD)
         test "$docs_head" != "$docs_commit"
         test "$(git -C "$central/repositories/docs" rev-parse HEAD^)" = "$docs_commit"
-        grep -Fq "revision=\"$docs_head\"" "$source_projects"
+        grep -Fq "commit = \"$docs_head\"" "$source_projects"
     else
         test "$(git -C "$central/repositories/docs" rev-parse HEAD)" = "$docs_commit"
     fi
@@ -89,9 +90,9 @@ composition_assert_checkpoint() {
     test -z "$(git -C "$central" for-each-ref --format='%(refname)' refs/heads/reqvire/manifests/)"
     git -C "$central" diff-tree --no-commit-id --name-only -r HEAD | sort > "$native_case/root-paths.txt"
     if [[ "$root_model" == model ]]; then
-        printf '%s\n' Model.md manifests/projects.xml > "$native_case/expected-paths.txt"
+        printf '%s\n' Model.md reqvire-workspace.toml > "$native_case/expected-paths.txt"
     else
-        printf '%s\n' manifests/projects.xml > "$native_case/expected-paths.txt"
+        printf '%s\n' reqvire-workspace.toml > "$native_case/expected-paths.txt"
     fi
     diff -u "$native_case/expected-paths.txt" "$native_case/root-paths.txt"
     (cd "$central" && "$REQVIRE_BIN" validate)
@@ -132,13 +133,13 @@ composition_omega() {
 
 composition_publish_source() {
     git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
-    (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
+    (cd "$central" && "$REQVIRE_BIN" workspace sync)
 }
 
 composition_stale_cache() {
     composition_omega
     # The root source and component checkout agree. Repo's cache is still alpha.
-    grep -Fq "$alpha" "$central/.repo/manifests/manifests/projects.xml"
+    grep -Fq "$alpha" "$central/.repo/manifests/reqvire-workspace.toml"
     impact_state > "$native_case/before.txt"
     (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/search.json"
     grep -Fq 'behavior is omega' "$native_case/search.json"
@@ -161,7 +162,7 @@ composition_branches() {
     for owner in "$child" "$child/repositories/component" "$child/repositories/docs"; do
         test "$(git -C "$owner" branch --show-current)" = feature/topic
     done
-    grep -Fq "$alpha" "$child/manifests/projects.xml"
+    grep -Fq "$alpha" "$child/reqvire-workspace.toml"
     test ! -e "$child/.reqvire-composition.json"
     jq -e '(.result.structuredContent.context // .result.structuredContent) |
       ((.manifest_owners // []) | length == 0)' "$native_case/create.json"
@@ -171,7 +172,7 @@ composition_branches() {
     impact_rpc reqvire.branch.open '{"branch":"feature/topic"}' "$native_case/reopen.json"
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/reopen.json")
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$alpha"
-    grep -Fq "$alpha" "$child/manifests/projects.xml"
+    grep -Fq "$alpha" "$child/reqvire-workspace.toml"
 }
 
 composition_checkpoint() {
@@ -240,7 +241,7 @@ composition_impact() {
     jq -e --arg base "$impact_base" --arg current "$impact_current" '
       .comparison | .base.central_commit == $base and .current.central_commit == $current and
       all([.base,.current][]; .central_commit as $root |
-        ([.manifest_inputs[].path] == ["manifests/default.xml","manifests/projects.xml"]) and
+        ([.manifest_inputs[].path] == ["reqvire-workspace.toml"]) and
         all(.manifest_inputs[]; .commit == $root and ((.owner // "") == "")))' "$native_case/impact.out"
     if [[ "$mode" != cli ]]; then
         impact_start_server "$mode" native
@@ -278,9 +279,9 @@ composition_root_failure() {
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
     test "$saved" != "$alpha"
     test "$(git -C "$central" rev-parse HEAD)" = "$impact_base"
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$impact_base"
+    test "$(cat "$native_case/cache-head")" = "$impact_base"
     impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/failed-status.json"
-    jq -e '.result.structuredContent.context.pending_changes | index("manifests/projects.xml") != null' "$native_case/failed-status.json"
+    jq -e '.result.structuredContent.context.pending_changes | index("reqvire-workspace.toml") != null' "$native_case/failed-status.json"
     rm "$hook"
     composition_commit
     test "$(git -C "$central/repositories/component" rev-parse HEAD)" = "$saved"
@@ -316,15 +317,9 @@ composition_publication_prepare() {
     sed -i "s@$alpha@$published_component@" "$source_projects"
     published_root=$(impact_commit "$central" 'Feature model and pins on one root branch')
     git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/feature/topic
-    # Refresh the cache from that actual root commit with Repo, not an authored
-    # cache commit or an unrelated history relabelled with the same URL.
-    (cd "$central" && repo init -q -u "file://$native_case/remotes/central" -b feature/topic -m manifests/default.xml \
-      --repo-url "file://$native_source" --repo-rev "$(git -C "$native_source" rev-parse HEAD)" --no-repo-verify --no-clone-bundle)
-    test "$(git -C "$central/.repo/manifests" rev-parse HEAD)" = "$published_root"
     git -C "$central" remote set-url origin https://github.com/test/project.git
-    git -C "$central/.repo/manifests" remote set-url origin https://github.com/test/project.git
-    git -C "$central/repositories/component" remote set-url local https://github.com/test/component
-    git -C "$central/repositories/docs" remote set-url local https://github.com/test/docs
+    git -C "$central/repositories/component" remote set-url origin https://github.com/test/component
+    git -C "$central/repositories/docs" remote set-url origin https://github.com/test/docs
     git -C "$central" config branch.feature/topic.reqvireCompositionBase "$impact_base"
     mkdir -p "$native_case/bin" "$native_case/github-state"
     cp "$TEST_SCRIPT_DIR/fixtures/git-double.sh" "$native_case/bin/git"
@@ -397,21 +392,19 @@ composition_fresh_consumer() {
     git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
     local consumer="$native_case/consumer"
     git clone -q --branch main "file://$native_case/remotes/central" "$consumer"
-    (cd "$consumer" && repo init -q -u "file://$native_case/remotes/central" -b main -m manifests/default.xml \
-      --repo-url "file://$native_source" --repo-rev "$(git -C "$native_source" rev-parse HEAD)" --no-repo-verify --no-clone-bundle &&
-      repo sync -q --no-clone-bundle --no-tags && "$REQVIRE_BIN" validate &&
+    (cd "$consumer" && "$REQVIRE_BIN" workspace sync && "$REQVIRE_BIN" validate &&
       "$REQVIRE_BIN" change-impact --git-commit "$impact_base" --json > "$native_case/consumer-impact.json")
     jq -e 'any(.added[]; .element_id | endswith("#added-capability"))' "$native_case/consumer-impact.json"
     test ! -e "$consumer/.reqvire-composition.json"
 }
 
 composition_missing_source() {
-    git -C "$central" rm -q manifests/projects.xml
-    impact_commit "$central" 'Remove authoritative include while cache retains it' > /dev/null
-    if (cd "$central" && "$REQVIRE_BIN" validate) > "$native_case/missing.txt" 2>&1; then
+    git -C "$central" rm -q reqvire-workspace.toml
+    impact_commit "$central" 'Remove explicitly selected source while old cache retains it' > /dev/null
+    if (cd "$central" && "$REQVIRE_BIN" --manifest reqvire-workspace.toml validate) > "$native_case/missing.txt" 2>&1; then
         echo 'Cached XML substituted for missing authoritative source' >&2; return 1
     fi
-    grep -Fq projects.xml "$native_case/missing.txt"
+    grep -Fq reqvire-workspace.toml "$native_case/missing.txt"
 }
 
 composition_unknown_component() {
@@ -440,50 +433,60 @@ composition_unknown_component() {
 
 composition_overlay() {
     local kind=$1 overlay="$central/manifests/revisions.xml" saved
-    mkdir -p "$central/.repo/local_manifests"
+    git -C "$central" rm -q reqvire-workspace.toml
+    mkdir -p "$central/manifests"
+    cat > "$central/manifests/default.xml" <<EOF
+<manifest>
+  <remote name="local" fetch="file://$native_case/remotes/"/>
+  <project name="component" path="repositories/component" remote="local" revision="$alpha"/>
+  <project name="docs" path="repositories/docs" remote="local" revision="$docs_commit"/>
+  <include name="manifests/revisions.xml"/>
+</manifest>
+EOF
+    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" > "$overlay"
+    impact_commit "$central" 'Version legacy XML selection' > /dev/null
     if [[ "$kind" == unversioned_overlay ]]; then
-        printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" > "$central/.repo/local_manifests/review.xml"
+        mkdir -p "$central/.repo/local_manifests"
+        printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$omega" > "$central/.repo/local_manifests/review.xml"
         impact_state > "$native_case/before.txt"
-        if (cd "$central" && "$REQVIRE_BIN" validate) > "$native_case/rejected.txt" 2>&1; then
-            echo 'Unversioned overlay was accepted' >&2; return 1
+        if (cd "$central" && "$REQVIRE_BIN" workspace migrate --from repo --source manifests/default.xml) > "$native_case/rejected.txt" 2>&1; then
+            echo 'Unsupported local XML overlay was silently omitted' >&2; return 1
         fi
         grep -Fq '.repo/local_manifests/review.xml' "$native_case/rejected.txt"
+        test ! -e "$source_manifest"
         impact_state > "$native_case/after.txt"
         diff -u "$native_case/before.txt" "$native_case/after.txt"
         return
     fi
-    printf '<manifest><extend-project name="component" revision="%s"/></manifest>\n' "$alpha" > "$overlay"
-    printf '<manifest><include name="manifests/revisions.xml"/></manifest>\n' > "$central/.repo/local_manifests/review.xml"
-    impact_base=$(impact_commit "$central" 'Version selected overlay in root history')
-    (cd "$central" && "$REQVIRE_BIN" search --json) > "$native_case/native.json"
-    (cd "$central" && "$REQVIRE_BIN" --manifest manifests/default.xml search --json) > "$native_case/explicit.json"
-    diff -u "$native_case/native.json" "$native_case/explicit.json"
+    (cd "$central" && "$REQVIRE_BIN" workspace migrate --from repo --source manifests/default.xml)
+    ! grep -Fq include "$source_manifest"
+    impact_base=$(impact_commit "$central" 'Record one native composition')
+    cp "$overlay" "$native_case/unchanged-legacy.xml"
     impact_start_server mcp native
     composition_add
     composition_commit
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
-    grep -Fq "revision=\"$saved\"" "$overlay"
-    grep -Fq "revision=\"$saved\"" "$source_projects"
+    grep -Fq "commit = \"$saved\"" "$source_manifest"
+    diff -u "$native_case/unchanged-legacy.xml" "$overlay"
     test "$(git -C "$central" rev-parse HEAD^)" = "$impact_base"
     (cd "$central" && "$REQVIRE_BIN" validate)
     (cd "$central" && "$REQVIRE_BIN" change-impact --git-commit "$impact_base" --json) > "$native_case/impact.json"
     jq -e 'any(.added[]; .element_id == "repositories/component/Added.md#added-capability") and
       all([.comparison.base,.comparison.current][];
-        .central_commit as $root | [.manifest_inputs[].path] == ["manifests/default.xml","manifests/projects.xml","manifests/revisions.xml"] and
+        .central_commit as $root | [.manifest_inputs[].path] == ["reqvire-workspace.toml"] and
         all(.manifest_inputs[]; .commit == $root))' "$native_case/impact.json"
     composition_stop
-    ln -sfn ../../manifests/revisions.xml "$central/.repo/local_manifests/review.xml"
     impact_start_server mcp native
-    impact_rpc reqvire.rename_element '{"branch":"main","element_name":"Added Capability","new_name":"Renamed Added Capability","dry_run":false}' "$native_case/symlink-rename.json"
+    impact_rpc reqvire.rename_element '{"branch":"main","element_name":"Added Capability","new_name":"Renamed Added Capability","dry_run":false}' "$native_case/restarted-rename.json"
     composition_commit
-    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/symlink-status.json"
-    jq -e '.result.structuredContent.context | .writes_available == true and .pending_changes == []' "$native_case/symlink-status.json"
+    impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/restarted-status.json"
+    jq -e '.result.structuredContent.context | .writes_available == true and .pending_changes == []' "$native_case/restarted-status.json"
     saved=$(git -C "$central/repositories/component" rev-parse HEAD)
-    grep -Fq "revision=\"$saved\"" "$overlay"
-    impact_rpc reqvire.branch.create '{"branch":"feature/overlay","base_ref":"HEAD","from_branch":"main"}' "$native_case/child.json"
+    grep -Fq "commit = \"$saved\"" "$source_manifest"
+    impact_rpc reqvire.branch.create '{"branch":"feature/converted","base_ref":"HEAD","from_branch":"main"}' "$native_case/child.json"
     local child
     child=$(jq -er '.result.structuredContent.workspace_root' "$native_case/child.json")
-    grep -Fq "revision=\"$saved\"" "$child/manifests/revisions.xml"
+    grep -Fq "commit = \"$saved\"" "$child/reqvire-workspace.toml"
     test "$(git -C "$child/repositories/component" rev-parse HEAD)" = "$saved"
 }
 
@@ -524,8 +527,8 @@ partial_prs mcp/partial-component-root-pr-set-reused
 push_retry mcp/component-before-root-push-without-manifest-ref
 fresh_consumer cli/published-root-source-composition-fresh-consumer
 missing_source cli/missing-authoritative-source-not-replaced-by-cache
-versioned_overlay mcp/versioned-root-overlay-checkpoint-and-impact
-unversioned_overlay cli/unversioned-overlay-rejected
+versioned_overlay mcp/migrated-xml-overlay-single-manifest-checkpoint-and-impact
+unversioned_overlay cli/unsupported-local-xml-overlay-rejected
 CASES
 }
 

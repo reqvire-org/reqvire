@@ -182,8 +182,8 @@ WHEN a model operation produces a changed candidate, the system SHALL invoke sha
   * definedBy: [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
   * definedBy: [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * definedBy: [Operation Command Contract Specification](Specifications.md#operation-command-contract-specification)
-  * derive: [Atomic Element Override](../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
   * derive: [Contract Bindings Identifier Updates](#contract-bindings-identifier-updates)
+  * derive: [Atomic Element Override](../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-element-override)
   * derive: [Create Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#create-element-operation)
   * derive: [Delete Element Operation](../Operations/ModelOperations/ElementManipulationRequirements.md#delete-element-operation)
   * derive: [Element Manipulation File Persistence](../Operations/ModelOperations/ElementManipulationRequirements.md#element-manipulation-file-persistence)
@@ -487,20 +487,21 @@ The system shall support defined verification categories following clearly defin
 
 ### Workspace Root Path Authority
 
-The system shall use the effective Reqvire workspace root as the project base for path resolution and use Git worktree membership as the file eligibility boundary, regardless of whether the workspace root is a Git repository root, a child of a Git repository root, or a parent of one or more Git repositories.
+The system SHALL use the effective workspace directory and repository inventory supplied by the workspace service as the path and file-eligibility authority for system-model processing.
 
 #### Details
-- The system shall treat the process working directory after startup workspace selection as the project's base for all file and folder references
-- The system shall implement path resolution following clearly defined specifications
-- The system shall normalize element identifiers, file paths, relation targets, contract_bindings, concept references, InternalPath targets, diagnostics, reports, exports, and consumer-visible model paths relative to the effective workspace root
-- Git repository roots shall determine which files and artifacts are eligible for SOI model processing, but shall not become path-resolution or identifier roots
-- Files and artifacts that are under the effective workspace root but are not inside any Git worktree shall be ignored by SOI model parsing, model resources, evidence collection, exports, consumer-visible model views, and change-impact inputs
-- Git repository revisions shall be treated as source-control metadata for eligible files and artifacts
-- When the effective workspace root is a child of a Git repository, parent repository content outside the workspace root shall be outside the Reqvire processing scope
-- When the effective workspace root is a parent of one or more Git repositories, nested repository roots shall not reset or namespace Reqvire identifiers; paths shall remain workspace-root-relative
+Normalize element identifiers, relation and contract-dependency targets, local resources, diagnostics, reports, exports and mutation paths relative to the effective workspace directory. Git repository roots determine file ownership and eligibility within that scope; they do not reset model identifier roots.
+
+Use only the participating repositories supplied by the shared service. When the effective directory is below its owning repository root, content outside that directory remains out of scope. Declared dependent repository directories remain workspace-relative paths. Files outside the supplied ownership boundaries and undeclared nested repositories do not enter the model.
+
+Model processing consumes workspace identity and ownership; it does not repeat manifest discovery or repository orchestration.
 
 #### Metadata
   * type: requirement
+
+#### Contract References
+  * [Workspace Discovery Specification](../Workspaces/Specifications.md#workspace-discovery-specification)
+  * [Workspace Management API Specification](../Workspaces/Specifications.md#workspace-management-api-specification)
 
 #### Relations
   * definedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)

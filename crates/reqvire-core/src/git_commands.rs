@@ -1,253 +1,31 @@
 use crate::error::ReqvireError;
-use rustc_hash::FxHashMap;
-use std::collections::{BTreeMap, BTreeSet};
-use std::io::Write;
+#[cfg(test)]
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{LazyLock, Mutex};
 
-/// Core Git execution for local metadata and immutable objects.
-///
-/// Callers that
-/// need bounded writes/cancellation supply their own runner to GitReader.
-/// Neither lazy object fetching nor any Git transport is permitted here.
+// Workspace owns the shared plumbing; this adapter retains core errors.
+pub use reqvire_workspace::git::{GitReader, TreeFile};
 pub fn run_local(
     directory: &Path,
     args: &[&str],
     input: Option<&[u8]>,
 ) -> Result<Vec<u8>, ReqvireError> {
-    let mut command = Command::new("git");
-    command
-        .current_dir(directory)
-        .args(["-c", "protocol.allow=never"])
-        .args(args)
-        .env("GIT_TERMINAL_PROMPT", "0")
-        .env("GIT_NO_LAZY_FETCH", "1")
-        .env("GIT_ALLOW_PROTOCOL", "")
-        .stdin(if input.is_some() {
-            Stdio::piped()
-        } else {
-            Stdio::null()
-        });
-    let output = if let Some(input) = input {
-        let mut process = command
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()?;
-        let mut stdin = process
-            .stdin
-            .take()
-            .ok_or_else(|| git_error("Missing Git object input"))?;
-        let bytes = input.to_vec();
-        let writer = std::thread::spawn(move || stdin.write_all(&bytes));
-        let output = process.wait_with_output()?;
-        writer
-            .join()
-            .map_err(|_| git_error("Git object writer failed"))??;
-        output
-    } else {
-        command.output()?
-    };
-    if !output.status.success() {
-        return Err(git_error(format!(
-            "Git in {}: {}",
-            directory.display(),
-            String::from_utf8_lossy(&output.stderr).trim()
-        )));
-    }
-    Ok(output.stdout)
+    reqvire_workspace::git::run_local(directory, args, input).map_err(Into::into)
 }
-
 pub fn local_bytes(directory: &Path, args: &[&str]) -> Result<Vec<u8>, ReqvireError> {
     run_local(directory, args, None)
 }
-
 pub fn local_text(directory: &Path, args: &[&str]) -> Result<String, ReqvireError> {
-    String::from_utf8(local_bytes(directory, args)?)
-        .map(|text| text.trim_end_matches(['\r', '\n']).to_owned())
-        .map_err(|e| git_error(e.to_string()))
-}
-
-/// Read-only Git plumbing with the caller's execution policy. MCP supplies its
-/// bounded, binary-safe runner; repository parsing stays in this shared layer.
-pub struct GitReader<'a, F> {
-    root: &'a Path,
-    run: F,
-}
-
-pub struct TreeFile {
-    pub bytes: std::sync::Arc<Vec<u8>>,
-    pub executable: bool,
-    pub symlink: bool,
-}
-
-impl<'a, F> GitReader<'a, F>
-where
-    F: FnMut(&[&str], Option<&[u8]>) -> Result<Vec<u8>, ReqvireError>,
-{
-    pub const fn new(root: &'a Path, run: F) -> Self {
-        Self { root, run }
-    }
-
-    pub fn operation_in_progress(&mut self) -> Result<bool, ReqvireError> {
-        let bytes = (self.run)(&["rev-parse", "--absolute-git-dir"], None)?;
-        let directory = PathBuf::from(git_utf8(&bytes)?.trim_end_matches(['\n', '\r']));
-        Ok([
-            "MERGE_HEAD",
-            "CHERRY_PICK_HEAD",
-            "REVERT_HEAD",
-            "rebase-merge",
-            "rebase-apply",
-            "sequencer",
-        ]
-        .iter()
-        .any(|marker| directory.join(marker).exists()))
-    }
-
-    pub fn changed_paths(
-        &mut self,
-        old: &str,
-        new: &str,
-    ) -> Result<BTreeSet<PathBuf>, ReqvireError> {
-        let bytes = (self.run)(
-            &[
-                "diff",
-                "--no-ext-diff",
-                "--no-renames",
-                "--name-only",
-                "-z",
-                old,
-                new,
-                "--",
-            ],
-            None,
-        )?;
-        bytes
-            .split(|b| *b == 0)
-            .filter(|p| !p.is_empty())
-            .map(|p| git_utf8(p).map(|p| self.root.join(p)))
-            .collect()
-    }
-
-    /// One tree read and one deduplicated blob batch, regardless of file count.
-    /// Missing paths represent deletions. Nonregular entries require a caller
-    /// with explicit symlink/submodule support rather than a byte-file snapshot.
-    pub fn regular_files_at_commit(
-        &mut self,
-        commit: &str,
-        paths: &BTreeSet<PathBuf>,
-    ) -> Result<BTreeMap<PathBuf, TreeFile>, ReqvireError> {
-        if paths.is_empty() {
-            return Ok(BTreeMap::new());
-        }
-        self.selected_files_at_commit(commit, Some(paths), false)
-    }
-
-    /// Read a complete tree for isolated historical reconstruction. Symlink
-    /// bytes are declarations; the caller must resolve them inside this tree.
-    pub(crate) fn files_at_commit(
-        &mut self,
-        commit: &str,
-    ) -> Result<BTreeMap<PathBuf, TreeFile>, ReqvireError> {
-        self.selected_files_at_commit(commit, None, true)
-    }
-
-    fn selected_files_at_commit(
-        &mut self,
-        commit: &str,
-        paths: Option<&BTreeSet<PathBuf>>,
-        with_symlinks: bool,
-    ) -> Result<BTreeMap<PathBuf, TreeFile>, ReqvireError> {
-        let tree = (self.run)(&["ls-tree", "-r", "-z", "--full-tree", commit], None)?;
-        let mut entries = BTreeMap::new();
-        for entry in tree.split(|b| *b == 0).filter(|e| !e.is_empty()) {
-            let (metadata, path) = git_utf8(entry)?
-                .split_once('\t')
-                .ok_or_else(|| git_error("Invalid Git tree entry"))?;
-            let mut metadata = metadata.split_whitespace();
-            let mode = metadata
-                .next()
-                .ok_or_else(|| git_error("Missing tree mode"))?;
-            let kind = metadata
-                .next()
-                .ok_or_else(|| git_error("Missing tree object kind"))?;
-            let oid = metadata
-                .next()
-                .ok_or_else(|| git_error("Missing tree object ID"))?;
-            let path = self.root.join(path);
-            if paths.is_none_or(|paths| paths.contains(&path)) {
-                if paths.is_none() && kind == "commit" && mode == "160000" {
-                    continue; // Undeclared submodules are outside the composition.
-                }
-                if kind != "blob"
-                    || !(matches!(mode, "100644" | "100755") || (with_symlinks && mode == "120000"))
-                {
-                    return Err(git_error(format!(
-                        "Changed nonregular artifact {} requires full admission",
-                        path.display()
-                    )));
-                }
-                entries.insert(path, (mode == "100755", mode == "120000", oid.to_owned()));
-            }
-        }
-        let oids: BTreeSet<_> = entries.values().map(|(_, _, oid)| oid.clone()).collect();
-        let mut blobs = BTreeMap::new();
-        if !oids.is_empty() {
-            let input = oids.iter().map(|s| format!("{s}\n")).collect::<String>();
-            let bytes = (self.run)(&["cat-file", "--batch"], Some(input.as_bytes()))?;
-            let mut cursor = bytes.as_slice();
-            for oid in oids {
-                let end = cursor
-                    .iter()
-                    .position(|b| *b == b'\n')
-                    .ok_or_else(|| git_error("Missing blob header"))?;
-                let mut fields = git_utf8(&cursor[..end])?.split_whitespace();
-                if fields.next() != Some(oid.as_str()) || fields.next() != Some("blob") {
-                    return Err(git_error("Invalid blob batch reply"));
-                }
-                let length: usize = fields
-                    .next()
-                    .ok_or_else(|| git_error("Missing blob length"))?
-                    .parse()
-                    .map_err(|_| git_error("Invalid blob length"))?;
-                cursor = &cursor[end + 1..];
-                if cursor.len() <= length || cursor[length] != b'\n' {
-                    return Err(git_error("Incomplete blob reply"));
-                }
-                blobs.insert(oid, std::sync::Arc::new(cursor[..length].to_vec()));
-                cursor = &cursor[length + 1..];
-            }
-        }
-        Ok(entries
-            .into_iter()
-            .map(|(path, (executable, symlink, oid))| {
-                (
-                    path,
-                    TreeFile {
-                        bytes: std::sync::Arc::clone(&blobs[&oid]),
-                        executable,
-                        symlink,
-                    },
-                )
-            })
-            .collect())
-    }
-}
-
-fn git_error(message: impl Into<String>) -> ReqvireError {
-    ReqvireError::GitCommandError(message.into())
-}
-fn git_utf8(bytes: &[u8]) -> Result<&str, ReqvireError> {
-    std::str::from_utf8(bytes).map_err(|e| git_error(e.to_string()))
+    reqvire_workspace::git::local_text(directory, args).map_err(Into::into)
 }
 
 static REPO_URL: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static COMMIT_HASH: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static GIT_ROOT_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
 static BRANCH_NAME: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
-static GIT_ROOT_CACHE: LazyLock<Mutex<FxHashMap<PathBuf, String>>> =
-    LazyLock::new(|| Mutex::new(FxHashMap::default()));
 
 // Disable caching in tests to prevent interference between parallel tests
 static DISABLE_CACHE_FOR_TESTS: AtomicBool = AtomicBool::new(false);
@@ -257,7 +35,7 @@ pub fn clear_git_cache() {
     COMMIT_HASH.lock().expect("mutex not poisoned").take();
     GIT_ROOT_DIR.lock().expect("mutex not poisoned").take();
     BRANCH_NAME.lock().expect("mutex not poisoned").take();
-    GIT_ROOT_CACHE.lock().expect("mutex not poisoned").clear();
+    reqvire_workspace::git::clear_root_cache();
 }
 
 #[cfg(test)]
@@ -428,39 +206,8 @@ pub fn get_file_at_commit(
 }
 
 /// Finds the Git repository root for a given absolute folder path.
-pub fn find_git_repo_root(absolute_folder_path: &PathBuf) -> Result<String, ReqvireError> {
-    let mut cache = GIT_ROOT_CACHE.lock().expect("mutex not poisoned");
-    if let Some(cached_root) = cache.get(absolute_folder_path) {
-        return Ok(cached_root.clone());
-    }
-
-    let output = Command::new("git")
-        .arg("rev-parse")
-        .arg("--show-toplevel")
-        .current_dir(absolute_folder_path)
-        .output();
-
-    match output {
-        Ok(output) if output.status.success() => {
-            let root = String::from_utf8_lossy(&output.stdout).trim().to_string();
-            cache.insert(absolute_folder_path.clone(), root.clone());
-            drop(cache);
-            Ok(root)
-        }
-        Ok(output) => {
-            let err = String::from_utf8_lossy(&output.stderr).trim().to_string();
-            Err(ReqvireError::GitCommandError(format!(
-                "git rev-parse failed to get repository root for {}: {}",
-                absolute_folder_path.to_string_lossy(),
-                err
-            )))
-        }
-        Err(err) => Err(ReqvireError::GitCommandError(format!(
-            "Failed to execute git rev-parse for {}: {}",
-            absolute_folder_path.to_string_lossy(),
-            err
-        ))),
-    }
+pub fn find_git_repo_root(absolute_folder_path: &Path) -> Result<String, ReqvireError> {
+    reqvire_workspace::git::find_root(absolute_folder_path).map_err(Into::into)
 }
 
 /// Returns the Git repository root directory

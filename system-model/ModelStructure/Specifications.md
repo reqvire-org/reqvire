@@ -702,61 +702,18 @@ Usage guidelines for selecting appropriate verification types.
 
 ### Workspace Scope Specification
 
-Path resolution, Git worktree eligibility, and scope validation rules for workspace-root-based project management.
+Path normalization and model membership within a workspace description supplied by the shared workspace service.
 
 #### Details
-The effective Reqvire workspace root defines path normalization, identifier storage, diagnostic paths, export paths, and consumer-visible model paths. The workspace root is the process working directory after startup workspace selection has been applied. Git worktree membership defines which files and artifacts under that workspace root are eligible to participate in the SOI model. Git repository roots, branches, remotes, and commits do not define Reqvire identifier roots.
+Use the service-provided effective directory as the common path base and its participating repository inventory as the source-control ownership boundary. Discovery and single-repository fallback belong to the workspace service; model processing must not scan for an alternative composition.
 
-**Workspace Root Detection:**
-- When a caller provides explicit workspace selection, Reqvire enters that directory before executing the requested command.
-- When no explicit workspace selection is provided, the current process working directory is the effective workspace root.
-- The effective workspace root may be a Git repository root, a child of a Git repository root, or a parent directory containing one or more Git repositories.
-- A non-Git workspace root is allowed only as a container for one or more descendant Git worktrees; files outside those descendant worktrees are ignored.
-- Git root detection is used to classify eligible files and artifacts by Git worktree membership and to collect revision, branch, remote, and dirty-state metadata; it must not change path normalization.
-- All internal paths are normalized to workspace-root-relative format for storage.
+Only files and artifacts below the effective directory and owned by a participating Git worktree are eligible. For a subdirectory workspace, other content in the owning repository is outside scope. Declared component paths do not reset or namespace identifiers. Non-Git content and undeclared nested repositories are excluded.
 
-**Source Selection Modes:**
-- Ordinary Git mode discovers containing and descendant Git worktrees under the existing rules below.
-- Repo mode narrows the participating worktree inventory to Central and its declared projects through manifest-defined source selection. The common path and Git containment rules remain in force; an undeclared nested repository is not admitted by generic discovery.
+Resolve ordinary Markdown links relative to their declaring document and slash-prefixed links relative to the effective workspace. Normalize relation targets, contract bindings/references, concept references, local evidence, exports, diagnostics and consumer-visible source paths consistently. References outside the eligible scope fail with the applicable missing/ineligible target diagnostic.
 
-**Git Worktree Eligibility Rules:**
-- A file or artifact is eligible for SOI model processing only when it is inside the effective workspace root and inside a Git worktree.
-- A workspace-root descendant folder that is not inside any Git worktree is ignored, including Markdown files, local assets, implementation files, and evidence artifacts under that folder.
-- When the workspace root is a child of a Git worktree, files under the workspace root remain eligible because they are inside that parent Git worktree; files outside the workspace root remain out of scope.
-- In ordinary Git mode, when the workspace root is a parent of multiple Git repositories, only files under discovered descendant Git worktrees are eligible.
-- Nested Git worktrees remain ordinary workspace subdirectories for addressing; their repository identity may be reported as metadata but does not alter the workspace-root-relative identifier.
-- Local InternalPath evidence, static assets, implementation files, and resource targets must also be inside an eligible Git worktree before they are included in resources reports, exports, semantic model facts, or other consumer-facing evidence/resource views.
+Global workspace exclusions and each repository's ownership-scoped Git ignores retain their existing roles. Root Git ignores for declared component checkouts do not exclude those components from the combined graph. Parsed Markdown documents are source containers; eligible non-model assets remain resources or evidence.
 
-**Path Resolution Rules:**
-- Operation path arguments are resolved relative to the effective workspace root because workspace selection is applied as a startup directory change before operation execution.
-- Markdown links without a leading slash are resolved relative to the source document that contains the link.
-- Markdown links that start with `/` are resolved relative to the effective workspace root, not relative to any Git repository root.
-- Source, target, diagnostic, report, diff, export, semantic-export, and consumer-visible paths are emitted in workspace-root-relative form.
-
-**Processing Scope:**
-- Reqvire processes eligible Git-worktree files under the effective workspace root, subject to supported ignore and exclusion rules.
-- Content outside the effective workspace root is out of scope even when it belongs to a parent Git repository.
-- Content inside the effective workspace root but outside all Git worktrees is ignored rather than parsed as model source or included as local evidence/resource content.
-- Nested Git repositories under the effective workspace root do not reset Reqvire path roots; their files remain addressed by workspace-root-relative paths such as `repo-a/system-model/File.md#element`.
-- Markdown files parsed as model documents become source file containers for consumer views that expose source navigation.
-- Relation and contract_bindings targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
-
-**Scope Boundary Validation:**
-- Relations referencing elements outside the effective workspace root report missing relation target errors.
-- References using relative paths (for example `../ParentFile.md#element`) that escape the workspace root result in missing relation target errors.
-- Root-relative links are constrained to the effective workspace root; they cannot address parent directories or sibling workspaces.
-- Absolute operating-system paths are not internal Reqvire identifiers. If accepted as command input, they must resolve under the effective workspace root before being stored as workspace-relative paths.
-- Missing relation target errors clearly identify unreachable references due to workspace scope limitations.
-- Model mutations must not persist files outside the effective workspace root or into workspace folders that are outside all eligible Git worktrees.
-
-**Workspace-Root Consumer Rules:**
-- MCP formatting with `fix: true` may rewrite authored links to canonical source-relative Markdown links for readability, but the resolved targets must remain workspace-root-relative identifiers internally.
-- Migration and mutation commands must write changed files by resolving registry paths against the effective workspace root; they must not prepend the caller's pre-startup directory, a parent Git path, or a nested Git repository path.
-- `change-impact` compares workspace-root-relative model snapshots built from eligible Git-worktree files and artifacts. In ordinary Git mode a Git commit argument selects one eligible worktree's baseline. In Repo mode it selects Central's baseline commit and the historical manifest composition selects each component's baseline commit; versioned composition provenance identifies separately owned manifest revisions without an additional baseline selector. Both modes preserve workspace-root-relative identifiers.
-- Semantic export, model JSON, coverage, resources, traces, search, diagnostics, and diff output must expose workspace-root-relative file paths and element identifiers.
-- Consumer records, static export manifests, source target metadata, and element target metadata must use workspace-root-relative paths for eligible Git-worktree content only.
-- Tooling workspace state may include Git metadata for eligible worktrees, but tool inputs, outputs, evidence references, mutation diffs, and resources must use workspace-root-relative paths.
-- Nested repositories retain their own source-control provenance, while model relations and identifiers continue to use one workspace-root-relative path namespace.
+The supplied owner may contain no model elements. The complete graph may come from pinned components without a synthetic root element. Source revisions are provenance, not path roots. Comparison, reporting and interface consumers use the same projected scope and cannot cause implicit repository synchronization.
 
 #### Metadata
   * type: specification

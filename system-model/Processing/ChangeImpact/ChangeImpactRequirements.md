@@ -13,7 +13,7 @@ Change impact detection encompasses:
 
 When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
-Change impact compares a base workspace snapshot with the current workspace snapshot. In ordinary Git mode, the Git commit option materializes the base snapshot from one eligible worktree. In Repo mode, comparison reconstructs the complete baseline composition from the selected historical manifest inputs and their pinned component commits. Git provenance does not redefine the workspace identifier root. All detected paths, relocations, relation targets, contract dependency targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
+Change impact compares a base workspace snapshot with the current workspace snapshot. In ordinary Git mode, the Git commit option materializes the base snapshot from one eligible worktree. For a declared composition, comparison reconstructs the complete baseline composition from the selected historical manifest inputs and their pinned component commits. Git provenance does not redefine the workspace identifier root. All detected paths, relocations, relation targets, contract dependency targets, evidence paths, and impact report links are interpreted as workspace-root-relative paths.
 
 **Contract Element Changes:**
 - Contract element content changes (hash changes) shall propagate change impact through the model to both binding and reference consumers through their distinct dependency relationships
@@ -66,7 +66,7 @@ When comparing complete workspace compositions, the system SHALL identify model 
   * type: requirement
 
 #### Contract References
-  * [Repo Change Impact Baseline Specification](Specifications.md#repo-change-impact-baseline-specification)
+  * [Workspace Change Impact Baseline Specification](Specifications.md#workspace-change-impact-baseline-specification)
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
@@ -76,14 +76,14 @@ When comparing complete workspace compositions, the system SHALL identify model 
 
 ### Manifest-Based Change Impact Baselines
 
-When comparing a manifest-defined workspace, the system SHALL use one selected workspace-root repository commit to reconstruct its model, historical manifest inputs and pinned component revisions without modifying the active workspace. If that commit cannot identify a selected manifest input's history, the system SHALL reject the comparison with the affected path rather than request another baseline revision or guess a composition.
+When comparing a declared workspace, the system SHALL construct the baseline model from the complete repository selections supplied for one owning-repository commit by the workspace service, rejecting unavailable provenance instead of guessing or partially reconstructing a composition.
 
 #### Metadata
   * type: requirement
 
-#### Contract Bindings
-  * [Workspace Composition Checkpoint Specification](../../ModelStructure/RepoWorkspaces.md#workspace-composition-checkpoint-specification)
-  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/RepoWorkspaces.md#manifest-defined-workspace-scope-specification)
+#### Contract References
+  * [Manifest-Defined Workspace Scope Specification](../../ModelStructure/WorkspaceScope.md#manifest-defined-workspace-scope-specification)
+  * [Workspace Baseline Composition Specification](../../Workspaces/Specifications.md#workspace-baseline-composition-specification)
 
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)

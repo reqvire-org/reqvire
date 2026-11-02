@@ -490,6 +490,7 @@ impl SessionToolCatalog {
 
 pub struct Worktrees {
     root: PathBuf,
+    workspace_prefix: PathBuf,
     common: PathBuf,
     manifest: Option<PathBuf>,
     storage: PathBuf,
@@ -581,6 +582,10 @@ impl Worktrees {
         .canonicalize()?;
         // Sibling storage cannot be scanned as part of the original or another context.
         let repository = PathBuf::from(git(&root, &["rev-parse", "--show-toplevel"])?);
+        let workspace_prefix = root
+            .strip_prefix(&repository)
+            .map_err(|e| error(e.to_string()))?
+            .to_owned();
         let parent = common
             .parent()
             .and_then(Path::parent)
@@ -616,6 +621,7 @@ impl Worktrees {
         let original = Self::new_id();
         let manager = Arc::new(Self {
             root: root.clone(),
+            workspace_prefix,
             common,
             manifest,
             storage,
@@ -847,9 +853,9 @@ impl Worktrees {
                 let mut status = context.metadata();
                 if !self.read_only {
                     let checkout = worktrees.iter().find(|row| {
-                        row["workspace_root"]
-                            .as_str()
-                            .is_some_and(|root| Path::new(root) == context.root)
+                        row["workspace_root"].as_str().is_some_and(|root| {
+                            Path::new(root).join(&self.workspace_prefix) == context.root
+                        })
                     });
                     status["observed_head"] =
                         checkout.map_or(Value::Null, |row| row["head"].clone());
@@ -868,7 +874,14 @@ impl Worktrees {
                     .iter()
                     .find(|r| r["branch"] == branch)
                     .and_then(|r| r["workspace_root"].as_str())
-                    .unwrap_or("");
+                    .map(|root| {
+                        if self.workspace_prefix.as_os_str().is_empty() {
+                            PathBuf::from(root)
+                        } else {
+                            Path::new(root).join(&self.workspace_prefix)
+                        }
+                    })
+                    .unwrap_or_default();
                 rows.push(json!({"worktree_id":id,"branch":branch,"head":head,
                     "workspace_root":root,"state":"unloaded","owned":false,
                     "available":true,"explorer_available":true,"original":false}));
@@ -896,10 +909,14 @@ impl Worktrees {
             {
                 row["managed"] = json!(self.is_managed(Path::new(path), branch));
             }
-            if let Some(context) = contexts
-                .values()
-                .find(|c| row["workspace_root"].as_str() == c.root.to_str())
-            {
+            if let Some(path) = row["workspace_root"].as_str() {
+                row["workspace_root"] = json!(Path::new(path).join(&self.workspace_prefix));
+            }
+            if let Some(context) = contexts.values().find(|c| {
+                row["workspace_root"]
+                    .as_str()
+                    .is_some_and(|root| Path::new(root) == c.root)
+            }) {
                 let metadata = context.metadata();
                 row.as_object_mut()
                     .expect("validated worktree context invariant")
@@ -932,14 +949,17 @@ impl Worktrees {
         ))
     }
     fn is_managed(&self, root: &Path, branch: &str) -> bool {
-        if !root.starts_with(&self.storage) {
+        let checkout = git(root, &["rev-parse", "--show-toplevel"])
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| root.to_owned());
+        if !checkout.starts_with(&self.storage) {
             return false;
         }
-        fs::read(self.provenance_path(root))
+        fs::read(self.provenance_path(&checkout))
             .ok()
             .and_then(|bytes| serde_json::from_slice::<Value>(&bytes).ok())
             .is_some_and(|record| {
-                record["workspace_root"] == json!(root) && record["branch"] == branch
+                record["workspace_root"] == json!(checkout) && record["branch"] == branch
             })
     }
     fn validate_branch(&self, branch: &str) -> Result<(), ReqvireError> {
@@ -1117,7 +1137,7 @@ impl Worktrees {
             if let Some(manifest) = &self.manifest {
                 if let Err(failure) = crate::mcp_repo_worktrees::prepare(
                     resolution_root,
-                    &root,
+                    &root.join(&self.workspace_prefix),
                     &self.common,
                     manifest,
                     create,
@@ -1140,7 +1160,7 @@ impl Worktrees {
             .entry(branch.into())
             .or_insert_with(Self::new_id)
             .clone();
-        match self.admit(root.clone(), id, false, managed) {
+        match self.admit(root.join(&self.workspace_prefix), id, false, managed) {
             Ok(context) => {
                 let mut value = context.metadata();
                 value["base_commit"] = json!(base_commit);
@@ -1242,6 +1262,8 @@ impl Worktrees {
                 "Only server-created secondary worktrees may be removed",
             ));
         }
+        let checkout = PathBuf::from(git(&context.root, &["rev-parse", "--show-toplevel"])?);
+        let provenance = self.provenance_path(&checkout);
         let mut worker = context.worker.lock().expect("worktree lock poisoned");
         context.request_locked(&mut worker, &json!({"operation":"check_clean"}))?;
         let head = context.metadata()["head"]
@@ -1256,8 +1278,7 @@ impl Worktrees {
                 "lock",
                 "--reason",
                 "Reqvire removal",
-                context
-                    .root
+                checkout
                     .to_str()
                     .expect("validated worktree context invariant"),
             ],
@@ -1297,8 +1318,7 @@ impl Worktrees {
                 &[
                     "worktree",
                     "unlock",
-                    context
-                        .root
+                    checkout
                         .to_str()
                         .expect("validated worktree context invariant"),
                 ],
@@ -1309,8 +1329,7 @@ impl Worktrees {
                     "worktree",
                     "remove",
                     "--",
-                    context
-                        .root
+                    checkout
                         .to_str()
                         .expect("validated worktree context invariant"),
                 ],
@@ -1323,8 +1342,7 @@ impl Worktrees {
                 &[
                     "worktree",
                     "unlock",
-                    context
-                        .root
+                    checkout
                         .to_str()
                         .expect("validated worktree context invariant"),
                 ],
@@ -1343,7 +1361,7 @@ impl Worktrees {
             .lock()
             .expect("browser inventory poisoned")
             .remove(&context.branch);
-        let _ = fs::remove_file(self.provenance_path(&context.root));
+        let _ = fs::remove_file(provenance);
         Ok(
             json!({"outcome":"completed","worktree_id":context.id,"branch":context.branch,"head":head,"removed":true}),
         )

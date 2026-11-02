@@ -2,7 +2,7 @@
 
 ### CLI interface
 
-The system SHALL provide a command-line interface for model inspection, artifact generation, interface startup, and deterministic source migration within the supported interface boundary.
+The system SHALL provide a command-line interface for model inspection, artifact generation, explicit workspace management, interface startup and deterministic source migration within the supported interface boundary.
 
 #### Metadata
   * type: requirement
@@ -57,7 +57,7 @@ The system shall provide a Model Context Protocol interface for external tools, 
 
 ### Model Interface Operation Boundary
 
-The system SHALL expose model inspection and artifact generation through the command-line and protocol interfaces, SHALL expose authored-model changes only through mutation-enabled MCP tools, and SHALL retain command-line source migration as the upgrade exception.
+The system SHALL expose model inspection and artifact generation through command-line and protocol interfaces, authored-model operations through mutation-enabled MCP, and explicit repository/composition management and deterministic source migration through their supported CLI surfaces.
 
 #### Metadata
   * type: requirement
@@ -81,6 +81,7 @@ Adapters SHALL preserve the shared operation result and validation contracts whi
 #### Contract References
   * [Model Interface Operation Boundary Specification](Specifications.md#model-interface-operation-boundary-specification)
   * [Existing Element Selection Specification](../ModelStructure/ElementSelection.md#existing-element-selection-specification)
+  * [Workspace Management API Specification](../Workspaces/Specifications.md#workspace-management-api-specification)
 
 #### Relations
   * definedBy: [Shared Core Operation Layer Specification](Specifications.md#shared-core-operation-layer-specification)

@@ -828,7 +828,7 @@ fn handle_resource_read(
     }
 }
 
-fn tool_success(value: Value) -> Value {
+pub fn tool_success(value: Value) -> Value {
     let text = serde_json::to_string_pretty(&value).unwrap_or_else(|_| value.to_string());
     json!({
         "content": [{ "type": "text", "text": text }],

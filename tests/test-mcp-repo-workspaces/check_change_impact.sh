@@ -20,33 +20,24 @@ impact_prepare() {
     git -C "$native_case/docs" init -qb main
     docs_commit=$(impact_commit "$native_case/docs" 'Documentation model and page')
     git clone -q --bare "$native_case/docs" "$native_case/remotes/docs"
-    mkdir -p "$central/parts"
-    printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$central/default.xml"
-    cat > "$central/parts/projects.xml" <<EOF
-<manifest>
-  <remote name="local" fetch="file://$native_case/remotes/"/>
-  <project name="component" path="repositories/component" remote="local" revision="$alpha"/>
-  <project name="docs" path="repositories/docs" remote="local" revision="$docs_commit"/>
-</manifest>
-EOF
+    { fixture_manifest; fixture_project component "$alpha"; fixture_project docs "$docs_commit"; } > "$central/reqvire-workspace.toml"
     impact_base=$(impact_commit "$central" 'Historical combined model')
-    sed -i "s/$alpha/$omega/" "$central/parts/projects.xml"
+    sed -i "s/$alpha/$omega/" "$central/reqvire-workspace.toml"
     impact_current=$(impact_commit "$central" 'Current combined model')
     git -C "$central" push -q "file://$native_case/remotes/central" HEAD:refs/heads/main
-    (cd "$central" && repo sync -q --no-clone-bundle --no-tags)
+    (cd "$central" && "$REQVIRE_BIN" workspace sync)
     git -C "$central/repositories/component" checkout -q -B main "$omega"
     git -C "$central/repositories/docs" checkout -q -B main "$docs_commit"
     # Keep Central's web identity distinct from component file remotes. Reports
     # must not invent Central blob URLs for component-owned paths.
     git -C "$central" remote set-url origin https://github.com/reqvire-test/central.git
-    git -C "$central/.repo/manifests" remote set-url origin https://github.com/reqvire-test/central.git
-    (cd "$central" && "$REQVIRE_BIN" --manifest default.xml validate)
+    (cd "$central" && "$REQVIRE_BIN" --manifest reqvire-workspace.toml validate)
     (cd "$central" && "$REQVIRE_BIN" validate)
 }
 
 impact_state() {
     local owner path
-    for owner in "$central" "$central"/repositories/* "$(dirname "$native")"; do
+    for owner in "$central" "$central"/repositories/*; do
         [[ -d "$owner" ]] || continue
         printf 'OWNER %s\n' "$owner"
         git -C "$owner" rev-parse HEAD
@@ -58,20 +49,14 @@ impact_state() {
             if [[ -f "$owner/$path" ]]; then sha256sum "$owner/$path"; else printf 'MISSING\n'; fi
         done < <(git -C "$owner" ls-files -z --cached --others --exclude-standard)
     done
-    # Include source-selection Repo administration, not only model inputs.
-    # Repo's trace and derived GitConfig JSON caches are not source-selection
-    # authority. The actual config, wrapper, Git refs/indexes and source bytes
-    # remain in this state comparison.
-    (cd "$central/.repo" && find . -type f ! -path './repo/*' ! -name index.lock \
-        ! -path '*/logs/*' ! -name 'TRACE_FILE*' ! -name .repo_config.json \
-        ! -name FETCH_HEAD ! -name COMMIT_EDITMSG -print0 | sort -z | xargs -0 sha256sum)
+
 }
 
 impact_cli() {
     local selection=$1 result
     shift
     local options=()
-    [[ "$selection" == native ]] || options+=(--manifest default.xml)
+    [[ "$selection" == native ]] || options+=(--manifest reqvire-workspace.toml)
     impact_state > "$native_case/before-state.txt"
     if (cd "$central" && "$REQVIRE_BIN" "${options[@]}" change-impact \
             --git-commit "$impact_base" "$@") > "$native_case/impact.out" 2> "$native_case/impact.err"; then
@@ -107,8 +92,7 @@ impact_provenance() {
         .key as $side | .value |
         {central: (.central_commit == (if $side == 0 then $base else $current end)),
          inputs: (.manifest_inputs == [
-           {path: "default.xml", commit: (if $side == 0 then $base else $current end)},
-           {path: "parts/projects.xml", commit: (if $side == 0 then $base else $current end)}]),
+           {path: "reqvire-workspace.toml", commit: (if $side == 0 then $base else $current end)}]),
          projects: ([.projects[] | {name,path,commit}] == [
            {name:"component",path:"repositories/component",commit:(if $side == 0 then $alpha else $omega end)},
            {name:"docs",path:"repositories/docs",commit:$docs}]),
@@ -121,7 +105,7 @@ impact_provenance() {
 
 impact_start_server() {
     local mode=$1 selection=$2 attempt options=() server_options=()
-    [[ "$selection" == native ]] || options+=(--manifest default.xml)
+    [[ "$selection" == native ]] || options+=(--manifest reqvire-workspace.toml)
     [[ "$mode" != serve ]] || server_options+=(--enable-mcp)
     server_options+=("${composition_server_options[@]}")
     (cd "$central" && exec "$REQVIRE_BIN" "${options[@]}" "$mode" \
@@ -215,14 +199,28 @@ impact_single_selector() {
 }
 
 impact_include() {
-    local owner
-    for owner in "$central"; do
-        mv "$owner/parts/projects.xml" "$owner/parts/current.xml"
-        sed -i 's@parts/projects.xml@parts/current.xml@' "$owner/default.xml"
-        impact_commit "$owner" 'Remove the historical include from the live tree' > /dev/null
-    done
+    # The baseline predates conversion. XML includes remain readable while
+    # the current composition has exactly one native source.
+    cp "$central/reqvire-workspace.toml" "$native_case/current-native.toml"
+    git -C "$central" rm -q reqvire-workspace.toml
+    mkdir -p "$central/parts"
+    printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$central/default.xml"
+    cat > "$central/parts/projects.xml" <<EOF
+<manifest>
+  <remote name="local" fetch="file://$native_case/remotes/"/>
+  <project name="component" path="repositories/component" remote="local" revision="$alpha"/>
+  <project name="docs" path="repositories/docs" remote="local" revision="$docs_commit"/>
+</manifest>
+EOF
+    impact_base=$(impact_commit "$central" 'Version XML baseline with included source')
+    git -C "$central" rm -q default.xml parts/projects.xml
+    cp "$native_case/current-native.toml" "$central/reqvire-workspace.toml"
+    impact_current=$(impact_commit "$central" 'Use one native manifest after conversion')
     impact_cli central --json
     impact_graph "$native_case/impact.out"
+    jq -e '.comparison |
+      [.base.manifest_inputs[].path] == ["default.xml","parts/projects.xml"] and
+      [.current.manifest_inputs[].path] == ["reqvire-workspace.toml"]' "$native_case/impact.out"
 }
 
 impact_bad_base() {
@@ -239,10 +237,10 @@ impact_bad_base() {
             echo 'Remote-only fixture commit is already available locally'; return 1
         fi
     fi
-    cp "$central/parts/projects.xml" "$native_case/valid-pins.xml"
-    sed -i "s/$omega/$revision/" "$central/parts/projects.xml"
+    cp "$central/reqvire-workspace.toml" "$native_case/valid-pins.toml"
+    sed -i "s/$omega/$revision/" "$central/reqvire-workspace.toml"
     impact_base=$(impact_commit "$central" 'Historical invalid or unlocked project selection')
-    cp "$native_case/valid-pins.xml" "$central/parts/projects.xml"
+    cp "$native_case/valid-pins.toml" "$central/reqvire-workspace.toml"
     impact_commit "$central" 'Restore the valid current composition' > /dev/null
     if impact_cli central --json; then echo 'Invalid historical selection was accepted'; return 1; fi
     local token
@@ -257,25 +255,28 @@ impact_project() {
         impact_base=$impact_current
         git clone -q "$native_case/remotes/component" "$central/repositories/moved"
         git -C "$central/repositories/moved" checkout -q --detach "$omega"
-        sed -i 's@path="repositories/component"@path="repositories/moved"@' "$central/parts/projects.xml"
+        sed -i 's@path = "repositories/component"@path = "repositories/moved"@' "$central/reqvire-workspace.toml"
         sed -i 's@repositories/component/@repositories/moved/@g' "$central/Model.md" "$central/repositories/docs/Model.md"
         docs_commit=$(impact_commit "$central/repositories/docs" 'Follow relocated contract')
         # Rewrite only the docs project pin; preserve the component revision.
-        sed -i "/name=\"docs\"/s/revision=\"[^\"]*\"/revision=\"$docs_commit\"/" "$central/parts/projects.xml"
+        sed -i "/name = \\\"docs\\\"/,/commit =/s/commit = \\\"[^\\\"]*\\\"/commit = \\\"$docs_commit\\\"/" "$central/reqvire-workspace.toml"
     elif [[ "$kind" == remove ]]; then
-        sed -i '/name="docs"/d' "$central/parts/projects.xml"
-        # Keep Repo's object database, while removing the retired live checkout.
+        fixture_remove "$central/reqvire-workspace.toml" docs
+        # Preserve local object storage while removing the retired live checkout.
+        # This fixture models an existing separate Git directory, as before.
+        mkdir -p "$central/.repo/projects/repositories"
+        mv "$central/repositories/docs/.git" "$central/.repo/projects/repositories/docs.git"
         rm -rf "$central/repositories/docs"
     else
         # Compare a current composition containing docs with a complete base
         # composition that has no docs project, while keeping current files valid.
-        cp "$central/parts/projects.xml" "$native_case/current-pins.xml"
-        sed -i '/name="docs"/d' "$central/parts/projects.xml"
+        cp "$central/reqvire-workspace.toml" "$native_case/current-pins.toml"
+        fixture_remove "$central/reqvire-workspace.toml" docs
         impact_base=$(impact_commit "$central" 'Historical composition without docs')
-        cp "$native_case/current-pins.xml" "$central/parts/projects.xml"
+        cp "$native_case/current-pins.toml" "$central/reqvire-workspace.toml"
     fi
     impact_commit "$central" 'Change project composition' > /dev/null
-    (cd "$central" && "$REQVIRE_BIN" --manifest default.xml validate)
+    (cd "$central" && "$REQVIRE_BIN" --manifest reqvire-workspace.toml validate)
     impact_cli central --json
     case "$kind" in
         add) jq -e '[.added[] | .. | objects | .name? // empty] | index("API Guide Requirement") != null' "$native_case/impact.out" ;;
@@ -296,9 +297,9 @@ impact_pending() {
         '{branch:"main",file:"repositories/component/Added.md",content:$content}')
     impact_rpc reqvire.add_element "$args" "$native_case/add-result.json"
     cp "$central/repositories/component/Added.md" "$native_case/accepted-added.txt"
-    cp "$central/default.xml" "$native_case/accepted-manifest.txt"
+    cp "$central/reqvire-workspace.toml" "$native_case/accepted-manifest.txt"
     printf 'External invalid model must not be imported.\n' > "$central/repositories/component/Added.md"
-    printf 'External invalid manifest must not be imported.\n' > "$central/default.xml"
+    printf 'External invalid manifest must not be imported.\n' > "$central/reqvire-workspace.toml"
     # Capture availability after independent external drift. The impact request
     # must preserve that state rather than hide source-guard diagnostics.
     impact_rpc reqvire.workspace_status '{"branch":"main"}' "$native_case/status-before.json"
@@ -329,7 +330,7 @@ impact_pending() {
     jq -e 'any(.result.structuredContent.added[]; .element_id | endswith("repositories/component/Added.md#added-capability"))' \
         "$native_case/impact-result.json"
     cp "$native_case/accepted-added.txt" "$central/repositories/component/Added.md"
-    cp "$native_case/accepted-manifest.txt" "$central/default.xml"
+    cp "$native_case/accepted-manifest.txt" "$central/reqvire-workspace.toml"
     impact_rpc reqvire.git.commit '{"branch":"main","message":"Save accepted Repo impact fixture"}' "$native_case/commit-result.json"
     # Explicit HEAD follows the newly accepted root checkpoint, including
     # the current set of selecting inputs after Central manifest flattening.

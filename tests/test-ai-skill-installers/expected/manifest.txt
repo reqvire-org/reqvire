@@ -31,4 +31,5 @@ reqvire-syseng/references/SpecificationLanguageCleanup.md
 reqvire-syseng/references/SpecificationsExtractionLogic.md
 reqvire-syseng/references/SubmodelRefactor.md
 reqvire-syseng/references/VerificationAlignment.md
+reqvire-syseng/references/Workspaces.md
 reqvire-syseng/references/explore.md

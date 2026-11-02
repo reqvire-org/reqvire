@@ -23,5 +23,5 @@ PASS mcp/partial-component-root-pr-set-reused
 PASS mcp/component-before-root-push-without-manifest-ref
 PASS cli/published-root-source-composition-fresh-consumer
 PASS cli/missing-authoritative-source-not-replaced-by-cache
-PASS mcp/versioned-root-overlay-checkpoint-and-impact
-PASS cli/unversioned-overlay-rejected
+PASS mcp/migrated-xml-overlay-single-manifest-checkpoint-and-impact
+PASS cli/unsupported-local-xml-overlay-rejected

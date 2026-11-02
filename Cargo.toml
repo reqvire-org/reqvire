@@ -2,6 +2,7 @@
 members = [
     "crates/reqvire-core",
     "crates/reqvire-cli",
+    "crates/reqvire-workspace",
     "crates/o-kernel",
 ]
 resolver = "2"
@@ -51,6 +52,7 @@ spargebra = "0.4.7"
 oxigraph = { version = "0.5.8", default-features = false }
 o-kernel = { path = "crates/o-kernel" }
 reqvire = { path = "crates/reqvire-core" }
+reqvire-workspace = { path = "crates/reqvire-workspace" }
 tiny_http = "0.12"
 tokio = { version = "1.48", features = ["macros", "rt-multi-thread", "signal", "net", "fs", "sync"] }
 axum = "0.8.4"

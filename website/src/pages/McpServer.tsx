@@ -1,4 +1,4 @@
-import { BulletList, CodeBlock, DetailGrid, Section } from "@/components/Doc";
+import { BulletList, CodeBlock, CommandList, DetailGrid, Section } from "@/components/Doc";
 import { Footer } from "@/components/Footer";
 
 export default function McpServer() {
@@ -429,10 +429,12 @@ reqvire.update_element({element_name: "Token Expiry Requirement", target: "Eleme
           destinations; invalid replacements retain the accepted model and files.
         </p>
         <p className="text-zinc-600 mt-4 mb-4">
-          MCP validates the model before starting. Migration remains CLI-only:
+          MCP validates the model before starting. For incompatible model syntax,
           preview with <code>reqvire migrate</code> and apply with{" "}
           <code>reqvire migrate --fix</code> before starting the server.
-          There is no MCP migration tool or startup mode that bypasses validation.
+          Model-syntax migration is CLI-only. The separate workspace migration
+          tool converts configuration in an already validated context; no startup
+          mode bypasses model validation.
         </p>
         <BulletList
           items={[
@@ -442,7 +444,7 @@ reqvire.update_element({element_name: "Token Expiry Requirement", target: "Eleme
             "Add --enable-commits to commit each successful non-empty mutation locally and include its commit identifier in the result. This flag requires --enable-mutations. Previews, rejections, and no-ops never create commits.",
             "Both modes update subsequent MCP reads and refresh the embedded Explorer after a successful write.",
             "The server owns its accepted snapshot. Resolve pending MCP edits before preparing external component commits and tracked source pins committed with related root work. Explicit branch.open validates and admits that composition; failed admission retains accepted reads. Background polling does not import external edits.",
-            "After a root commit timeout, MCP checks local Git automatically. A verified published commit is reconciled without repeating the ref side effect. Confirmed non-publication returns an error: single-repository automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits. Repo checkpoints retain accepted pending edits and confirmed owner commits until the root checkpoint completes. reqvire.git.reconcile applies only to a recorded live root attempt: inspect the exact attempted_commit with dry_run: true, then use false for verified recovery. Unknown component outcomes require preserving the reported commits/files/index, operator verification and repair, then clean validated admission. They cannot be repaired by blindly retrying commit, opening the branch, or using root reconciliation. Reads retain accepted content with diagnostics while writes are blocked.",
+            "After a root commit timeout, MCP checks local Git automatically. A verified published commit is reconciled without repeating the ref side effect. Confirmed non-publication returns an error: single-repository automatic mutations roll back their changes, while reqvire.git.commit keeps accepted pending edits. Workspace checkpoints retain accepted pending edits and confirmed owner commits until the root checkpoint completes. reqvire.git.reconcile applies only to a recorded live root attempt: inspect the exact attempted_commit with dry_run: true, then use false for verified recovery. Unknown component outcomes require preserving the reported commits/files/index, operator verification and repair, then clean validated admission. They cannot be repaired by blindly retrying commit, opening the branch, or using root reconciliation. Reads retain accepted content with diagnostics while writes are blocked.",
             "Restart requires the same clean-start checks. Use reqvire.git.commit for accepted pending changes before stopping, or resolve saved changes before restarting. Branch creation and remote publication require explicit tool calls.",
             "Leftover lock files are reused after their holders exit. A worker that survives its parent still owns its locks. If startup reports a lock error, check the named path and OS error: fix permissions for the server/container user or use a filesystem with locking support as indicated. Do not delete lock files to bypass an active owner.",
             "Most mutation tools support dry_run.",
@@ -506,7 +508,7 @@ reqvire serve --enable-mcp --enable-mutations
           { name: "reqvire.branch.open", desc: "Requires an existing local branch. Reuses an unchanged healthy context. Explicitly opening a changed prepared composition performs full validated admission without a reload flag; rejection preserves accepted reads. Pending edits and recovery block admission." },
           { name: "reqvire.branch.refresh", desc: "Checks and adopts the selected owned branch's local HEAD. dry_run defaults to false; true checks only. After the guard passes, uses normal validated loading. Requires a clean tree, no accepted pending changes, the same branch and no unresolved Git/recovery operation. Creates no commit and works without --enable-commits." },
           { name: "reqvire.branch.close", desc: "Requires branch. Closes a clean, server-created secondary context and cleans up its managed working directory while preserving the Git branch and commits. Original and externally prepared contexts are protected. Reopen the retained branch explicitly before using it again." },
-          { name: "reqvire.git.commit", desc: "Requires a message and checkpoints accepted changes, excluding unrelated staging and external edits. In Repo mode it commits changed components first, then updated source pins with related root changes in one root commit. An explicit commit can lock admitted mutable pins; a fully pinned unchanged composition is a no-op. It works without GitHub enablement." },
+          { name: "reqvire.git.commit", desc: "Requires a message and checkpoints accepted changes, excluding unrelated staging and external edits. In a declared composition it commits changed components first, then updated source pins with related root changes in one root commit. Admission requires exact pins; an unchanged checkpoint is a no-op. It works without GitHub enablement." },
           { name: "reqvire.git.reconcile", desc: "Verifies a live recorded unknown-outcome commit using exact attempted_commit and context routing. Preview is the default; dry_run: false completes only its affected index entries and accepted state after all checks pass. It preserves unrelated recorded staging and never updates a ref or retries a commit." },
         ]} />
         <CodeBlock>{`{
@@ -571,28 +573,51 @@ reqvire serve --enable-mcp --enable-mutations
         </p>
       </Section>
 
-      <Section title="Repo Workspaces">
+      <Section title="Multi-repository Workspaces">
         <p className="text-zinc-600 mb-4">
-          The manifest-owning root repository and branch are the source of truth
-          for the source manifest and component pins. Repo&apos;s
-          <code> .repo/manifest.xml</code> entry selects that tracked source
-          automatically. The root may contain model elements or only the
-          manifest and configuration; pinned repositories can supply the entire
-          model. Repo administration remains internal in either layout.
+          The owning repository and branch track <code>reqvire-workspace.toml</code>.
+          All native repository declarations belong in that one file; native
+          includes, fragments and overlays are unsupported.
+          Configure <code>repositories_dir</code>, register dependencies and
+          explicitly sync their pins before validated startup. The root may
+          hold a shared model or only configuration while components supply the
+          complete model. Native operation needs Git; no Repo client or Python.
         </p>
-        <CodeBlock>{`# From an initialized, synchronized manifest-owning root checkout
+        <CodeBlock>{`reqvire workspace sync
 reqvire mcp --enable-mutations
 
 # Or expose Explorer and MCP together
 reqvire serve --enable-mcp --enable-mutations`}</CodeBlock>
+        <p className="text-zinc-600 mb-4">
+          Existing <code>reqvire.workspace_status</code> stays read-only.
+          Mutation-enabled admitted contexts also expose the shared preparation
+          operations below. CLI remains the bootstrap path when dependencies
+          must be prepared before a valid model can load.
+        </p>
+        <CommandList items={[
+          { cmd: "reqvire.workspace.add", desc: "Register url/path/ref under the configured checkout parent and record an exact pin." },
+          { cmd: "reqvire.workspace.remove", desc: "Remove a path declaration while preserving its checkout." },
+          { cmd: "reqvire.workspace.sync", desc: "Reproduce pins by default; latest: true follows configured refs and advances pins." },
+          { cmd: "reqvire.workspace.freeze", desc: "Capture committed HEADs locally while preserving refs; dry_run: true previews without writes." },
+          { cmd: "reqvire.workspace.migrate", desc: "Convert Repo XML with from: repo and optional source/dry_run, then use normal sync." },
+        ]} />
+        <p className="text-zinc-600 mb-4">
+          Tracking refs remain separate from feature branches and commit pins.
+          The shared service validates repository identity, paths and ownership.
+          MCP validates the complete prepared candidate before acceptance;
+          rejection preserves the accepted model and source. Resolve pending
+          model edits and recovery first. Standalone CLI cannot bypass a live
+          MCP owner. Status and freeze never fetch; add, sync and migration may
+          acquire objects only when explicitly requested.
+        </p>
         <BulletList items={[
           "The same branch operations manage one repository or a declared composition. branch.create reads the requested root base's tracked source manifest and prepares the requested named component branches at their own pins. Creation leaves pins and existing user checkouts unchanged.",
-          "Prepare clean committed authoring inputs and locally available objects. Track source XML/includes in the root repository, for example manifests/default.xml, and ignore .repo administration and component checkout directories. A matching cached filename is not another source authority.",
+          "Prepare clean committed authoring inputs and locally available objects. Track reqvire-workspace.toml in the root branch, explicitly configure repositories_dir and ignore only its declared checkout paths. The tracking ref is update policy; the commit is the exact selection.",
           "Mutations use workspace-relative paths and save files in their owning repositories. Edits remain pending by default. Explicit or opt-in automatic commits save changed components first, update source pins, then commit those pins with accepted root changes in one root commit. Unchanged components receive no commit.",
           "A pin-only root commit is meaningful when all model content is in components. A fully pinned unchanged composition is a no-op. There is no separately authored manifest branch, cached-manifest commit, manifest PR or manual root self-association.",
           "A later root checkpoint failure retains confirmed component commits and pending root work. Inspect outcomes before retrying. Unknown component outcomes require operator repair; recorded root attempts use root reconciliation. Accepted snapshots remain readable while recovery blocks writes.",
-          "Explicit push publishes required component branches before the root. One PR-create call creates/reuses linked changed-component PRs and one root PR containing source pin and root changes, with explicit review targets. Repo administration is not a publication target.",
-          "For external work, commit components, then source pins and related root changes on the root feature branch. Clean validated branch.open admits that composition without a reload mode. Guarded refresh and background polling do not import component or source-pin changes.",
+          "Explicit push publishes required component branches before the root. One PR-create call creates/reuses linked changed-component PRs and one root PR containing source pin and root changes, with explicit review targets. Internal administration is not a publication target.",
+          "For external work, commit components, preview/apply workspace freeze with no conflicting live owner, then commit pins with related root changes. The owning MCP context can explicitly freeze committed external state through complete candidate validation. Clean validated branch.open admits that composition without a reload mode. Guarded refresh and background polling do not import component or source-pin changes.",
         ]} />
         <CodeBlock>{`{
   "name": "reqvire.branch.create",
@@ -623,7 +648,7 @@ reqvire serve --enable-mcp --enable-mutations`}</CodeBlock>
         <p className="text-zinc-600 mt-4">
           Preview, apply, then commit. The model can be entirely in pinned
           components; root model documents are optional. The User Guide shows
-          initial source-manifest publication, Repo setup and external work.
+          initial TOML setup, registration, synchronization, migration and external work.
         </p>
         <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">
           Change Impact Analysis
@@ -641,7 +666,7 @@ reqvire serve --enable-mcp --enable-mutations`}</CodeBlock>
 }`}</CodeBlock>
         <p className="text-zinc-600 mb-4">
           The root baseline commit supplies its authoritative source manifest,
-          includes and optional root model. Its pins supply each component&apos;s
+          and optional root model. Pre-conversion baselines can read versioned XML through the shared reader, without Repo/Python. Its pins supply each component&apos;s
           own commit and can select the entire model. Native discovery requires
           no additional manifest revision selector or association with a cached
           checkout. Missing source history, unavailable objects or mutable
@@ -702,7 +727,7 @@ reqvire mcp --enable-mutations --enable-github --github-remote upstream`}</CodeB
         </p>
         <p className="text-zinc-600 mt-4">
           Publication uses registered repository identities and configured remotes.
-          In Repo mode, required components publish before the manifest-owning root branch. Forks
+          In a declared composition, required components publish before the manifest-owning root branch. Forks
           are not supported. Automatic commits remain a separate opt-in through
           <code> --enable-commits</code>. Repository access at startup does not
           guarantee permission for every operation: push rules and later permission

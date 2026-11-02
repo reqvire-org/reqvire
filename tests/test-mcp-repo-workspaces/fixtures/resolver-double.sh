@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Count only the production Repo resolver, then invoke the actual interpreter.
+# Count source-owner discovery, then invoke the real Git implementation.
 set -euo pipefail
-if [[ $# -gt 1 && "$1" == -c && "$2" == *'from manifest_xml import RepoClient'* ]]; then
+if [[ " $* " == *" rev-parse --show-toplevel "* ]]; then
     printf 'resolve\n' >> "$REQVIRE_REPO_TEST_RESOLVER_LOG"
 fi
-exec "$REQVIRE_REPO_TEST_PYTHON" "$@"
+exec "$REQVIRE_REPO_TEST_GIT" "$@"

@@ -1,0 +1,20 @@
+# Elements
+
+### Documentation Capability
+
+Provide user guidance.
+
+#### Metadata
+  * type: capability
+---
+
+### Documentation Requirement
+
+The system SHALL provide user guidance.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Documentation Capability](#documentation-capability)
+---

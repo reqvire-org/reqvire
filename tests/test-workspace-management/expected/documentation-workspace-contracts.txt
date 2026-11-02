@@ -1,0 +1,9 @@
+Native Workspace Manifest Specification
+Repo Workspace Migration Specification
+Workspace Composition Checkpoint Specification
+Workspace Dependency Registration Specification
+Workspace Dependency Removal Specification
+Workspace Discovery Specification
+Workspace Pin Freeze Specification
+Workspace Status Specification
+Workspace Synchronization Specification

@@ -6,8 +6,8 @@ Contract dependencies include Contract Bindings for shared implementation obliga
 
 Workflow:
 - Call `reqvire.workspace_status` first and record model validity, dirty state, current branch, and HEAD.
-- Establish and state the comparison base before judging impact. Prefer the user-provided base; otherwise use the repository's merge-base with `main` when available, or explain the fallback.
-- In a Repo workspace, use that one workspace-root repository commit for the root model and its historical manifest/includes; load components at the commits pinned there. Independent manifest history cannot be guessed. Select a manifest tracked in the workspace-root repository at server startup with `--manifest` when needed.
+- Establish and state the comparison base before judging impact. Prefer the user's explicit base or available confirmed PR/CI context. Without review context, ask for the baseline rather than assuming main or HEAD. Explicit HEAD reviews pending changes.
+- In a declared workspace, the selected root commit supplies reqvire-workspace.toml and optional root model sources; its exact pins supply component content. Preparation is explicit through the shared workspace API. A baseline predating conversion reads its versioned XML through the same crate, requiring neither Repo/Python nor a second manifest commit flag. Analysis never fetches, syncs or imports live external edits.
 - Call `reqvire.change_impact` with that base and analyze the structured buckets: `added[]`, `changed[]`, `removed[]`, `relocated[]`, `impact_scope[]`, and `invalidated_verifications[]`.
 - Treat `impact_scope[]` as the high-level affected-area summary. For each scope root, use downstream collection to enumerate covered children so no impacted descendant is skipped.
 - Separate direct added, changed, removed, and relocated elements from propagated impacts, `changed_contract_bindings`, `changed_contract_references`, and invalidated verifications.

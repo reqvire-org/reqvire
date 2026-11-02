@@ -23,8 +23,8 @@ npm-package = "reqvire"
 workspace = true
 
 [dependencies]
+reqvire-workspace.workspace = true
 reqvire = { workspace = true }
-quick-xml = { workspace = true }
 
 # CLI
 clap = { workspace = true }

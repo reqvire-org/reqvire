@@ -1,0 +1,20 @@
+# Elements
+
+### Website Capability
+
+Provide product information.
+
+#### Metadata
+  * type: capability
+---
+
+### Website Requirement
+
+The system SHALL provide website information.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Website Capability](#website-capability)
+---

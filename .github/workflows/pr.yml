@@ -81,7 +81,7 @@ jobs:
         env:
           REQVIRE_BIN: ${{ github.workspace }}/target/release/reqvire
         run: |
-          # Repo/Bun/Python test tools are pinned with the local dev environment.
+          # Bun and process-test tools are pinned with the local dev environment.
           source bin/activate-hermit
           repo version
           browser=$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \( -name chrome-headless-shell -o -name headless_shell \) -print -quit)
@@ -95,8 +95,8 @@ jobs:
           name: end-to-end-test-logs
           path: /tmp/reqvire-test-logs
 
-  macos-repo-unit-tests:
-    name: Run Repo Workspace Unit Tests on macOS
+  macos-workspace-unit-tests:
+    name: Run Workspace Crate Tests on macOS
     needs: test
     if: ${{ !cancelled() && needs.test.outputs.explorer_artifact_id != '' }}
     runs-on: macos-latest
@@ -117,7 +117,7 @@ jobs:
           path: explorer/dist
 
       - name: Run manifest source and macOS path regressions
-        run: cargo test --locked -p reqvire --lib repo_workspace::tests --verbose
+        run: cargo test --locked -p reqvire-workspace --verbose
 
   validate:
     name: Validate Requirements

@@ -3,6 +3,13 @@ Reqvire requirements & traceability management tool
 Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
+  workspace         Prepare and manage repository workspaces
+    workspace status Inspect repository locations, pins and local state
+    workspace add   Register and prepare a dependent repository
+    workspace remove Remove a declaration and preserve its checkout
+    workspace sync  Synchronize recorded pins, or explicitly advance configured refs
+    workspace freeze Record committed component HEADs as exact pins
+    workspace migrate Convert Repo XML into a native workspace and synchronize
   serve             Serve the embedded Explorer UI via HTTP server
   export            Export the Explorer SPA as a static site to a directory
   mcp               Start Reqvire MCP server
@@ -29,9 +36,28 @@ Commands:
 
 Options:
   --workspace <DIR>         Workspace directory to operate on
-  --manifest <FILE>         Override Repo manifest location (default: .repo/manifest.xml)
+  --manifest <FILE>         Override native workspace manifest location (default: reqvire-workspace.toml)
   -h, --help               Print help
   -V, --version            Print version
+
+WORKSPACE ADD OPTIONS:
+       <URL>                    Git URL of the dependent repository
+      --path <PATH>             Checkout path relative to repositories_dir
+      --ref <REFERENCE>         Configured tracking ref, preserved when recording pins
+
+WORKSPACE REMOVE OPTIONS:
+       <PATH>                   Declared path relative to repositories_dir
+
+WORKSPACE SYNC OPTIONS:
+      --latest                  Follow configured refs and update exact commit pins
+
+WORKSPACE FREEZE OPTIONS:
+      --dry-run                 Preview pin changes without writing
+
+WORKSPACE MIGRATE OPTIONS:
+      --from <FROM>             Source workspace format
+      --source <SOURCE>         XML source override (default: .repo/manifest.xml)
+      --dry-run                 Preview conversion and synchronization without writing
 
 SERVE OPTIONS:
       --host <HOST>             Bind address

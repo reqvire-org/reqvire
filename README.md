@@ -44,13 +44,14 @@ Use Reqvire to:
   `reqvire.branch.close`, and `reqvire.branch.refresh` for both single repositories
   and multi-repository workspaces. Previous `reqvire.worktree.*` names are no
   longer supported; clients must inspect contract compatibility.
-- **Multi-repository fixes and improvements.** Repo's native `.repo/manifest.xml`
-  discovers the source manifest owned by the root branch. MCP prepares coordinated
-  component branches, commits changed components, then commits updated source pins
-  with root changes in one root commit. The root can contain only the manifest and
-  configuration, with the entire model in pinned repositories. Explicit push
-  publishes components before the root; PR creation links changed-component PRs
-  with one root PR.
+- **Native workspace management (breaking change).** Track
+  `reqvire-workspace.toml` with a configured `repositories_dir`, repository URLs,
+  tracking refs and exact commit pins. CLI `workspace status/add/remove/sync/freeze/migrate`
+  and typed MCP workspace tools share one workspace crate. Native operation no
+  longer requires Google Repo or Python. Convert existing XML with
+  `reqvire workspace migrate --from repo`; model-syntax migration remains separate.
+  Coordinated branches, component-first checkpoints, explicit publication and
+  linked PR sets retain their existing workflow.
 - **Change impact analysis across repositories.** Comparisons reconstruct the
   selected composition from recorded manifest revisions and component pins.
   Available PR context selects the target's merge-base; otherwise supply an
@@ -110,63 +111,66 @@ the workspace but outside Git worktrees are ignored by model processing.
 
 ### Multi-repository models
 
-Use an initialized Google Repo workspace whose root repository owns the source
-manifest. The root can contain model elements or only manifest/configuration
-files, with the complete model in pinned repositories. Runtime prerequisites are
-Git, Python 3 and an initialized Google Repo client. Install the `repo` launcher
-and explicitly run `repo init` and `repo sync` before using Reqvire. By default,
-Reqvire follows Repo's active `.repo/manifest.xml` entry to the root branch's
-tracked source XML/includes, for example `manifests/default.xml`. Repo's cached
-checkout is internal administration. `--manifest` remains an optional alternate
-source selection. Keep `.repo/` and component checkout directories ignored by the
-root Git repository while tracking the source manifest normally. All declared projects must be local,
-inside the workspace, at the selected revisions, and match their repository identity.
-Project paths must be unique and non-overlapping. Repo submanifests are unsupported.
+Track one native `reqvire-workspace.toml` in the repository and branch owning
+the product composition. The owner may contain a shared model or only
+configuration while pinned components supply the entire model. Set the
+checkout parent explicitly; `repositories` is never a hardcoded directory:
 
-```bash
-# From an already initialized and synchronized workspace-root checkout
-reqvire validate                         # default: .repo/manifest.xml
-reqvire serve --enable-mcp --enable-mutations
+```toml
+version = 1
+repositories_dir = "external"
 ```
 
-CLI, MCP and Explorer share the combined model and workspace-relative identifiers.
-Workspace `.reqvireignore` rules remain global; each repository's Git ignores
-apply to its own files. A selected manifest failure is an error, and Reqvire
-never fetches missing projects or revisions implicitly.
+```bash
+reqvire workspace add https://github.com/YOUR_ORG/website.git --path website --ref refs/heads/main
+reqvire workspace add https://github.com/YOUR_ORG/user-docs.git --path user-docs --ref refs/heads/main
+reqvire workspace status
+```
+
+Add specific root ignore entries for `/external/website/` and
+`/external/user-docs/`, then commit the manifest and ignore configuration
+through the normal branch/review process. Another clone runs
+`reqvire workspace sync` to reproduce those pins before model validation
+or MCP startup. Native preparation requires Git and no Repo/Python runtime.
+
+Each declaration retains `ref` as its configured update source and `commit`
+as its exact selection. Normal sync reproduces commits; `sync --latest`
+explicitly follows refs and advances pins. `freeze --dry-run` previews
+committed component HEADs, and `freeze` records them without changing refs.
+`workspace remove PATH` unregisters a declaration and preserves its checkout.
+These CLI operations do not commit or publish. Without a manifest, Reqvire
+uses its normal single-repository workflow.
 
 The same MCP branch tools manage one repository or a declared composition.
-Explicit branch creation uses the requested root base's composition and creates
-named component branches at their own pins. Commits save changed components,
-then commit updated tracked source pins together with root changes. The root
-branch is the manifest authority; no separately authored manifest branch, cached
-manifest commit/PR or manual root self-association is needed. Explicit GitHub
-publication pushes components before the root and can create linked component
-and root PRs in one call, with explicit review targets. Change impact uses available PR context or one
-explicit baseline override; select `HEAD` for pending changes. See the
-[User Guide](https://www.reqvire.org/user-guide) and
+Requested root bases supply their own component pins; worktrees stay internal.
+Typed workspace add/remove/sync/freeze/migrate tools share the CLI's service
+and validate changed compositions before admission. Checkpoints commit
+changed components first, update pins, then commit pins with accepted root
+changes in one root commit. Publication remains explicit: components before
+root, with linked component/root PRs when requested.
+
+For external work, commit components, preview/apply CLI freeze without a live
+MCP owner, and commit the pins with related root work before full validated
+`branch.open`. The owning MCP context can explicitly freeze committed external
+state through candidate validation. Rejected candidates retain accepted reads.
+
+Convert an existing Repo workspace with:
+
+```bash
+reqvire workspace migrate --from repo --dry-run
+reqvire workspace migrate --from repo
+```
+
+This reads selected XML, writes native TOML into the effective root and runs
+normal sync, preserving checkouts and their Git metadata. Source XML remains
+available. A pre-conversion comparison baseline can read its versioned XML
+through the shared workspace reader; analysis never fetches or synchronizes.
+
+CLI, MCP and Explorer use the same combined model and workspace-relative
+identifiers. Select the actual PR baseline or use the sole explicit
+`--git-commit` override; explicit `HEAD` reviews pending work.
+See the [User Guide](https://www.reqvire.org/user-guide) and
 [MCP Server guide](https://www.reqvire.org/mcp-server) for setup and recovery.
-
-The Explorer UI is embedded in release/npm binaries. Source builds are for
-development and must build the Explorer bundle before compiling Rust.
-
----
-
-# Development setup
-
-An optional Hermit environment in `bin/` pins the Rust, Node, Bun, Python,
-ripgrep and Google Repo versions used for development. Activate it with
-`source bin/activate-hermit`, then run `hermit install` and `make build`.
-System Git, Make, a native linker and browser system libraries remain OS
-prerequisites. See [Contributor setup](doc/README.md#development-quick-start)
-for build, browser and multi-repository test instructions.
-
----
-
-# Skills and MCP
-
-Reqvire exposes model context through an MCP server and ships setup assets for
-Claude Code and Codex. Full setup details live in the documentation:
-[Coding Assistants](https://www.reqvire.org/coding-assistants)
 
 ## MCP Server
 

@@ -16,8 +16,18 @@ pub fn workspace_status(
         files.insert(file.clone());
     }
 
+    let scope = crate::workspace::WorkspaceScope::discover()?;
+    let workspace = reqvire_workspace::Workspace {
+        root: scope.root.clone(),
+        owner: scope.git_worktrees[0].clone(),
+        composition: scope.repo.as_deref().cloned(),
+    };
+    let status = workspace.status()?;
     Ok(json!({
         "workspace_root": current_dir_string(),
+        "manifest":status["manifest"],
+        "repositories_dir":status["repositories_dir"],
+        "projects":status["projects"],
         "git": git_state(),
         "eligible_git_worktrees": eligible_git_worktrees_state(),
         "reqvire_version": env!("CARGO_PKG_VERSION"),

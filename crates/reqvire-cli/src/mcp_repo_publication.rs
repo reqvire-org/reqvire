@@ -1,6 +1,5 @@
 //! Coordinated publication reuses the existing bounded GitHub operations.
 use super::*;
-use reqvire::repo_workspace::normalize_url;
 
 struct Dependency {
     path: PathBuf,
@@ -13,21 +12,7 @@ impl Dependency {
         Ok(json!({"branch":text(&self.metadata,"branch")?,"head":text(&self.metadata,"commit")?}))
     }
     fn changed(&self, base: &Value) -> bool {
-        if base.is_null() {
-            return true;
-        }
-        let identity = normalize_url(
-            self.metadata["repository"]
-                .as_str()
-                .or_else(|| self.metadata["fetch_url"].as_str())
-                .unwrap_or(""),
-        );
-        let entries = base["projects"].as_array();
-        let matched = entries.into_iter().flatten().find(|entry| {
-            normalize_url(entry["repository"].as_str().unwrap_or("")) == identity
-                && entry["path"] == self.metadata["path"]
-        });
-        matched.is_none_or(|entry| entry["commit"] != self.metadata["commit"])
+        reqvire_workspace::publication::changed(&self.metadata, base)
     }
 }
 
@@ -173,30 +158,20 @@ impl Worktrees {
             }
             return self.github.execute(&context.root, name, args, status);
         }
-        // Distinct checkouts must never publish competing values to one ref.
-        let mut destinations = BTreeMap::new();
-        if let Some(repository) = self.github.repository_key() {
-            destinations.insert(
-                (repository, text(status, "branch")?.to_owned()),
-                PathBuf::new(),
-            );
-        }
-        for dependency in &dependencies {
-            if let (Some(repository), Some(branch)) = (
-                dependency.access.repository_key(),
-                dependency.metadata["branch"].as_str(),
-            ) {
-                if let Some(previous) =
-                    destinations.insert((repository, branch.to_owned()), dependency.path.clone())
-                {
-                    return Err(error(format!(
-                        "Repository owners {} and {} target the same published branch {branch}; prepare distinct authoring branches before publication",
-                        if previous.as_os_str().is_empty() { "workspace root".into() } else { previous.display().to_string() },
-                        dependency.path.display()
-                    )));
-                }
-            }
-        }
+        let owners = std::iter::once((
+            PathBuf::new(),
+            self.github.repository_key(),
+            status["branch"].as_str(),
+        ))
+        .chain(dependencies.iter().map(|d| {
+            (
+                d.path.clone(),
+                d.access.repository_key(),
+                d.metadata["branch"].as_str(),
+            )
+        }))
+        .filter_map(|(path, repository, branch)| Some((path, repository?, branch?.to_owned())));
+        reqvire_workspace::publication::distinct_refs(owners)?;
         if name == "reqvire.git.push" {
             let base = context
                 .change_base
@@ -206,10 +181,19 @@ impl Worktrees {
                 .map(|reference| self.publication_base(context, worker, &reference))
                 .transpose()?
                 .unwrap_or(Value::Null);
-            let mut outcomes = Vec::new();
-            for dependency in &dependencies {
-                let root = context.root.join(&dependency.path);
-                let operation =
+            let paths = dependencies
+                .iter()
+                .map(|d| d.path.clone())
+                .collect::<Vec<_>>();
+            return Ok(reqvire_workspace::publication::publish(
+                &paths,
+                reqvire_workspace::publication::Kind::Push,
+                |path| -> Result<Value, ReqvireError> {
+                    let dependency = dependencies
+                        .iter()
+                        .find(|d| d.path == path)
+                        .expect("declared publication owner");
+                    let root = context.root.join(path);
                     if dependency.changed(&base) && dependency.metadata["branch"].is_string() {
                         dependency
                             .access
@@ -218,32 +202,12 @@ impl Worktrees {
                         dependency
                             .access
                             .push_dependency(&root, text(&dependency.metadata, "commit")?)
-                    };
-                match operation {
-                    Ok(result) => {
-                        let unknown = result["outcome"] == "unknown";
-                        outcomes.push(annotated(result, dependency));
-                        if unknown {
-                            return Ok(
-                                json!({"outcome":"unknown","projects":outcomes,"error":"Dependency push could not be confirmed; root was not published"}),
-                            );
-                        }
                     }
-                    Err(failure) => {
-                        outcomes.push(json!({"path":dependency.path,"commit":dependency.metadata["commit"],"outcome":"failed"}));
-                        return Ok(
-                            json!({"outcome":"failed","projects":outcomes,"error":failure.to_string()}),
-                        );
-                    }
-                }
-            }
-            let mut result = match self.github.execute(&context.root, name, args, status) {
-                Ok(value) => value,
-                Err(failure) => json!({"outcome":"failed","error":failure.to_string()}),
-            };
-            result["projects"] = json!(outcomes);
-            return Ok(result);
+                },
+                |_| self.github.execute(&context.root, name, args, status),
+            ));
         }
+
         let base_name = text(args, "base")?;
         let (target, _) = self.github.preflight_pr(
             &context.root,
@@ -284,62 +248,35 @@ impl Worktrees {
                 text(&selected, "head")?,
             )?;
         }
-        let mut prs = Vec::new();
-        for dependency in changed {
-            let mut selected_args = args.clone();
-            selected_args["base"] = targets.expect("validated dependency targets")
-                [dependency.path.to_string_lossy().as_ref()]
-            .clone();
-            match dependency.access.execute(
-                &context.root.join(&dependency.path),
-                name,
-                &selected_args,
-                &dependency.status()?,
-            ) {
-                Ok(result) => {
-                    let unknown = result["outcome"] == "unknown";
-                    prs.push(annotated(result, dependency));
-                    if unknown {
-                        return Ok(
-                            json!({"outcome":"unknown","pull_requests":prs,"error":"Dependency PR creation could not be confirmed; root PR was not created"}),
-                        );
-                    }
-                }
-                Err(failure) => {
-                    return Ok(
-                        json!({"outcome":"failed","pull_requests":prs,"error":failure.to_string()}),
-                    )
-                }
-            }
-        }
-        let mut root_args = args.clone();
-        if !prs.is_empty() {
-            let mut body = text(args, "body").unwrap_or("").to_owned();
-            body.push_str("\n\n## Coordinated pull requests\n\n");
-            for pr in &prs {
-                body.push_str(&format!(
-                    "- [{}]({}) — commit `{}`\n",
-                    text(pr, "path")?,
-                    text(pr, "pr_url")?,
-                    text(pr, "commit")?
-                ));
-            }
-            root_args["body"] = json!(body);
-        }
-        let mut result = match self.github.execute(&context.root, name, &root_args, status) {
-            Ok(result) => result,
-            Err(failure) => {
-                return Ok(
-                    json!({"outcome":"failed","pull_requests":prs,"error":failure.to_string()}),
+        let paths = changed.iter().map(|d| d.path.clone()).collect::<Vec<_>>();
+        let mut result = reqvire_workspace::publication::publish(
+            &paths,
+            reqvire_workspace::publication::Kind::PullRequests,
+            |path| -> Result<Value, ReqvireError> {
+                let dependency = changed
+                    .iter()
+                    .find(|d| d.path == path)
+                    .expect("changed publication owner");
+                let mut selected_args = args.clone();
+                selected_args["base"] = targets.expect("validated dependency targets")
+                    [path.to_string_lossy().as_ref()]
+                .clone();
+                dependency.access.execute(
+                    &context.root.join(path),
+                    name,
+                    &selected_args,
+                    &dependency.status()?,
                 )
-            }
-        };
-        let mut root = result.clone();
-        root["path"] = json!("");
-        root["number"] = root["pr_number"].clone();
-        root["url"] = root["pr_url"].clone();
-        prs.push(root);
-        result["pull_requests"] = json!(prs);
+            },
+            |prs| {
+                let mut root_args = args.clone();
+                root_args["body"] = json!(reqvire_workspace::publication::linked_body(
+                    args["body"].as_str().unwrap_or(""),
+                    prs
+                ));
+                self.github.execute(&context.root, name, &root_args, status)
+            },
+        );
         if matches!(result["outcome"].as_str(), Some("completed" | "no_op")) {
             if let Err(failure) = self.remember_review_target(context, args) {
                 result["warning"]=json!(format!("PR set confirmed, but its local review baseline could not be recorded: {failure}"));
