@@ -429,8 +429,8 @@
     --accent-ring-light: color-mix(in oklab, var(--color-accent-9-light) 32%, transparent);
     --accent-ring-dark: color-mix(in oklab, var(--color-accent-9-dark) 50%, transparent);
 
-    --focus-ring-light: color-mix(in oklab, var(--color-accent-9-light) 38%, transparent);
-    --focus-ring-dark: color-mix(in oklab, var(--color-accent-9-dark) 55%, transparent);
+    --focus-ring-light: color-mix(in oklab, var(--color-accent-9-light) 75%, transparent);
+    --focus-ring-dark: color-mix(in oklab, var(--color-accent-9-dark) 70%, transparent);
 
     --scroll-thumb-light: var(--slate-6-light);
     --scroll-thumb-dark: var(--warm-10-dark);

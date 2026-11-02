@@ -1,12 +1,17 @@
 import { css, cx } from "@linaria/atomic";
 import { type HTMLAttributes, type ComponentChildren } from "preact";
+import { useEffect, useRef } from "preact/hooks";
 
 const baseUX = css`
   display: flex;
   align-items: stretch;
   gap: var(--space-1);
   position: relative;
+  min-width: 0;
   height: var(--ds-tabs-h);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 
   svg {
     display: block;
@@ -16,6 +21,7 @@ const baseUX = css`
 
 const tabBaseUX = css`
   display: inline-flex;
+  flex: 0 0 auto;
   position: relative;
   align-items: center;
   gap: var(--space-5);
@@ -27,6 +33,11 @@ const tabBaseUX = css`
   white-space: nowrap;
   cursor: pointer;
   transition: color var(--dur-fast);
+
+  /* Inside the list, which scrolls and so clips anything outside it. */
+  &:focus-visible {
+    outline-offset: calc(var(--focus-w) * -1);
+  }
 
   svg {
     width: var(--icon-sm);
@@ -147,6 +158,24 @@ export function Tabs<T extends string = string>({
   className = "",
   ...props
 }: TabsProps<T>) {
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const reveal = () => {
+      const tab = list.querySelector('[aria-selected="true"]');
+      if (!tab || list.scrollWidth <= list.clientWidth) return;
+      const box = list.getBoundingClientRect(), target = tab.getBoundingClientRect();
+      // scrollLeft and not scrollIntoView, which would also scroll the page around the list.
+      if (target.left < box.left) list.scrollLeft += target.left - box.left;
+      else if (target.right > box.right) list.scrollLeft += target.right - box.right;
+    };
+    reveal();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(reveal);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [value, items.length]);
   const cls = cx(
     "ds-tabs",
     baseUX,
@@ -156,7 +185,7 @@ export function Tabs<T extends string = string>({
     className,
   );
   return (
-    <div className={cls} role="tablist" {...props}>
+    <div ref={listRef} className={cls} role="tablist" {...props}>
       {items.map((it) => {
         const active = it.value === value;
         const tabSkinX = variant === "pill" ? tabSkinPillX : tabSkinUnderlineX;

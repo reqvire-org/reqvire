@@ -94,6 +94,7 @@ const optionClass = css`
   &[data-active="true"] { background: var(--bg-sunken); }
   &[aria-selected="true"] { background: var(--accent-subtle); }
   &[aria-selected="true"] > svg { color: var(--accent); }
+  &[aria-selected="true"] small { color: var(--text-secondary); }
   &[aria-disabled="true"] { color: var(--text-disabled); cursor: default; }
   svg { flex: 0 0 auto; width: var(--icon-sm); height: var(--icon-sm); }
 `;

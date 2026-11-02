@@ -187,7 +187,11 @@
   },
   "layout": {
     "widthTokens": [
-      "--content-max"
+      "--color-role-thesaurus-map-concept-node-min-width",
+      "--color-role-thesaurus-map-scheme-node-min-width",
+      "--side-pane-width",
+      "--space-flow-node-width",
+      "--space-markdown-diagram-measure"
     ]
   },
   "framework": "preact",

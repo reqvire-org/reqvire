@@ -154,6 +154,11 @@
   max-width: var(--ux-showcase-page-wide-max-w);
 }
 
+/* Scenario titles are single long component names. */
+.ux-showcase-page h1 {
+  overflow-wrap: anywhere;
+}
+
 .ux-showcase-section {
   display: flex;
   flex-direction: column;
@@ -220,11 +225,13 @@
 }
 
 .ux-showcase-input-demo--md {
-  width: var(--ux-showcase-input-demo-md-w);
+  width: 100%;
+  max-width: var(--ux-showcase-input-demo-md-w);
 }
 
 .ux-showcase-input-demo--lg {
-  width: var(--ux-showcase-input-demo-lg-w);
+  width: 100%;
+  max-width: var(--ux-showcase-input-demo-lg-w);
 }
 
 .ux-showcase-card-demo {
@@ -512,7 +519,8 @@
 
 .ux-showcase-tree-demo {
   display: flex;
-  width: var(--ux-showcase-pane-demo-w);
+  width: 100%;
+  max-width: var(--ux-showcase-pane-demo-w);
   flex-direction: column;
   gap: var(--stack-gap-compact);
   padding: var(--space-8);
@@ -523,7 +531,8 @@
 
 .ux-showcase-sidebar-demo {
   display: flex;
-  width: var(--ux-showcase-pane-demo-w);
+  width: 100%;
+  max-width: var(--ux-showcase-pane-demo-w);
   flex-direction: column;
   gap: var(--space-2);
 }
@@ -814,8 +823,14 @@
 }
 
 @media (max-width: 720px) {
+  /* The demo keeps all three panes: a phone scrolls the frame across them. */
   .ux-showcase-shell-demo {
     min-height: var(--ux-showcase-shell-demo-mobile-min-h);
+    overflow-x: auto;
+  }
+
+  .ux-showcase-shell-demo__app {
+    min-width: calc(var(--space-left-pane-width-2) + var(--space-current-right-width) + var(--ux-showcase-pane-demo-w));
   }
 
   .ux-showcase-pattern-grid--two {

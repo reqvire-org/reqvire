@@ -61,6 +61,7 @@ const baseUX = css`
     display: flex;
     min-width: 0;
     flex: 1 1 auto;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-4);
     border: 0;

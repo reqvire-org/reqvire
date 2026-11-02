@@ -85,6 +85,13 @@ const baseUX = css`
     min-width: 0;
     min-height: 0;
   }
+  /* Zero-size clip: the probe keeps its measured size without widening any scrollable area. */
+  .ux-trace-flow-node-probe {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
   .ux-trace-flow-node-size {
     position: absolute;
     visibility: hidden;
@@ -453,7 +460,7 @@ function FlowCanvas({ layoutEngine, topology, title, summary, kind, controls, co
     </header>
     <div className="ux-trace-flow-canvas" ref={canvas}>
       {/* Outside the transformed viewport: layout consumes the actual shared CSS dimensions. */}
-      <div className="ux-trace-flow-node-size" ref={nodeProbe} aria-hidden="true" />
+      <div className="ux-trace-flow-node-probe"><div className="ux-trace-flow-node-size" ref={nodeProbe} aria-hidden="true" /></div>
       {graph && <ReactFlow className={flowCanvasClasses()} key={graph.direction} nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} onInit={initializeCanvas}
         onNodeClick={(event, node) => {
           // Register with React Flow so read-only nodes retain browser pointer events.

@@ -15,6 +15,12 @@ import { flowCanvasClasses } from "../graphs/FlowCanvasSkin/FlowCanvasSkin";
 import { RouteFrame, RouteLayout } from "../shell";
 import { WorkspaceShell } from "../content/WorkspaceShell";
 import { useLatestRef } from "../../hooks/useLatestRef";
+import {
+  mapFocusNeighborhoodPositions,
+  mapMindMapPositions,
+  THESAURUS_SCHEME_NODE_ID,
+  THESAURUS_SCHEME_POSITION,
+} from "./thesaurusLayout";
 
 export interface ThesaurusConceptUsage {
   id?: string;
@@ -295,14 +301,16 @@ const shellBaseUX = css`
   }
 
   .ux-thesaurus-flow-node__label {
+    display: -webkit-box;
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
+    overflow-wrap: anywhere;
     font-size: var(--text-base);
     font-weight: var(--weight-bold);
     line-height: var(--leading-tight);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .ux-thesaurus-flow-node__focus {
@@ -334,14 +342,20 @@ const shellBaseUX = css`
 
   .ux-thesaurus-flow-node.is-scheme {
     min-width: var(--color-role-thesaurus-map-scheme-node-min-width);
+    max-width: var(--color-role-thesaurus-map-scheme-node-min-width);
     border: var(--border-w) solid var(--color-role-concept);
     border-radius: var(--radius-sm);
     padding: var(--space-4) var(--space-5);
     background: var(--color-role-thesaurus-map-scheme-node-bg);
   }
 
+  .ux-thesaurus-flow-node.is-scheme .ux-thesaurus-flow-node__meta {
+    color: var(--text-secondary);
+  }
+
   .ux-thesaurus-flow-node.is-concept {
     min-width: var(--color-role-thesaurus-map-concept-node-min-width);
+    max-width: var(--color-role-thesaurus-map-concept-node-min-width);
     border: var(--border-w) solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4);
@@ -780,7 +794,6 @@ type ThesaurusFlowLayout = {
   edges: ThesaurusFlowEdge[];
 };
 
-const THESAURUS_SCHEME_NODE_ID = "__scheme__";
 const THESAURUS_NODE_TYPES = {
   scheme: ThesaurusFlowNodeComponent,
   concept: ThesaurusFlowNodeComponent,
@@ -788,9 +801,6 @@ const THESAURUS_NODE_TYPES = {
 const THESAURUS_EDGE_TYPES = {
   mindmap: ThesaurusMindMapEdge,
 };
-const MINDMAP_X_STEP = 240;
-const MINDMAP_Y_STEP = 112;
-const MINDMAP_SIDE_OFFSET = 56;
 const THESAURUS_CONCEPT_NODE_CENTER_WIDTH = 180;
 const THESAURUS_CONCEPT_NODE_CENTER_HEIGHT = 44;
 const THESAURUS_SELECTION_CENTER_DURATION = 260;
@@ -805,10 +815,10 @@ function ThesaurusFlowNodeComponent({ data, type }: NodeProps<ThesaurusFlowNode>
         data.focusCenter && "is-focus-center",
       )}
     >
-      <Handle type="target" position={Position.Left} />
-      <Handle type="target" position={Position.Right} />
+      <Handle id="target-left" type="target" position={Position.Left} />
+      <Handle id="target-right" type="target" position={Position.Right} />
       <div className="ux-thesaurus-flow-node__header">
-        <div className="ux-thesaurus-flow-node__label">{data.label}</div>
+        <div className="ux-thesaurus-flow-node__label" title={String(data.label)}>{data.label}</div>
         {data.focusable && data.conceptId ? (
           <button
             type="button"
@@ -825,15 +835,15 @@ function ThesaurusFlowNodeComponent({ data, type }: NodeProps<ThesaurusFlowNode>
         ) : null}
       </div>
       {data.meta ? <div className="ux-thesaurus-flow-node__meta">{data.meta}</div> : null}
-      <Handle type="source" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
+      <Handle id="source-left" type="source" position={Position.Left} />
+      <Handle id="source-right" type="source" position={Position.Right} />
     </div>
   );
 }
 
 function ThesaurusMindMapEdge({ id, sourceX, sourceY, targetX, targetY }: EdgeProps) {
   const direction = targetX >= sourceX ? 1 : -1;
-  const controlOffset = Math.max(Math.abs(targetX - sourceX) * 0.52, MINDMAP_X_STEP * 0.25);
+  const controlOffset = Math.abs(targetX - sourceX) * 0.5;
   const path = [
     `M ${sourceX} ${sourceY}`,
     `C ${sourceX + controlOffset * direction} ${sourceY}`,
@@ -867,7 +877,7 @@ function buildThesaurusFlowLayout(
     {
       id: THESAURUS_SCHEME_NODE_ID,
       type: "scheme",
-      position: { x: 0, y: 0 },
+      position: THESAURUS_SCHEME_POSITION,
       hidden: focusNeighborhood !== null,
       data: {
         conceptId: null,
@@ -892,7 +902,7 @@ function buildThesaurusFlowLayout(
     const branchClass = branchByTopConcept.get(topId) ?? "branch-0";
     const isFocusVisible = focusNeighborhood?.visibleIds.has(concept.id) ?? false;
     const isFocusCenter = focusId === concept.id;
-    const position = focusPositionById.get(concept.id) ?? positionById.get(concept.id) ?? { x: MINDMAP_X_STEP, y: 0 };
+    const position = focusPositionById.get(concept.id) ?? positionById.get(concept.id) ?? { x: 0, y: 0 };
     const direction = position.x >= 0 ? 1 : -1;
     const relatedCount = conceptNeighborhood(concept.id, concepts, conceptIds).relatedIds.length;
     nodes.push({
@@ -921,6 +931,7 @@ function buildThesaurusFlowLayout(
         source: isTopConcept ? THESAURUS_SCHEME_NODE_ID : concept.parentId as string,
         target: concept.id,
         type: "mindmap",
+        ...edgeHandles(position.x),
         className: `taxonomy ${branchClass}`,
       });
     }
@@ -937,12 +948,20 @@ function buildThesaurusFlowLayout(
         source: focusId as string,
         target: relatedId,
         type: "mindmap",
+        ...edgeHandles(focusPositionById.get(relatedId)?.x ?? 0),
         className: `focus ${branchClass}`,
       });
     }
   }
 
   return { nodes, edges };
+}
+
+/** An edge leaves the side of its source that faces its target's column. */
+function edgeHandles(targetX: number) {
+  return targetX >= 0
+    ? { sourceHandle: "source-right", targetHandle: "target-left" }
+    : { sourceHandle: "source-left", targetHandle: "target-right" };
 }
 
 function conceptNeighborhood(
@@ -963,85 +982,6 @@ function conceptNeighborhood(
     relatedIds: Array.from(relatedIds),
     visibleIds: new Set([focusId, ...relatedIds]),
   };
-}
-
-function mapFocusNeighborhoodPositions(focusId: string, visibleIds: ReadonlySet<string>) {
-  const positionById = new Map<string, { x: number; y: number }>();
-  positionById.set(focusId, { x: 0, y: 0 });
-  const relatedIds = Array.from(visibleIds).filter((id) => id !== focusId);
-  const radiusX = MINDMAP_X_STEP * 1.18;
-  const radiusY = MINDMAP_Y_STEP * 1.18;
-  relatedIds.forEach((id, index) => {
-    const angle = (-Math.PI / 2) + (index * 2 * Math.PI) / Math.max(relatedIds.length, 1);
-    positionById.set(id, {
-      x: Math.cos(angle) * radiusX,
-      y: Math.sin(angle) * radiusY,
-    });
-  });
-  return positionById;
-}
-
-function mapMindMapPositions(
-  concepts: readonly ThesaurusConceptItem[],
-  topConceptIds: readonly string[],
-  conceptIds: ReadonlySet<string>,
-  branchDirectionByTopConcept: ReadonlyMap<string, number>,
-) {
-  const childrenByParent = new Map<string, ThesaurusConceptItem[]>();
-  const conceptById = new Map(concepts.map((concept) => [concept.id, concept]));
-  for (const concept of concepts) {
-    const parentId = concept.parentId && conceptIds.has(concept.parentId) ? concept.parentId : THESAURUS_SCHEME_NODE_ID;
-    const siblings = childrenByParent.get(parentId) ?? [];
-    siblings.push(concept);
-    childrenByParent.set(parentId, siblings);
-  }
-  for (const siblings of childrenByParent.values()) {
-    siblings.sort((left, right) => left.label.localeCompare(right.label));
-  }
-
-  const positionById = new Map<string, { x: number; y: number }>();
-  const placeSide = (rootIds: readonly string[], direction: number) => {
-    const totalLeaves = rootIds.reduce((sum, id) => sum + countConceptLeaves(id, childrenByParent), 0);
-    const sideOffset = direction > 0 ? -MINDMAP_SIDE_OFFSET : MINDMAP_SIDE_OFFSET;
-    let cursor = -((Math.max(totalLeaves, 1) - 1) * MINDMAP_Y_STEP) / 2 + sideOffset;
-    for (const rootId of rootIds) {
-      const root = conceptById.get(rootId);
-      if (!root) continue;
-      cursor = placeConceptSubtree(root, direction, 1, cursor, childrenByParent, positionById);
-    }
-  };
-  placeSide(topConceptIds.filter((id) => branchDirectionByTopConcept.get(id) === -1), -1);
-  placeSide(topConceptIds.filter((id) => branchDirectionByTopConcept.get(id) !== -1), 1);
-  return positionById;
-}
-
-function placeConceptSubtree(
-  concept: ThesaurusConceptItem,
-  direction: number,
-  depth: number,
-  cursor: number,
-  childrenByParent: ReadonlyMap<string, readonly ThesaurusConceptItem[]>,
-  positionById: Map<string, { x: number; y: number }>,
-) {
-  const children = childrenByParent.get(concept.id) ?? [];
-  if (children.length === 0) {
-    positionById.set(concept.id, { x: direction * depth * MINDMAP_X_STEP, y: cursor });
-    return cursor + MINDMAP_Y_STEP;
-  }
-  const start = cursor;
-  let nextCursor = cursor;
-  for (const child of children) {
-    nextCursor = placeConceptSubtree(child, direction, depth + 1, nextCursor, childrenByParent, positionById);
-  }
-  const end = nextCursor - MINDMAP_Y_STEP;
-  positionById.set(concept.id, { x: direction * depth * MINDMAP_X_STEP, y: (start + end) / 2 });
-  return nextCursor;
-}
-
-function countConceptLeaves(id: string, childrenByParent: ReadonlyMap<string, readonly ThesaurusConceptItem[]>): number {
-  const children = childrenByParent.get(id) ?? [];
-  if (children.length === 0) return 1;
-  return children.reduce((sum, child) => sum + countConceptLeaves(child.id, childrenByParent), 0);
 }
 
 function topConceptId(

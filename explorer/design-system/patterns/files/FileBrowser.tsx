@@ -106,6 +106,7 @@ const frameUX = css`
   flex-direction: column;
   gap: var(--space-7);
   overflow: visible;
+  container: file-browser / inline-size;
 
   [data-product-pattern="app-shell"] & {
     overflow: auto;
@@ -220,6 +221,12 @@ const tableUX = css`
   --ds-tablewrap-bg: transparent;
   --ds-table-min-w: var(--ux-file-table-min-w);
   --ds-table-td-p: var(--space-4) var(--space-6);
+
+  /* Narrower than the table: its columns scroll in their own region, the toolbar stays put.
+     Wider, it stays unclipped so its sticky header follows the frame's vertical scroll. */
+  @container file-browser (max-width: 780px) {
+    overflow-x: auto;
+  }
 
   th {
     font-weight: var(--weight-bold);

@@ -242,17 +242,13 @@ const headerContextClass = css`
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 46vw, calc(var(--space-32) * 4 + var(--space-10)));
+  width: min(36vw, calc(var(--space-32) * 4 + var(--space-10)));
   height: var(--app-header-height);
   box-sizing: border-box;
   padding-right: var(--space-10);
 
   @media (max-width: 900px) {
     padding-right: var(--space-6);
-  }
-
-  @media (max-width: 600px) {
-    width: clamp(calc(var(--space-32) * 2 + var(--space-6)), 32vw, calc(var(--space-32) * 3 + var(--space-6)));
   }
 `;
 
