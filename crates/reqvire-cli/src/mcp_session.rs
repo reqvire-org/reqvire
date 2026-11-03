@@ -436,10 +436,10 @@ impl MutationSession {
         let branch = git_text(&root, &["symbolic-ref", "--quiet", "HEAD"]).map_err(|_| {
             error("Mutation-enabled MCP requires a named branch (detached HEAD is not supported)")
         })?;
-        let common = PathBuf::from(git_text(
+        let common = reqvire_workspace::paths::canonicalize_existing(&PathBuf::from(git_text(
             &root,
             &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-        )?);
+        )?))?;
         let lock_path = common.join(format!(
             "reqvire-mcp-{}.lock",
             reqvire::utils::hash_content(&branch)
@@ -1214,7 +1214,10 @@ fn prepare_commit_for(
 ) -> Result<PreparedCommit, ReqvireError> {
     // Git index/tree paths are relative to the owning checkout even when the
     // model and manifest live below it.
-    let owner = PathBuf::from(git_text(root, &["rev-parse", "--show-toplevel"])?);
+    let owner = reqvire_workspace::paths::canonicalize_existing(&PathBuf::from(git_text(
+        root,
+        &["rev-parse", "--show-toplevel"],
+    )?))?;
     let root = owner.as_path();
     let candidate_index = tempfile::NamedTempFile::new()?.into_temp_path();
     fs::remove_file(&candidate_index)?;
@@ -1774,7 +1777,7 @@ mod observation_tests {
     use super::*;
 
     fn repository() -> tempfile::TempDir {
-        let directory = tempfile::tempdir().unwrap();
+        let directory = reqvire_workspace::paths::temporary_directory().unwrap();
         git_text(directory.path(), &["init", "-qb", "main"]).unwrap();
         git_text(
             directory.path(),
@@ -1877,7 +1880,7 @@ mod lock_tests {
                 ERROR_GEN_FAILURE as i32,
             ]
         };
-        let temp = tempfile::tempdir().unwrap();
+        let temp = reqvire_workspace::paths::temporary_directory().unwrap();
         for name in [
             "reqvire-mcp-branch.lock",
             "reqvire-mcp-worktree.lock",
@@ -1935,7 +1938,7 @@ mod lock_tests {
     #[test]
     #[cfg(unix)]
     fn orderly_lock_release_does_not_wait_for_incidental_descriptor_copies() {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = reqvire_workspace::paths::temporary_directory().unwrap();
         for name in [
             "reqvire-mcp-branch.lock",
             "reqvire-mcp-worktree.lock",
@@ -1969,7 +1972,7 @@ mod lock_tests {
 
     #[test]
     fn lock_files_are_reused_and_contention_never_replaces_a_held_file() {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = reqvire_workspace::paths::temporary_directory().unwrap();
         for name in [
             "reqvire-mcp-branch.lock",
             "reqvire-mcp-worktree.lock",

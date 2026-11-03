@@ -230,7 +230,7 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
         ));
     }
     let path_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let path = PathBuf::from(path_str);
+    let path = reqvire_workspace::paths::canonicalize_existing(Path::new(&path_str))?;
 
     // Only cache if caching is enabled
     if !is_cache_disabled() {
@@ -323,7 +323,8 @@ mod local_reader_tests {
 
     #[test]
     fn shared_reader_round_trips_binary_objects_and_modes() {
-        let directory = tempfile::tempdir().expect("Git reader fixture");
+        let directory =
+            reqvire_workspace::paths::temporary_directory().expect("Git reader fixture");
         let root = directory.path();
         local_bytes(root, &["init", "--quiet"]).expect("Git reader fixture");
         local_bytes(root, &["config", "user.name", "Git reader test"]).expect("Git reader fixture");
@@ -371,7 +372,8 @@ mod local_reader_tests {
 
     #[test]
     fn local_runner_disallows_transports_even_for_file_remotes() {
-        let directory = tempfile::tempdir().expect("Git reader fixture");
+        let directory =
+            reqvire_workspace::paths::temporary_directory().expect("Git reader fixture");
         local_bytes(directory.path(), &["init", "--quiet"]).expect("Git reader fixture");
         let remote = format!("file://{}", directory.path().display());
         let error = local_bytes(directory.path(), &["ls-remote", &remote])

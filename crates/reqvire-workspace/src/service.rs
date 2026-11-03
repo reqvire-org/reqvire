@@ -6,6 +6,7 @@ use crate::{
         self, document, full_commit, matching_remote, validate_checkout, WorkspaceComposition,
         WorkspaceProject, MANIFEST,
     },
+    paths::canonicalize_existing,
     process, Error,
 };
 use serde::Serialize;
@@ -75,8 +76,11 @@ pub fn require_clean(root: &Path) -> Result<(), Error> {
 
 /// Find a native workspace within the containing Git boundary, without crossing it.
 pub fn effective_root(start: &Path) -> Result<PathBuf, Error> {
-    let start = start.canonicalize()?;
-    let owner = PathBuf::from(local(&start, &["rev-parse", "--show-toplevel"])?).canonicalize()?;
+    let start = canonicalize_existing(start)?;
+    let owner = canonicalize_existing(&PathBuf::from(local(
+        &start,
+        &["rev-parse", "--show-toplevel"],
+    )?))?;
     let mut path = start.clone();
     loop {
         if std::fs::symlink_metadata(path.join(MANIFEST)).is_ok() {
@@ -209,9 +213,11 @@ impl Drop for Prepared {
 
 impl Workspace {
     pub fn open(root: &Path) -> Result<Self, Error> {
-        let root = root.canonicalize()?;
-        let owner =
-            PathBuf::from(local(&root, &["rev-parse", "--show-toplevel"])?).canonicalize()?;
+        let root = canonicalize_existing(root)?;
+        let owner = canonicalize_existing(&PathBuf::from(local(
+            &root,
+            &["rev-parse", "--show-toplevel"],
+        )?))?;
         let composition = manifest::selected_manifest(&root)?
             .map(|p| WorkspaceComposition::resolve(&root, p))
             .transpose()?;
@@ -251,10 +257,10 @@ impl Workspace {
             )?);
             paths.insert(worktree);
             if let Ok(branch) = local(&owner, &["symbolic-ref", "--quiet", "HEAD"]) {
-                let common = PathBuf::from(local(
+                let common = canonicalize_existing(&PathBuf::from(local(
                     &owner,
                     &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-                )?);
+                )?))?;
                 paths.insert(common.join(format!("reqvire-mcp-{}.lock", hash(branch.as_bytes()))));
                 if let Some(requested) = &requested_branch {
                     paths.insert(
@@ -509,10 +515,10 @@ impl Workspace {
                         )?);
                         let mut new_locks = vec![worktree];
                         if let Some(branch) = &root_branch {
-                            let common = PathBuf::from(local(
+                            let common = canonicalize_existing(&PathBuf::from(local(
                                 &checkout,
                                 &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-                            )?);
+                            )?))?;
                             new_locks.push(common.join(format!(
                                 "reqvire-mcp-{}.lock",
                                 hash(format!("refs/heads/{branch}").as_bytes())

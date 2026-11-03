@@ -12,7 +12,8 @@ const HOOK_TIMEOUT: Duration = Duration::from_secs(2);
 
 fn isolated(name: &str, test: impl FnOnce()) {
     if std::env::var("REQVIRE_MCP_CACHE_TEST_CHILD").as_deref() == Ok(name) {
-        let directory = tempfile::tempdir().expect("create temporary test workspace");
+        let directory = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test workspace");
         std::env::set_current_dir(directory.path()).expect("change test working directory");
         assert!(Command::new("git")
             .args(["init", "-q"])

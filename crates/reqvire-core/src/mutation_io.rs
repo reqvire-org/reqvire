@@ -377,7 +377,8 @@ mod tests {
     use super::*;
 
     fn fixture() -> (tempfile::TempDir, SnapshotFiles) {
-        let directory = tempfile::tempdir().expect("test fixture operation should succeed");
+        let directory = reqvire_workspace::paths::temporary_directory()
+            .expect("test fixture operation should succeed");
         let root = directory.path().to_path_buf();
         let files = SnapshotFiles {
             root: root.clone(),

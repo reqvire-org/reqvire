@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn session_git_drains_large_streams_while_sending_binary_stdin() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         crate::mcp_session::git(dir.path(), &["init", "-q"], None, None).unwrap();
         let script = dir.path().join("duplex.py");
         fs::write(&script, "import sys, signal\nsignal.alarm(2)\nsys.stdout.buffer.write(b'x' * 1048576)\nsys.stdout.flush()\nsys.stderr.buffer.write(b'e' * 1048576)\nsys.stderr.flush()\ndata = sys.stdin.buffer.read()\nsys.stdout.buffer.write(b'\\0\\xff' + data)\n").unwrap();
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn incomplete_stdin_cannot_be_reported_as_success() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let command = python(dir.path(), "import os, time\nos.close(0)\nprint('apparent success', flush=True)\ntime.sleep(0.1)\n");
         let result = run_command(command, Some(&vec![b'x'; 1048576]), Duration::from_secs(2));
         let failure = result
@@ -83,7 +83,7 @@ mod tests {
     }
 
     fn inherited_pipe_is_bounded_and_descendant_stops(parent_exits: bool) {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let script = format!("import subprocess, sys, time\nsubprocess.Popen([sys.executable, '-c', \"import time; from pathlib import Path; time.sleep(1); Path('descendant-effect').write_text('unexpected')\"])\n{}\n", if parent_exits { "sys.exit(0)" } else { "time.sleep(5)" });
         let result = run_command(
             python(dir.path(), &script),
@@ -115,7 +115,7 @@ mod tests {
 
     #[test]
     fn output_limit_is_detected_before_waiting_for_process_exit() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let command = python(dir.path(), "import sys, time, signal\nsignal.alarm(3)\nsys.stdout.buffer.write(b'x' * (17 * 1024 * 1024))\nsys.stdout.flush()\ntime.sleep(2)\n");
         let failure = run_command(command, None, Duration::from_secs(1))
             .err()
@@ -127,7 +127,7 @@ mod tests {
 
     #[test]
     fn timeout_does_not_erase_or_retry_a_completed_side_effect() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let command = python(dir.path(), "from pathlib import Path\nimport time\nwith Path('attempts').open('a') as f: f.write('one\\n')\ntime.sleep(5)\n");
         let failure = run_command(command, None, Duration::from_millis(250))
             .err()
@@ -142,7 +142,7 @@ mod tests {
 
     #[test]
     fn session_git_preserves_large_blobs_literal_paths_and_alternate_indexes() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let git = |args: &[&str], input: Option<&[u8]>, index: Option<&Path>| {
             crate::mcp_session::git(dir.path(), args, input, index).unwrap()
         };
@@ -208,7 +208,7 @@ mod tests {
 
     #[test]
     fn output_caps_apply_to_each_stream_without_exposing_data() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         for stream in ["stdout", "stderr"] {
             let script = format!("import sys, time\nsys.{stream}.buffer.write(b'sensitive-data' * 4)\nsys.{stream}.flush()\ntime.sleep(2)\n");
             let failure = run_binary(
@@ -242,7 +242,7 @@ mod tests {
 
     #[test]
     fn text_adapter_retains_nonzero_stderr_and_closes_empty_stdin() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let output = run_command(
             python(
                 dir.path(),
@@ -262,7 +262,7 @@ mod tests {
 
     #[test]
     fn noninteractive_settings_preserve_configured_transport() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let mut command = python(dir.path(), "import os\nassert os.environ['GIT_TERMINAL_PROMPT'] == '0'\nassert os.environ['GH_PROMPT_DISABLED'] == '1'\nassert os.environ['GH_PAGER'] == 'cat'\nassert os.environ['GIT_SSH_COMMAND'] == 'configured transport'\n");
         command.env("GIT_SSH_COMMAND", "configured transport");
         assert!(
@@ -274,7 +274,7 @@ mod tests {
 
     #[test]
     fn spawn_failure_is_distinct_from_an_interrupted_operation() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = reqvire_workspace::paths::temporary_directory().unwrap();
         let failure = run_binary(
             Command::new(dir.path().join("missing-executable")),
             None,

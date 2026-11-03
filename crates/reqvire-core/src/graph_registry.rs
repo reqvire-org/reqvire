@@ -328,7 +328,8 @@ mod tests {
 
     #[test]
     fn new_artifact_links_store_workspace_relative_targets() {
-        let workspace = tempfile::TempDir::new().expect("create artifact link workspace");
+        let workspace = reqvire_workspace::paths::temporary_directory()
+            .expect("create artifact link workspace");
         let source_file = "repo-b/specifications/B.md";
         let source_id = "repo-b/specifications/B.md#source";
         let mut source = make_element(source_id, "Source Requirement");
@@ -1014,7 +1015,6 @@ mod tests {
     #[test]
     fn test_flush_creates_proper_markdown_with_cross_file_relations() {
         use std::fs;
-        use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
@@ -1053,7 +1053,8 @@ mod tests {
         assert!(result.is_ok());
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().expect("create temporary test directory");
+        let temp_dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -1136,7 +1137,6 @@ mod tests {
     #[test]
     fn test_flush_includes_page_content() {
         use std::fs;
-        use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
@@ -1156,7 +1156,8 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().expect("create temporary test directory");
+        let temp_dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -1198,7 +1199,6 @@ mod tests {
     #[test]
     fn test_flush_multiple_elements() {
         use std::fs;
-        use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
@@ -1225,7 +1225,8 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().expect("create temporary test directory");
+        let temp_dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -1248,7 +1249,6 @@ mod tests {
     #[test]
     fn test_flush_handles_empty_page_content() {
         use std::fs;
-        use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
@@ -1267,7 +1267,8 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().expect("create temporary test directory");
+        let temp_dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
@@ -1288,7 +1289,6 @@ mod tests {
     #[test]
     fn test_flush_always_outputs_elements_header() {
         use std::fs;
-        use tempfile::TempDir;
 
         let mut registry = GraphRegistry::new();
 
@@ -1307,7 +1307,8 @@ mod tests {
         let graph = registry;
 
         // Create temp directory for flush output
-        let temp_dir = TempDir::new().expect("create temporary test directory");
+        let temp_dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test directory");
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files

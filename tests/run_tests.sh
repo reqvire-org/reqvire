@@ -1,7 +1,7 @@
 #!/bin/bash
 set +e
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 SOURCE_REQVIRE_BIN="${REQVIRE_BIN:-$(pwd)/target/release/reqvire}"
 REQVIRE_BIN="$ROOT_DIR/reqvire_timing_wrapper.sh"
 
@@ -22,6 +22,7 @@ format_ms() {
 
 SUITE_STARTED_MS="$(now_ms)"
 TMP_DIR="$(mktemp -d -t reqvire-e2e-XXXXXX)" || exit 1
+TMP_DIR="$(cd "$TMP_DIR" && pwd -P)" || exit 1
 REAL_REQVIRE_BIN="$TMP_DIR/reqvire"
 ACTIVE_TEST_PID=""
 ACTIVE_FIXTURE=""
@@ -72,7 +73,7 @@ trap 'interrupted 129' HUP
 
 LOG_ROOT="${REQVIRE_TEST_LOG_DIR:-/tmp/reqvire-test-logs}"
 mkdir -p -- "$LOG_ROOT" || exit 1
-LOG_ROOT="$(cd "$LOG_ROOT" && pwd)" || exit 1
+LOG_ROOT="$(cd "$LOG_ROOT" && pwd -P)" || exit 1
 LOG_DIR="$(mktemp -d "$LOG_ROOT/run-XXXXXX")" || exit 1
 BENCHMARK_INVOCATIONS_FILE="$LOG_DIR/invocations.tsv"
 BENCHMARK_TESTS_FILE="$LOG_DIR/tests.tsv"

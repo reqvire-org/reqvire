@@ -492,7 +492,7 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf
         // For relative paths, resolve relative to base_path
         let joined_path = base_path.join(p);
         // Try to canonicalize, fall back to logical resolution if it fails
-        joined_path.canonicalize().map_or_else(
+        reqvire_workspace::paths::canonicalize_existing(&joined_path).map_or_else(
             |_| {
                 // Logical path resolution for non-existent files
                 let mut resolved_path = base_path.to_path_buf();
@@ -609,8 +609,8 @@ pub fn to_relative_identifier(
     };
 
     // Try to canonicalize if files exist, otherwise compute from path strings
-    let canonical_path = resolved_path.canonicalize().ok();
-    let canonical_base = base_path.canonicalize().ok();
+    let canonical_path = reqvire_workspace::paths::canonicalize_existing(&resolved_path).ok();
+    let canonical_base = reqvire_workspace::paths::canonicalize_existing(base_path).ok();
 
     let relative = if let (Some(ref normalized), Some(ref base)) =
         (&canonical_path, &canonical_base)
@@ -800,7 +800,6 @@ mod tests {
     use std::fs;
     use std::path::PathBuf;
     use std::process::Command;
-    use tempfile::TempDir;
 
     // Mock Config structure for tests
     struct MockConfig {
@@ -870,7 +869,8 @@ mod tests {
         // Save original directory to restore at the end
         let original_dir = std::env::current_dir().expect("read test working directory");
 
-        let temp_dir = TempDir::new().expect("Failed to create temp dir");
+        let temp_dir =
+            reqvire_workspace::paths::temporary_directory().expect("Failed to create temp dir");
         let temp_path = temp_dir.path();
 
         std::env::set_current_dir(temp_path).expect("Failed to set current directory");
@@ -1223,7 +1223,8 @@ mod tests {
         // Save original directory to restore at the end
         let original_dir = std::env::current_dir().expect("read test working directory");
 
-        let temp_spec_folder = TempDir::new().expect("Failed to create temp dir");
+        let temp_spec_folder =
+            reqvire_workspace::paths::temporary_directory().expect("Failed to create temp dir");
         let specifications_folder = temp_spec_folder.path().to_path_buf();
 
         // Set working directory to temp folder

@@ -1,6 +1,7 @@
 //! Offline source reconstruction. Model parsing belongs to consumers.
 use crate::{
     git::{local_text as text, run_local},
+    paths::canonicalize_existing,
     Error, WorkspaceComposition, WorkspaceProject,
 };
 use std::{
@@ -185,12 +186,12 @@ pub fn project_objects(
     let stored = PathBuf::from(stored);
     candidates.push(stored);
     candidates.push(root.join(&project.path));
-    let common = crate::git::local_text(
+    let common = canonicalize_existing(&PathBuf::from(crate::git::local_text(
         root,
         &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-    )?;
+    )?))?;
     candidates.push(
-        PathBuf::from(common)
+        common
             .join("reqvire-repo-objects")
             .join(crate::service::hash(
                 format!("{}:{}", project.name, identity).as_bytes(),
@@ -227,6 +228,10 @@ pub fn read(
     current: &WorkspaceComposition,
     reference: &str,
 ) -> Result<Baseline, Error> {
+    // Compare and reconstruct paths using the same physical prefix as Git.
+    // macOS callers may reach /private/var through the /var alias.
+    let canonical_root = canonicalize_existing(root)?;
+    let root = canonical_root.as_path();
     let central = resolve(
         root,
         if reference == "HEAD" {
@@ -235,7 +240,10 @@ pub fn read(
             reference
         },
     )?;
-    let owner = PathBuf::from(text(root, &["rev-parse", "--show-toplevel"])?).canonicalize()?;
+    let owner = canonicalize_existing(&PathBuf::from(text(
+        root,
+        &["rev-parse", "--show-toplevel"],
+    )?))?;
     let prefix = root
         .strip_prefix(&owner)
         .map_err(|e| failure(e.to_string()))?;
@@ -243,7 +251,7 @@ pub fn read(
         .into_iter()
         .filter_map(|(p, b)| p.strip_prefix(prefix).ok().map(|p| (p.to_owned(), b)))
         .collect();
-    let temporary = tempfile::tempdir()?;
+    let temporary = crate::paths::temporary_directory()?;
     let staged = temporary.path();
     materialize(staged, &central_files)?;
     let mut base = if central_files.contains_key(&current.manifest) {
@@ -322,7 +330,7 @@ mod tests {
     use crate::git::local_bytes as git;
     #[test]
     fn historical_objects_preserve_binary_bytes_and_unusual_file_names() {
-        let directory = tempfile::tempdir().expect("temporary repository");
+        let directory = crate::paths::temporary_directory().expect("temporary repository");
         let root = directory.path();
         git(root, &["init", "-q", "-b", "main"]).expect("initialize repository");
         let path = Path::new("binary with tab\tand newline\n.bin");
@@ -409,7 +417,7 @@ mod tests {
                 .contains("cycle")
         );
         // Exercise the Git mode and object path as well as target resolution.
-        let directory = tempfile::tempdir().expect("temporary repository");
+        let directory = crate::paths::temporary_directory().expect("temporary repository");
         let root = directory.path();
         git(root, &["init", "-q"]).expect("initialize repository");
         std::fs::write(root.join("data.bin"), b"owned data").expect("owned fixture");

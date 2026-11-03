@@ -127,6 +127,32 @@ CARGO
     diff -u "$folder/expected.txt" "$folder/commands.txt"
 }
 
+platform_paths() {
+    local folder="$work/platform-paths" command selected='' platform
+    mkdir -p "$folder/commands"
+    workflow_job "$pr" path-normalization-tests > "$folder/job.yml"
+    grep -Fq 'runs-on: ${{ matrix.os }}' "$folder/job.yml"
+    grep -Fq 'fail-fast: false' "$folder/job.yml"
+    for platform in ubuntu-latest macos-latest windows-latest; do
+        grep -Fq "$platform" "$folder/job.yml"
+    done
+    workflow_steps "$folder/job.yml" "$folder/steps"
+    for command in "$folder"/steps/*.run; do
+        if grep -Fq 'cargo test ' "$command"; then selected=$command; break; fi
+    done
+    [[ -n "$selected" ]] || fail 'cross-platform path test step is missing'
+    cat > "$folder/commands/cargo" <<'CARGO'
+#!/bin/bash
+set -eu
+printf '%s\n' "$*" > "$TRACE"
+[[ "$*" == 'test --locked -p reqvire-workspace --lib paths::tests --verbose' ]]
+CARGO
+    chmod +x "$folder/commands/cargo"
+    execute_step "$selected" "$folder" "PATH=$folder/commands:$PATH" "TRACE=$folder/commands.txt"
+    printf '%s\n' 'test --locked -p reqvire-workspace --lib paths::tests --verbose' > "$folder/expected.txt"
+    diff -u "$folder/expected.txt" "$folder/commands.txt"
+}
+
 model_gate() {
     local invalid=$1 folder="$work/model-$1" command selected=''
     mkdir -p "$folder/target/release"
@@ -180,6 +206,7 @@ for label in pr release; do
 done
 record pr-current-revision-policy policy
 record pr-macos-manifest-unit-tests macos_units
+record pr-platform-path-tests platform_paths
 record valid-model-gate model_gate false
 record invalid-model-fails-gate model_gate true
 exit "$status"

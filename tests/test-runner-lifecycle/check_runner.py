@@ -96,7 +96,7 @@ def wait_until(predicate, seconds=5):
 def check(name, function):
     try:
         with tempfile.TemporaryDirectory(prefix="reqvire-runner-check-") as folder:
-            function(Harness(Path(folder)))
+            function(Harness(Path(folder).resolve()))
         CHECKS.append(f"PASS {name}")
     except Exception as error:
         CHECKS.append(f"FAIL {name}")

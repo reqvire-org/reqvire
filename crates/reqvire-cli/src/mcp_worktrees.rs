@@ -9,6 +9,7 @@ use reqvire::{
     error::ReqvireError,
     explorer_runtime::{ExplorerRuntimeAssets, ExplorerRuntimeData},
 };
+use reqvire_workspace::paths::canonicalize_existing;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{
@@ -573,15 +574,17 @@ impl Worktrees {
             explorer,
             read_only,
         } = policy;
-        let root = root.canonicalize()?;
+        let root = canonicalize_existing(root)?;
         let manifest = reqvire::repo_workspace::selected_manifest(&root)?;
-        let common = PathBuf::from(git(
+        let common = canonicalize_existing(&PathBuf::from(git(
             &root,
             &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-        )?)
-        .canonicalize()?;
+        )?))?;
         // Sibling storage cannot be scanned as part of the original or another context.
-        let repository = PathBuf::from(git(&root, &["rev-parse", "--show-toplevel"])?);
+        let repository = canonicalize_existing(&PathBuf::from(git(
+            &root,
+            &["rev-parse", "--show-toplevel"],
+        )?))?;
         let workspace_prefix = root
             .strip_prefix(&repository)
             .map_err(|e| error(e.to_string()))?
@@ -665,12 +668,11 @@ impl Worktrees {
         if self.shutting_down.load(Ordering::Acquire) {
             return Err(error("MCP session is shutting down"));
         }
-        let root = root.canonicalize()?;
-        if PathBuf::from(git(
+        let root = canonicalize_existing(&root)?;
+        if canonicalize_existing(&PathBuf::from(git(
             &root,
             &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-        )?)
-        .canonicalize()?
+        )?))?
             != self.common
         {
             return Err(error("Worktree belongs to a different repository"));
@@ -951,6 +953,7 @@ impl Worktrees {
     fn is_managed(&self, root: &Path, branch: &str) -> bool {
         let checkout = git(root, &["rev-parse", "--show-toplevel"])
             .map(PathBuf::from)
+            .and_then(|path| canonicalize_existing(&path).map_err(Into::into))
             .unwrap_or_else(|_| root.to_owned());
         if !checkout.starts_with(&self.storage) {
             return false;
@@ -1262,7 +1265,10 @@ impl Worktrees {
                 "Only server-created secondary worktrees may be removed",
             ));
         }
-        let checkout = PathBuf::from(git(&context.root, &["rev-parse", "--show-toplevel"])?);
+        let checkout = canonicalize_existing(&PathBuf::from(git(
+            &context.root,
+            &["rev-parse", "--show-toplevel"],
+        )?))?;
         let provenance = self.provenance_path(&checkout);
         let mut worker = context.worker.lock().expect("worktree lock poisoned");
         context.request_locked(&mut worker, &json!({"operation":"check_clean"}))?;
@@ -1970,6 +1976,15 @@ pub fn repository_worktrees(root: &Path) -> Result<Vec<Value>, ReqvireError> {
             continue;
         }
         if let Some(path) = part.strip_prefix("worktree ") {
+            let path = match canonicalize_existing(Path::new(path)) {
+                Ok(path) => path,
+                // Git also lists missing, prunable checkouts. Retain those
+                // entries without inventing a physical filesystem identity.
+                Err(failure) if failure.kind() == std::io::ErrorKind::NotFound => {
+                    PathBuf::from(path)
+                }
+                Err(failure) => return Err(failure.into()),
+            };
             row["workspace_root"] = json!(path);
         } else if let Some(head) = part.strip_prefix("HEAD ") {
             row["head"] = json!(head);
@@ -2273,7 +2288,7 @@ mod tests {
         }
     }
     fn fixture() -> TestRepo {
-        let temp = tempfile::tempdir().unwrap();
+        let temp = reqvire_workspace::paths::temporary_directory().unwrap();
         let path = temp.path().join("repo");
         fs::create_dir(&path).unwrap();
         let root = path.as_path();
@@ -2287,6 +2302,46 @@ mod tests {
             _directory: temp,
             root: path,
         }
+    }
+
+    #[test]
+    fn worktree_inventory_uses_physical_paths_and_retains_missing_checkouts() {
+        let repo = fixture();
+        let checkout = repo._directory.path().join("secondary");
+        git(
+            repo.path(),
+            &[
+                "worktree",
+                "add",
+                "-qb",
+                "secondary",
+                checkout.to_str().unwrap(),
+            ],
+        )
+        .unwrap();
+        let physical = canonicalize_existing(&checkout).unwrap();
+        let rows = repository_worktrees(repo.path()).unwrap();
+        assert_eq!(rows.len(), 2);
+        for row in &rows {
+            let root = Path::new(row["workspace_root"].as_str().unwrap());
+            assert_eq!(root, canonicalize_existing(root).unwrap());
+        }
+        #[cfg(unix)]
+        {
+            let alias = repo._directory.path().join("alias");
+            std::os::unix::fs::symlink(repo.path(), &alias).unwrap();
+            assert_eq!(repository_worktrees(&alias).unwrap(), rows);
+        }
+        fs::remove_dir_all(&checkout).unwrap();
+        let retained = repository_worktrees(repo.path()).unwrap();
+        assert_eq!(retained.len(), 2);
+        assert_eq!(
+            retained
+                .iter()
+                .find(|row| row["branch"] == "secondary")
+                .unwrap()["workspace_root"],
+            json!(physical)
+        );
     }
     fn executable() -> PathBuf {
         std::env::var_os("REQVIRE_TEST_BIN")
@@ -3288,7 +3343,7 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
             json!({"branch":"dirty","base_ref":"main"}),
         );
         fs::remove_file(temp.path().join("untracked.txt")).unwrap();
-        let external = tempfile::tempdir().unwrap();
+        let external = reqvire_workspace::paths::temporary_directory().unwrap();
         let path = external.path().join("external");
         git(
             temp.path(),

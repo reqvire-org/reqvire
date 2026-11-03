@@ -684,7 +684,8 @@ mod tests {
     }
     impl Fixture {
         fn new() -> Self {
-            let temp = tempfile::tempdir().expect("validated worktree context invariant");
+            let temp = reqvire_workspace::paths::temporary_directory()
+                .expect("validated worktree context invariant");
             let root = temp.path().join("repo");
             fs::create_dir(&root).expect("validated worktree context invariant");
             git(&root, &["init", "-qb", "main"]).expect("validated worktree context invariant");

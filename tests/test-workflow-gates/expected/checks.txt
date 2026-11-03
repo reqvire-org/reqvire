@@ -8,5 +8,6 @@ PASS release-build-failure
 PASS release-test-failure
 PASS pr-current-revision-policy
 PASS pr-macos-manifest-unit-tests
+PASS pr-platform-path-tests
 PASS valid-model-gate
 PASS invalid-model-fails-gate

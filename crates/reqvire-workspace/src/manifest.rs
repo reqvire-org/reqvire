@@ -1,4 +1,5 @@
 //! Native manifests and immutable composition provenance. Loading is offline.
+use crate::paths::canonicalize_existing;
 use crate::{git::local_text as git_text, Error};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -89,13 +90,13 @@ pub fn relative_path(root: &Path, path: &Path) -> Result<PathBuf, Error> {
 }
 
 pub fn contained(root: &Path, path: &Path) -> Result<(), Error> {
-    let physical = root.canonicalize()?;
+    let physical = canonicalize_existing(root)?;
     let relative = relative_path(root, path)?;
     let mut check = root.join(relative);
     loop {
         match std::fs::symlink_metadata(&check) {
             Ok(_) => {
-                let actual = check.canonicalize()?;
+                let actual = canonicalize_existing(&check)?;
                 if !actual.starts_with(&physical)
                     || actual
                         != physical.join(
@@ -138,7 +139,7 @@ pub fn full_commit(value: &str) -> bool {
 
 impl WorkspaceComposition {
     pub fn resolve(root: &Path, selection: PathBuf) -> Result<Self, Error> {
-        let root = root.canonicalize()?;
+        let root = canonicalize_existing(root)?;
         let selection = relative_path(&root, &selection)?;
         contained(&root, &selection)?;
         let source = std::fs::read_to_string(root.join(&selection))?;
@@ -252,16 +253,17 @@ impl WorkspaceComposition {
             .map_err(|e| failure(format!("Workspace manifest {}: {e}", selection.display())))
     }
     fn load_inner(root: &Path, selection: PathBuf) -> Result<Self, Error> {
-        let root = root.canonicalize()?;
+        let root = canonicalize_existing(root)?;
         let mut view = Self::resolve(&root, selection)?;
-        let owner =
-            PathBuf::from(git_text(&root, &["rev-parse", "--show-toplevel"])?).canonicalize()?;
+        let owner = canonicalize_existing(&PathBuf::from(git_text(
+            &root,
+            &["rev-parse", "--show-toplevel"],
+        )?))?;
         let source = root.join(&view.manifest);
-        let source_owner = PathBuf::from(git_text(
+        let source_owner = canonicalize_existing(&PathBuf::from(git_text(
             source.parent().expect("source parent"),
             &["rev-parse", "--show-toplevel"],
-        )?)
-        .canonicalize()?;
+        )?))?;
         if source_owner != owner {
             return Err(failure("Native manifest belongs to another repository"));
         }
@@ -348,11 +350,12 @@ impl WorkspaceComposition {
 }
 
 pub fn validate_checkout(checkout: &Path, project: &WorkspaceProject) -> Result<(), Error> {
-    let physical = checkout
-        .canonicalize()
+    let physical = canonicalize_existing(checkout)
         .map_err(|e| failure(format!("Missing project {}: {e}", project.path.display())))?;
-    let owner =
-        PathBuf::from(git_text(checkout, &["rev-parse", "--show-toplevel"])?).canonicalize()?;
+    let owner = canonicalize_existing(&PathBuf::from(git_text(
+        checkout,
+        &["rev-parse", "--show-toplevel"],
+    )?))?;
     if physical != owner || !checkout.join(".git").exists() {
         return Err(failure(format!(
             "Foreign or missing checkout {}",

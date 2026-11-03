@@ -1,4 +1,5 @@
 //! Shared local Git plumbing. Offline reads never acquire remote objects.
+use crate::paths::canonicalize_existing;
 use crate::Error;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -18,7 +19,13 @@ pub fn find_root(directory: &Path) -> Result<String, Error> {
     if let Some(root) = cache.get(directory) {
         return Ok(root.clone());
     }
-    let root = local_text(directory, &["rev-parse", "--show-toplevel"])?;
+    let root = canonicalize_existing(Path::new(&local_text(
+        directory,
+        &["rev-parse", "--show-toplevel"],
+    )?))?
+    .into_os_string()
+    .into_string()
+    .map_err(|_| git_error("Git root is not UTF-8"))?;
     cache.insert(directory.to_owned(), root.clone());
     drop(cache);
     Ok(root)

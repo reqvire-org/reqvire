@@ -95,6 +95,26 @@ jobs:
           name: end-to-end-test-logs
           path: /tmp/reqvire-test-logs
 
+  path-normalization-tests:
+    name: Check Physical Paths (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run shared filesystem identity tests
+        run: cargo test --locked -p reqvire-workspace --lib paths::tests --verbose
+
   macos-workspace-unit-tests:
     name: Run Workspace Crate Tests on macOS
     needs: test

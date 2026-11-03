@@ -164,10 +164,10 @@ impl CompositionLease {
                 )));
             }
             if let Some(branch) = &observed.branch {
-                let common = PathBuf::from(git_text(
+                let common = crate::paths::canonicalize_existing(&PathBuf::from(git_text(
                     &checkout,
                     &["rev-parse", "--path-format=absolute", "--git-common-dir"],
-                )?);
+                )?))?;
                 acquire(common.join(format!(
                     "reqvire-mcp-{}.lock",
                     crate::service::hash(branch.as_bytes())

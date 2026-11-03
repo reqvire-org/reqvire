@@ -6,6 +6,7 @@ pub mod lease;
 pub mod legacy;
 pub mod locks;
 pub mod manifest;
+pub mod paths;
 pub mod process;
 pub mod publication;
 pub mod scope;

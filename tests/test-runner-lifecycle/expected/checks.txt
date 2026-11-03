@@ -13,3 +13,4 @@ PASS fixture-setup-failure
 PASS cleanup-failure-stops-run
 PASS distinct-wall-and-process-timing
 PASS mixed-suite-results
+PASS canonical-temporary-and-log-paths

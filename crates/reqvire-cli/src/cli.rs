@@ -771,7 +771,7 @@ pub fn apply_workspace(workspace: Option<&PathBuf>) -> Result<(), ReqvireError> 
         return Ok(());
     };
 
-    let canonical = std::fs::canonicalize(workspace).map_err(|e| {
+    let canonical = reqvire_workspace::paths::canonicalize_existing(workspace).map_err(|e| {
         ReqvireError::PathError(format!(
             "Failed to resolve workspace '{}': {}",
             workspace.display(),

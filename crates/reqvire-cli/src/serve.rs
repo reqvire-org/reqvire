@@ -596,10 +596,9 @@ fn workspace_file_response_at(
         return None;
     }
     if path.components().any(|p| p.as_os_str() == ".git")
-        || !absolute_path
-            .canonicalize()
+        || !reqvire_workspace::paths::canonicalize_existing(&absolute_path)
             .ok()
-            .zip(root.canonicalize().ok())
+            .zip(reqvire_workspace::paths::canonicalize_existing(root).ok())
             .is_some_and(|(path, root)| path.starts_with(root))
     {
         return None;
@@ -705,7 +704,8 @@ mod tests {
         ServeState,
         Arc<crate::mcp_worktrees::Context>,
     ) {
-        let directory = tempfile::tempdir().expect("worker fixture directory");
+        let directory =
+            reqvire_workspace::paths::temporary_directory().expect("worker fixture directory");
         let root = directory.path();
         for args in [
             vec!["init", "-qb", "main"],
@@ -795,7 +795,8 @@ mod tests {
             (true, true, false),
             (true, true, true),
         ] {
-            let temp = tempfile::tempdir().expect("test fixture operation should succeed");
+            let temp = reqvire_workspace::paths::temporary_directory()
+                .expect("test fixture operation should succeed");
             let root = temp.path().join("repo");
             std::fs::create_dir(&root).expect("test fixture operation should succeed");
             let git = |args: &[&str]| {
@@ -935,7 +936,8 @@ mod tests {
 
     #[tokio::test]
     async fn read_only_worktree_routes_do_not_require_mcp_or_ownership() {
-        let temp = tempfile::tempdir().expect("test fixture operation should succeed");
+        let temp = reqvire_workspace::paths::temporary_directory()
+            .expect("test fixture operation should succeed");
         let root = temp.path().join("repo");
         let second = temp.path().join("second");
         let invalid = temp.path().join("invalid");
@@ -1152,7 +1154,7 @@ mod tests {
     #[allow(clippy::unwrap_used)]
     async fn recovery_routes_keep_snapshot_but_reject_disk_assets() {
         use std::os::unix::fs::PermissionsExt;
-        let temp = tempfile::tempdir().unwrap();
+        let temp = reqvire_workspace::paths::temporary_directory().unwrap();
         let root = temp.path();
         let git = |args: &[&str]| crate::mcp_process::git(root, args).unwrap();
         git(&["init", "-qb", "main"]);
@@ -1299,7 +1301,8 @@ if [ "$1" = prepared ]; then rm -f Model.md; mkdir Model.md; exit 1; fi
 
     #[tokio::test]
     async fn worktree_routes_publish_only_the_selected_snapshot_and_asset_boundary() {
-        let temp = tempfile::tempdir().expect("test fixture operation should succeed");
+        let temp = reqvire_workspace::paths::temporary_directory()
+            .expect("test fixture operation should succeed");
         let root = temp.path().join("repo");
         std::fs::create_dir(&root).expect("test fixture operation should succeed");
         let git = |args: &[&str]| {

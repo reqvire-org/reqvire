@@ -111,7 +111,7 @@ impl WorkspaceScope {
                     && self.is_eligible_path(&path)
                     && path.is_file()
                 {
-                    if !path.canonicalize()?.starts_with(owner) {
+                    if !reqvire_workspace::paths::canonicalize_existing(&path)?.starts_with(owner) {
                         return Err(ReqvireError::PathError(format!(
                             "Source symlink escapes repository: {}",
                             path.display()
@@ -157,7 +157,7 @@ pub fn absolute_logical_path(path: &Path) -> PathBuf {
 }
 
 fn normalize_existing_path(path: PathBuf) -> Result<PathBuf, ReqvireError> {
-    path.canonicalize()
+    reqvire_workspace::paths::canonicalize_existing(&path)
         .map_err(|error| ReqvireError::PathError(error.to_string()))
 }
 

@@ -98,7 +98,8 @@ struct Workspace {
 impl Workspace {
     fn new() -> Self {
         let original = std::env::current_dir().expect("read test working directory");
-        let dir = tempfile::tempdir().expect("create temporary test workspace");
+        let dir = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test workspace");
         std::env::set_current_dir(dir.path()).expect("change test working directory");
         git(&["init", "-q"]);
         git(&["config", "user.email", "cache-test@example.test"]);
@@ -631,7 +632,8 @@ case!(workspace_and_git_context_do_not_alias, {
     git(&["commit", "-qm", "initial"]);
     load().expect("load valid test model");
     assert_eq!(builds(), 2, "HEAD/dirty change must change identity");
-    let second = tempfile::tempdir().expect("create temporary test workspace");
+    let second =
+        reqvire_workspace::paths::temporary_directory().expect("create temporary test workspace");
     std::env::set_current_dir(second.path()).expect("change test working directory");
     git(&["init", "-q"]);
     std::fs::write("Model.md", MODEL).expect("write test fixture");
@@ -1096,7 +1098,8 @@ case!(
     evidence_worktree_eligibility_changes_revalidate_and_recover,
     {
         let _workspace = Workspace::new();
-        let backup = tempfile::tempdir().expect("create temporary test workspace");
+        let backup = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test workspace");
         // A workspace containing two independent eligible worktrees, not itself Git.
         std::fs::rename(".git", backup.path().join("workspace-git")).expect("rename test fixture");
         for directory in ["model", "evidence"] {

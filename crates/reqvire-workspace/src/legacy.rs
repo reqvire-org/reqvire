@@ -2,6 +2,7 @@
 use crate::{
     git::local_text as git_text,
     manifest::{full_commit, WorkspaceComposition, WorkspaceProject},
+    paths::canonicalize_existing,
     Error,
 };
 use quick_xml::{
@@ -75,7 +76,7 @@ fn overlay_entries(root: &Path) -> Result<Vec<PathBuf>, Error> {
     Ok(entries)
 }
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 fn observe_selector(
     root: &Path,
     path: &Path,
@@ -146,10 +147,9 @@ fn stage_manifest(
         )));
     }
     let source = root.join(&relative);
-    if source
-        .canonicalize()
+    if canonicalize_existing(&source)
         .map_err(|e| failure(format!("Manifest source {}: {e}", relative.display())))?
-        != root.canonicalize()?.join(&relative)
+        != canonicalize_existing(root)?.join(&relative)
     {
         return Err(failure(format!(
             "Manifest symlink is not allowed: {}",
@@ -217,12 +217,12 @@ pub fn source_manifest(root: &Path, selection: &Path) -> Result<PathBuf, Error> 
     }
     let entry = root.join(selection);
     if std::fs::symlink_metadata(&entry)?.file_type().is_symlink() {
-        let target = entry.canonicalize()?;
-        let owner = if overlay || !target.starts_with(root.canonicalize()?.join(".repo/manifests"))
-        {
-            root.canonicalize()?
+        let target = canonicalize_existing(&entry)?;
+        let physical = canonicalize_existing(root)?;
+        let owner = if overlay || !target.starts_with(physical.join(".repo/manifests")) {
+            physical
         } else {
-            root.canonicalize()?.join(".repo/manifests")
+            physical.join(".repo/manifests")
         };
         return target
             .strip_prefix(owner)
@@ -293,12 +293,12 @@ fn fetch_url(root: &Path, fetch: &str, name: &str) -> Result<String, Error> {
 
 /// Resolve the selected versioned XML source and includes into a flat native inventory.
 pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Error> {
-    let root = root.canonicalize()?;
+    let root = canonicalize_existing(root)?;
     if let Some(overlay) = overlay_entries(&root)?.first() {
         return Err(failure(format!("Unsupported Repo local overlay {}; version its effective declarations in the selected XML source before migration",overlay.display())));
     }
     let manifest = source_manifest(&root, selection)?;
-    let temporary = tempfile::tempdir()?;
+    let temporary = crate::paths::temporary_directory()?;
     let mut inputs = BTreeMap::new();
     stage_manifest(
         &root,
@@ -446,15 +446,14 @@ pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Er
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        observe_selector, selected_manifest, selected_manifest_at, stage_manifest,
-        WorkspaceComposition,
-    };
+    #[cfg(unix)]
+    use super::observe_selector;
+    use super::{selected_manifest, selected_manifest_at, stage_manifest, WorkspaceComposition};
     use std::{collections::BTreeMap, path::Path};
 
     #[test]
     fn default_selection_identifies_root_source_without_reading_cached_xml() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
         std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         std::fs::create_dir_all(root.join("manifests")).expect("source directory");
@@ -478,7 +477,7 @@ mod tests {
 
     #[test]
     fn override_selects_an_alternate_repo_manifest_location() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
         std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         let alternate = std::path::Path::new(".repo/manifests/alternate.xml");
@@ -497,7 +496,7 @@ mod tests {
 
     #[test]
     fn native_entries_reject_ambiguous_sources_and_path_traversal() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
         std::fs::create_dir_all(root.join(".repo")).expect("Repo metadata");
         for entry in [
@@ -518,9 +517,9 @@ mod tests {
 
     #[test]
     fn includes_use_root_sources_and_missing_inputs_cannot_fall_back_to_cache() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
-        let staged = tempfile::tempdir().expect("staging directory");
+        let staged = crate::paths::temporary_directory().expect("staging directory");
         std::fs::create_dir_all(root.join("manifests")).expect("source directory");
         std::fs::create_dir_all(root.join(".repo/manifests/manifests")).expect("cache directory");
         let manifest = "<manifest><include name=\"manifests/projects.xml\"/></manifest>\n";
@@ -599,7 +598,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn native_repo_entry_symlink_selects_root_source_not_cache_bytes() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
         std::fs::create_dir_all(root.join(".repo/manifests")).expect("manifest directory");
         std::fs::write(root.join(".repo/manifests/default.xml"), "stale cached XML")
@@ -620,7 +619,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn retargeting_an_entry_is_rejected_even_when_cached_files_have_identical_bytes() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let root = temporary.path();
         std::fs::create_dir_all(root.join(".repo/manifests")).expect("cache directory");
         for path in ["first.xml", "second.xml"] {
@@ -672,13 +671,13 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn manifest_guards_allow_an_aliased_workspace_prefix_and_reject_source_symlinks() {
-        let temporary = tempfile::tempdir().expect("temporary workspace");
+        let temporary = crate::paths::temporary_directory().expect("temporary workspace");
         let physical = temporary.path().join("physical");
         std::fs::create_dir(&physical).expect("physical workspace");
         let alias = temporary.path().join("alias");
         std::os::unix::fs::symlink(&physical, &alias).expect("workspace prefix alias");
         std::fs::write(physical.join("default.xml"), "<manifest/>\n").expect("root source");
-        let staged = tempfile::tempdir().expect("staging directory");
+        let staged = crate::paths::temporary_directory().expect("staging directory");
         let mut inputs = BTreeMap::new();
         stage_manifest(
             &alias,

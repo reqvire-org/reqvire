@@ -126,8 +126,7 @@ pub fn export_to_dir(
 }
 
 fn copy_workspace_assets(output_dir: &std::path::Path) -> Result<(), ReqvireError> {
-    let output_dir = output_dir
-        .canonicalize()
+    let output_dir = reqvire_workspace::paths::canonicalize_existing(output_dir)
         .unwrap_or_else(|_| output_dir.to_path_buf());
     let scope = crate::workspace::WorkspaceScope::discover()?;
     for scan_root in scope.scan_roots() {
@@ -143,7 +142,8 @@ fn copy_workspace_assets_from_dir(
 ) -> Result<(), ReqvireError> {
     use std::fs;
 
-    let canonical_dir = dir.canonicalize().unwrap_or_else(|_| dir.to_path_buf());
+    let canonical_dir =
+        reqvire_workspace::paths::canonicalize_existing(dir).unwrap_or_else(|_| dir.to_path_buf());
     if canonical_dir == output_dir || canonical_dir.starts_with(output_dir) {
         return Ok(());
     }

@@ -9,7 +9,8 @@ use std::process::Command;
 // persistent model cache cannot interfere with the library's parallel unit tests.
 #[test]
 fn coverage_tool_shares_rollup_and_refreshes_external_evidence_changes() {
-    let workspace = tempfile::tempdir().expect("temporary model workspace");
+    let workspace =
+        reqvire_workspace::paths::temporary_directory().expect("temporary model workspace");
     let original = std::env::current_dir().expect("working directory");
     struct RestoreDirectory(PathBuf);
     impl Drop for RestoreDirectory {

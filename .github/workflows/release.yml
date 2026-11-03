@@ -52,16 +52,7 @@ jobs:
       - name: Test
         env:
           REQVIRE_TEST_BIN: ${{ github.workspace }}/target/release/reqvire
-        run: |
-          if [[ "$RUNNER_OS" == "macOS" ]]; then
-            # on macOS skip our two tmpdir‐symlink tests
-            cargo test --locked --verbose \
-              -- --skip test_to_relative_identifier \
-                 --skip test_to_relative_identifier_with_github_fragments
-          else
-            # on Linux (and everywhere else) run them all
-            cargo test --locked --verbose
-          fi
+        run: cargo test --locked --verbose
         
       - name: Build Binary
         run: |

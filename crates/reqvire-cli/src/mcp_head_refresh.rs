@@ -215,7 +215,10 @@ impl MutationSession {
             ));
         }
         let head = observed.checkout.head.expect("checked committed HEAD");
-        let owner = PathBuf::from(git_text(&self.root, &["rev-parse", "--show-toplevel"])?);
+        let owner = reqvire_workspace::paths::canonicalize_existing(&PathBuf::from(git_text(
+            &self.root,
+            &["rev-parse", "--show-toplevel"],
+        )?))?;
         let changed = reqvire::git_commands::GitReader::new(&owner, |args, input| {
             git(&owner, args, input, None)
         })

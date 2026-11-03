@@ -53,7 +53,7 @@ impl Worktrees {
                     return Err(error("Invalid declared publication owner path"));
                 }
                 let root = context.root.join(&path);
-                if root.canonicalize()? != root {
+                if reqvire_workspace::paths::canonicalize_existing(&root)? != root {
                     return Err(error("Publication owner changed its checkout boundary"));
                 }
                 let access = GithubAccess::check(&root, true, text(item, "remote")?);

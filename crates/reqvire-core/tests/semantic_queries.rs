@@ -5,7 +5,8 @@ use std::{fs, path::PathBuf, process::Command};
 
 #[test]
 fn managed_queries_mcp_discovery_validation_projection_and_cache() {
-    let workspace = tempfile::tempdir().expect("test fixture operation should succeed");
+    let workspace = reqvire_workspace::paths::temporary_directory()
+        .expect("test fixture operation should succeed");
     struct Restore(PathBuf);
     impl Drop for Restore {
         fn drop(&mut self) {

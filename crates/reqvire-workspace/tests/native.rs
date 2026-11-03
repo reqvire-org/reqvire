@@ -50,17 +50,18 @@ fn commit(path: &Path, message: &str) -> String {
 }
 impl Fixture {
     fn new(prepared: bool) -> Self {
-        let temporary = tempfile::tempdir().unwrap();
-        let root = temporary.path().join("root");
-        let seed = temporary.path().join("seed");
-        let remote = temporary.path().join("remote.git");
+        let temporary = reqvire_workspace::paths::temporary_directory().unwrap();
+        let directory = temporary.path().to_path_buf();
+        let root = directory.join("root");
+        let seed = directory.join("seed");
+        let remote = directory.join("remote.git");
         init(&seed);
         fs::write(seed.join("code.txt"), "A\n").unwrap();
         let a = commit(&seed, "A");
         fs::write(seed.join("code.txt"), "B\n").unwrap();
         let b = commit(&seed, "B");
         command(
-            temporary.path(),
+            &directory,
             &[
                 "clone",
                 "-q",
@@ -308,6 +309,53 @@ fn discovery_stops_at_component_git_boundary_and_accepts_subdirectory_root() {
 }
 #[cfg(unix)]
 #[test]
+fn baseline_reads_accept_ancestor_aliases_for_root_and_subdirectory_workspaces() {
+    use std::os::unix::fs::symlink;
+    let f = Fixture::new(true);
+    let nested = f.root.join("engineering");
+    fs::create_dir_all(&nested).unwrap();
+    fs::write(
+        nested.join(MANIFEST),
+        "version = 1\nrepositories_dir = \"vendor\"\n",
+    )
+    .unwrap();
+    fs::write(nested.join("evidence.txt"), "nested source\n").unwrap();
+    let head = commit(&f.root, "Nested workspace");
+    let prefix = f.root.parent().unwrap().join("prefix-alias");
+    symlink(f.root.parent().unwrap(), &prefix).unwrap();
+    for relative in ["root", "root/engineering"] {
+        let canonical = f.root.parent().unwrap().join(relative);
+        let alias = prefix.join(relative);
+        assert_eq!(Workspace::open(&alias).unwrap().root, canonical);
+        assert_eq!(
+            PathBuf::from(reqvire_workspace::git::find_root(&alias).unwrap()),
+            f.root
+        );
+        assert_eq!(
+            reqvire_workspace::service::effective_root(&alias).unwrap(),
+            canonical
+        );
+        let current = WorkspaceComposition::load(&canonical, MANIFEST.into()).unwrap();
+        let expected = baseline::read(&canonical, &current, "HEAD").unwrap();
+        let observed = baseline::read(&alias, &current, "HEAD").unwrap();
+        assert_eq!(observed.composition, expected.composition);
+        assert_eq!(observed.files, expected.files);
+        assert!(observed
+            .files
+            .keys()
+            .all(|path| path.starts_with(&canonical)));
+        if relative.ends_with("engineering") {
+            assert!(observed.files.contains_key(&canonical.join("evidence.txt")));
+            assert!(!observed.files.contains_key(&f.root.join(MANIFEST)));
+        }
+    }
+    assert_eq!(command(&f.root, &["rev-parse", "HEAD"]), head);
+    assert_eq!(command(&f.root, &["status", "--porcelain"]), "");
+    assert_eq!(command(&f.component(), &["rev-parse", "HEAD"]), f.a);
+}
+
+#[cfg(unix)]
+#[test]
 fn portable_prefix_alias_is_accepted_but_component_symlinks_are_rejected() {
     use std::os::unix::fs::symlink;
     let f = Fixture::new(false);
@@ -350,6 +398,16 @@ fn xml_to_native_migration_preserves_linked_git_directory_and_supports_old_basel
     assert_eq!(old.composition.projects[0].commit, f.a);
     assert!(old.files.contains_key(&component.join("code.txt")));
     assert_eq!(command(&component, &["rev-parse", "HEAD"]), f.a);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::symlink;
+        let prefix = f.root.parent().unwrap().join("prefix-alias");
+        symlink(f.root.parent().unwrap(), &prefix).unwrap();
+        let aliased = baseline::read(&prefix.join("root"), &current, &base).unwrap();
+        assert_eq!(aliased.composition, old.composition);
+        assert_eq!(aliased.files, old.files);
+        assert_eq!(fs::read(component.join(".git")).unwrap(), link);
+    }
     let repeated = f.run(Operation::Migrate {
         source: Some("manifests/default.xml".into()),
     });

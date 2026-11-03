@@ -10,7 +10,8 @@ const OTHER: &str = include_str!("../../../tests/test-cache-integration/fixtures
 
 fn isolated(name: &str, test: impl Future<Output = ()>) {
     if std::env::var("REQVIRE_MCP_CACHE_TEST_CHILD").as_deref() == Ok(name) {
-        let directory = tempfile::tempdir().expect("create temporary test workspace");
+        let directory = reqvire_workspace::paths::temporary_directory()
+            .expect("create temporary test workspace");
         std::env::set_current_dir(directory.path()).expect("change test working directory");
         assert!(Command::new("git")
             .args(["init", "-q"])
@@ -1537,7 +1538,8 @@ async fn owned_http_reads_overlap_writes(commits: bool) {
     // These are correctness checks, so allow slower CI hosts while keeping the
     // read barrier held longer than any individual response deadline.
     const RESPONSE_TIMEOUT: Duration = Duration::from_secs(15);
-    let barrier = tempfile::tempdir().expect("test fixture operation should succeed");
+    let barrier = reqvire_workspace::paths::temporary_directory()
+        .expect("test fixture operation should succeed");
     let real_git = Command::new("sh")
         .args(["-c", "command -v git"])
         .output()

@@ -6,7 +6,7 @@ use std::{fs, path::PathBuf, process::Command};
 // Exercise the same dispatcher used by MCP without depending on an HTTP listener.
 #[test]
 fn contract_reference_tools_preserve_semantics_and_refresh_revisions() {
-    let workspace = tempfile::tempdir().expect("temporary workspace");
+    let workspace = reqvire_workspace::paths::temporary_directory().expect("temporary workspace");
     struct RestoreDirectory(PathBuf);
     impl Drop for RestoreDirectory {
         fn drop(&mut self) {

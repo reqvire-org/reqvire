@@ -5,7 +5,7 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 
 ## Workspace Management Decisions
 
-Persistent project decisions, updated with the user on 2026-11-02:
+Persistent project decisions, updated with the user on 2026-11-03:
 
 - The native target is one tracked reqvire-workspace.toml at the effective workspace root, including a subdirectory root. Required repositories_dir configures the checkout parent; never hardcode repositories. Each declaration identifies URL/path, a configured tracking ref and an exact commit pin. The owning repository/branch is the source of truth; it may contain all, some or none of the model.
 - Native runtime uses the reqvire-workspace crate and reqvire-workspace.toml. Repo XML is read only for explicit migration and older change-impact baselines; it is not a live workspace fallback. WorkspacesPlan.md and system-model/Workspaces/ describe the contracts. Do not refer to the removed ModelStructure/RepoWorkspaces.md.
@@ -20,6 +20,7 @@ Persistent project decisions, updated with the user on 2026-11-02:
 - Review uses the actual PR baseline and one explicit Git-baseline override. Do not assume origin/main, add another manifest-commit flag or rename change impact analysis.
 - Explicit branch.open admits a clean prepared changed composition; rejected admission preserves accepted reads. No reload/adopt mode is approved. Guarded branch.refresh remains artifact-only. Explicit workspace freeze is a separate validated candidate operation, with no pending accepted edits or unresolved recovery bypass.
 - Keep the Git executable backend and reuse shared git_commands/GitReader plus bounded execution. A Git-library rewrite needs a separate measured reason.
+- Resolve physical existing paths through reqvire_workspace::paths::canonicalize_existing, including roots returned by Git. Create temporary directories/fixtures through paths::temporary_directory so their paths use the physical OS-selected temporary parent. Rust selects the OS filesystem implementation; do not strip platform prefixes manually. Logical model paths and nonexistent destinations remain lexical; keep declared-path comparisons that reject component/source symlinks. Path tests run on Linux, macOS and Windows.
 - Before implementation, update requirements/verifications and capture failing Bash/Git/jq tests. Keep provider/consumer subgraphs independent and use Contract References for documentation/adapters. Preserve existing regression assertions during fixture conversion. Website/shipped skills must be updated with verified runtime behavior; model edits alone do not update them.
 
 ## MBSE Development Workflow

@@ -5,7 +5,8 @@ use std::{fs, path::PathBuf, process::Command};
 
 #[test]
 fn rejected_taxonomy_mutations_preserve_mcp_accepted_state() {
-    let workspace = tempfile::tempdir().expect("test fixture operation should succeed");
+    let workspace = reqvire_workspace::paths::temporary_directory()
+        .expect("test fixture operation should succeed");
     struct RestoreDirectory(PathBuf);
     impl Drop for RestoreDirectory {
         fn drop(&mut self) {

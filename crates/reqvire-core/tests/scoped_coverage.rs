@@ -240,7 +240,8 @@ fn assert_scope_parity(registry: &GraphRegistry, expected_scopes: &Value) -> Val
 fn compact_scopes_preserve_shared_subjects_and_global_contract_evidence() {
     let fixture =
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/test-scoped-coverage");
-    let workspace = tempfile::tempdir().expect("test fixture operation should succeed");
+    let workspace = reqvire_workspace::paths::temporary_directory()
+        .expect("test fixture operation should succeed");
     for directory in ["specifications", "evidence"] {
         fs::create_dir(workspace.path().join(directory))
             .expect("test fixture operation should succeed");
