@@ -62,6 +62,9 @@ are Git-ignored.
 - Lint: `cargo clippy -- -D warnings`
 - Format: `cargo fmt`
 
+Every version bump must include `cargo update`. Review the resulting Cargo.lock
+changes and rerun the required Rust and E2E checks against the updated dependency set.
+
 ### Development Commands
 
 The E2E runner defaults to `target/release/reqvire` and copies that executable
