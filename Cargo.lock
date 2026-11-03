@@ -1009,7 +1009,7 @@ dependencies = [
 
 [[package]]
 name = "o-kernel"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "oxigraph",
  "thiserror",
@@ -1432,7 +1432,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "reqvire"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "assert_fs",
  "camino",
@@ -1460,7 +1460,7 @@ dependencies = [
 
 [[package]]
 name = "reqvire-cli"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "assert_fs",
  "axum",
@@ -1487,7 +1487,7 @@ dependencies = [
 
 [[package]]
 name = "reqvire-workspace"
-version = "1.5.1"
+version = "1.5.2"
 dependencies = [
  "log",
  "quick-xml",

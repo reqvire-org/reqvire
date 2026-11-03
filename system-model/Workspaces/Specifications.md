@@ -20,6 +20,10 @@ Use one native manifest containing all repository declarations. Native TOML incl
 
 ### Repo Workspace Migration Specification
 
+Migration resolves Repo's active entry independently of legacy baseline reconstruction. The default .repo/manifest.xml wrapper selects XML under .repo/manifests/; includes resolve within that manifest checkout. Support Repo's symlink entry within the workspace and an explicit root-owned XML source. A root file with the same name must not shadow the active Repo selection; importing that different source requires an explicit source selection. Preserve the source XML, selector and Git backing metadata. Reject missing or escaping selected sources and include cycles without substituting a different manifest.
+
+This migration rule does not relax baseline provenance. Comparisons against older compositions continue to read versioned root-owned XML from the selected baseline tree and never substitute a live Repo manifest checkout.
+
 #### Details
 Read the selected Repo XML manifest and translate its effective repository declarations to reqvire-workspace.toml at the effective workspace root, then invoke the normal workspace synchronization implementation. Reuse shared parsing, identity and synchronization services; do not create a second checkout engine.
 

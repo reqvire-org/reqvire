@@ -338,6 +338,32 @@ case_migrate() {
     assert_equal "$PIN_A" "$(head_of "$COMPONENT")" 'Post-migration native sync changed pin'
 }
 
+case_migrate_repo_default() {
+    legacy_fixture migrate-repo-default
+    mkdir -p "$ROOT/.repo/manifests/parts"
+    cp "$ROOT/manifests/default.xml" "$ROOT/.repo/manifests/parts/projects.xml"
+    cp "$ROOT/manifests/default.xml" "$CASE_DIR/cached.before.xml"
+    sed "s/$PIN_A/$PIN_B/g" "$ROOT/manifests/default.xml" > "$ROOT/default.xml"
+    git_do -C "$OWNER" rm -q manifests/default.xml
+    commit_all "$OWNER" native-repo-layout
+    rm -f "$ROOT/.repo/manifest.xml"
+    printf '<manifest><include name="default.xml"/></manifest>\n' > "$ROOT/.repo/manifest.xml"
+    printf '<manifest><include name="parts/projects.xml"/></manifest>\n' > "$ROOT/.repo/manifests/default.xml"
+    prepare_backend
+    ok_action migrate '{"from":"repo","dry_run":true}' "$CASE_DIR/preview.json"
+    [[ ! -e "$ROOT/reqvire-workspace.toml" ]] || die 'Native Repo preview wrote source'
+    ok_action migrate '{"from":"repo"}' "$CASE_DIR/migrate.json"
+    assert_file "$CASE_DIR/cached.before.xml" "$ROOT/.repo/manifests/parts/projects.xml"
+    status_projection "$CASE_DIR/status.json"
+    assert_project "$CASE_DIR/status.json" vendor-product/website "$PIN_A" "$PIN_A"
+    cp "$ROOT/reqvire-workspace.toml" "$CASE_DIR/native.before.toml"
+    rm "$ROOT/.repo/manifest.xml"
+    ln -s manifests/default.xml "$ROOT/.repo/manifest.xml"
+    ok_action migrate '{"from":"repo"}' "$CASE_DIR/symlink.json"
+    assert_file "$CASE_DIR/native.before.toml" "$ROOT/reqvire-workspace.toml"
+    assert_equal "$PIN_A" "$(head_of "$COMPONENT")" 'Root copy shadowed Repo selection'
+}
+
 case_migrate_conflict() {
     legacy_fixture migrate-conflict
     require_operation migrate
@@ -474,6 +500,7 @@ case "$CASE_NAME" in
     single) case_single ;;
     invalid-manifest) case_invalid_manifest ;;
     migrate) case_migrate ;;
+    migrate-repo-default) case_migrate_repo_default ;;
     migrate-conflict) case_migrate_conflict ;;
     migration-impact) case_migration_impact ;;
     discovery) case_discovery ;;

@@ -21,10 +21,10 @@ run_case() {
 }
 
 run_case model workspace-boundaries
-for name in status add remove sync latest initial-ref freeze dirty-freeze selection single invalid-manifest migrate migrate-conflict dirty-sync diverged-sync latest-without-ref partial-sync migration-impact; do
+for name in status add remove sync latest initial-ref freeze dirty-freeze selection single invalid-manifest migrate migrate-repo-default migrate-conflict dirty-sync diverged-sync latest-without-ref partial-sync migration-impact; do
     run_case cli "$name"
 done
-for name in discovery status add remove sync latest freeze dirty-freeze migrate readonly dirty-sync diverged-sync latest-without-ref shared-ownership rejected-composition subdirectory; do
+for name in discovery status add remove sync latest freeze dirty-freeze migrate migrate-repo-default readonly dirty-sync diverged-sync latest-without-ref shared-ownership rejected-composition subdirectory; do
     run_case mcp "$name"
 done
 diff -u "$TEST_SCRIPT_DIR/expected/checks.txt" "$TEST_DIR/output/checks.txt" || status=1

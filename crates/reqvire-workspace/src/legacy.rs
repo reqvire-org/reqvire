@@ -291,17 +291,79 @@ fn fetch_url(root: &Path, fetch: &str, name: &str) -> Result<String, Error> {
     Ok(format!("{prefix}{}", parts.join("/")))
 }
 
-/// Resolve the selected versioned XML source and includes into a flat native inventory.
+/// Resolve versioned root-owned XML for historical baseline reconstruction.
 pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Error> {
     let root = canonicalize_existing(root)?;
     if let Some(overlay) = overlay_entries(&root)?.first() {
         return Err(failure(format!("Unsupported Repo local overlay {}; version its effective declarations in the selected XML source before migration",overlay.display())));
     }
     let manifest = source_manifest(&root, selection)?;
+    resolve_sources(&root, &root, selection, manifest)
+}
+
+/// Import Repo's live selection, including its ordinary manifest checkout.
+/// Baseline reconstruction deliberately retains its separate versioned-source rule.
+pub fn resolve_migration(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Error> {
+    let root = canonicalize_existing(root)?;
+    let selection = relative_path(&root, selection)?;
+    if let Some(overlay) = overlay_entries(&root)?.first() {
+        return Err(failure(format!("Unsupported Repo local overlay {}; consolidate its effective declarations in the selected XML source before migration", overlay.display())));
+    }
+    let cached = root.join(".repo/manifests");
+    let (source_root, manifest) = if selection == Path::new(".repo/manifest.xml") {
+        let entry = root.join(&selection);
+        if std::fs::symlink_metadata(&entry)?.file_type().is_symlink() {
+            let target = canonicalize_existing(&entry)?;
+            if let Ok(relative) = target.strip_prefix(&cached) {
+                (cached.clone(), source_path(&cached, relative)?)
+            } else {
+                let relative = target
+                    .strip_prefix(&root)
+                    .map_err(|_| failure("Repo manifest entry escapes workspace"))?;
+                (root.clone(), source_path(&root, relative)?)
+            }
+        } else {
+            let xml = std::fs::read_to_string(&entry)?;
+            let tags = tags(&xml)?;
+            let includes: Vec<_> = tags.iter().filter(|(name, _)| name == "include").collect();
+            if includes.len() != 1
+                || tags
+                    .iter()
+                    .any(|(name, _)| name != "manifest" && name != "include")
+            {
+                return Err(failure("Repo entry must identify one source manifest"));
+            }
+            let manifest = source_path(&cached, Path::new(attr(&includes[0].1, "name")?))?;
+            (cached, manifest)
+        }
+    } else if let Ok(relative) = selection.strip_prefix(".repo/manifests") {
+        (cached.clone(), source_path(&cached, relative)?)
+    } else {
+        (root.clone(), source_path(&root, &selection)?)
+    };
+    if source_root != root && canonicalize_existing(&source_root)? != source_root {
+        return Err(failure("Repo manifest checkout escapes its declared path"));
+    }
+    let source = source_root.join(&manifest);
+    let mut view = resolve_sources(&root, &source_root, &selection, manifest)
+        .map_err(|error| failure(format!("Migration source {}: {error}", source.display())))?;
+    if selection == Path::new(".repo/manifest.xml") {
+        view.inputs
+            .insert(selection.clone(), std::fs::read(root.join(&selection))?);
+    }
+    Ok(view)
+}
+
+fn resolve_sources(
+    root: &Path,
+    source_root: &Path,
+    selection: &Path,
+    manifest: PathBuf,
+) -> Result<WorkspaceComposition, Error> {
     let temporary = crate::paths::temporary_directory()?;
     let mut inputs = BTreeMap::new();
     stage_manifest(
-        &root,
+        source_root,
         &manifest,
         temporary.path(),
         &mut inputs,
@@ -349,9 +411,9 @@ pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Er
             "manifest" | "remote" | "default" => {}
             "project" => {
                 let name = attr(&attrs, "name")?.to_owned();
-                let path = relative_path(&root, Path::new(attrs.get("path").unwrap_or(&name)))?;
-                crate::manifest::relative_path(&root, &path)?;
-                crate::manifest::contained(&root, &path)?;
+                let path = relative_path(root, Path::new(attrs.get("path").unwrap_or(&name)))?;
+                crate::manifest::relative_path(root, &path)?;
+                crate::manifest::contained(root, &path)?;
                 let remote_name = attrs
                     .get("remote")
                     .or_else(|| defaults.get("remote"))
@@ -369,7 +431,7 @@ pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Er
                     .get("upstream")
                     .cloned()
                     .or_else(|| (!full_commit(&revision)).then(|| revision.clone()));
-                let url = fetch_url(&root, attr(remote, "fetch")?, &name)?;
+                let url = fetch_url(source_root, attr(remote, "fetch")?, &name)?;
                 projects.push(WorkspaceProject {
                     name,
                     path,
@@ -411,13 +473,13 @@ pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Er
                             .or_else(|| (!full_commit(rev)).then(|| rev.clone()));
                     }
                     if let Some(dest) = attrs.get("dest-path") {
-                        p.path = crate::manifest::relative_path(&root, Path::new(dest))?;
+                        p.path = crate::manifest::relative_path(root, Path::new(dest))?;
                     }
                     if let Some(remote) = attrs.get("remote") {
                         let info = remotes
                             .get(remote)
                             .ok_or_else(|| failure("Unknown XML remote"))?;
-                        p.fetch_url = fetch_url(&root, attr(info, "fetch")?, &p.name)?;
+                        p.fetch_url = fetch_url(source_root, attr(info, "fetch")?, &p.name)?;
                         p.remote = info.get("alias").unwrap_or(remote).clone();
                     }
                 }
@@ -434,12 +496,18 @@ pub fn resolve(root: &Path, selection: &Path) -> Result<WorkspaceComposition, Er
             return Err(failure("Duplicate or overlapping XML project paths"));
         }
     }
+    let prefix = source_root
+        .strip_prefix(root)
+        .map_err(|_| failure("Manifest source root escapes workspace"))?;
     Ok(WorkspaceComposition {
         selection: selection.to_owned(),
-        manifest,
+        manifest: prefix.join(manifest),
         repositories_dir: ".".into(),
         projects,
-        inputs,
+        inputs: inputs
+            .into_iter()
+            .map(|(path, bytes)| (prefix.join(path), bytes))
+            .collect(),
         ..WorkspaceComposition::default()
     })
 }

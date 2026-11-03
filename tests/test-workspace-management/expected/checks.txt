@@ -11,6 +11,7 @@ PASS cli/selection
 PASS cli/single
 PASS cli/invalid-manifest
 PASS cli/migrate
+PASS cli/migrate-repo-default
 PASS cli/migrate-conflict
 PASS cli/dirty-sync
 PASS cli/diverged-sync
@@ -26,6 +27,7 @@ PASS mcp/latest
 PASS mcp/freeze
 PASS mcp/dirty-freeze
 PASS mcp/migrate
+PASS mcp/migrate-repo-default
 PASS mcp/readonly
 PASS mcp/dirty-sync
 PASS mcp/diverged-sync

@@ -319,7 +319,7 @@ impl Workspace {
         let mut view=match &operation {
             Operation::Migrate{source}=>{
                 let source=source.clone().unwrap_or_else(||PathBuf::from(".repo/manifest.xml"));
-                let old=crate::legacy::resolve(&self.root,&source)?;
+                let old=crate::legacy::resolve_migration(&self.root,&source)?;
                 source_guards.extend(old.inputs.clone());
                 let mut converted=toml_edit::DocumentMut::new();
                 converted["version"]=toml_edit::value(1);

@@ -37,7 +37,8 @@ Executable entry: tests/run_tests.sh test-workspace-management; the focused Bash
 Convert selected Repo XML to the native root TOML and synchronize through the ordinary workspace operation.
 
 #### Details
-- Use local XML remote/default/project declarations with a full component pin and upstream tracking ref. CLI discovers the default Repo entry; MCP can select an explicit source in an admitted context.
+- Use local XML remote/default/project declarations with a full component pin and upstream tracking ref. Cover the ordinary .repo/manifest.xml include wrapper, a symlink entry and included files under .repo/manifests/ without a root XML copy. A conflicting root default.xml must not shadow the active Repo selection. Cover explicit root-owned XML separately; CLI and MCP use the same converter. Missing selected cached XML, escaping sources and include cycles fail without fallback or native output.
+- Preserve all source XML, selector bytes, component HEADs and Git links during preview. On apply, use the selected composition through ordinary synchronization. Retain baseline regressions proving that live cached XML cannot replace versioned sources from a selected older root commit.
 - Preview preserves the absence of native TOML and existing component HEAD. Apply writes TOML at the effective root, preserves XML and checkout paths, records the selected pin/ref, and creates no root commit. Subsequent native sync reproduces that pin.
 - A conflicting native target must fail without overwriting it or changing the component HEAD.
 - Shared crate XML tests cover include/default normalization, source/cache authority, unsupported input, repeated equivalent conversion and checkouts whose .git file points to independent backing storage. Migration is conversion plus shared sync; no separate backing-store conversion or cleanup workflow is required.

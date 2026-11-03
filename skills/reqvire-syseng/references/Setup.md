@@ -39,7 +39,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --version
 For reproducible runtime behavior, set `REQVIRE_NPX_PACKAGE` before starting the assistant:
 
 ```bash
-export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@1.5.0
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@1.5.2
 ```
 
 Use the intended workspace root for validation and MCP startup. Model-syntax migration remains

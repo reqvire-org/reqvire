@@ -126,9 +126,9 @@ This review verifies the documented worktree and publication workflow against im
 
 Verify both model-bearing and manifest-only central repository examples use the same root-owned source manifest branch and PR. The native TOML manifest remains tracked outside ignored derived workspace administration; examples do not create a separate manifest lane, cached-manifest commit/PR or manual root self-association. External-work instructions update tracked source pins before explicit admission.
 
-Follow CLI status/add/remove/sync/freeze/migration and corresponding MCP workspace instructions as documented, including a root already using repositories for ordinary code, a manifest-only owner and a subdirectory workspace. Verify that external freeze does not conflict with a running MCP owner and that component/root commits and PRs retain their established order.
+Follow CLI status/add/remove/sync/freeze and corresponding MCP workspace instructions as documented, including a root already using repositories for ordinary code, a manifest-only owner and a subdirectory workspace. Verify that external freeze does not conflict with a running MCP owner and that component/root commits and PRs retain their established order.
 
-Check the documented difference between tracking ref and exact pin: normal sync reproduces pins, explicit latest advances them, freeze preserves refs and removal keeps checkouts. Walk through XML conversion to native root TOML followed by ordinary sync. Workspace migration must not be confused with CLI-only model-syntax migration or model-less MCP startup.
+Check the documented difference between tracking ref and exact pin: normal sync reproduces pins, explicit latest advances them, freeze preserves refs and removal keeps checkouts. Walk through migration instructions in README’s latest-release section and confirm the User Guide contains no migration sections. Workspace migration must not be confused with CLI-only model-syntax migration or model-less MCP startup.
 
 #### Metadata
   * type: demonstration-verification

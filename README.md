@@ -32,13 +32,13 @@ Use Reqvire to:
 - inspect traceability, coverage, and change impact
 - expose structured engineering context to AI workflows without exporting a separate model
 
-## What's new in 1.5.0
+## What's new in 1.5.2
 
-- **MCP model authoring (breaking change).** Typed MCP tools replace CLI authoring
-  commands and their previews. Accepted mutations validate the model and persist
-  canonical formatting. Start `reqvire mcp --enable-mutations` to author models.
-  Use `reqvire.format` for formatting and `reqvire.lint` with `fix: true` for safe
-  lint repair. Inspection remains available without mutation permission.
+- **Repo migration and portable paths.** Migration reads the normal
+  `.repo/manifest.xml` entry and its sources/includes under `.repo/manifests/`;
+  no root XML copy is required. An explicit `--source FILE` selects a different
+  XML source. Shared path and temporary-directory handling fixes macOS prefix
+  mismatches, with path checks on Linux, macOS and Windows.
 - **Branch-based MCP tools (breaking change).** Tool contract version 5 uses
   `reqvire.branch.list`, `reqvire.branch.create`, `reqvire.branch.open`,
   `reqvire.branch.close`, and `reqvire.branch.refresh` for both single repositories
@@ -57,6 +57,18 @@ Use Reqvire to:
   Available PR context selects the target's merge-base; otherwise supply an
   explicit baseline. Select `HEAD` for pending changes. Analysis never fetches
   or synchronizes repositories. See [multi-repository models](#multi-repository-models).
+
+For an existing Google Repo workspace, preview conversion and then apply it:
+
+```bash
+reqvire workspace migrate --from repo --dry-run
+reqvire workspace migrate --from repo
+```
+
+This reads `.repo/manifest.xml` and its selected sources under `.repo/manifests/`.
+Use `--source FILE` to import a different XML, such as a newer root manifest.
+Review and commit the generated `reqvire-workspace.toml`. Existing XML and Git
+backing storage are preserved.
 
 The CLI retains validation, lint inspection, discovery, coverage, reports,
 exports, managed-query inspection, and server startup. Migration remains
@@ -153,18 +165,6 @@ For external work, commit components, preview/apply CLI freeze without a live
 MCP owner, and commit the pins with related root work before full validated
 `branch.open`. The owning MCP context can explicitly freeze committed external
 state through candidate validation. Rejected candidates retain accepted reads.
-
-Convert an existing Repo workspace with:
-
-```bash
-reqvire workspace migrate --from repo --dry-run
-reqvire workspace migrate --from repo
-```
-
-This reads selected XML, writes native TOML into the effective root and runs
-normal sync, preserving checkouts and their Git metadata. Source XML remains
-available. A pre-conversion comparison baseline can read its versioned XML
-through the shared workspace reader; analysis never fetches or synchronizes.
 
 CLI, MCP and Explorer use the same combined model and workspace-relative
 identifiers. Select the actual PR baseline or use the sole explicit

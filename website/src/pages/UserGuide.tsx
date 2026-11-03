@@ -155,19 +155,6 @@ git commit -m "Record component changes and product pins"`}</CodeBlock>
           requirements, checks and pages needing review across repositories.
           A remote URL alone does not load another model or its history.
         </p>
-        <h3 className="text-lg font-semibold text-zinc-900 mt-6 mb-3">Migrating a Repo Workspace</h3>
-        <CodeBlock>{`reqvire workspace migrate --from repo --dry-run
-reqvire workspace migrate --from repo`}</CodeBlock>
-        <p className="text-zinc-600 mb-4">
-          Migration reads the selected Repo XML, writes native TOML into the
-          effective root, then runs normal sync. Existing checkouts and Git
-          metadata remain in place. Use <code>--source FILE</code> for an explicit
-          XML source. Preview writes nothing; a conflicting native manifest is
-          not overwritten. This differs from CLI <code>migrate</code>, which
-          upgrades model syntax before validated MCP startup.
-          Supported XML includes and defaults are flattened into the one native
-          manifest. Unsupported XML elements and Repo local overlays fail explicitly.
-        </p>
       </Section>
 
       <Section title="Core Commands">
@@ -319,17 +306,6 @@ reqvire lint
 reqvire lint --fixable
 reqvire lint --auditable
 reqvire lint --json --output reports/lint.json`}</CodeBlock>
-      </Section>
-
-      <Section title="Migrating Existing Models">
-        <p className="text-zinc-600 mb-4">
-          Model-syntax migration remains CLI-only. MCP validates the model before starting,
-          so migrate incompatible source before launching an MCP server.
-          The migrate command previews changes by default; add --fix to apply them.
-        </p>
-        <CodeBlock>{`reqvire migrate
-reqvire migrate --fix
-reqvire validate`}</CodeBlock>
       </Section>
 
       <Section title="Search and Collection">

@@ -367,6 +367,72 @@ fn portable_prefix_alias_is_accepted_but_component_symlinks_are_rejected() {
     assert!(Workspace::open(&f.root).is_err());
 }
 #[test]
+fn migration_reads_repo_checkout_and_includes_without_a_root_copy() {
+    let f = Fixture::new(true);
+    command(&f.root, &["rm", "-q", MANIFEST]);
+    commit(&f.root, "Before native migration");
+    let sources = f.root.join(".repo/manifests");
+    fs::create_dir_all(sources.join("parts")).unwrap();
+    let entry = "<manifest><include name=\"default.xml\"/></manifest>\n";
+    fs::write(f.root.join(".repo/manifest.xml"), entry).unwrap();
+    let manifest = format!("<manifest><remote name=\"local\" fetch=\"file://{}/\"/><default remote=\"local\" revision=\"refs/heads/main\"/><include name=\"parts/projects.xml\"/></manifest>\n", f.remote.parent().unwrap().display());
+    let project = format!("<manifest><project name=\"remote.git\" path=\"external/site\" revision=\"{}\" upstream=\"refs/heads/main\"/></manifest>\n",f.a);
+    fs::write(sources.join("default.xml"), &manifest).unwrap();
+    fs::write(sources.join("parts/projects.xml"), &project).unwrap();
+    let preview = Workspace::open(&f.root)
+        .unwrap()
+        .prepare(Operation::Migrate { source: None }, true, &[])
+        .unwrap()
+        .accept();
+    assert!(preview.after.contains(&f.a));
+    assert!(!f.root.join(MANIFEST).exists());
+    f.run(Operation::Migrate { source: None });
+    assert!(String::from_utf8(f.bytes()).unwrap().contains(&f.a));
+    assert_eq!(command(&f.component(), &["rev-parse", "HEAD"]), f.a);
+    assert_eq!(
+        fs::read_to_string(f.root.join(".repo/manifest.xml")).unwrap(),
+        entry
+    );
+    assert_eq!(
+        fs::read_to_string(sources.join("default.xml")).unwrap(),
+        manifest
+    );
+    assert_eq!(
+        fs::read_to_string(sources.join("parts/projects.xml")).unwrap(),
+        project
+    );
+
+    let alternate = manifest
+        .replace(
+            "<include name=\"parts/projects.xml\"/>",
+            &project.replace("<manifest>", "").replace("</manifest>", ""),
+        )
+        .replace(&f.a, &f.b);
+    fs::write(f.root.join("default.xml"), alternate).unwrap();
+    f.run(Operation::Migrate { source: None });
+    assert_eq!(command(&f.component(), &["rev-parse", "HEAD"]), f.a);
+    #[cfg(unix)]
+    {
+        fs::remove_file(f.root.join(".repo/manifest.xml")).unwrap();
+        std::os::unix::fs::symlink("manifests/default.xml", f.root.join(".repo/manifest.xml"))
+            .unwrap();
+        f.run(Operation::Migrate { source: None });
+        assert_eq!(command(&f.component(), &["rev-parse", "HEAD"]), f.a);
+    }
+    fs::remove_file(sources.join("parts/projects.xml")).unwrap();
+    let original = f.bytes();
+    let error = Workspace::open(&f.root)
+        .unwrap()
+        .prepare(Operation::Migrate { source: None }, false, &[])
+        .err()
+        .expect("selected include is missing")
+        .to_string();
+    assert!(error.contains("parts/projects.xml"), "{error}");
+    assert_eq!(f.bytes(), original);
+    assert_eq!(command(&f.component(), &["rev-parse", "HEAD"]), f.a);
+}
+
+#[test]
 fn xml_to_native_migration_preserves_linked_git_directory_and_supports_old_baseline() {
     let f = Fixture::new(true);
     let component = f.component();
