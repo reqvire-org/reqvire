@@ -12,7 +12,7 @@ import {
   type ReactFlowInstance,
 } from "@xyflow/react";
 import { flowCanvasClasses } from "../graphs/FlowCanvasSkin/FlowCanvasSkin";
-import { RouteFrame, RouteLayout } from "../shell";
+import { RouteFrame, RouteLayout } from "../shell/RouteFrame";
 import { WorkspaceShell } from "../content/WorkspaceShell";
 import { useLatestRef } from "../../hooks/useLatestRef";
 import {

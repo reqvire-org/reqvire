@@ -6,7 +6,7 @@ import { BarMeterFill, ConicSwatch, DonutMeter, TokenSwatch } from "../../compon
 import { ElementIcon } from "../../components/data/ElementIcon";
 import { TypeBadge } from "../../components/data/TypeBadge";
 import type { DesignSystemColorToken } from "../../palette";
-import { RouteLayout, RoutePanel, type RouteLayoutProps, type RoutePanelProps } from "../shell";
+import { RouteLayout, RoutePanel, type RouteLayoutProps, type RoutePanelProps } from "../shell/RouteFrame";
 
 const tracePanelBaseUX = css`
   --ux-trace-meta-grid-min-w: var(--space-trace-meta-grid-min-w);

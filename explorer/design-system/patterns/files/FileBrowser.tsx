@@ -15,7 +15,7 @@ import {
   TableViewport,
 } from "../../components/data/Table";
 import { TypeBadge } from "../../components/data/TypeBadge";
-import { RouteLayout, RoutePanel } from "../shell";
+import { RouteLayout, RoutePanel } from "../shell/RouteFrame";
 
 export type FileBrowserLayout = "list" | "grid";
 export type FileBrowserMode = FileBrowserLayout | "graph" | "flow";

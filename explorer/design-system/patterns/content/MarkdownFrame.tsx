@@ -5,6 +5,14 @@ export type MarkdownFrameVariant = "detail" | "preview";
 
 export const MARKDOWN_TABLE_WRAP_CLASS = "ux-markdown-table-wrap";
 
+/** The class a highlighted node of an interactive diagram carries. */
+export const MARKDOWN_DIAGRAM_NODE_HIGHLIGHT_CLASS = "is-diagram-node-highlighted";
+
+/** Sizes an interactive diagram's frame to the height measured for it, in pixels. */
+export function setMarkdownDiagramHeight(frame: HTMLElement, height: number): void {
+  frame.style.setProperty("--ux-markdown-diagram-height", `${height}px`);
+}
+
 export interface MarkdownFrameProps extends Omit<(HTMLAttributes<HTMLDivElement> & { className?: string }), "style"> {
   variant?: MarkdownFrameVariant;
   children?: ComponentChildren;
@@ -71,6 +79,18 @@ const markdownBaseUX = css`
   .mermaid + h3,
   .mermaid + h4 {
     margin-top: var(--space-8);
+  }
+
+  /* An interactive diagram fills a frame sized to its measured height. */
+  .mermaid-interactive {
+    min-height: 0;
+    height: var(--ux-markdown-diagram-height, auto);
+  }
+
+  .mermaid-interactive svg {
+    max-width: none;
+    width: 100%;
+    height: 100%;
   }
 
   .diagram-nav-buttons {
@@ -236,6 +256,10 @@ const markdownSkinX = css`
 
   .mermaid {
     background: var(--bg-surface);
+  }
+
+  .mermaid-interactive .is-diagram-node-highlighted {
+    filter: var(--filter-highlight-glow);
   }
 
   .diagram-nav-buttons {

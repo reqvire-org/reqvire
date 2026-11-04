@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { Icon } from "../../components/core/Icon";
 import { ElementIcon } from "../../components/data/ElementIcon";
 import { TreeItem } from "../../components/navigation/TreeItem";
-import { PaneTree, PaneTreeNode, PaneSearchForm } from "../side-pane";
+import { PaneTree, PaneTreeNode } from "../side-pane/PaneTree";
+import { PaneSearchForm } from "../side-pane/PaneControls";
 
 export interface CoverageNavigationScope {
   identifier: string;

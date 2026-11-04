@@ -57,12 +57,12 @@ shared ownership and tooling rules belong to the ADS tooling contract.
   the owner-local README. Toast's Sonner notice stays in `components/core/toast/`.
 
 MCP guarded editing is enabled in the repository `.mcp.json`. Discover units with
-`ads_units`, read targeted source ranges, and submit one owner as a Git unified
-patch through `ads_apply_patch`. Mandatory architecture, registered lint, type and
-preview-build checks run before application. Other editors must run the same
-normal project gates. Use `ads_capture` with a discovered scenario ID for an
-on-demand screenshot. A guarded dry run with `screenshot: true` and explicit
-`captures` selections produces current/candidate images without applying source.
+`ads_units`, then edit through a draft: `ads_create_draft` for the owners, `ads_update_draft`
+with a Git unified patch, `ads_show_draft` to render it beside the accepted version, and
+`ads_accept` for the reviewed revision (`dryRun: true` runs every check without writing).
+Mandatory architecture, registered lint, type and preview-build checks run before
+anything is applied. Other editors must run the same normal project gates. Use
+`ads_capture` with a discovered scenario ID, or a draft, for an on-demand screenshot.
 Read the returned PNG resources and freshness metadata; images do not replace
 behavior checks. Load the served `ads://guides/captures` reference for the full
 contract. Local ADS development setup is in [../README.md](../README.md).

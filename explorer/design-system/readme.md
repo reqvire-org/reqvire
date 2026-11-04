@@ -78,14 +78,17 @@ records Reqvire-specific conventions; shared architecture belongs to the
 [ADS tooling contract](https://github.com/reqvire-org/ads/blob/main/docs/ADS.md).
 
 [ds.config.json](../ds.config.json) identifies this directory and the public
-`@ds` alias. It registers Toast usage rules and the Sonner import restriction,
-measured-renderer file/property boundaries, and documented non-state component
-variables. Changes to those exceptions belong in that configuration.
+`@ds` alias. It registers Toast usage rules and the Sonner import restriction. Measured
+renderer properties and documented non-state component variables are granted by the
+owning unit's `<Owner>.ads.contract.ts` (`styles.writes`, `customization`); changes to
+those exceptions belong in that owner's contract.
 See [Explorer build and commands](../README.md#build--embed-flow) for validation
 and running the showcase.
 
-- [index.ts](index.ts) exposes components, patterns, palette helpers and types.
-- [styles.css](styles.css) is the foundation entry, imported by `src/main.tsx`.
+- [index.ts](index.ts) exposes components, patterns, palette helpers and types. ADS
+  generates it from each owner's `<Owner>.ads.exports.ts`; declare public names there and
+  never edit the barrel.
+- [styles.css](styles.css) is the foundation entry ADS generates from the token sheets, imported by `src/main.tsx`.
   Token values and theme definitions live in [tokens/](tokens/).
 - [palette.ts](palette.ts) maps model element types to semantic roles and colors.
 - [patterns/readme.md](patterns/readme.md) identifies the product layers; the
@@ -192,13 +195,13 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semant
 - `assets/logo-mark.svg` — 200x200 source brand mark (reconstruction); the `BrandMark` component references it and favicon/app-icon PNG/ICO outputs are generated from this file.
 - `SKILL.md` — Agent-Skill manifest for downloading this system into Claude Code.
 
-**Components** (`components/<group>/` — TSX source exported via `index.ts`)
+**Components** (`components/<group>/` — TSX source, each publishing through its own `.ads.exports.ts`)
 - `core/` — **Toast**, **Toaster**, **toast**, **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
 - `data/` — **CodeRef**, **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
 - `controls/` — **ToggleRow**, **SegmentedControl**, **SearchInput**, **Tabs**
 - `navigation/` — **TreeItem**, **Breadcrumb**, **SidebarSection**
 
-**Product patterns** (`patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
+**Product patterns** (`patterns/<group>/` — reusable UX/product patterns, each publishing through its own `.ads.exports.ts`)
 - `shell/` — **AppShell**, **ShellPane**, **PaneResizer**, **ShellMain**, **RouteFrame**, **RouteLayout**, **RoutePanel**
 - `chrome/`, `files/`, `resources/`, `search/`, `reports/`, `side-pane/`, `detail/`, `content/`, `feedback/` — reusable UX/product visual patterns
 

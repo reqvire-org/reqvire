@@ -1,6 +1,6 @@
 import { type ComponentChildren } from "preact";
 import { css, cx } from "@linaria/atomic";
-import { RoutePanel } from "../shell";
+import { RoutePanel } from "../shell/RouteFrame";
 
 export interface WorkspaceShellProps {
   rootLabel: ComponentChildren;

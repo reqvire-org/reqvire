@@ -15,6 +15,8 @@ import {
   InlineConceptReference,
   MARKDOWN_TABLE_WRAP_CLASS,
   MarkdownFrame,
+  MARKDOWN_DIAGRAM_NODE_HIGHLIGHT_CLASS,
+  setMarkdownDiagramHeight,
   RendererNotice,
   observePalette,
   paletteContext,
@@ -729,11 +731,9 @@ function initializeMermaidInteraction(container: HTMLDivElement, sourceCode: str
     );
   };
 
+  // MarkdownFrame sizes the SVG to fill the interactive frame.
   svg.removeAttribute("width");
   svg.removeAttribute("height");
-  svg.style.maxWidth = "none";
-  svg.style.width = "100%";
-  svg.style.height = "100%";
 
   requestAnimationFrame(() => {
     const containerWidth = container.clientWidth || 720;
@@ -744,10 +744,9 @@ function initializeMermaidInteraction(container: HTMLDivElement, sourceCode: str
     const naturalHeight = Math.ceil(baseViewBox.height + 24);
     const desiredHeight = Math.min(Math.max(minViewportHeight, naturalHeight), viewportHeight);
     const largeDiagram = baseViewBox.width > containerWidth || naturalHeight > desiredHeight;
-    container.style.minHeight = "0";
-    container.style.height = largeDiagram
-      ? `${desiredHeight}px`
-      : `${Math.min(Math.max(minViewportHeight, naturalHeight), viewportHeight)}px`;
+    setMarkdownDiagramHeight(container, largeDiagram
+      ? desiredHeight
+      : Math.min(Math.max(minViewportHeight, naturalHeight), viewportHeight));
 
     if (fitInsideContainer) {
       initialViewBox = { ...baseViewBox };
@@ -955,14 +954,12 @@ function enableMermaidEdgeHighlight(svg: SVGSVGElement) {
   const edges = [...svg.querySelectorAll<SVGPathElement>("path.flowchart-link, .edges path")];
   const clear = () => {
     edges.forEach((edge) => edge.classList.remove("edge-highlighted"));
-    nodes.forEach((node) => {
-      node.style.filter = "";
-    });
+    nodes.forEach((node) => node.classList.remove(MARKDOWN_DIAGRAM_NODE_HIGHLIGHT_CLASS));
   };
   nodes.forEach((node) => {
     node.addEventListener("mouseenter", () => {
       clear();
-      node.style.filter = "var(--filter-highlight-glow)";
+      node.classList.add(MARKDOWN_DIAGRAM_NODE_HIGHLIGHT_CLASS);
       edges.forEach((edge) => edge.classList.add("edge-highlighted"));
     });
     node.addEventListener("mouseleave", clear);
