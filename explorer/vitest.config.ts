@@ -14,7 +14,7 @@ export default defineConfig({
     dedupe: ["preact"],
     alias: [
       ...preactAliases,
-      { find: "@ds/review", replacement: path.resolve(__dirname, "./design-system/review/index.ts") },
+      { find: "@ds/review", replacement: path.resolve(__dirname, "./design-system/review/index.ads.review.ts") },
       { find: "@ds", replacement: path.resolve(__dirname, "./design-system/index.ts") },
       { find: "@", replacement: path.resolve(__dirname, "./src") },
     ],
@@ -30,5 +30,8 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.{ts,tsx}", "design-system/**/*.ads.{test,spec}.{ts,tsx}"],
     exclude: ["**/node_modules/**", "**/*.ads.behavior.spec.ts"],
     setupFiles: ["src/test/setupCssTokens.ts"],
+    // Scenarios rendered by integration tests use ADS preview framing, whose
+    // module imports its stylesheet; let Vite transform it instead of Node.
+    server: { deps: { inline: ["@reqvire-org/ads"] } },
   },
 });

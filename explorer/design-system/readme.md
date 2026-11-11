@@ -239,15 +239,16 @@ Optional `<Owner>.ads.contract.ts` files register actual owner token, paint or
 behavior contracts. This project has no legacy JSON owner manifests to convert;
 shared token definitions stay in CSS. `ds.config.json` remains tooling
 configuration, and `.ads.fixture.json` remains ordinary example data.
-Token fixtures declare literal `{ token, property, probe }` bindings for all real
-foundation names and use the project-owned `TokenSamples` review renderer. The App checks
-the rendered effects against those probes; computed CSS supplies values. `composition/Workspace/`
+ADS renders the Tokens views from the token sheets; `tokens/catalog.ads.json` groups
+literal `{ token, property, probe }` bindings for the foundation names, and the App
+checks the rendered effects against those probes. `composition/Workspace/`
 contains `Workspace.ads.scenario.tsx`, its fixtures and `Workspace.ads.helpers.tsx`
 for the larger fixture workspace and reusable local state/callback adapter.
 Focused screen/navigation entries supply their own view/mode through local fixtures.
-The compiler adapter is `showcase/mcp/main.tsx`; it unmounts the native root on
-switch/rebuild. `scripts/build-mcp-previews.mjs` reuses production Vite, Linaria,
-framework aliases and runtime guards, while keeping renderers/workers lazy.
+The compiler adapter is `showcase/mcp/main.ads.mount.tsx`; it renders into ADS's
+preview frame and unmounts the native root on switch/rebuild. ADS's managed
+compiler (`ads compile .`, or the MCP/showcase runtime) builds the previews,
+keeping renderers/workers lazy.
 
 Every public renderable export and declared token must have reachable scenario
 coverage. Preview metadata does not establish behavior: inspect standalone views,
@@ -256,7 +257,8 @@ Full application providers, routes and network/store tests belong under `src/tes
 
 ## Development review UI
 
-Demo framing and token renderers live in `review/`, imported through `@ds/review`.
+Project-specific demonstration arrangements live in `review/` as `.ads.review.*`
+helpers, imported through `@ds/review`; generic framing comes from ADS's preview API.
 They are absent from the production public entry and product catalogue. Scenarios
 render the actual components/patterns with fixture inputs. Application code must
 not import review implementations, types or styles. Preview mounting stays inside

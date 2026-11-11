@@ -24,10 +24,11 @@ shared ownership and tooling rules belong to the ADS tooling contract.
   Scenarios use public `@ds` entities and zero-input default views, with literal
   `scenario` metadata. Helpers use `.ads.helpers.ts[x]`; tests use `.ads.test.ts[x]`.
   Optional static owner registration lives in `.ads.contract.ts`; reusable demo
-  framing lives in development-only `review/` and is imported from `@ds/review`.
-- Token fixtures declare literal `{ token, property, probe }` samples and render
-  `TokenSamples`. Keep bindings and coverage complete; every sample must visibly
-  apply the real token to its declared property. The App checks rendered effects.
+  arrangements live in development-only `review/` (`.ads.review.*` with
+  `.ads.exports.ts` sidecars) and are imported from `@ds/review`.
+- ADS renders the Tokens views from the token sheets and `tokens/catalog.ads.json`,
+  whose groups hold literal `{ token, property, probe }` bindings. Keep bindings and
+  coverage complete; do not author token scenarios or renderers.
 - Shared document presentation belongs to the Linaria `documentClasses()` helper
   in `patterns/shell/DocumentSkin.ts`. Both browser mounts apply it to the body,
   including portals; keep its base cascade layer so component styles win.
@@ -40,7 +41,8 @@ shared ownership and tooling rules belong to the ADS tooling contract.
 - The showcase shell belongs to ADS tooling. Do not add project browser pages,
   navigation replicas or a second preview pipeline. `npm run dev:showcase` starts
   its MCP runtime and managed compiler. Reuse an existing `ads_status.showcaseUrl`.
-- `showcase/mcp/main.tsx` mounts/unmounts native Preact inside the App iframe.
+- `showcase/mcp/main.ads.mount.tsx` mounts/unmounts native Preact into ADS's
+  `createPreviewRoot` frame and applies `documentClasses()` to the body.
   The outer host never receives project CSS/runtime. Preserve theme updates,
   independently mountable scenarios and complete teardown of listeners, timers,
   portals, graph renderers and workers.

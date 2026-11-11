@@ -26,6 +26,7 @@ const baseUX = css`
     flex: none;
     --ds-token-swatch-size: var(--ds-togglerow-swatch-size, var(--icon-xs));
     width: var(--ds-togglerow-swatch-w, var(--icon-xs));
+    max-width: 100%;
     height: var(--ds-togglerow-swatch-h, var(--icon-xs));
     border-radius: var(--radius-xs);
     background: var(--ds-token-swatch-color, transparent);
@@ -54,7 +55,7 @@ const baseUX = css`
     display: var(--ds-togglerow-meta-display, inline-flex);
     align-items: var(--ds-togglerow-meta-ai, center);
     justify-content: var(--ds-togglerow-meta-jc, center);
-    min-width: var(--ds-togglerow-meta-min-w, var(--space-count-pill-height));
+    min-width: min(100%, var(--ds-togglerow-meta-min-w, var(--space-count-pill-height)));
     height: var(--ds-togglerow-meta-h, var(--space-count-pill-height));
     padding: var(--ds-togglerow-meta-p, 0 var(--control-padding-sm));
     border-radius: var(--ds-togglerow-meta-radius, var(--radius-full));
@@ -229,13 +230,10 @@ export function ToggleRow({
         "ds-togglerow",
         baseUX,
         skinX,
-        line && "ds-togglerow--line",
-        line && skinLineX,
+        line && cx("ds-togglerow--line", skinLineX),
         variant === "filter" && skinFilterX,
-        (isStatic || hasStaticClass) && "ds-togglerow--static",
-        (isStatic || hasStaticClass) && skinStaticX,
-        on && "is-on",
-        !on && "is-off",
+        (isStatic || hasStaticClass) && cx("ds-togglerow--static", skinStaticX),
+        on ? "is-on" : "is-off",
         className,
       )}
       aria-pressed={on}

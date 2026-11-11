@@ -6,7 +6,6 @@
 
 @layer base {
   :root {
-    --font-showcase: system-ui, sans-serif;
   /* Families */
   --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system,
                "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

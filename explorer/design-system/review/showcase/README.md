@@ -1,23 +1,16 @@
-# Showcase frame
+# Showcase demonstration regions
 
-`ShowcaseHeader`, `ShowcaseNavigation`, and `ShowcaseRegion` are public APIs for
-minimal, neutral showcase chrome and predefined example layouts. Import them
-through `@ds`. Fixtures supply content, state, and callbacks; this pattern owns
-CSS and markup. It accepts no arbitrary `style` or `className` props.
+`ShowcaseRegion` is a development review helper (`.ads.review.tsx`) exported
+through `@ds/review` for scenarios only. It offers a finite set of named
+arrangements. Generic page, section, heading, row, column and label framing maps
+to ADS's preview framing (`previewFrameClasses`); Reqvire-specific demonstration
+layouts (shell mocks, pattern cards, tree/sidebar demos) are styled in
+`frame.ads.review.css`. It accepts no arbitrary `style` or `className` props.
 
-The header provides light/dark switching and a minimize button. The showcase app
-applies `data-theme` to the document so patterns, components, and toast portals
-use the same theme. Minimize removes the complete header without replacing
-example content; refresh restores it. Neutral chrome has dedicated token values.
+ADS owns the showcase shell, navigation, theme switching and preview framing;
+the preview mount (`showcase/mcp/main.ads.mount.tsx`) renders into
+`createPreviewRoot` and applies the product document skin.
 
-Pages are Tokens, Components, Patterns, and Mocks. Component groups are examples,
-and mocks compose public DS patterns with local fixture data. Full application
-integration harnesses and their route/store tests live under `src/test/`.
-
-The header/navigation adapts the DS tooling repository's working example:
-https://github.com/reqvire-org/ads/tree/main/design-system/review/showcase
-Its MIT notice is retained in `LICENSE.source.md`. This source is project-owned;
-the installed DS tool does not supply a UI catalogue.
-
-Navigation uses the layers, box, layout-grid, and grid section icons at small size,
-with muted opacity and a subtle neutral active border. It does not use product Tabs.
+Originally adapted from the DS tooling repository's working example:
+https://github.com/reqvire-org/ads. Its MIT notice is retained in
+`LICENSE.source.md`.

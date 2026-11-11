@@ -123,6 +123,7 @@ const itemUX = css`
 const announcementUX = css`
   position: absolute;
   width: var(--border-w);
+  max-width: 100%;
   height: var(--border-w);
   padding: 0;
   margin: 0;

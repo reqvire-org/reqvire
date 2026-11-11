@@ -8,7 +8,7 @@ export interface BadgeProps extends Omit<(HTMLAttributes<HTMLSpanElement> & { cl
 
 const baseUX = css`
   display: inline-flex;
-  min-width: var(--ds-badge-min-w, calc(var(--space-8) + var(--space-1)));
+  min-width: calc(var(--space-8) + var(--space-1));
   height: var(--ds-badge-h, calc(var(--space-8) + var(--space-1)));
   align-items: center;
   justify-content: center;
@@ -37,8 +37,8 @@ const solidSkinX = css`
 
 const dotSkinX = css`
   min-width: 0;
-  width: var(--ds-badge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
-  height: var(--ds-badge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
+  width: calc(var(--space-3) + var(--space-1) / 2);
+  height: calc(var(--space-3) + var(--space-1) / 2);
   padding: 0;
 `;
 

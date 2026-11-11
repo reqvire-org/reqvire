@@ -153,19 +153,6 @@
     --space-graph-side-panel-w: 390px;
     --space-graph-side-panel-max-h: 420px;
     --space-brand-name-nudge-y: 0.5px;
-    --space-showcase-shadow-card-min-w: var(--space-80);
-    --space-showcase-page-max-w: 1240px;
-    --space-showcase-page-wide-max-w: 1480px;
-    --space-showcase-swatch-col-min-w: 130px;
-    --space-showcase-type-label-min-w: 140px;
-    --space-showcase-space-label-min-w: 120px;
-    --space-showcase-mock-card-min-w: 220px;
-    --space-showcase-input-demo-lg-w: 480px;
-    --space-showcase-card-demo-w: 200px;
-    --space-showcase-pane-demo-w: 320px;
-    --space-showcase-shell-demo-h: 680px;
-    --space-showcase-shell-demo-min-h: 560px;
-    --space-showcase-shell-demo-mobile-min-h: 620px;
     --space-left-pane-width-2: 318px;
     --space-current-right-width: 268px;
   }

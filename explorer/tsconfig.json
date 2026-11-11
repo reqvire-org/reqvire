@@ -26,7 +26,7 @@
     "baseUrl": ".",
     "paths": {
       "@ds/review": [
-        "design-system/review/index.ts"
+        "design-system/review/index.ads.review.ts"
       ],
       "@ds": [
         "design-system/index.ts"

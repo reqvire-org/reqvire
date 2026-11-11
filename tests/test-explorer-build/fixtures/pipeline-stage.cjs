@@ -20,7 +20,7 @@ if (name === 'ci') {
 if (process.env.FAIL_STAGE === name || Number(process.env.FAIL_AT) ===
     fs.readFileSync(process.env.TRACE, 'utf8').trim().split('\n').length) process.exit(23);
 if (name === 'app' || name === 'kit') {
-  const dir = name === 'app' ? 'dist' : 'design-system/dist-kit';
+  const dir = name === 'app' ? 'dist' : 'dist-kit';
   fs.mkdirSync(dir, {recursive: true});
   fs.writeFileSync(dir + '/built', 'current artifact');
 }

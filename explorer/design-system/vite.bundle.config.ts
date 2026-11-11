@@ -1,7 +1,8 @@
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import wyw from "@wyw-in-js/vite";
 import { linariaTagResolver } from "@reqvire-org/ads/linaria";
+import { developmentImportGuard } from "@reqvire-org/ads/scenarios/vite";
 import { preactAliases, preactRuntimeGuard } from "../preact.config";
 
 const __dirname = import.meta.dirname;
@@ -10,6 +11,8 @@ export default defineConfig({
   esbuild: { jsx: "automatic", jsxImportSource: "preact" },
   resolve: { alias: preactAliases, dedupe: ["preact"] },
   plugins: [
+    // ADS types this plugin with its own private Vite copy; the plugin API is compatible.
+    developmentImportGuard() as Plugin,
     preactRuntimeGuard(),
     wyw({
       tagResolver: linariaTagResolver,
@@ -18,7 +21,8 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: path.resolve(__dirname, "dist-kit"),
+    // Outside design-system/: ADS 0.4.5 scans every script there, generated output included, and its check fails on it.
+    outDir: path.resolve(__dirname, "../dist-kit"),
     emptyOutDir: true,
     minify: false,
     sourcemap: false,

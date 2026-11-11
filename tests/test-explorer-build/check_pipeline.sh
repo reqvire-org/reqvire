@@ -20,8 +20,7 @@ fixture() {
       .scripts["lint:ds"]="bun stage.cjs lint:ds" |
       .scripts["lint:style"]="bun stage.cjs lint:style" |
       .scripts["assets:ds"]="bun stage.cjs assets:ds" |
-      .scripts["generate:icons"]="bun stage.cjs icons" |
-      .scripts["build:mcp-previews"]="bun stage.cjs previews"
+      .scripts["generate:icons"]="bun stage.cjs icons"
     ' "$root/explorer/package.json" > "$app/package.json"
     printf '{}' > "$app/bun.lock"
     cp "$root/Makefile" "$repo/Makefile"
@@ -55,7 +54,7 @@ composition() {
     calls_equal "$expected"
     local stage path
     for stage in app kit; do
-        if [[ "$stage" == app ]]; then path="$app/dist/built"; else path="$app/design-system/dist-kit/built"; fi
+        if [[ "$stage" == app ]]; then path="$app/dist/built"; else path="$app/dist-kit/built"; fi
         if jq -e --arg stage "$stage" 'index($stage) != null' <<< "$expected" > /dev/null; then
             [[ -e "$path" ]] || fail "$stage output missing"
         else
@@ -127,7 +126,7 @@ expand() {
             hook=$(jq -r --arg name "pre$name" '.scripts[$name] // empty' "$root/explorer/package.json")
             [[ -z "$hook" ]] || expand "$hook"
             case "$name" in
-                lint:ds|lint:style|assets:ds|typecheck|generate:icons|build:ds-bundle|test:ads|test:behavior|build:mcp-previews)
+                lint:ds|lint:style|assets:ds|typecheck|generate:icons|build:ds-bundle|test:ads|test:behavior|build:showcase)
                     printf '%s\n' "$name" ;;
                 *) command=$(jq -er --arg name "$name" '.scripts[$name]' "$root/explorer/package.json"); expand "$command" ;;
             esac
@@ -158,7 +157,7 @@ workflow_stages() {
           all(["lint:ds","lint:style","typecheck","unit","app"][];
             . as $stage | [$stages[] | select(. == $stage)] | length == 1) and
           (index("app") > ([index("lint:ds"),index("lint:style"),index("typecheck"),index("unit")] | max)) and
-          (all(.[]; . != "test:ads" and . != "test:behavior" and . != "build:mcp-previews"))
+          (all(.[]; . != "test:ads" and . != "test:behavior" and . != "build:showcase"))
         ' "$block.json" > /dev/null
         expected_kit=0; [[ "$filename" != pr.yml ]] || expected_kit=1
         jq -e --argjson expected "$expected_kit" '[.[] | select(. == "build:ds-bundle")] | length == $expected' "$block.json" > /dev/null
@@ -199,7 +198,7 @@ record pipeline-check composition check '["lint:ds","lint:style","typecheck"]'
 record pipeline-build:app composition build:app '["icons","app"]'
 record pipeline-build:ds-bundle composition build:ds-bundle '["kit"]'
 record pipeline-build:all composition build:all "$(jq -c '. + ["kit"]' <<< "$built")"
-record pipeline-test:ads composition test:ads '["icons","previews","ads"]'
+record pipeline-test:ads composition test:ads '["lint:ds","assets:ds","icons","ads","ads"]'
 record pipeline-stops-on-failure failures
 record make-dependency-reuse-and-retry make_dependencies
 record ci-builds-and-checks-once workflow_stages
