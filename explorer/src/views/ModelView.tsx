@@ -28,7 +28,7 @@ export function ModelView({ onOpenElement }: { onOpenElement: (id: string) => vo
 function ModelFlowView({ onOpenElement }: { onOpenElement: (id: string) => void }) {
   const ui = useExplorerUiState();
   const { store, elementById, getModelFlowIndex } = useStore();
-  const [scope, setScope] = useState<ModelFlowScope>("downstream");
+  const [scope, setScope] = useState<ModelFlowScope>("upstream");
   const data = useMemo(() => selectModelFlow(getModelFlowIndex(), ui.modelSelectionId, store.project.root_label, scope),
     [getModelFlowIndex, store.project.root_label, ui.modelSelectionId, scope]);
   return <ModelFlowScreen data={data} layoutEngine={flowLayoutEngine} mode={ui.modelMode}
