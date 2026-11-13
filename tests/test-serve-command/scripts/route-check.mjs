@@ -117,6 +117,7 @@ await withBrowser(profile, async ({ evaluate, navigate: navigatePage, rpc }) => 
       return flow?.getAttribute("aria-busy") === "false" && flow.querySelectorAll(".react-flow__node").length > 0;
     });
     await waitFor(ready);
+    if (!await evaluate(() => document.querySelector('[aria-label="Flow direction"] button[aria-label="Top to bottom"]')?.getAttribute('aria-pressed') === 'true')) return false;
     const original = await evaluate(() => [...document.querySelectorAll(".react-flow__node")].map(node => node.dataset.id).sort());
     await evaluate(() => [...document.querySelectorAll('[aria-label="Flow direction"] button')]
       .find(button => button.getAttribute("aria-label") === "Left to right").click());
@@ -138,6 +139,12 @@ await withBrowser(profile, async ({ evaluate, navigate: navigatePage, rpc }) => 
     const members = () => evaluate(() => [...document.querySelectorAll('.react-flow__node')].map(node => node.dataset.id));
     const scope = label => evaluate(label => document.querySelector(`[aria-label="Flow scope"] button[aria-label="${label}"]`).click(), label);
     await select(requirement);
+    await waitFor(async () => {
+      const ids = await members();
+      return await ready() && ids.includes(requirement) && ids.includes(parent) && !ids.includes(verification) && !ids.includes(sibling);
+    });
+    if (!await evaluate(() => document.querySelector('[aria-label="Flow scope"] button[aria-label="Upstream"]')?.getAttribute('aria-pressed') === 'true')) return false;
+    await scope("Downstream");
     await waitFor(async () => {
       const ids = await members();
       return await ready() && ids.includes(requirement) && ids.includes(verification) && !ids.includes(parent) && !ids.includes(sibling);
