@@ -42,9 +42,10 @@ jobs:
       - name: Install Explorer dependencies
         run: cd explorer && bun install --frozen-lockfile
 
-      - name: Build checked Explorer SPA bundle
-        # All Cargo profiles/targets below embed this job's checked bundle.
-        run: cd explorer && bun run build
+      - name: Build Explorer SPA bundle
+        # PR CI owns validation; release jobs only build the production assets.
+        # All Cargo profiles/targets below embed this job's prebuilt bundle.
+        run: cd explorer && bun run build:app
 
       - name: Build host CLI for Rust worker tests
         run: cargo build --release --locked --bin reqvire
@@ -134,7 +135,7 @@ jobs:
         # The Rust binaries already embed this bundle. The npm package also
         # ships the built dist so package contents make the Explorer payload
         # explicit and npm publish fails if the bundle is missing.
-        run: cd explorer && bun run build
+        run: cd explorer && bun run build:app
 
       - name: Download All Archives
         uses: actions/download-artifact@v6
