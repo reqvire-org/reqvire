@@ -65,7 +65,7 @@ impact_cli() {
         result=$?
     fi
     impact_state > "$native_case/after-state.txt"
-    diff -u "$native_case/before-state.txt" "$native_case/after-state.txt"
+    diff -u "$native_case/before-state.txt" "$native_case/after-state.txt" || return 1
     cat "$native_case/impact.out" "$native_case/impact.err" > "$native_case/impact.diagnostic"
     if [[ "$result" != 0 ]]; then cat "$native_case/impact.diagnostic" >&2; fi
     return "$result"
@@ -187,6 +187,154 @@ impact_native() {
     impact_graph "$native_case/impact.out"
     impact_provenance
     test ! -e "$central/.reqvire-composition.json"
+}
+
+impact_dangling_fixture() {
+    local owner=$1 policy=$2
+    mkdir -p "$owner/tools/dev" "$owner/server"
+    printf '{}\n' > "$owner/server/package.json"
+    printf 'server/node_modules/\n' >> "$owner/.gitignore"
+    ln -s ../../server/node_modules "$owner/tools/dev/node_modules"
+    if [[ "$policy" == gitignore ]]; then
+        printf 'tools/dev/\n' >> "$owner/.gitignore"
+    elif [[ "$policy" == reqvireignore && "$owner" == "$central" ]]; then
+        printf 'tools/dev/**\n' >> "$central/.reqvireignore"
+    fi
+    if [[ "$policy" != source ]]; then
+        # A duplicate managed element proves that ordinary loading actually
+        # applies this exclusion, independently of the broken directory link.
+        cat > "$owner/tools/dev/Model.md" <<'EOF'
+# Elements
+
+### Component Capability
+
+Ignored dependency model must not enter the graph.
+
+#### Metadata
+  * type: capability
+---
+EOF
+        ln -s ignored-b.md "$owner/tools/dev/ignored-a.md"
+        ln -s ignored-a.md "$owner/tools/dev/ignored-b.md"
+        git -C "$owner" add -f tools/dev/Model.md tools/dev/ignored-a.md tools/dev/ignored-b.md
+    fi
+    # Tracked entries can still match ignore rules; force staging so this is
+    # historical-source selection rather than an untracked-file-only check.
+    git -C "$owner" add -f tools/dev/node_modules
+    test -L "$owner/tools/dev/node_modules"
+    test ! -e "$owner/tools/dev/node_modules"
+}
+
+impact_dangling() {
+    local key=${1#dangling_} location policy
+    location=${key%%_*}
+    policy=${key#*_}
+    [[ "$key" != "$location" ]] || policy=source
+    # The existing complete graph/provenance assertions must pass before the
+    # incidental symlink is introduced into either repository's history.
+    impact_native
+    local original_base=$impact_base original_alpha=$alpha original_omega=$omega
+    local owner=$central
+    if [[ "$location" == component ]]; then
+        owner="$central/repositories/component"
+        git -C "$owner" checkout -q --detach "$original_alpha"
+        impact_dangling_fixture "$owner" "$policy"
+        alpha=$(impact_commit "$owner" 'Historical incidental dependency symlink')
+        git -C "$owner" checkout -q main
+        impact_dangling_fixture "$owner" "$policy"
+        omega=$(impact_commit "$owner" 'Current incidental dependency symlink')
+    fi
+    git -C "$central" checkout -q --detach "$original_base"
+    if [[ "$location" == root ]]; then
+        impact_dangling_fixture "$owner" "$policy"
+    else
+        sed -i "s/$original_alpha/$alpha/" "$central/reqvire-workspace.toml"
+        if [[ "$policy" == reqvireignore ]]; then
+            printf 'repositories/component/tools/dev/**\n' > "$central/.reqvireignore"
+        fi
+    fi
+    impact_base=$(impact_commit "$central" 'Baseline with incidental dependency symlink')
+    git -C "$central" checkout -q main
+    if [[ "$location" == root ]]; then
+        impact_dangling_fixture "$owner" "$policy"
+    else
+        sed -i "s/$original_omega/$omega/" "$central/reqvire-workspace.toml"
+        if [[ "$policy" == reqvireignore ]]; then
+            printf 'repositories/component/tools/dev/**\n' > "$central/.reqvireignore"
+        fi
+    fi
+    impact_current=$(impact_commit "$central" 'Current composition with incidental dependency symlink')
+    local baseline_owner=$impact_base revision
+    [[ "$location" != component ]] || baseline_owner=$alpha
+    for revision in "$baseline_owner" HEAD; do
+        git -C "$owner" ls-tree "$revision" tools/dev/node_modules | grep -q '^120000 blob '
+    done
+    git -C "$owner" check-ignore server/node_modules/
+    test -z "$(git -C "$owner" ls-tree -r --name-only HEAD -- server/node_modules)"
+    (cd "$central" && "$REQVIRE_BIN" validate)
+    impact_cli native --json
+    impact_graph "$native_case/impact.out"
+    impact_provenance
+}
+
+impact_source_alias_fixture() {
+    mkdir -p "$central/sources"
+    git -C "$central" mv Model.md sources/Model.source
+    ln -s sources "$central/source-alias"
+    ln -s source-alias/Model.source "$central/Model.md"
+}
+
+impact_source_alias() {
+    impact_native
+    git -C "$central" checkout -q --detach "$impact_base"
+    impact_source_alias_fixture
+    impact_base=$(impact_commit "$central" 'Historical model source through directory alias')
+    git -C "$central" checkout -q main
+    impact_source_alias_fixture
+    impact_current=$(impact_commit "$central" 'Current model source through directory alias')
+    (cd "$central" && "$REQVIRE_BIN" validate)
+    impact_native
+}
+
+impact_required_source() {
+    local kind=$1 token source=Model.md
+    impact_native
+    git -C "$central" checkout -q --detach "$impact_base"
+    case "$kind" in
+        required_manifest)
+            source=reqvire-workspace.toml
+            git -C "$central" rm -q "$source"
+            ln -s missing-workspace.toml "$central/$source"
+            token=repo_impact_manifest_history_unavailable
+            ;;
+        selected_cycle)
+            git -C "$central" rm -q Model.md
+            ln -s loop.md "$central/Model.md"
+            ln -s Model.md "$central/loop.md"
+            token='Historical symlink cycle'
+            ;;
+        selected_escape)
+            cp "$central/Model.md" "$native_case/outside-model.md"
+            git -C "$central" rm -q Model.md
+            ln -s ../outside-model.md "$central/Model.md"
+            token='Historical symlink escapes its repository'
+            ;;
+        selected_evidence)
+            source=evidence.txt
+            sed -i '/specify: \[Central Capability\]/a\  * satisfiedBy: [Evidence](evidence.txt)' "$central/Model.md"
+            ln -s evidence-loop.txt "$central/evidence.txt"
+            ln -s evidence.txt "$central/evidence-loop.txt"
+            token='Historical symlink cycle'
+            ;;
+    esac
+    impact_base=$(impact_commit "$central" 'Unavailable required historical source')
+    git -C "$central" checkout -q main
+    (cd "$central" && "$REQVIRE_BIN" validate)
+    if impact_cli native --json; then
+        echo 'Unavailable required historical source was silently accepted'; return 1
+    fi
+    grep -Fq "$token" "$native_case/impact.diagnostic"
+    grep -Fq "$source" "$native_case/impact.diagnostic"
 }
 
 impact_single_selector() {
@@ -363,6 +511,17 @@ serve serve/repo-impact-parity-and-isolation
 foreign_manifest cli/repo-impact-root-source-without-association
 foreign_mcp mcp/repo-impact-root-source-without-association
 foreign_serve serve/repo-impact-root-source-without-association
+dangling_root cli/repo-impact-dangling-root-source-selection
+dangling_component cli/repo-impact-dangling-component-source-selection
+dangling_root_gitignore cli/repo-impact-dangling-root-gitignore
+dangling_component_gitignore cli/repo-impact-dangling-component-gitignore
+dangling_root_reqvireignore cli/repo-impact-dangling-root-reqvireignore
+dangling_component_reqvireignore cli/repo-impact-dangling-component-reqvireignore
+source_alias cli/repo-impact-selected-file-and-directory-alias
+required_manifest cli/repo-impact-required-manifest-link-rejected
+selected_cycle cli/repo-impact-selected-source-cycle-rejected
+selected_escape cli/repo-impact-selected-source-escape-rejected
+selected_evidence cli/repo-impact-selected-evidence-cycle-rejected
 selector cli/repo-impact-single-baseline-selector
 include cli/repo-impact-historical-includes
 missing cli/repo-impact-missing-base-commit
@@ -385,6 +544,9 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
         foreign_manifest) impact_native ;;
         foreign_mcp) impact_mcp mcp native ;;
         foreign_serve) impact_mcp serve native ;;
+        dangling_*) impact_dangling "$1" ;;
+        source_alias) impact_source_alias ;;
+        required_manifest|selected_cycle|selected_escape|selected_evidence) impact_required_source "$1" ;;
         selector) impact_single_selector ;;
         include) impact_include ;;
         missing|unlocked) impact_bad_base "$1" ;;

@@ -193,9 +193,6 @@ export type ColorToken =
   | "--color-role-verification-type-inspection"
   | "--color-role-verification-type-test"
   | "--color-semantic-contract"
-  | "--color-showcase-border"
-  | "--color-showcase-canvas"
-  | "--color-showcase-ink"
   | "--color-verification"
   | "--color-verification-objective"
   | "--control-swatch-ring"
@@ -475,9 +472,6 @@ export const palette = {
     "--color-role-verification-type-inspection": { css: "#c4b75c", rgba: [196, 183, 92, 1] },
     "--color-role-verification-type-test": { css: "#4caf50", rgba: [76, 175, 80, 1] },
     "--color-semantic-contract": { css: "#ef4444", rgba: [239, 68, 68, 1] },
-    "--color-showcase-border": { css: "#dddddd", rgba: [221, 221, 221, 1] },
-    "--color-showcase-canvas": { css: "#fafafa", rgba: [250, 250, 250, 1] },
-    "--color-showcase-ink": { css: "#444444", rgba: [68, 68, 68, 1] },
     "--color-verification": { css: "#4caf50", rgba: [76, 175, 80, 1] },
     "--color-verification-objective": { css: "#126121", rgba: [18, 97, 33, 1] },
     "--control-swatch-ring": { css: "rgba(13, 17, 25, 0.08)", rgba: [13, 17, 25, 0.08] },
@@ -728,9 +722,6 @@ export const palette = {
     "--color-role-verification-type-inspection": { css: "#00846e", rgba: [0, 132, 110, 1] },
     "--color-role-verification-type-test": { css: "#4caf50", rgba: [76, 175, 80, 1] },
     "--color-semantic-contract": { css: "#ef4444", rgba: [239, 68, 68, 1] },
-    "--color-showcase-border": { css: "#444444", rgba: [68, 68, 68, 1] },
-    "--color-showcase-canvas": { css: "#181818", rgba: [24, 24, 24, 1] },
-    "--color-showcase-ink": { css: "#dddddd", rgba: [221, 221, 221, 1] },
     "--color-verification": { css: "#4caf50", rgba: [76, 175, 80, 1] },
     "--color-verification-objective": { css: "#126121", rgba: [18, 97, 33, 1] },
     "--control-swatch-ring": { css: "rgba(13, 17, 25, 0.08)", rgba: [13, 17, 25, 0.08] },

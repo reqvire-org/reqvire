@@ -239,7 +239,7 @@ const tracePanelSkinX = css`
   }
 
   .trace-verification-title:hover {
-    color: var(--accent);
+    color: var(--accent-text);
     text-decoration: underline;
     text-underline-offset: var(--space-1);
   }
@@ -457,6 +457,8 @@ const coverageDashboardBaseUX = css`
   .coverage-donut,
   .coverage-breakdown__pie {
     display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
     flex: none;
     place-items: center;
     border-radius: var(--radius-full);
@@ -470,7 +472,8 @@ const coverageDashboardBaseUX = css`
   .coverage-donut::after,
   .coverage-breakdown__pie::after {
     content: "";
-    grid-area: 1 / 1;
+    grid-column: 1;
+    grid-row: 1;
     border-radius: inherit;
   }
 

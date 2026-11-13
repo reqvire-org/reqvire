@@ -14,6 +14,7 @@ const baseUX = css`
   justify-content: center;
   flex: none;
   width: var(--ds-elemicon-size);
+  max-width: 100%;
   height: var(--ds-elemicon-size);
   border-radius: var(--radius-xs);
 

@@ -104,7 +104,7 @@ The application consumes design-system source through `@ds`; it does not require
 standalone kit. `bun run build:all` builds the checked application plus that
 optional kit. `bun run build:ds-bundle` uses
 `design-system/vite.bundle.config.ts` and external Preact globals; its
-generated outputs are separate from the application bundle and are not tracked.
+generated outputs (in `dist-kit/`, outside `design-system/`) are separate from the application bundle and are not tracked.
 The bundle-only commands require checks to have run first.
 
 ---
@@ -122,16 +122,15 @@ bun run build      # source checks + unit/integration tests + SPA build
 bun run ads-mcp          # stdio MCP + showcase; guarded editing enabled
 bun run ads-read-mcp     # stdio MCP + showcase; read-only
 bun run dev:showcase    # MCP client showcase; open the printed URL
-bun run build:showcase  # checked MCP preview resource graph -> .ds/preview/
-bun run build:mcp-previews -- --watch  # advanced: compiler without the managed host
+bun run build:showcase  # checks, then `ads compile .` -> .ds/preview/
 ```
 
 ### Browser verification
 
 `playwright.ads.config.ts` discovers colocated `.ads.behavior.spec.ts` files.
 The owners' `.ads.contract.ts` files register the checks with the `widget`
-profile in `ds.config.json`. ADS MCP acceptance and validation policies enable
-these checks through `behaviorChecks: true`. GitHub Actions builds do not run
+profile in `ds.config.json`. ADS draft acceptance and validation run
+these checks through `acceptance.behavior: true`. GitHub Actions builds do not run
 ADS browser verification or compile MCP previews. For an explicit local run,
 `bun run test:ads` first validates and compiles the
 preview graph, then calls `ads verify .`, which starts
@@ -222,14 +221,14 @@ records and callback adapters live with the workspace composition; focused
 screen scenarios supply their own initial view/mode. Full application route and
 store harnesses remain under `src/test/`.
 
-`ds.config.json` declares `framework: "preact"`, the `.ds/preview/manifest.json`
-resource graph and its managed watcher. Starting ADS MCP also starts the website
+`ds.config.json` declares `framework: "preact"`; ADS publishes the
+`.ds/preview/manifest.json` resource graph from its managed compiler. Starting ADS MCP also starts the website
 and compiler; use the URL from `ads_status`. Components, styles, fonts and runtime
 execute only inside the sandboxed App. The host's theme selects the project's
 own skin. Failed checks/builds retain the previous preview with stale diagnostics.
-Token fixtures declare literal `{ token, property, probe }` samples. The public
-`TokenSamples` review helper applies each real token to its declared CSS property;
-the App audits the rendered bindings in addition to static coverage. Build
+ADS renders the Tokens views itself; `design-system/tokens/catalog.ads.json`
+declares literal `{ token, property, probe }` bindings, and the App audits the
+rendered bindings in addition to static coverage. Build
 freshness checks source revisions as well as emitted resources.
 
 ## ADS MCP and showcase
@@ -246,7 +245,7 @@ Open **http://127.0.0.1:4191/**. Use `bun run ads-read-mcp -- --port 4191` inste
 for read-only MCP; run one command at a time. Both start the showcase and managed
 preview compiler. `bun run dev:showcase` starts the browser-only runtime.
 These launch commands use the exact published ADS version in `bun.lock`, as do
-build checks and the preview compiler. Bun 1.3.13 or newer is required.
+build checks and the preview compiler. Bun 1.4.1 or newer is required.
 
 The repository's `.mcp.json` launches ADS with guarded mutations from the
 repository root using:
@@ -261,7 +260,7 @@ MCP connection after changing client configuration or upgrading ADS.
 
 The managed preview compiler keeps a persistent Vite graph and reuses unchanged
 module transforms after edits. Validation still gates publication. One-off
-`build:mcp-previews` commands remain checked, fresh builds.
+`build:showcase` runs are checked, fresh builds.
 
 For visual review through MCP, discover a scenario with `ads_scenarios` and call
 `ads_capture` with its exact ID. Screenshot-enabled patch/transaction dry runs

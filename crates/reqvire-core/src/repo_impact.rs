@@ -152,10 +152,10 @@ pub fn historical_model(
     let snapshot = SnapshotFiles {
         root: root.clone(),
         workspace: Some(Arc::new(historical)),
-        files: Arc::new(files),
+        files,
         executable: Arc::new(BTreeSet::new()),
     };
-    let _view = snapshot.enter_historical();
+    let view = snapshot.enter_historical(Some(Arc::new(reconstruction.sources)));
     let exclusions = exclusions.rebuilt();
     let mut model = ModelManager::new();
     match model.parse_and_validate_with_mode(None, &exclusions, false) {
@@ -165,6 +165,7 @@ pub fn historical_model(
         }
         Err(error) => return Err(error),
     }
+    view.check_historical_sources()?;
     Ok((model, comparison))
 }
 

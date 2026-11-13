@@ -6,6 +6,17 @@ PASS serve/repo-impact-parity-and-isolation
 PASS cli/repo-impact-root-source-without-association
 PASS mcp/repo-impact-root-source-without-association
 PASS serve/repo-impact-root-source-without-association
+PASS cli/repo-impact-dangling-root-source-selection
+PASS cli/repo-impact-dangling-component-source-selection
+PASS cli/repo-impact-dangling-root-gitignore
+PASS cli/repo-impact-dangling-component-gitignore
+PASS cli/repo-impact-dangling-root-reqvireignore
+PASS cli/repo-impact-dangling-component-reqvireignore
+PASS cli/repo-impact-selected-file-and-directory-alias
+PASS cli/repo-impact-required-manifest-link-rejected
+PASS cli/repo-impact-selected-source-cycle-rejected
+PASS cli/repo-impact-selected-source-escape-rejected
+PASS cli/repo-impact-selected-evidence-cycle-rejected
 PASS cli/repo-impact-single-baseline-selector
 PASS cli/repo-impact-historical-includes
 PASS cli/repo-impact-missing-base-commit

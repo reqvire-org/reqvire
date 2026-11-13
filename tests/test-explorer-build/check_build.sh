@@ -99,13 +99,13 @@ BUN
 
 watches() {
     fixture watches
-    mkdir -p "$repo/explorer/design-system/dist-showcase" "$repo/explorer/design-system/dist-kit"
+    mkdir -p "$repo/explorer/design-system/dist-showcase" "$repo/explorer/dist-kit"
     invoke
     sed -n 's/^cargo:rerun-if-changed=//p' "$repo/build.stdout" > "$repo/watched.txt"
     grep -Fxq "$dist" "$repo/watched.txt"
     local generated watched target
-    for generated in dist-kit dist-showcase; do
-        target="$repo/explorer/design-system/$generated"
+    for generated in dist-kit design-system/dist-showcase; do
+        target="$repo/explorer/$generated"
         while IFS= read -r watched; do
             [[ "$watched" != "$target" && "$target" != "$watched/"* ]] || fail 'generated design output is watched'
         done < "$repo/watched.txt"
@@ -154,9 +154,9 @@ cargo_fresh() {
     chmod +x "$bin_dir/bun"
     cargo_runs=0
     cargo_run; embedded || fail 'initial embedding did not run'
-    for name in dist-showcase dist-kit; do
-        mkdir -p "$repo/explorer/design-system/$name"
-        printf 'generated output' > "$repo/explorer/design-system/$name/index.html"
+    for name in design-system/dist-showcase dist-kit; do
+        mkdir -p "$repo/explorer/$name"
+        printf 'generated output' > "$repo/explorer/$name/index.html"
     done
     cargo_run
     cp "$cargo_log" "$repo/second-cargo.log"

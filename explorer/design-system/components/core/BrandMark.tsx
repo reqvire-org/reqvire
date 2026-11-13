@@ -9,8 +9,8 @@ export interface BrandMarkProps extends Omit<(ImgHTMLAttributes<HTMLImageElement
 
 const baseUX = css`
   display: block;
-  width: var(--ds-brandmark-size, var(--icon-lg));
-  height: var(--ds-brandmark-size, var(--icon-lg));
+  width: var(--icon-lg);
+  height: var(--icon-lg);
   object-fit: contain;
 `;
 

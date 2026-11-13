@@ -61,7 +61,8 @@ const accentUX = css`
   top: 0;
   bottom: 0;
   left: 0;
-  width: var(--ds-card-accent-w, var(--border-w-heavy));
+  width: var(--border-w-heavy);
+  max-width: 100%;
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
   background: var(--ds-card-accent-color);
 `;
@@ -93,12 +94,9 @@ export function Card({
         "ds-card",
         baseUX,
         skinX,
-        padded ? paddedUX : "",
-        padded ? "ds-card--pad" : "",
-        interactive ? interactiveSkinX : "",
-        interactive ? "ds-card--interactive" : "",
-        selected ? selectedSkinX : "",
-        selected ? "ds-card--selected" : "",
+        padded ? cx(paddedUX, "ds-card--pad") : "",
+        interactive ? cx(interactiveSkinX, "ds-card--interactive") : "",
+        selected ? cx(selectedSkinX, "ds-card--selected") : "",
         accentColorToken ? accentTokenSkinX : "",
         className,
       )}

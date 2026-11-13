@@ -20,6 +20,8 @@ struct PreparedFile {
 }
 struct Context {
     files: SnapshotFiles,
+    historical_sources: Option<Arc<reqvire_workspace::baseline::Sources>>,
+    historical_errors: RefCell<BTreeSet<String>>,
     overlay: BTreeMap<PathBuf, Option<PreparedFile>>,
     changed: BTreeSet<PathBuf>,
     removed_directories: BTreeSet<PathBuf>,
@@ -40,6 +42,8 @@ impl SnapshotFiles {
             assert!(slot.borrow().is_none(), "nested mutation file snapshot");
             *slot.borrow_mut() = Some(Context {
                 files: self.clone(),
+                historical_sources: None,
+                historical_errors: RefCell::default(),
                 overlay: BTreeMap::new(),
                 changed: BTreeSet::new(),
                 removed_directories: BTreeSet::new(),
@@ -53,10 +57,15 @@ impl SnapshotFiles {
 
     /// Temporarily replace a request's view for an isolated historical model
     /// build. Dropping the guard restores the accepted view, including overlays.
-    pub(crate) fn enter_historical(&self) -> SnapshotGuard {
+    pub(crate) fn enter_historical(
+        &self,
+        sources: Option<Arc<reqvire_workspace::baseline::Sources>>,
+    ) -> SnapshotGuard {
         let previous = CONTEXT.with(|slot| {
             slot.replace(Some(Context {
                 files: self.clone(),
+                historical_sources: sources,
+                historical_errors: RefCell::default(),
                 overlay: BTreeMap::new(),
                 changed: BTreeSet::new(),
                 removed_directories: BTreeSet::new(),
@@ -69,6 +78,23 @@ impl SnapshotFiles {
     }
 }
 impl SnapshotGuard {
+    /// Lenient graph validation must not swallow integrity failures encountered
+    /// while reading selected historical dependencies or checking their metadata.
+    pub(crate) fn check_historical_sources(&self) -> io::Result<()> {
+        CONTEXT.with(|slot| {
+            let context = slot.borrow();
+            let context = context.as_ref().expect("active snapshot");
+            let errors = context.historical_errors.borrow();
+            if errors.is_empty() {
+                Ok(())
+            } else {
+                Err(io::Error::other(
+                    errors.iter().cloned().collect::<Vec<_>>().join("\n"),
+                ))
+            }
+        })
+    }
+
     /// Pin source-control provenance to the accepted request snapshot.
     pub fn set_git_identity(&self, head: &str, branch: &str) {
         CONTEXT.with(|slot| {
@@ -153,6 +179,18 @@ pub fn model() -> Option<Arc<ModelManager>> {
     })
 }
 impl Context {
+    fn historical_read(&self, path: &Path) -> io::Result<Option<Arc<Vec<u8>>>> {
+        self.historical_sources
+            .as_ref()
+            .expect("historical source view")
+            .read(path)
+            .map_err(|error| {
+                let message = format!("Historical source {}: {error}", path.display());
+                self.historical_errors.borrow_mut().insert(message.clone());
+                io::Error::other(message)
+            })
+    }
+
     fn file(&self, path: &Path) -> Option<&Arc<Vec<u8>>> {
         self.overlay.get(path).map_or_else(
             || self.files.files.get(path),
@@ -205,6 +243,16 @@ pub fn read(path: impl AsRef<Path>) -> io::Result<Vec<u8>> {
         let mut slot = slot.borrow_mut();
         match slot.as_mut() {
             Some(c) => {
+                if c.historical_sources.is_some() {
+                    return c
+                        .historical_read(&path)?
+                        .map(|bytes| (*bytes).clone())
+                        .ok_or_else(|| {
+                            let error = not_found(&path);
+                            c.historical_errors.borrow_mut().insert(error.to_string());
+                            error
+                        });
+                }
                 if let Some(bytes) = c.file(&path) {
                     return Ok((**bytes).clone());
                 }
@@ -231,7 +279,14 @@ pub fn read_to_string(path: impl AsRef<Path>) -> io::Result<String> {
 pub fn file_size(path: impl AsRef<Path>) -> Option<u64> {
     let path = absolute(path.as_ref());
     CONTEXT.with(|slot| match slot.borrow().as_ref() {
-        Some(context) => context.file(&path).map(|bytes| bytes.len() as u64),
+        Some(context) => match &context.historical_sources {
+            Some(_) => context
+                .historical_read(&path)
+                .ok()
+                .flatten()
+                .map(|bytes| bytes.len() as u64),
+            None => context.file(&path).map(|bytes| bytes.len() as u64),
+        },
         None => std::fs::metadata(path)
             .ok()
             .filter(|m| m.is_file())
@@ -239,13 +294,21 @@ pub fn file_size(path: impl AsRef<Path>) -> Option<u64> {
     })
 }
 pub fn is_file(path: impl AsRef<Path>) -> bool {
-    let path = absolute(path.as_ref());
+    selected_file(path.as_ref()).unwrap_or(false)
+}
+/// Called after model discovery filters so only selected links are resolved.
+/// Preserve integrity errors instead of silently dropping a selected source.
+pub(crate) fn selected_file(path: &Path) -> io::Result<bool> {
+    let path = absolute(path);
     CONTEXT.with(|slot| {
         slot.borrow().as_ref().map_or_else(
-            || path.is_file(),
+            || Ok(path.is_file()),
             |c| {
-                c.file(&path).is_some()
-                    || (c.capture && !c.overlay.contains_key(&path) && path.is_file())
+                if c.historical_sources.is_some() {
+                    return c.historical_read(&path).map(|bytes| bytes.is_some());
+                }
+                Ok(c.file(&path).is_some()
+                    || (c.capture && !c.overlay.contains_key(&path) && path.is_file()))
             },
         )
     })
@@ -428,7 +491,7 @@ mod tests {
         Arc::make_mut(&mut historical.files)
             .insert(path.clone(), Arc::new(b"historical bytes".to_vec()));
         {
-            let _view = historical.enter_historical();
+            let _view = historical.enter_historical(None);
             assert_eq!(read(&path).expect("historical read"), b"historical bytes");
             assert!(super::model().is_none());
         }

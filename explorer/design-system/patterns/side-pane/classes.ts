@@ -1,6 +1,42 @@
-import { css } from "@linaria/atomic";
+import { css, cx } from "@linaria/atomic";
 
-export const sideContentClass = css`
+// Stable pattern hooks for selectors that relate these elements; each exported
+// class carries its hook, so the selectors match exactly where the class is applied.
+const emptyHook = "ux-side-pane-empty";
+const globalSearchHook = "ux-side-pane-global-search";
+const globalSearchControlHook = "ux-side-pane-global-search-control";
+const globalSearchResultsHook = "ux-side-pane-global-search-results";
+const paneActionRowHook = "ux-side-pane-action-row";
+const paneControlsHook = "ux-side-pane-controls";
+const paneControlsTitleHook = "ux-side-pane-controls-title";
+const paneFilterGridHook = "ux-side-pane-filter-grid";
+const paneFilterGridTwoHook = "ux-side-pane-filter-grid-two";
+const paneGhostLinkHook = "ux-side-pane-ghost-link";
+const paneLegendHook = "ux-side-pane-legend";
+const paneLegendRowHook = "ux-side-pane-legend-row";
+const paneLegendTextHook = "ux-side-pane-legend-text";
+const paneNavRowCountHook = "ux-side-pane-nav-row-count";
+const paneNavRowIconHook = "ux-side-pane-nav-row-icon";
+const paneNavRowLabelHook = "ux-side-pane-nav-row-label";
+const paneSectionLabelHook = "ux-side-pane-section-label";
+const paneSelectedElementHook = "ux-side-pane-selected-element";
+const paneSelectedElementLinkHook = "ux-side-pane-selected-element-link";
+const paneSelectionHintHook = "ux-side-pane-selection-hint";
+const paneSelectionKindHook = "ux-side-pane-selection-kind";
+const paneSelectionNameHook = "ux-side-pane-selection-name";
+const paneSelectionOpenHook = "ux-side-pane-selection-open";
+const paneSelectionRowHook = "ux-side-pane-selection-row";
+const paneSummaryHook = "ux-side-pane-summary";
+const paneSummaryFooterHook = "ux-side-pane-summary-footer";
+const sideContentHook = "ux-side-pane-side-content";
+const treeHook = "ux-side-pane-tree";
+const treeNodeHook = "ux-side-pane-tree-node";
+const treeTabHook = "ux-side-pane-tree-tab";
+const treeTabLabelHook = "ux-side-pane-tree-tab-label";
+const treeTabMarkHook = "ux-side-pane-tree-tab-mark";
+const treeTabToggleHook = "ux-side-pane-tree-tab-toggle";
+
+export const sideContentClass = cx(sideContentHook, css`
   box-sizing: border-box;
   display: flex;
   min-width: 0;
@@ -8,7 +44,7 @@ export const sideContentClass = css`
   flex: 1 1 auto;
   flex-direction: column;
   width: calc(var(--ux-left-pane-width) - var(--ux-left-pane-collapsed-width));
-`;
+`);
 
 export const sideContentAppClass = css`
   display: flex;
@@ -21,7 +57,7 @@ export const sideContentAppClass = css`
   overflow-y: hidden;
 `;
 
-export const treeClass = css`
+export const treeClass = cx(treeHook, css`
   box-sizing: border-box;
   --ds-treeitem-count-ml: var(--space-1);
   --ds-treeitem-h: var(--space-16);
@@ -40,42 +76,42 @@ export const treeClass = css`
   padding-bottom: var(--space-7);
   padding-left: 0;
   scrollbar-gutter: stable;
-`;
+`);
 
-export const treeTabClass = css`
+export const treeTabClass = cx(treeTabHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const treeTabLabelClass = css`
+export const treeTabLabelClass = cx(treeTabLabelHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const treeTabToggleClass = css`
+export const treeTabToggleClass = cx(treeTabToggleHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const treeTabMarkClass = css`
+export const treeTabMarkClass = cx(treeTabMarkHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const globalSearchClass = css`
+export const globalSearchClass = cx(globalSearchHook, css`
   box-sizing: border-box;
   flex: 0 0 auto;
   margin-top: var(--space-12);
   margin-right: var(--side-pane-content-inset-inline);
   margin-bottom: var(--side-pane-search-content-gap);
   margin-left: var(--side-pane-content-inset-inline);
-`;
+`);
 
-export const globalSearchControlClass = css`
+export const globalSearchControlClass = cx(globalSearchControlHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const globalSearchResultsClass = css`
+export const globalSearchResultsClass = cx(globalSearchResultsHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const paneControlsClass = css`
+export const paneControlsClass = cx(paneControlsHook, css`
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -109,9 +145,9 @@ export const paneControlsClass = css`
   --ds-togglerow-meta-lh: 1;
   --ds-togglerow-line-min-h: var(--control-height-sm);
   --ds-togglerow-static-cursor: default;
-`;
+`);
 
-export const paneControlsTitleClass = css`
+export const paneControlsTitleClass = cx(paneControlsTitleHook, css`
   box-sizing: border-box;
   margin-top: 0;
   margin-right: 0;
@@ -121,9 +157,9 @@ export const paneControlsTitleClass = css`
   font-weight: var(--weight-semibold);
   letter-spacing: 0;
   line-height: var(--leading-tight);
-`;
+`);
 
-export const paneSummaryClass = css`
+export const paneSummaryClass = cx(paneSummaryHook, css`
   box-sizing: border-box;
   --ds-section-head-p: 0;
   display: flex;
@@ -131,9 +167,9 @@ export const paneSummaryClass = css`
   flex-wrap: nowrap;
   align-items: stretch;
   gap: var(--space-5);
-`;
+`);
 
-export const paneSummaryFooterClass = css`
+export const paneSummaryFooterClass = cx(paneSummaryFooterHook, css`
   box-sizing: border-box;
   flex: 0 0 auto;
   margin-top: auto;
@@ -144,7 +180,7 @@ export const paneSummaryFooterClass = css`
   padding-right: var(--side-pane-content-inset-inline);
   padding-bottom: var(--space-12);
   padding-left: var(--side-pane-content-inset-inline);
-`;
+`);
 
 export const summaryClass = css`
   box-sizing: border-box;
@@ -186,7 +222,7 @@ export const paneNavListClass = css`
   gap: var(--stack-gap-compact);
 `;
 
-export const paneNavRowLabelClass = css`
+export const paneNavRowLabelClass = cx(paneNavRowLabelHook, css`
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -194,7 +230,7 @@ export const paneNavRowLabelClass = css`
   font-weight: var(--weight-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
+`);
 
 export const paneNavRowClass = css`
   box-sizing: border-box;
@@ -227,7 +263,7 @@ export const paneNavRowClass = css`
     color: var(--text-strong);
   }
 
-  &.is-selected .${paneNavRowLabelClass} {
+  &.is-selected .${paneNavRowLabelHook} {
     color: var(--text-strong);
     font-weight: var(--weight-semibold);
   }
@@ -238,17 +274,17 @@ export const paneNavRowClass = css`
   }
 `;
 
-export const paneNavRowIconClass = css`
+export const paneNavRowIconClass = cx(paneNavRowIconHook, css`
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-`;
+`);
 
-export const paneNavRowCountClass = css`
+export const paneNavRowCountClass = cx(paneNavRowCountHook, css`
   box-sizing: border-box;
   display: inline-flex;
-  min-width: var(--space-count-pill-height);
+  min-width: min(100%, var(--space-count-pill-height));
   height: var(--space-count-pill-height);
   align-items: center;
   justify-content: center;
@@ -256,9 +292,9 @@ export const paneNavRowCountClass = css`
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: 1;
-`;
+`);
 
-export const paneActionRowClass = css`
+export const paneActionRowClass = cx(paneActionRowHook, css`
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -267,9 +303,9 @@ export const paneActionRowClass = css`
   margin-right: 0;
   margin-bottom: 0;
   margin-left: 0;
-`;
+`);
 
-export const paneGhostLinkClass = css`
+export const paneGhostLinkClass = cx(paneGhostLinkHook, css`
   box-sizing: border-box;
   display: inline-flex;
   height: var(--control-height-sm);
@@ -283,28 +319,28 @@ export const paneGhostLinkClass = css`
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
   text-decoration: none;
-`;
+`);
 
-export const paneLegendClass = css`
+export const paneLegendClass = cx(paneLegendHook, css`
   box-sizing: border-box;
   display: grid;
   gap: var(--stack-gap-compact);
-`;
+`);
 
-export const paneFilterGridClass = css`
+export const paneFilterGridClass = cx(paneFilterGridHook, css`
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--compact-column-min), 1fr));
   align-items: start;
   gap: var(--space-4) var(--space-8);
-`;
+`);
 
-export const paneFilterGridTwoClass = css`
+export const paneFilterGridTwoClass = cx(paneFilterGridTwoHook, css`
   box-sizing: border-box;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-`;
+`);
 
-export const paneLegendRowClass = css`
+export const paneLegendRowClass = cx(paneLegendRowHook, css`
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -314,13 +350,13 @@ export const paneLegendRowClass = css`
   padding-right: var(--space-7);
   padding-bottom: 0;
   padding-left: var(--space-7);
-`;
+`);
 
-export const paneLegendTextClass = css`
+export const paneLegendTextClass = cx(paneLegendTextHook, css`
   box-sizing: border-box;
   font-size: var(--text-caption);
   line-height: 1.3;
-`;
+`);
 
 export const paneSymbolClass = css`
   box-sizing: border-box;
@@ -348,11 +384,11 @@ export const graphControlSwatchClass = css`
   border-radius: var(--radius-xs);
 `;
 
-export const paneSelectedElementClass = css`
+export const paneSelectedElementClass = cx(paneSelectedElementHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const paneSelectedElementLinkClass = css`
+export const paneSelectedElementLinkClass = cx(paneSelectedElementLinkHook, css`
   box-sizing: border-box;
   appearance: none;
   display: inline-flex;
@@ -387,17 +423,17 @@ export const paneSelectedElementLinkClass = css`
     border-color: var(--border-strong);
     background: var(--bg-hover);
   }
-`;
+`);
 
-export const paneSelectionRowClass = css`
+export const paneSelectionRowClass = cx(paneSelectionRowHook, css`
   box-sizing: border-box;
   display: flex;
   min-width: 0;
   align-items: center;
   gap: var(--space-2);
-`;
+`);
 
-export const paneSelectionNameClass = css`
+export const paneSelectionNameClass = cx(paneSelectionNameHook, css`
   box-sizing: border-box;
   flex: 1 1 auto;
   min-width: 0;
@@ -405,9 +441,9 @@ export const paneSelectionNameClass = css`
   overflow-y: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
+`);
 
-export const paneSelectionKindClass = css`
+export const paneSelectionKindClass = cx(paneSelectionKindHook, css`
   box-sizing: border-box;
   flex: 0 0 auto;
   overflow-x: visible;
@@ -422,15 +458,15 @@ export const paneSelectionKindClass = css`
   font-size: var(--text-micro);
   font-weight: var(--weight-semibold);
   line-height: 1.2;
-`;
+`);
 
-export const paneSelectionOpenClass = css`
+export const paneSelectionOpenClass = cx(paneSelectionOpenHook, css`
   box-sizing: border-box;
   flex: 0 0 auto;
   color: var(--text-muted);
-`;
+`);
 
-export const paneSelectionHintClass = css`
+export const paneSelectionHintClass = cx(paneSelectionHintHook, css`
   box-sizing: border-box;
   margin-top: 0;
   margin-right: 0;
@@ -438,9 +474,9 @@ export const paneSelectionHintClass = css`
   margin-left: 0;
   color: var(--text-muted);
   font-size: var(--text-caption);
-`;
+`);
 
-export const paneSectionLabelClass = css`
+export const paneSectionLabelClass = cx(paneSectionLabelHook, css`
   box-sizing: border-box;
   display: block;
   margin-top: var(--space-6);
@@ -452,18 +488,18 @@ export const paneSectionLabelClass = css`
   letter-spacing: var(--tracking-pane-chrome-letter-spacing);
   line-height: 1;
   text-transform: uppercase;
-`;
+`);
 
-export const treeNodeClass = css`
+export const treeNodeClass = cx(treeNodeHook, css`
   box-sizing: border-box;
-`;
+`);
 
-export const emptyClass = css`
+export const emptyClass = cx(emptyHook, css`
   box-sizing: border-box;
   font-size: var(--text-sm);
   font-style: italic;
   line-height: 1.45;
-`;
+`);
 
 export const baseUX = css`
   position: fixed;
@@ -482,11 +518,11 @@ export const baseUX = css`
     --ux-current-left-width: var(--ux-left-pane-width);
   }
 
-  &.is-collapsed .${sideContentClass} {
+  &.is-collapsed .${sideContentHook} {
     display: none;
   }
 
-  .${treeTabClass} {
+  .${treeTabHook} {
     position: relative;
     display: flex;
     min-height: 0;
@@ -499,12 +535,12 @@ export const baseUX = css`
     cursor: pointer;
   }
 
-  &:not(.is-collapsed) .${treeTabLabelClass},
-  &:not(.is-collapsed) .${treeTabMarkClass} {
+  &:not(.is-collapsed) .${treeTabLabelHook},
+  &:not(.is-collapsed) .${treeTabMarkHook} {
     display: none;
   }
 
-  .${treeTabLabelClass} {
+  .${treeTabLabelHook} {
     display: inline-block;
     margin-top: var(--space-14);
     writing-mode: vertical-rl;
@@ -514,7 +550,7 @@ export const baseUX = css`
     text-transform: uppercase;
   }
 
-  .${treeTabToggleClass} {
+  .${treeTabToggleHook} {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -526,7 +562,7 @@ export const baseUX = css`
     transform: translate(-50%, -50%);
   }
 
-  .${globalSearchControlClass} {
+  .${globalSearchControlHook} {
     position: relative;
     --ds-search-input-h: var(--control-height-lg);
     --ds-search-input-p: 0 var(--space-8) 0 calc(var(--space-16) + var(--space-3));
@@ -535,7 +571,7 @@ export const baseUX = css`
     --ds-search-icon-sz: var(--icon-md);
   }
 
-  .${globalSearchResultsClass},
+  .${globalSearchResultsHook},
   .ontology-graph-results {
     --ux-pane-search-results-max-h: min(var(--space-pane-search-results-limit), calc(100vh - var(--space-32)));
     max-height: var(--ux-pane-search-results-max-h);
@@ -554,13 +590,13 @@ export const baseUX = css`
     scrollbar-gutter: stable;
   }
 
-  .${globalSearchResultsClass}:empty,
+  .${globalSearchResultsHook}:empty,
   .ontology-graph-results:empty {
     display: none;
   }
 
-  .${globalSearchResultsClass} button,
-  .${globalSearchResultsClass} a,
+  .${globalSearchResultsHook} button,
+  .${globalSearchResultsHook} a,
   .ontology-graph-results button,
   .ontology-graph-results a {
     appearance: none;
@@ -579,12 +615,12 @@ export const baseUX = css`
     cursor: pointer;
   }
 
-  .${globalSearchResultsClass} small,
+  .${globalSearchResultsHook} small,
   .ontology-graph-results small {
     font-size: var(--text-micro);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result,
+  .${globalSearchResultsHook} .ontology-graph-result,
   .ontology-graph-results .ontology-graph-result {
     display: grid;
     grid-template-columns: var(--icon-md) minmax(0, 1fr) var(--icon-lg);
@@ -601,7 +637,7 @@ export const baseUX = css`
     list-style: none;
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph,
+  .${globalSearchResultsHook} .ontology-graph-result-glyph,
   .ontology-graph-results .ontology-graph-result-glyph {
     display: inline-flex;
     align-items: center;
@@ -613,7 +649,7 @@ export const baseUX = css`
     background: var(--color-role-rdf-resource);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-label,
+  .${globalSearchResultsHook} .ontology-graph-result-label,
   .ontology-graph-results .ontology-graph-result-label {
     min-width: 0;
     overflow-x: hidden;
@@ -622,7 +658,7 @@ export const baseUX = css`
     white-space: nowrap;
   }
 
-  .${globalSearchResultsClass} .ontology-graph-badge,
+  .${globalSearchResultsHook} .ontology-graph-badge,
   .ontology-graph-results .ontology-graph-badge {
     display: inline-flex;
     align-items: center;
@@ -641,7 +677,7 @@ export const baseUX = css`
     line-height: 1;
   }
 
-  .${paneControlsClass} {
+  .${paneControlsHook} {
     display: grid;
     flex: 0 0 auto;
     gap: var(--space-4);
@@ -671,7 +707,7 @@ export const baseUX = css`
     --ds-togglerow-static-cursor: default;
   }
 
-  .ux-app & .${paneControlsClass} {
+  .ux-app & .${paneControlsHook} {
     gap: var(--stack-gap-compact);
     padding-top: var(--space-8);
     padding-right: var(--side-pane-content-inset-inline);
@@ -679,7 +715,7 @@ export const baseUX = css`
     padding-left: var(--side-pane-content-inset-inline);
   }
 
-  .${paneControlsTitleClass} {
+  .${paneControlsTitleHook} {
     margin-top: 0;
     margin-right: 0;
     margin-bottom: var(--space-7);
@@ -690,7 +726,7 @@ export const baseUX = css`
     line-height: var(--leading-tight);
   }
 
-  .${paneSectionLabelClass} {
+  .${paneSectionLabelHook} {
     display: block;
     margin-top: var(--space-6);
     margin-right: 0;
@@ -702,7 +738,7 @@ export const baseUX = css`
     text-transform: uppercase;
   }
 
-  .ux-app & .${paneSectionLabelClass} {
+  .ux-app & .${paneSectionLabelHook} {
     margin-top: var(--space-12);
     margin-right: 0;
     margin-bottom: var(--space-5);
@@ -715,27 +751,27 @@ export const baseUX = css`
     line-height: 1;
   }
 
-  .${paneLegendClass} {
+  .${paneLegendHook} {
     display: grid;
     gap: var(--stack-gap-compact);
   }
 
-  .${paneFilterGridClass} {
+  .${paneFilterGridHook} {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--compact-column-min), 1fr));
     align-items: start;
     gap: var(--space-4) var(--space-8);
   }
 
-  .${paneFilterGridClass}.${paneFilterGridTwoClass} {
+  .${paneFilterGridHook}.${paneFilterGridTwoHook} {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .${paneFilterGridClass} .${paneSectionLabelClass}:first-child {
+  .${paneFilterGridHook} .${paneSectionLabelHook}:first-child {
     margin-top: 0;
   }
 
-  .ux-app & .${paneLegendClass} {
+  .ux-app & .${paneLegendHook} {
     --ds-togglerow-h: var(--control-height-sm);
     --ds-togglerow-min-h: var(--control-height-sm);
     --ds-togglerow-gap: var(--space-6);
@@ -750,7 +786,7 @@ export const baseUX = css`
     gap: var(--stack-gap-compact);
   }
 
-  .${paneSummaryClass} {
+  .${paneSummaryHook} {
     --ds-section-head-p: 0;
     display: flex;
     flex-wrap: wrap;
@@ -758,7 +794,7 @@ export const baseUX = css`
     gap: var(--space-4);
   }
 
-  .ux-app & .${paneSummaryClass} {
+  .ux-app & .${paneSummaryHook} {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
@@ -769,7 +805,7 @@ export const baseUX = css`
     margin-left: 0;
   }
 
-  .ux-app & .${paneSummaryClass}.${paneSummaryFooterClass} {
+  .ux-app & .${paneSummaryHook}.${paneSummaryFooterHook} {
     margin-top: auto;
     margin-right: 0;
     margin-bottom: 0;
@@ -791,14 +827,14 @@ export const baseUX = css`
     padding-left: var(--side-pane-content-inset-inline);
   }
 
-  .${paneSummaryClass} .${paneSectionLabelClass} {
+  .${paneSummaryHook} .${paneSectionLabelHook} {
     margin-top: 0;
     margin-right: var(--space-1);
     margin-bottom: 0;
     margin-left: 0;
   }
 
-  .ux-app & .${paneSummaryClass} .${paneSectionLabelClass} {
+  .ux-app & .${paneSummaryHook} .${paneSectionLabelHook} {
     margin-top: 0;
     margin-right: 0;
     margin-bottom: 0;
@@ -809,7 +845,7 @@ export const baseUX = css`
     padding-left: 0;
   }
 
-  .${paneLegendRowClass} {
+  .${paneLegendRowHook} {
     display: flex;
     align-items: center;
     gap: var(--space-6);
@@ -820,12 +856,12 @@ export const baseUX = css`
     padding-left: var(--space-7);
   }
 
-  .${paneLegendTextClass} {
+  .${paneLegendTextHook} {
     font-size: var(--text-caption);
     line-height: 1.3;
   }
 
-  .${treeClass} {
+  .${treeHook} {
     --ds-treeitem-count-ml: var(--space-1);
     --ds-treeitem-h: var(--space-16);
     --ds-treeitem-label-flex: 0 1 auto;
@@ -845,27 +881,27 @@ export const baseUX = css`
     scrollbar-gutter: stable;
   }
 
-  .${globalSearchClass} + .${paneControlsClass},
-  .ux-app & .${globalSearchClass} + .${paneControlsClass} {
+  .${globalSearchHook} + .${paneControlsHook},
+  .ux-app & .${globalSearchHook} + .${paneControlsHook} {
     padding-top: 0;
   }
 
-  .${globalSearchClass} + .${treeClass},
-  .ux-app & .${globalSearchClass} + .${treeClass} {
+  .${globalSearchHook} + .${treeHook},
+  .ux-app & .${globalSearchHook} + .${treeHook} {
     padding-top: 0;
   }
 
-  .${globalSearchClass} + .${paneControlsClass} > .${paneSectionLabelClass}:first-child,
-  .ux-app & .${globalSearchClass} + .${paneControlsClass} > .${paneSectionLabelClass}:first-child {
+  .${globalSearchHook} + .${paneControlsHook} > .${paneSectionLabelHook}:first-child,
+  .ux-app & .${globalSearchHook} + .${paneControlsHook} > .${paneSectionLabelHook}:first-child {
     margin-top: 0;
   }
 
-  .${paneControlsClass} > .${treeClass}:first-child,
-  .ux-app & .${paneControlsClass} > .${treeClass}:first-child {
+  .${paneControlsHook} > .${treeHook}:first-child,
+  .ux-app & .${paneControlsHook} > .${treeHook}:first-child {
     padding-top: 0;
   }
 
-  .${treeNodeClass} {
+  .${treeNodeHook} {
     min-width: 0;
     margin-top: 0;
     margin-right: 0;
@@ -873,15 +909,15 @@ export const baseUX = css`
     margin-left: 0;
   }
 
-  .${treeNodeClass} > summary {
+  .${treeNodeHook} > summary {
     list-style: none;
   }
 
-  .${treeNodeClass} > summary::-webkit-details-marker {
+  .${treeNodeHook} > summary::-webkit-details-marker {
     display: none;
   }
 
-  .${paneSelectedElementClass} {
+  .${paneSelectedElementHook} {
     display: grid;
     gap: var(--space-5);
     margin-top: 0;
@@ -890,14 +926,14 @@ export const baseUX = css`
     margin-left: 0;
   }
 
-  .${paneSelectedElementClass} .${paneSectionLabelClass} {
+  .${paneSelectedElementHook} .${paneSectionLabelHook} {
     margin-top: 0;
     margin-right: 0;
     margin-bottom: 0;
     margin-left: 0;
   }
 
-  .${paneSelectedElementLinkClass} {
+  .${paneSelectedElementLinkHook} {
     display: inline-flex;
     width: 100%;
     min-width: 0;
@@ -919,7 +955,7 @@ export const baseUX = css`
       border-color var(--dur-fast);
   }
 
-  .${paneSelectedElementLinkClass} span:last-child {
+  .${paneSelectedElementLinkHook} span:last-child {
     min-width: 0;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -927,18 +963,18 @@ export const baseUX = css`
     white-space: nowrap;
   }
 
-  .${paneSelectionRowClass} {
+  .${paneSelectionRowHook} {
     display: flex;
     min-width: 0;
     align-items: center;
     gap: var(--space-2);
   }
 
-  .${paneSelectionRowClass} .${paneSelectedElementLinkClass} {
+  .${paneSelectionRowHook} .${paneSelectedElementLinkHook} {
     flex: 1 1 auto;
   }
 
-  .${paneSelectionNameClass} {
+  .${paneSelectionNameHook} {
     flex: 1 1 auto;
     min-width: 0;
     overflow-x: hidden;
@@ -947,7 +983,7 @@ export const baseUX = css`
     white-space: nowrap;
   }
 
-  .${paneSelectionKindClass} {
+  .${paneSelectionKindHook} {
     flex: 0 0 auto;
     overflow-x: visible;
     overflow-y: visible;
@@ -961,11 +997,11 @@ export const baseUX = css`
     line-height: 1.2;
   }
 
-  .${paneSelectionOpenClass} {
+  .${paneSelectionOpenHook} {
     flex: 0 0 auto;
   }
 
-  .${paneSelectionHintClass} {
+  .${paneSelectionHintHook} {
     margin-top: 0;
     margin-right: 0;
     margin-bottom: 0;
@@ -973,7 +1009,7 @@ export const baseUX = css`
     font-size: var(--text-caption);
   }
 
-  .${paneActionRowClass} {
+  .${paneActionRowHook} {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-5);
@@ -983,7 +1019,7 @@ export const baseUX = css`
     margin-left: 0;
   }
 
-  .${paneGhostLinkClass} {
+  .${paneGhostLinkHook} {
     display: inline-flex;
     height: var(--control-height-sm);
     align-items: center;
@@ -998,14 +1034,14 @@ export const baseUX = css`
     text-decoration: none;
   }
 
-  .${paneGhostLinkClass} svg {
+  .${paneGhostLinkHook} svg {
     display: block;
     width: var(--icon-sm);
     height: var(--icon-sm);
     flex: 0 0 auto;
   }
 
-  .${emptyClass} {
+  .${emptyHook} {
     font-size: var(--text-sm);
     font-style: italic;
     line-height: 1.45;
@@ -1033,30 +1069,30 @@ export const skinX = css`
   background: var(--bg-surface);
   color: var(--text-body);
 
-  .${treeTabClass} {
+  .${treeTabHook} {
     background: var(--bg-surface);
     color: var(--text-secondary);
   }
 
-  .${treeTabClass}:hover,
-  .${treeTabClass}:focus-visible {
+  .${treeTabHook}:hover,
+  .${treeTabHook}:focus-visible {
     background: var(--bg-hover);
     color: var(--text-secondary);
     outline: 0;
   }
 
-  .${treeTabToggleClass} {
+  .${treeTabToggleHook} {
     color: var(--text-muted);
   }
 
-  .${globalSearchControlClass} {
+  .${globalSearchControlHook} {
     --ds-search-input-border: var(--border-w) solid var(--border-strong);
     --ds-search-input-bg: var(--bg-canvas);
     --ds-search-input-color: var(--text-body);
     --ds-search-input-placeholder-color: var(--text-muted);
   }
 
-  .${globalSearchResultsClass},
+  .${globalSearchResultsHook},
   .ontology-graph-results {
     border: var(--border-w) solid var(--border-subtle);
     border-radius: var(--radius-md);
@@ -1064,50 +1100,50 @@ export const skinX = css`
     box-shadow: var(--shadow-lg);
   }
 
-  .${globalSearchResultsClass} button,
-  .${globalSearchResultsClass} a,
+  .${globalSearchResultsHook} button,
+  .${globalSearchResultsHook} a,
   .ontology-graph-results button,
   .ontology-graph-results a {
     background: transparent;
     color: var(--text-body);
   }
 
-  .${globalSearchResultsClass} button:hover,
-  .${globalSearchResultsClass} a:hover,
+  .${globalSearchResultsHook} button:hover,
+  .${globalSearchResultsHook} a:hover,
   .ontology-graph-results button:hover,
   .ontology-graph-results a:hover {
     background: var(--bg-hover);
   }
 
-  .${globalSearchResultsClass} small,
+  .${globalSearchResultsHook} small,
   .ontology-graph-results small {
     color: var(--text-muted);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result:hover,
-  .${globalSearchResultsClass} .ontology-graph-result:focus-visible,
+  .${globalSearchResultsHook} .ontology-graph-result:hover,
+  .${globalSearchResultsHook} .ontology-graph-result:focus-visible,
   .ontology-graph-results .ontology-graph-result:hover,
   .ontology-graph-results .ontology-graph-result:focus-visible {
     background: var(--bg-hover);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result.text-gray-400,
+  .${globalSearchResultsHook} .ontology-graph-result.text-gray-400,
   .ontology-graph-results .ontology-graph-result.text-gray-400 {
     color: var(--text-muted);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-badge,
+  .${globalSearchResultsHook} .ontology-graph-badge,
   .ontology-graph-results .ontology-graph-badge {
     background: var(--bg-sunken);
     color: var(--danger-text);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph,
+  .${globalSearchResultsHook} .ontology-graph-result-glyph,
   .ontology-graph-results .ontology-graph-result-glyph {
     background: var(--color-role-rdf-resource);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="semantic-query"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="semantic-query"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="semantic-query"] {
     background: var(--color-role-ontology);
     color: var(--color-ink);
@@ -1119,64 +1155,64 @@ export const skinX = css`
     justify-content: center;
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="class"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="class"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="class"] {
     background: var(--color-role-rdf-class);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="skos-concept"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="skos-concept"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="skos-concept"] {
     background: var(--color-role-rdf-concept);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="skos-concept-scheme"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="skos-concept-scheme"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="skos-concept-scheme"] {
     background: var(--color-role-rdf-concept-scheme);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="named-individual"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="named-individual"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="named-individual"] {
     background: var(--color-role-rdf-individual);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="datatype"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="datatype"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="datatype"] {
     background: var(--color-role-rdf-datatype);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="class-expression"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="class-expression"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="class-expression"] {
     background: var(--color-role-rdf-classexpr);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="node-shape"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="node-shape"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="node-shape"] {
     background: var(--color-role-rdf-nodeshape);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="property-shape"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="property-shape"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="property-shape"] {
     background: var(--color-role-rdf-propshape);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="object-property"],
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="property"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="object-property"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="property"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="object-property"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="property"] {
     background: var(--color-role-rdf-objprop);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="datatype-property"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="datatype-property"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="datatype-property"] {
     background: var(--color-role-rdf-dtprop);
   }
 
-  .${globalSearchResultsClass} .ontology-graph-result-glyph[data-semantic-type="rdf-property"],
+  .${globalSearchResultsHook} .ontology-graph-result-glyph[data-semantic-type="rdf-property"],
   .ontology-graph-results .ontology-graph-result-glyph[data-semantic-type="rdf-property"] {
     background: var(--color-role-rdf-rdfprop);
   }
 
-  .${paneControlsClass} {
+  .${paneControlsHook} {
     --ds-togglerow-bg: transparent;
     --ds-togglerow-meta-bg: var(--bg-sunken);
     --ds-togglerow-meta-color: var(--text-secondary);
@@ -1184,56 +1220,56 @@ export const skinX = css`
     --ds-togglerow-line-swatch-bg: transparent;
   }
 
-  .${paneControlsTitleClass} {
+  .${paneControlsTitleHook} {
     color: var(--text-strong);
   }
 
-  .${paneSectionLabelClass},
-  .${paneLegendTextClass},
-  .${paneSelectionOpenClass},
-  .${emptyClass} {
+  .${paneSectionLabelHook},
+  .${paneLegendTextHook},
+  .${paneSelectionOpenHook},
+  .${emptyHook} {
     color: var(--text-muted);
   }
 
-  .${treeClass} {
+  .${treeHook} {
     --ds-treeitem-twist-color: var(--text-muted);
   }
 
-  .${paneSelectedElementLinkClass} {
+  .${paneSelectedElementLinkHook} {
     border: var(--border-w) solid var(--border-default);
     background: var(--bg-surface);
     color: var(--text-body);
   }
 
-  .${paneSelectedElementLinkClass}:hover {
+  .${paneSelectedElementLinkHook}:hover {
     border-color: var(--border-strong);
     background: var(--bg-hover);
   }
 
-  .${paneSelectionKindClass} {
+  .${paneSelectionKindHook} {
     background: var(--bg-sunken);
     color: var(--text-muted);
   }
 
-  .${paneNavRowIconClass} {
+  .${paneNavRowIconHook} {
     color: var(--text-muted);
   }
 
-  .${paneNavRowLabelClass} {
+  .${paneNavRowLabelHook} {
     color: var(--text-body);
   }
 
-  .${paneNavRowCountClass} {
+  .${paneNavRowCountHook} {
     background: var(--bg-sunken);
     color: var(--text-secondary);
   }
 
-  .${paneGhostLinkClass} {
+  .${paneGhostLinkHook} {
     background: transparent;
     color: var(--text-secondary);
   }
 
-  .${paneGhostLinkClass}:hover {
+  .${paneGhostLinkHook}:hover {
     background: var(--bg-hover);
     color: var(--text-strong);
   }

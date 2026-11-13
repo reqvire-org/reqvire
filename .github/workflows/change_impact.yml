@@ -65,23 +65,36 @@ jobs:
 
       - name: Ensure PR branch remains checked out
         run: |
-          git checkout ${{ github.event.issue.pull_request.head.ref }}
+          git checkout "$HEAD_REF"
          
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-              
-      - name: Build reqvirecli from source
-        run: |
-          cargo build --release
-          cp target/release/reqvire ./reqvire
+      - name: Set up Node for the Explorer build
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+
+      - name: Install Explorer dependencies
+        run: cd explorer && bun install --frozen-lockfile
+
+      - name: Build Explorer before embedding it in the CLI
+        run: cd explorer && bun run build
+
+      - name: Build Reqvire CLI from source
+        run: cargo build --release --locked --bin reqvire
 
 
       - name: Run Reqvire Impact (if triggered)
         if: contains(github.event.comment.body, '/reqvire impact')
         id: run_impact
         run: |
-          OUTPUT=$(./reqvire change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
+          OUTPUT=$(./target/release/reqvire change-impact --git-commit "$BASE_COMMIT" 2>&1 || echo "⚠️ reqvire impact failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -90,7 +103,7 @@ jobs:
         if: contains(github.event.comment.body, '/reqvire traces')
         id: run_traces
         run: |
-          OUTPUT=$(./reqvire traces 2>&1 || echo "⚠️ reqvire traces failed.")
+          OUTPUT=$(./target/release/reqvire traces 2>&1 || echo "⚠️ reqvire traces failed.")
           echo "REQVIRE_OUTPUT<<EOF" >> $GITHUB_ENV
           echo "$OUTPUT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

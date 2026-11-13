@@ -43,6 +43,7 @@ const verticalUX = css`
     bottom: 0;
     left: 50%;
     width: var(--border-w);
+    max-width: 100%;
     transform: translateX(-50%);
   }
 `;

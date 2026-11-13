@@ -193,19 +193,21 @@ const linkSkinX = css`
   }
 `;
 
+// Each tone/size is one class composition (skin + public hook), so every
+// rendered state can be established without multiplying independent lookups.
 const toneSkinX: Record<ButtonTone, string> = {
-  primary: primarySkinX,
-  accent: accentSkinX,
-  secondary: secondarySkinX,
-  ghost: ghostSkinX,
-  danger: dangerSkinX,
-  link: linkSkinX,
+  primary: cx(primarySkinX, BUTTON_TONE_CLASSES.primary),
+  accent: cx(accentSkinX, BUTTON_TONE_CLASSES.accent),
+  secondary: cx(secondarySkinX, BUTTON_TONE_CLASSES.secondary),
+  ghost: cx(ghostSkinX, BUTTON_TONE_CLASSES.ghost),
+  danger: cx(dangerSkinX, BUTTON_TONE_CLASSES.danger),
+  link: cx(linkSkinX, BUTTON_TONE_CLASSES.link),
 };
 
 const sizeUX: Record<ButtonSize, string> = {
-  sm: smUX,
-  md: "",
-  lg: lgUX,
+  sm: cx(smUX, BUTTON_SIZE_CLASSES.sm),
+  md: BUTTON_SIZE_CLASSES.md,
+  lg: cx(lgUX, BUTTON_SIZE_CLASSES.lg),
 };
 
 export function Button({
@@ -227,9 +229,7 @@ export function Button({
         "ds-btn",
         baseUX,
         toneSkinX[tone],
-        BUTTON_TONE_CLASSES[tone],
         sizeUX[size],
-        BUTTON_SIZE_CLASSES[size],
         block ? "ds-btn--block" : "",
         className,
       )}

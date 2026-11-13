@@ -34,6 +34,7 @@ const baseUX = css`
 
   .ds-search__icon svg {
     width: var(--ds-search-icon-sz, var(--icon-sm));
+    max-width: 100%;
     height: var(--ds-search-icon-sz, var(--icon-sm));
   }
 

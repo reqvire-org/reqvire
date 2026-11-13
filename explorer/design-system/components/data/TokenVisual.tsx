@@ -34,6 +34,7 @@ export interface SegmentedMeterProps extends Omit<(HTMLAttributes<HTMLDivElement
 const tokenSwatchUX = css`
   display: inline-flex;
   width: var(--ds-token-swatch-size, var(--space-6));
+  max-width: 100%;
   height: var(--ds-token-swatch-size, var(--space-6));
   flex: none;
   border-radius: var(--ds-token-swatch-radius, var(--radius-xs));
@@ -234,10 +235,14 @@ const colorTokenSkinX = css`
 
 const donutUX = css`
   display: grid;
+  /* One explicit cell (the implicit auto track it replaces): ring and label stack in it. */
+  grid-template-columns: auto;
+  grid-template-rows: auto;
   place-items: center;
 
   .ds-donut__svg {
-    grid-area: 1 / 1;
+    grid-column: 1;
+    grid-row: 1;
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
@@ -257,7 +262,8 @@ const donutUX = css`
   }
 
   .ds-donut__content {
-    grid-area: 1 / 1;
+    grid-column: 1;
+    grid-row: 1;
     z-index: var(--z-local-base);
   }
 `;

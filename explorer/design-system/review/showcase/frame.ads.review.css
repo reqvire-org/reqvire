@@ -1,0 +1,419 @@
+/* Reqvire demonstration arrangements for scenarios. Generic page, section,
+   row, column and label framing comes from ADS (previewFrameClasses). These
+   classes style only the demo scaffold, never rendered components or patterns.
+   Raw finite sizes size demonstrations only. */
+
+.ux-showcase-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+/* Scenario titles are single long component names. */
+.ux-showcase-page h1 {
+  overflow-wrap: anywhere;
+}
+
+.ux-showcase-control-list {
+  display: flex;
+  width: min(100%, var(--space-workspace-crumb-wide-max-w));
+  flex-direction: column;
+  gap: var(--stack-gap-compact);
+}
+
+.ux-showcase-input-demo--md {
+  width: 100%;
+  max-width: var(--space-file-path-max-w);
+}
+
+.ux-showcase-input-demo--lg {
+  width: 100%;
+  max-width: 480px;
+}
+
+.ux-showcase-card-demo {
+  width: 200px;
+}
+
+.ux-showcase-card-demo__title {
+  color: var(--text-body);
+  font-size: var(--text-sm);
+}
+
+.ux-showcase-card-demo__desc {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+.ux-showcase-modal-copy {
+  color: var(--text-body);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.ux-showcase-modal-footer-spacer {
+  flex: 1;
+}
+
+.ux-showcase-canvas {
+  padding: var(--space-10);
+  background: var(--bg-surface);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+/* ---- Icon grid -------------------------------------------------- */
+
+.ux-showcase-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--space-file-row-card-min-h), 1fr));
+  gap: var(--space-2);
+}
+
+.ux-showcase-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: default;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+
+.ux-showcase-icon-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-strong);
+}
+
+/* ---- Navigation demos ------------------------------------------- */
+
+.ux-showcase-tree-demo {
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  flex-direction: column;
+  gap: var(--stack-gap-compact);
+  padding: var(--space-8);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-sidebar-demo {
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ux-showcase-sidebar-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.ux-showcase-stat-line {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ux-showcase-stat-line strong {
+  color: var(--text-strong);
+}
+
+.ux-showcase-muted-note {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-style: italic;
+}
+
+.ux-showcase-table-strong {
+  color: var(--text-strong);
+  font-weight: var(--weight-medium);
+}
+
+.ux-showcase-status {
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+}
+
+.ux-showcase-status--ready {
+  color: var(--success-text);
+}
+
+/* ---- Product pattern demos -------------------------------------- */
+
+.ux-showcase-shell-demo {
+  position: relative;
+  height: min(680px, calc(100vh - var(--space-24)));
+  min-height: 560px;
+  overflow: hidden;
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-canvas);
+}
+
+.ux-showcase-shell-demo__app {
+  --ux-left-pane-width: var(--space-left-pane-width-2);
+  --ux-current-right-width: var(--space-current-right-width);
+}
+
+.ux-showcase-shell-visually-hidden {
+  position: absolute;
+  width: var(--border-w);
+  height: var(--border-w);
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.ux-showcase-shell-nav-placeholder,
+.ux-showcase-shell-badge-placeholder {
+  display: inline-block;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+}
+
+.ux-showcase-shell-nav-placeholder {
+  width: var(--space-24);
+  height: var(--space-4);
+}
+
+.ux-showcase-shell-nav-placeholder--medium {
+  width: var(--space-14);
+}
+
+.ux-showcase-shell-nav-placeholder--wide {
+  width: var(--space-32);
+}
+
+.ux-showcase-shell-badge-placeholder {
+  width: var(--space-8);
+  height: var(--space-4);
+}
+
+.ux-showcase-pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-10);
+  align-items: start;
+}
+
+.ux-showcase-pattern-grid--two {
+  grid-template-columns: repeat(auto-fit, minmax(var(--space-graph-side-panel-max-h), 1fr));
+}
+
+.ux-showcase-pattern-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-8);
+  overflow: hidden;
+  padding: var(--space-10);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-pattern-card--tall {
+  min-height: 560px;
+}
+
+.ux-showcase-pattern-card--notice {
+  min-height: var(--space-file-path-max-w);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.ux-showcase-pattern-card__body {
+  position: relative;
+  display: flex;
+  min-height: var(--space-24);
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-10);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+}
+
+.ux-showcase-pattern-muted {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.ux-showcase-pattern-toolbar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.ux-showcase-shell-main-mock {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--space-10);
+  overflow: auto;
+  padding: var(--space-12);
+}
+
+.ux-showcase-shell-pane-mock {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: var(--space-10);
+}
+
+.ux-showcase-shell-workspace-header {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.ux-showcase-shell-placeholder-stack,
+.ux-showcase-shell-placeholder-group {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ux-showcase-shell-placeholder {
+  min-width: 0;
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+}
+
+.ux-showcase-shell-placeholder--search {
+  height: var(--control-height-md);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-placeholder--heading {
+  width: 44%;
+  height: var(--space-5);
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: var(--bg-sunken);
+}
+
+.ux-showcase-shell-placeholder--row {
+  width: 100%;
+  height: var(--space-12);
+}
+
+.ux-showcase-shell-placeholder--short {
+  width: 72%;
+}
+
+.ux-showcase-shell-placeholder--tile {
+  height: var(--space-20);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-placeholder--icon {
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--accent-subtle);
+}
+
+.ux-showcase-shell-placeholder--title {
+  width: 58%;
+  height: var(--space-10);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-placeholder--subtitle {
+  width: 78%;
+  height: var(--space-7);
+}
+
+.ux-showcase-shell-placeholder--action {
+  width: var(--space-32);
+  height: var(--control-height-sm);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-6);
+}
+
+.ux-showcase-shell-placeholder--stat {
+  min-height: calc(var(--space-20) + var(--space-8));
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.74fr);
+  gap: var(--space-8);
+  align-items: stretch;
+  min-height: var(--space-workspace-crumb-wide-max-w);
+  padding: var(--space-12);
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+}
+
+.ux-showcase-shell-placeholder--panel {
+  min-height: 100%;
+  background: var(--bg-sunken);
+}
+
+.ux-showcase-shell-placeholder--panel-accent {
+  background: var(--accent-subtle);
+}
+
+.ux-showcase-shell-detail-rail {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-10);
+  overflow: auto;
+  padding: var(--space-10);
+  border-left: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+@media (max-width: 720px) {
+  /* The demo keeps all three panes: a phone scrolls the frame across them. */
+  .ux-showcase-shell-demo {
+    min-height: 620px;
+    overflow-x: auto;
+  }
+
+  .ux-showcase-shell-demo__app {
+    min-width: calc(var(--space-left-pane-width-2) + var(--space-current-right-width) + 320px);
+  }
+
+  .ux-showcase-pattern-grid--two {
+    grid-template-columns: 1fr;
+  }
+
+  .ux-showcase-shell-board {
+    grid-template-columns: 1fr;
+  }
+}

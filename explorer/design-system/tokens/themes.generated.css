@@ -106,9 +106,6 @@
   --color-role-semantic-contract-ink: var(--ads-if-light, var(--color-role-semantic-contract-ink-light))var(--ads-if-dark, var(--color-role-semantic-contract-ink-dark));
   --color-role-verification-ink: var(--ads-if-light, var(--color-role-verification-ink-light))var(--ads-if-dark, var(--color-role-verification-ink-dark));
   --color-role-verification-objective-ink: var(--ads-if-light, var(--color-role-verification-objective-ink-light))var(--ads-if-dark, var(--color-role-verification-objective-ink-dark));
-  --color-showcase-border: var(--ads-if-light, var(--color-showcase-border-light))var(--ads-if-dark, var(--color-showcase-border-dark));
-  --color-showcase-canvas: var(--ads-if-light, var(--color-showcase-canvas-light))var(--ads-if-dark, var(--color-showcase-canvas-dark));
-  --color-showcase-ink: var(--ads-if-light, var(--color-showcase-ink-light))var(--ads-if-dark, var(--color-showcase-ink-dark));
   --focus-ring: var(--ads-if-light, var(--focus-ring-light))var(--ads-if-dark, var(--focus-ring-dark));
   --info: var(--ads-if-light, var(--info-light))var(--ads-if-dark, var(--info-dark));
   --info-fg: var(--ads-if-light, var(--info-fg-light))var(--ads-if-dark, var(--info-fg-dark));

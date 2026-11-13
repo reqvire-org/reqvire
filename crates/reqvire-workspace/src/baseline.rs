@@ -43,8 +43,30 @@ fn relative(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-/// Read Git objects directly: no checkout, filters, index, ref updates or fetch.
-pub fn tree(directory: &Path, commit: &str) -> Result<BTreeMap<PathBuf, Arc<Vec<u8>>>, Error> {
+/// A Git inventory retains symlink declarations until a consumer reads a source.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Tree {
+    files: BTreeMap<PathBuf, Arc<Vec<u8>>>,
+    links: BTreeSet<PathBuf>,
+}
+impl Tree {
+    /// Resolve only the requested source, inside this repository's own tree.
+    /// Missing paths and directory targets have no file contents.
+    pub fn read(&self, path: &Path) -> Result<Option<Arc<Vec<u8>>>, Error> {
+        if !path.as_os_str().is_empty() {
+            relative(path)?;
+        }
+        link_contents(path, &self.files, &self.links, &mut BTreeSet::new())
+    }
+
+    fn link_ancestor(&self, path: &Path) -> bool {
+        path.ancestors()
+            .any(|ancestor| self.links.contains(ancestor))
+    }
+}
+
+/// Read Git objects directly: no checkout, link resolution, index updates or fetch.
+pub fn tree(directory: &Path, commit: &str) -> Result<Tree, Error> {
     let mut reader =
         crate::git::GitReader::new(directory, |args, input| run_local(directory, args, input));
     let entries = reader.files_at_commit(commit)?;
@@ -61,21 +83,7 @@ pub fn tree(directory: &Path, commit: &str) -> Result<BTreeMap<PathBuf, Arc<Vec<
         }
         files.insert(path, entry.bytes);
     }
-    let resolved = links
-        .iter()
-        .map(|path| {
-            link_contents(path, &files, &links, &mut BTreeSet::new())
-                .map(|bytes| (path.clone(), bytes))
-        })
-        .collect::<Result<Vec<_>, _>>()?;
-    for (path, bytes) in resolved {
-        if let Some(bytes) = bytes {
-            files.insert(path, bytes);
-        } else {
-            files.remove(&path);
-        } // Directory symlinks are not file sources.
-    }
-    Ok(files)
+    Ok(Tree { files, links })
 }
 
 fn link_contents(
@@ -100,16 +108,7 @@ fn link_contents(
             let suffix = path.strip_prefix(parent).expect("source ancestor");
             return link_contents(&target.join(suffix), files, links, visiting);
         }
-        if files
-            .keys()
-            .any(|file| file != path && file.starts_with(path))
-        {
-            return Ok(None);
-        }
-        return Err(failure(format!(
-            "Unavailable historical symlink target: {}",
-            path.display()
-        )));
+        return Ok(None);
     };
     if !links.contains(path) {
         return Ok(Some(Arc::clone(bytes)));
@@ -126,6 +125,12 @@ fn link_contents(
 fn link_target(path: &Path, bytes: &[u8]) -> Result<PathBuf, Error> {
     let target = std::str::from_utf8(bytes)
         .map_err(|e| failure(format!("Historical symlink {}: {e}", path.display())))?;
+    if target.is_empty() || target.contains('\0') {
+        return Err(failure(format!(
+            "Invalid historical symlink target: {}",
+            path.display()
+        )));
+    }
     let mut resolved = PathBuf::new();
     for component in path
         .parent()
@@ -219,9 +224,42 @@ pub fn project_objects(
     Err(failure(format!("repo_impact_base_unavailable: project {} ({}) revision {} is unavailable locally; no fetch was attempted",project.name,project.path.display(),project.revision)))
 }
 
+/// Read-only historical sources with the same visible inventory as the model
+/// snapshot. Link targets are looked up only in their owning repository.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Sources {
+    files: Arc<BTreeMap<PathBuf, Arc<Vec<u8>>>>,
+    repositories: BTreeMap<PathBuf, Tree>,
+}
+impl Sources {
+    pub fn read(&self, path: &Path) -> Result<Option<Arc<Vec<u8>>>, Error> {
+        let Some((owner, tree)) = self
+            .repositories
+            .iter()
+            .filter(|(owner, _)| path.starts_with(owner))
+            .max_by_key(|(owner, _)| owner.components().count())
+        else {
+            return Ok(None);
+        };
+        let relative = path.strip_prefix(owner).expect("owning repository");
+        // A consumer can read through a visible directory alias, but cannot
+        // access unselected administration or paths outside the effective root.
+        if !self.files.contains_key(path)
+            && !relative.ancestors().skip(1).any(|ancestor| {
+                tree.links.contains(ancestor) && self.files.contains_key(&owner.join(ancestor))
+            })
+        {
+            return Ok(None);
+        }
+        tree.read(relative)
+    }
+}
+
 pub struct Baseline {
     pub composition: WorkspaceComposition,
-    pub files: BTreeMap<PathBuf, Arc<Vec<u8>>>,
+    /// Raw entries for discovery; use sources.read() for actual file contents.
+    pub files: Arc<BTreeMap<PathBuf, Arc<Vec<u8>>>>,
+    pub sources: Sources,
 }
 pub fn read(
     root: &Path,
@@ -247,21 +285,56 @@ pub fn read(
     let prefix = root
         .strip_prefix(&owner)
         .map_err(|e| failure(e.to_string()))?;
-    let central_files: BTreeMap<_, _> = tree(&owner, &central)?
-        .into_iter()
-        .filter_map(|(p, b)| p.strip_prefix(prefix).ok().map(|p| (p.to_owned(), b)))
+    let central_tree = tree(&owner, &central)?;
+    let central_files: BTreeMap<_, _> = central_tree
+        .files
+        .iter()
+        .filter_map(|(p, b)| {
+            p.strip_prefix(prefix)
+                .ok()
+                .map(|p| (p.to_owned(), Arc::clone(b)))
+        })
         .collect();
     let temporary = crate::paths::temporary_directory()?;
     let staged = temporary.path();
-    materialize(staged, &central_files)?;
-    let mut base = if central_files.contains_key(&current.manifest) {
-        resolve_native(staged, current.manifest.clone())?
+    let native_manifest = if central_files.contains_key(&current.manifest)
+        || central_tree.link_ancestor(&prefix.join(&current.manifest))
+    {
+        Some(current.manifest.clone())
     } else if central_files.contains_key(Path::new(crate::manifest::MANIFEST)) {
-        resolve_native(staged, crate::manifest::MANIFEST.into())?
+        Some(PathBuf::from(crate::manifest::MANIFEST))
     } else {
+        None
+    };
+    let mut base = if let Some(manifest) = native_manifest {
+        // Select from raw entries before staging: a broken manifest must not
+        // disappear and turn an invalid composition into a single repository.
+        if central_tree.link_ancestor(&prefix.join(&manifest)) {
+            return Err(failure(format!(
+                "repo_impact_manifest_history_unavailable: Manifest symlink is not allowed: {}",
+                manifest.display()
+            )));
+        }
+        materialize(
+            staged,
+            &BTreeMap::from([(manifest.clone(), Arc::clone(&central_files[&manifest]))]),
+        )?;
+        resolve_native(staged, manifest)?
+    } else {
+        // Only regular XML can select legacy sources. Includes remain strict:
+        // an unavailable or symlinked required include fails the legacy reader.
+        let xml_files: BTreeMap<_, _> = central_files
+            .iter()
+            .filter(|(path, _)| {
+                path.extension().is_some_and(|e| e == "xml")
+                    && !central_tree.links.contains(&prefix.join(path))
+            })
+            .map(|(path, bytes)| (path.clone(), Arc::clone(bytes)))
+            .collect();
+        materialize(staged, &xml_files)?;
         let mut candidates = BTreeSet::new();
         let mut included = BTreeSet::new();
-        for (path, bytes) in &central_files {
+        for (path, bytes) in &xml_files {
             if path.extension().is_some_and(|e| e == "xml") {
                 if let Ok(text) = std::str::from_utf8(bytes) {
                     if let Ok(tags) = crate::legacy::tags(text) {
@@ -288,6 +361,7 @@ pub fn read(
     };
     base.central_commit = central;
     base.central_repository = current.central_repository.clone();
+    let mut repositories = BTreeMap::from([(owner.clone(), central_tree)]);
     let mut files = BTreeMap::new();
     for (path, bytes) in central_files {
         if !path.starts_with(".repo") && !base.projects.iter().any(|p| path.starts_with(&p.path)) {
@@ -306,13 +380,21 @@ pub fn read(
                 project.path.display()
             )));
         }
-        for (path, bytes) in tree(&objects, &project.commit)? {
-            files.insert(root.join(&project.path).join(path), bytes);
+        let project_root = root.join(&project.path);
+        let project_tree = tree(&objects, &project.commit)?;
+        for (path, bytes) in &project_tree.files {
+            files.insert(project_root.join(path), Arc::clone(bytes));
         }
+        repositories.insert(project_root, project_tree);
     }
+    let files = Arc::new(files);
     Ok(Baseline {
         composition: base,
-        files,
+        files: Arc::clone(&files),
+        sources: Sources {
+            files,
+            repositories,
+        },
     })
 }
 fn resolve_native(root: &Path, manifest: PathBuf) -> Result<WorkspaceComposition, Error> {
@@ -360,8 +442,19 @@ mod tests {
         );
         std::fs::write(root.join(path), b"live bytes").expect("uncommitted edit");
         let files = tree(root, &head).expect("read historical objects");
-        assert_eq!(files[path].as_slice(), original);
-        assert!(files[Path::new("empty.txt")].is_empty());
+        assert_eq!(
+            files
+                .read(path)
+                .expect("historical read")
+                .expect("file source")
+                .as_slice(),
+            original
+        );
+        assert!(files
+            .read(Path::new("empty.txt"))
+            .expect("historical source lookup")
+            .expect("historical source lookup")
+            .is_empty());
         assert_eq!(
             std::fs::read(root.join(path)).expect("live source"),
             b"live bytes"
@@ -425,6 +518,10 @@ mod tests {
         symlink(".", root.join("directory-link")).expect("directory symlink fixture");
         symlink("directory-link/data.bin", root.join("chained-alias.bin"))
             .expect("symlink through directory fixture");
+        symlink("missing", root.join("unused-link")).expect("dangling fixture");
+        symlink("../outside", root.join("unused-escape")).expect("external fixture");
+        symlink("cycle-b", root.join("cycle-a")).expect("cycle fixture");
+        symlink("cycle-a", root.join("cycle-b")).expect("cycle fixture");
         git(root, &["add", "."]).expect("stage fixture");
         git(
             root,
@@ -442,11 +539,33 @@ mod tests {
         )
         .expect("commit fixture");
         let historical = tree(root, "HEAD").expect("historical symlink");
-        assert!(!historical.contains_key(Path::new("directory-link")));
+        assert!(historical.files.contains_key(Path::new("directory-link")));
+        assert!(historical.files.contains_key(Path::new("unused-link")));
+        assert!(historical
+            .read(Path::new("directory-link"))
+            .expect("historical source lookup")
+            .is_none());
+        assert!(historical
+            .read(Path::new("unused-link"))
+            .expect("historical source lookup")
+            .is_none());
+        assert!(historical.read(Path::new("unused-escape")).is_err());
+        assert!(historical.read(Path::new("cycle-a")).is_err());
         assert_eq!(
-            historical[Path::new("chained-alias.bin")].as_slice(),
+            historical
+                .read(Path::new("chained-alias.bin"))
+                .expect("historical source lookup")
+                .expect("historical source lookup")
+                .as_slice(),
             b"owned data"
         );
-        assert_eq!(historical[Path::new("alias.bin")].as_slice(), b"owned data");
+        assert_eq!(
+            historical
+                .read(Path::new("alias.bin"))
+                .expect("historical source lookup")
+                .expect("historical source lookup")
+                .as_slice(),
+            b"owned data"
+        );
     }
 }

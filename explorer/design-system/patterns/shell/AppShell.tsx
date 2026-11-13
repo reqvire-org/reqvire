@@ -168,7 +168,8 @@ const headerBaseUX = css`
     display: grid;
     flex-basis: auto;
     grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: var(--app-header-height) var(--control-height-lg);
+    /* calc() makes each token a single track, so child row placement is checkable. */
+    grid-template-rows: calc(var(--app-header-height)) calc(var(--control-height-lg));
     height: auto;
   }
 

@@ -180,13 +180,6 @@
     --color-blue-11-dark: oklch(0.8539 0.07257 253.9);
     --color-blue-12-dark: oklch(0.955 0.0214 253.9);
 
-    --color-showcase-canvas-light: #fafafa;
-    --color-showcase-ink-light: #444444;
-    --color-showcase-border-light: #dddddd;
-    --color-showcase-canvas-dark: #181818;
-    --color-showcase-ink-dark: #dddddd;
-    --color-showcase-border-dark: #444444;
-
     /* Fixed in every theme: ink for shadows and labels on light fills, paper for glyphs on
        colored fills. */
     --color-ink: #0d1119;

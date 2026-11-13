@@ -44,8 +44,9 @@ const baseUX = css`
   .ds-treeitem__twist {
     display: inline-flex;
     width: var(--ds-treeitem-twist-w, var(--space-7));
+    max-width: 100%;
     height: var(--icon-sm);
-    flex: 0 0 var(--ds-treeitem-twist-w, var(--space-7));
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     color: var(--ds-treeitem-twist-color, var(--text-faint));
@@ -53,8 +54,8 @@ const baseUX = css`
   }
 
   .ds-treeitem__twist svg {
-    width: var(--ds-treeitem-twist-icon-size, var(--space-6));
-    height: var(--ds-treeitem-twist-icon-size, var(--space-6));
+    width: var(--space-6);
+    height: var(--space-6);
   }
 
   &.is-open > .ds-treeitem__twist {

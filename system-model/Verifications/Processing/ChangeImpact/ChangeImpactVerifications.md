@@ -324,6 +324,16 @@ Verify complete baseline composition reconstruction and read isolation using rea
 - Accepted pending changes remain current inputs even after external working-file drift. Preserve existing ambiguous-source rejection, baseline policy and standalone/embedded outcomes.
 - Convert format-specific fixture setup while retaining existing PASS/failure expectations. Inspect retained logs and JSON for failures; do not skip comparisons, weaken source-state checks or construct partial baselines.
 
+- Separately commit tools/dev/node_modules pointing to ../../server/node_modules in the root repository and a pinned component, with the target absent from the historical Git tree. Require the comparison without this incidental link to pass the complete graph and provenance assertions first. After introducing the link, require current validation and historical change-impact to succeed with the same graph/provenance checks and unchanged repository source state.
+- Repeat both locations with tools/dev/ excluded by the owning repository's root .gitignore, and with the corresponding workspace-relative tools/dev/** path excluded by .reqvireignore. Force-stage the symlink and a duplicate managed element in the excluded directory. Current validation must pass, proving that exclusions apply to tracked model candidates; historical reconstruction must not require the incidental link target.
+
+Run the six dangling_* cases through REQVIRE_REPO_CHECKS=impact REQVIRE_BIN="$PWD/target/debug/reqvire" ./tests/run_tests.sh test-mcp-repo-workspaces.
+
+- Include cyclic Markdown symlinks inside the ignored directories; source exclusions must prevent their resolution. Reading an eligible model through a file alias and a directory alias must preserve its complete historical graph and provenance.
+- A committed unavailable native manifest must fail with repo_impact_manifest_history_unavailable instead of silently yielding an empty composition. Selected model-source cycles and repository escapes must fail explicitly. A cycle encountered through an evidence reference must remain fatal when historical graph validation retries in lenient mode.
+
+The source_alias, required_manifest, selected_cycle, selected_escape and selected_evidence cases exercise these positive and negative checks in the same change-impact suite.
+
 #### Metadata
   * type: test-verification
 

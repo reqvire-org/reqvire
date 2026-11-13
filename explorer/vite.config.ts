@@ -1,7 +1,8 @@
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import wyw from "@wyw-in-js/vite";
 import { linariaTagResolver } from "@reqvire-org/ads/linaria";
+import { developmentImportGuard } from "@reqvire-org/ads/scenarios/vite";
 import { preactAliases, preactRuntimeGuard } from "./preact.config";
 import { assetMergePlugin } from "./design-system/vite.assetMerge";
 
@@ -18,6 +19,9 @@ export default defineConfig({
   base: "./",
   esbuild: { jsx: "automatic", jsxImportSource: "preact" },
   plugins: [
+    // Rejects drafts, .ads.* development modules/styles and the preview API in the app build.
+    // ADS types this plugin with its own private Vite copy; the plugin API is compatible.
+    developmentImportGuard() as Plugin,
     preactRuntimeGuard(),
     assetMergePlugin({
       dsAssetsDir: path.resolve(__dirname, "design-system/assets"),
@@ -35,7 +39,7 @@ export default defineConfig({
     dedupe: ["preact"],
     alias: [
       ...preactAliases,
-      { find: "@ds/review", replacement: path.resolve(__dirname, "./design-system/review/index.ts") },
+      { find: "@ds/review", replacement: path.resolve(__dirname, "./design-system/review/index.ads.review.ts") },
       { find: "@ds", replacement: path.resolve(__dirname, "./design-system/index.ts") },
       { find: "@", replacement: path.resolve(__dirname, "./src") },
     ],

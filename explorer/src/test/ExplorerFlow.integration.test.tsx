@@ -361,14 +361,18 @@ describe("Explorer flow integration", () => {
     const flow = screen.getByRole("region", { name: "Model flow" });
     expect(within(flow).getByRole("heading", { name: "Ontology Construct Classification" })).toBeTruthy();
     await waitFor(() => expect(within(flow).queryByRole("article", { name: "Property Projection" })).toBeNull());
-    expect(within(flow).getByRole("button", { name: "Downstream" }).getAttribute("aria-pressed")).toBe("true");
+    expect(within(flow).getByRole("button", { name: "Upstream" }).getAttribute("aria-pressed")).toBe("true");
+    expect(within(flow).getByRole("button", { name: "Top to bottom" }).getAttribute("aria-pressed")).toBe("true");
     for (const name of ["Downstream", "Upstream", "Left to right", "Top to bottom"]) {
       const control = within(flow).getByRole("button", { name });
       expect(control.textContent).toBe("");
       expect(control.getAttribute("title")).toBe(name);
       expect(control.querySelector("svg")).not.toBeNull();
     }
-    expect(within(flow).queryByRole("article", { name: "Ontology Exploration" })).toBeNull();
+    expect(within(flow).getByRole("article", { name: "Ontology Exploration" })).toBeTruthy();
+    expect(within(flow).queryByRole("article", { name: "O-Kernel Ontology Classification Unit Test Verification" })).toBeNull();
+    fireEvent.click(within(flow).getByRole("button", { name: "Downstream" }));
+    await waitFor(() => expect(within(flow).queryByRole("article", { name: "Ontology Exploration" })).toBeNull());
     expect(within(flow).getByRole("article", { name: "O-Kernel Ontology Classification Unit Test Verification" })).toBeTruthy();
     fireEvent.click(within(flow).getByRole("button", { name: "Left to right" }));
     fireEvent.click(within(flow).getByRole("button", { name: "Upstream" }));

@@ -6,6 +6,13 @@ set -uo pipefail
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 status=0
 
+if [[ "${REQVIRE_REPO_CHECKS:-all}" == impact ]]; then
+    source "$TEST_SCRIPT_DIR/check_change_impact.sh"
+    run_impact_cases
+    diff -u "$TEST_SCRIPT_DIR/expected/impact-checks.txt" "$TEST_DIR/output/impact-checks.txt" || status=1
+    exit "$status"
+fi
+
 if [[ "${REQVIRE_REPO_CHECKS:-all}" == composition ]]; then
     source "$TEST_SCRIPT_DIR/check_composition.sh"
     run_composition_cases
