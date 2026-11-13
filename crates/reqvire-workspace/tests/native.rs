@@ -479,3 +479,94 @@ fn xml_to_native_migration_preserves_linked_git_directory_and_supports_old_basel
     });
     assert!(!repeated.changed);
 }
+
+#[cfg(unix)]
+#[test]
+fn baseline_inventory_preserves_links_and_required_manifest_entries() {
+    use std::os::unix::fs::symlink;
+    let f = Fixture::new(true);
+    symlink("missing", f.root.join("unselected-link")).unwrap();
+    let base = commit(&f.root, "Unselected dangling link");
+    let current = WorkspaceComposition::load(&f.root, MANIFEST.into()).unwrap();
+    let baseline = baseline::read(&f.root, &current, &base).unwrap();
+    assert_eq!(
+        baseline.files[&f.root.join("unselected-link")].as_slice(),
+        b"missing"
+    );
+    assert!(baseline
+        .sources
+        .read(&f.root.join("unselected-link"))
+        .unwrap()
+        .is_none());
+    assert_eq!(baseline.composition.projects.len(), 1);
+
+    let manifest = f.bytes();
+    fs::remove_file(f.root.join(MANIFEST)).unwrap();
+    symlink("missing.toml", f.root.join(MANIFEST)).unwrap();
+    let broken = commit(&f.root, "Unavailable historical manifest");
+    fs::remove_file(f.root.join(MANIFEST)).unwrap();
+    fs::write(f.root.join(MANIFEST), manifest).unwrap();
+    commit(&f.root, "Valid current manifest");
+    let error = baseline::read(&f.root, &current, &broken)
+        .err()
+        .expect("reject unavailable selection")
+        .to_string();
+    assert!(
+        error.contains("repo_impact_manifest_history_unavailable"),
+        "{error}"
+    );
+    assert!(error.contains(MANIFEST), "{error}");
+}
+
+#[cfg(unix)]
+#[test]
+fn historical_reads_use_only_the_selected_owning_repository() {
+    use std::os::unix::fs::symlink;
+    let f = Fixture::new(true);
+    let component = f.component();
+    symlink("code.txt", component.join("alias.txt")).unwrap();
+    symlink("../../root.txt", component.join("outside.txt")).unwrap();
+    command(&component, &["config", "user.name", "Workspace Test"]);
+    command(
+        &component,
+        &["config", "user.email", "workspace@example.invalid"],
+    );
+    let pin = commit(&component, "Component source aliases");
+    fs::write(
+        f.root.join(MANIFEST),
+        String::from_utf8(f.bytes()).unwrap().replace(&f.a, &pin),
+    )
+    .unwrap();
+    fs::write(f.root.join("root.txt"), b"root bytes").unwrap();
+    symlink("untracked.txt", f.root.join("untracked-alias.txt")).unwrap();
+    symlink("external/site/code.txt", f.root.join("component-alias.txt")).unwrap();
+    let base = commit(&f.root, "Root source aliases");
+    let current = WorkspaceComposition::load(&f.root, MANIFEST.into()).unwrap();
+    fs::write(f.root.join("untracked.txt"), b"live bytes").unwrap();
+    let baseline = baseline::read(&f.root, &current, &base).unwrap();
+    assert_eq!(
+        baseline
+            .sources
+            .read(&component.join("alias.txt"))
+            .unwrap()
+            .unwrap()
+            .as_slice(),
+        b"A\n"
+    );
+    assert!(baseline
+        .sources
+        .read(&f.root.join("untracked-alias.txt"))
+        .unwrap()
+        .is_none());
+    assert!(baseline
+        .sources
+        .read(&f.root.join("component-alias.txt"))
+        .unwrap()
+        .is_none());
+    let error = baseline
+        .sources
+        .read(&component.join("outside.txt"))
+        .unwrap_err()
+        .to_string();
+    assert!(error.contains("escapes its repository"), "{error}");
+}

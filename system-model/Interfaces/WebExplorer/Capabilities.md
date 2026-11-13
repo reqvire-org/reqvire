@@ -362,7 +362,7 @@ Implementation details shall follow the associated contract specifications.
   * satisfiedBy: [model.rs](../../../crates/reqvire-core/src/report/model.rs)
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/patterns/reports/TraceFlow.tsx)
   * satisfiedBy: [ModelView.tsx](../../../explorer/src/views/ModelView.tsx)
-  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/design-system/patterns/reports/flowLayout.worker.ts)
   * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
   * verifiedBy: [Model View Element Navigation Test](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#model-view-element-navigation-test)
 ---
@@ -777,7 +777,7 @@ When a verification is selected in served or exported Explorer Traces, the syste
   * satisfiedBy: [TraceFlow.tsx](../../../explorer/design-system/patterns/reports/TraceFlow.tsx)
   * satisfiedBy: [traceFlow.ts](../../../explorer/src/lib/traceFlow.ts)
   * satisfiedBy: [ReportViews.tsx](../../../explorer/src/views/ReportViews.tsx)
-  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/src/workers/flowLayout.worker.ts)
+  * satisfiedBy: [flowLayout.worker.ts](../../../explorer/design-system/patterns/reports/flowLayout.worker.ts)
   * satisfiedBy: [flowLayoutEngine.ts](../../../explorer/src/workers/flowLayoutEngine.ts)
   * verifiedBy: [SPA Explorer Store Contract Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
 ---
